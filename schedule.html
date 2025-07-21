@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAN121 - Network Essentials Class Schedule</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32, #4caf50);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            background-size: cover;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .semester-info {
+            font-size: 1rem;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .navigation-bar {
+            background: linear-gradient(90deg, #1b5e20, #2e7d32);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-button {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            min-width: 200px;
+        }
+
+        .dropdown-button:hover {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 280px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 1001;
+            border: 2px solid #2e7d32;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background: linear-gradient(90deg, #e8f5e8, #c8e6c9);
+            color: #1b5e20;
+            font-weight: 600;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-toggle {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .view-toggle:hover {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .progress-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid #2e7d32;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2e7d32, #4caf50, #66bb6a);
+            border-radius: 10px;
+            transition: width 1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .week-section {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #2e7d32;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e8f5e8, transparent);
+            border-radius: 0 0 0 100px;
+        }
+
+        .week-section.active {
+            display: block;
+            animation: fadeInSlide 0.5s ease;
+        }
+
+        @keyframes fadeInSlide {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .week-title {
+            color: #2e7d32;
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+
+        .week-dates {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .domain-banner {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .domain-banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" fill="white" opacity="0.1"><circle cx="10" cy="10" r="2"/><circle cx="30" cy="10" r="2"/><circle cx="50" cy="10" r="2"/><circle cx="70" cy="10" r="2"/><circle cx="90" cy="10" r="2"/></svg>');
+        }
+
+        .domain-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .domain-percentage {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            display: inline-block;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .topics-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .topics-title {
+            color: #2e7d32;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .topic-tag {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            color: #1b5e20;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #a5d6a7;
+        }
+
+        .assignments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .assignment-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assignment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #2e7d32, #4caf50);
+        }
+
+        .assignment-card:hover {
+            border-color: #4caf50;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .assignment-type {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .assignment-title {
+            color: #2e7d32;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .assignment-description {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .full-schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            margin-top: 1rem;
+        }
+
+        .full-schedule-table th,
+        .full-schedule-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .full-schedule-table th {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .full-schedule-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .full-schedule-table tr:hover {
+            background: linear-gradient(90deg, #e8f5e8, #f1f8e9);
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .week-indicator {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .status-indicator {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-upcoming { background-color: #fff3e0; color: #f57c00; }
+        .status-current { background-color: #e8f5e8; color: #2e7d32; }
+        .status-completed { background-color: #e3f2fd; color: #1976d2; }
+
+        .footer {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .nav-container { flex-direction: column; align-items: center; }
+            .week-header { flex-direction: column; text-align: center; }
+            .assignments-grid { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+            .week-section { padding: 1rem; }
+        }
+
+        .loading-spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #2e7d32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Network Essentials Class Schedule</h1>
+            <p class="subtitle">LAN121 - CompTIA Network+ N10-009 Preparation</p>
+            <div class="semester-info">Fall 2025 • Dr. John Sands • Saturdays Online</div>
+        </div>
+    </div>
+
+    <nav class="navigation-bar">
+        <div class="nav-container">
+            <div class="dropdown">
+                <button class="dropdown-button">Select Week ▼</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="showWeek(1)">Week 1 - Network Concepts (Aug 25)</a>
+                    <a href="#" onclick="showWeek(2)">Week 2 - Network Concepts Cont. (Sep 1)</a>
+                    <a href="#" onclick="showWeek(3)">Week 3 - Network Implementation (Sep 8)</a>
+                    <a href="#" onclick="showWeek(4)">Week 4 - Network Implementation Cont. (Sep 15)</a>
+                    <a href="#" onclick="showWeek(5)">Week 5 - Network Operations (Sep 22)</a>
+                    <a href="#" onclick="showWeek(6)">Week 6 - Network Security (Sep 29)</a>
+                    <a href="#" onclick="showWeek(7)">Week 7 - Network Troubleshooting (Oct 6)</a>
+                    <a href="#" onclick="showWeek(8)">Week 8 - Troubleshooting & Final (Oct 10)</a>
+                </div>
+            </div>
+            <button class="view-toggle" onclick="toggleFullSchedule()">View Full Schedule</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="progress-container">
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">Course Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">Course starts August 25, 2025</p>
+        </div>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Week 1 -->
+        <div id="week1" class="week-section active">
+            <div class="week-header">
+                <h2 class="week-title">Week 1</h2>
+                <div class="week-dates">August 25, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 1: Network Concepts</div>
+                <span class="domain-percentage">23% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">OSI Model</span>
+                    <span class="topic-tag">Network Devices</span>
+                    <span class="topic-tag">Cloud Concepts</span>
+                    <span class="topic-tag">Network Protocols</span>
+                    <span class="topic-tag">Physical Layer</span>
+                    <span class="topic-tag">Networking Concepts</span>
+                    <span class="topic-tag">IP Addressing</span>
+                    <span class="topic-tag">WAN Protocols</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 1 - OSI Activity</div>
+                    <div class="assignment-description">Hands-on exploration of the OSI model layers and their functions in network communication.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 2 -->
+        <div id="week2" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 2</h2>
+                <div class="week-dates">September 1, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 1: Network Concepts (Continued)</div>
+                <span class="domain-percentage">23% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Advanced Protocols</span>
+                    <span class="topic-tag">Physical Layer Details</span>
+                    <span class="topic-tag">Networking Concepts</span>
+                    <span class="topic-tag">Advanced Addressing</span>
+                    <span class="topic-tag">WAN Protocols</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 2 - Computer Math</div>
+                    <div class="assignment-description">Binary, hexadecimal, and subnet calculations essential for networking.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 1 - SOHO IPv4 Network</div>
+                    <div class="assignment-description">Configure a Small Office/Home Office IPv4 network with proper addressing.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Exam</div>
+                    <div class="assignment-title">Exam Domain 1</div>
+                    <div class="assignment-description">Comprehensive exam covering all Network Concepts topics.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 3 -->
+        <div id="week3" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 3</h2>
+                <div class="week-dates">September 8, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 2: Network Implementation</div>
+                <span class="domain-percentage">20% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Physical Layer</span>
+                    <span class="topic-tag">Data Link Layer</span>
+                    <span class="topic-tag">Switching</span>
+                    <span class="topic-tag">Wireless Networks</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 3</div>
+                    <div class="assignment-description">Practical exercises on physical and data link layer concepts.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 4</div>
+                    <div class="assignment-description">Switching and wireless network configuration activities.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 4 -->
+        <div id="week4" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 4</h2>
+                <div class="week-dates">September 15, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 2: Network Implementation (Continued)</div>
+                <span class="domain-percentage">20% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Network Layer</span>
+                    <span class="topic-tag">Routing Protocols</span>
+                    <span class="topic-tag">Router Configuration</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 2 - VLANs and Trunking</div>
+                    <div class="assignment-description">Configure Virtual LANs and trunk ports for network segmentation.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 5</div>
+                    <div class="assignment-description">Network layer and routing protocol exercises.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Exam</div>
+                    <div class="assignment-title">Exam Domain 2</div>
+                    <div class="assignment-description">Comprehensive exam on Network Implementation topics.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 5 -->
+        <div id="week5" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 5</h2>
+                <div class="week-dates">September 22, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 3: Network Operations</div>
+                <span class="domain-percentage">19% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Network Processes</span>
+                    <span class="topic-tag">Procedures</span>
+                    <span class="topic-tag">Network Monitoring</span>
+                    <span class="topic-tag">Disaster Recovery</span>
+                    <span class="topic-tag">Network Addressing</span>
+                    <span class="topic-tag">Network Management</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 3 - DHCP and NAT</div>
+                    <div class="assignment-description">Configure Dynamic Host Configuration Protocol and Network Address Translation.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 6</div>
+                    <div class="assignment-description">Network operations and management exercises.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Exam</div>
+                    <div class="assignment-title">Exam Domain 3</div>
+                    <div class="assignment-description">Comprehensive exam covering Network Operations.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 6 -->
+        <div id="week6" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 6</h2>
+                <div class="week-dates">September 29, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 4: Network Security</div>
+                <span class="domain-percentage">14% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Security Concepts</span>
+                    <span class="topic-tag">Network Attacks</span>
+                    <span class="topic-tag">Security Solutions</span>
+                    <span class="topic-tag">Firewalls</span>
+                    <span class="topic-tag">VPNs</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 4 - DNS, FTP, Email, HTTP/HTTPS</div>
+                    <div class="assignment-description">Configure and secure common network services and protocols.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 7</div>
+                    <div class="assignment-description">Network security implementation and threat analysis.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Exam</div>
+                    <div class="assignment-title">Exam Domain 4</div>
+                    <div class="assignment-description">Comprehensive exam on Network Security topics.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 7 -->
+        <div id="week7" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 7</h2>
+                <div class="week-dates">October 6, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 5: Network Troubleshooting</div>
+                <span class="domain-percentage">24% of Exam</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Troubleshooting Methodology</span>
+                    <span class="topic-tag">Physical Layer Issues</span>
+                    <span class="topic-tag">Data Link Layer Problems</span>
+                    <span class="topic-tag">Network Diagnostics</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 5 - Static and Dynamic IPv4 Routing</div>
+                    <div class="assignment-description">Configure and troubleshoot static and dynamic routing protocols.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Activity</div>
+                    <div class="assignment-title">Activity 8</div>
+                    <div class="assignment-description">Network troubleshooting scenarios and methodology practice.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Exam</div>
+                    <div class="assignment-title">Exam Domain 5</div>
+                    <div class="assignment-description">Comprehensive exam on Network Troubleshooting fundamentals.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 8 -->
+        <div id="week8" class="week-section">
+            <div class="week-header">
+                <h2 class="week-title">Week 8</h2>
+                <div class="week-dates">October 10, 2025</div>
+            </div>
+            
+            <div class="domain-banner">
+                <div class="domain-title">Domain 5: Network Troubleshooting (Continued) & Final Exam</div>
+                <span class="domain-percentage">24% of Exam + Final Assessment</span>
+            </div>
+
+            <div class="topics-section">
+                <h3 class="topics-title">📚 Topics Covered</h3>
+                <div class="topics-list">
+                    <span class="topic-tag">Network Layer Issues</span>
+                    <span class="topic-tag">Performance Problems</span>
+                    <span class="topic-tag">Protocol Troubleshooting</span>
+                    <span class="topic-tag">Comprehensive Review</span>
+                </div>
+            </div>
+
+            <h3 style="color: #2e7d32; margin-bottom: 1rem;">📋 Assignments Due</h3>
+            <div class="assignments-grid">
+                <div class="assignment-card">
+                    <div class="assignment-type">Lab</div>
+                    <div class="assignment-title">Lab 6 - Wireless Network</div>
+                    <div class="assignment-description">Configure and troubleshoot wireless network infrastructure and security.</div>
+                </div>
+                <div class="assignment-card">
+                    <div class="assignment-type">Final Exam</div>
+                    <div class="assignment-title">Final Exam</div>
+                    <div class="assignment-description">Comprehensive final exam covering all course domains. Mandatory attendance required.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Schedule View -->
+        <div id="fullSchedule" class="week-section" style="display: none;">
+            <div class="week-header">
+                <h2 class="week-title">Complete Course Schedule</h2>
+                <div class="week-dates">Fall 2025 - 8 Week Overview</div>
+            </div>
+            
+            <table class="full-schedule-table">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Date</th>
+                        <th>Domain & Topics</th>
+                        <th>Assignments</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="showWeek(1)">
+                        <td><span class="week-indicator">Week 1</span></td>
+                        <td>Aug 25, 2025</td>
+                        <td><strong>Domain 1: Network Concepts (23%)</strong><br>
+                            OSI Model, Devices, Cloud Concepts, Protocols, Physical Layer</td>
+                        <td>Activity 1 - OSI Activity</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(2)">
+                        <td><span class="week-indicator">Week 2</span></td>
+                        <td>Sep 1, 2025</td>
+                        <td><strong>Domain 1 Continued</strong><br>
+                            Advanced Protocols, Addressing, WAN Protocols</td>
+                        <td>Activity 2, Lab 1, Exam Domain 1</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(3)">
+                        <td><span class="week-indicator">Week 3</span></td>
+                        <td>Sep 8, 2025</td>
+                        <td><strong>Domain 2: Network Implementation (20%)</strong><br>
+                            Physical & Data Link Layers, Switching, Wireless</td>
+                        <td>Activity 3, Activity 4</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(4)">
+                        <td><span class="week-indicator">Week 4</span></td>
+                        <td>Sep 15, 2025</td>
+                        <td><strong>Domain 2 Continued</strong><br>
+                            Network Layer, Routing Protocols</td>
+                        <td>Lab 2, Activity 5, Exam Domain 2</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(5)">
+                        <td><span class="week-indicator">Week 5</span></td>
+                        <td>Sep 22, 2025</td>
+                        <td><strong>Domain 3: Network Operations (19%)</strong><br>
+                            Processes, Monitoring, DR, Network Management</td>
+                        <td>Lab 3, Activity 6, Exam Domain 3</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(6)">
+                        <td><span class="week-indicator">Week 6</span></td>
+                        <td>Sep 29, 2025</td>
+                        <td><strong>Domain 4: Network Security (14%)</strong><br>
+                            Security Concepts, Attacks, Solutions</td>
+                        <td>Lab 4, Activity 7, Exam Domain 4</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(7)">
+                        <td><span class="week-indicator">Week 7</span></td>
+                        <td>Oct 6, 2025</td>
+                        <td><strong>Domain 5: Network Troubleshooting (24%)</strong><br>
+                            Methodology, Physical & Data Link Issues</td>
+                        <td>Lab 5, Activity 8, Exam Domain 5</td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                    <tr onclick="showWeek(8)">
+                        <td><span class="week-indicator">Week 8</span></td>
+                        <td>Oct 10, 2025</td>
+                        <td><strong>Domain 5 Continued & Final</strong><br>
+                            Network Layer Issues, Performance, Final Review</td>
+                        <td>Lab 6, <strong>Final Exam</strong></td>
+                        <td><span class="status-indicator status-upcoming">Upcoming</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2e7d32;">
+                <h3 style="color: #2e7d32; margin-bottom: 1rem;">📊 Domain Breakdown Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <strong style="color: #2e7d32;">Domain 1</strong><br>
+                        Network Concepts<br>
+                        <span style="font-size: 1.2rem; font-weight: bold;">23%</span>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <strong style="color: #2e7d32;">Domain 2</strong><br>
+                        Network Implementation<br>
+                        <span style="font-size: 1.2rem; font-weight: bold;">20%</span>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <strong style="color: #2e7d32;">Domain 3</strong><br>
+                        Network Operations<br>
+                        <span style="font-size: 1.2rem; font-weight: bold;">19%</span>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <strong style="color: #2e7d32;">Domain 4</strong><br>
+                        Network Security<br>
+                        <span style="font-size: 1.2rem; font-weight: bold;">14%</span>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <strong style="color: #2e7d32;">Domain 5</strong><br>
+                        Network Troubleshooting<br>
+                        <span style="font-size: 1.2rem; font-weight: bold;">24%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Moraine Valley Community College</p>
+        <p>LAN121 - Network Essentials | Dr. John Sands | Fall 2025</p>
+    </div>
+
+    <script>
+        let currentView = 'weekly';
+        let currentWeek = 1;
+
+        // Course dates
+        const courseStart = new Date('2025-08-25');
+        const courseEnd = new Date('2025-10-10');
+        const currentDate = new Date();
+
+        // Week dates
+        const weekDates = [
+            new Date('2025-08-25'), // Week 1
+            new Date('2025-09-01'), // Week 2
+            new Date('2025-09-08'), // Week 3
+            new Date('2025-09-15'), // Week 4
+            new Date('2025-09-22'), // Week 5
+            new Date('2025-09-29'), // Week 6
+            new Date('2025-10-06'), // Week 7
+            new Date('2025-10-10')  // Week 8
+        ];
+
+        function showWeek(weekNumber) {
+            currentView = 'weekly';
+            currentWeek = weekNumber;
+            
+            // Show loading spinner briefly for smooth transition
+            showLoadingSpinner();
+            
+            setTimeout(() => {
+                hideLoadingSpinner();
+                
+                // Hide all sections
+                const sections = document.querySelectorAll('.week-section');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    section.style.display = 'none';
+                });
+                
+                // Show selected week
+                const targetWeek = document.getElementById(`week${weekNumber}`);
+                if (targetWeek) {
+                    targetWeek.style.display = 'block';
+                    targetWeek.classList.add('active');
+                    targetWeek.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                
+                updateDropdownButton(`Week ${weekNumber}`);
+                updateToggleButton('View Full Schedule');
+            }, 300);
+        }
+
+        function toggleFullSchedule() {
+            if (currentView === 'weekly') {
+                currentView = 'full';
+                showLoadingSpinner();
+                
+                setTimeout(() => {
+                    hideLoadingSpinner();
+                    
+                    // Hide all week sections
+                    const weekSections = document.querySelectorAll('.week-section');
+                    weekSections.forEach(section => {
+                        section.classList.remove('active');
+                        section.style.display = 'none';
+                    });
+                    
+                    // Show full schedule
+                    const fullSchedule = document.getElementById('fullSchedule');
+                    fullSchedule.style.display = 'block';
+                    fullSchedule.classList.add('active');
+                    fullSchedule.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    updateDropdownButton('Full Schedule View');
+                    updateToggleButton('View Weekly Schedule');
+                    updateTableStatuses();
+                }, 300);
+            } else {
+                currentView = 'weekly';
+                showWeek(currentWeek);
+            }
+        }
+
+        function showLoadingSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'flex';
+        }
+
+        function hideLoadingSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'none';
+        }
+
+        function updateDropdownButton(text) {
+            const button = document.querySelector('.dropdown-button');
+            button.textContent = text + ' ▼';
+        }
+
+        function updateToggleButton(text) {
+            const button = document.querySelector('.view-toggle');
+            button.textContent = text;
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (currentDate < courseStart) {
+                const daysUntilStart = Math.ceil((courseStart - currentDate) / (1000 * 60 * 60 * 24));
+                progressFill.style.width = '0%';
+                progressText.textContent = `Course starts in ${daysUntilStart} days (August 25, 2025)`;
+            } else if (currentDate > courseEnd) {
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Course completed! Final exam: October 10, 2025';
+            } else {
+                const totalDuration = courseEnd - courseStart;
+                const elapsed = currentDate - courseStart;
+                const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                progressFill.style.width = progress + '%';
+                
+                const currentWeekNum = getCurrentWeek();
+                progressText.textContent = `Week ${currentWeekNum} of 8 - ${Math.round(progress)}% complete`;
+            }
+        }
+
+        function getCurrentWeek() {
+            for (let i = 0; i < weekDates.length; i++) {
+                if (currentDate <= weekDates[i]) {
+                    return i + 1;
+                }
+            }
+            return 8; // Final week
+        }
+
+        function updateTableStatuses() {
+            const rows = document.querySelectorAll('.full-schedule-table tbody tr');
+            const currentWeekNum = getCurrentWeek();
+            
+            rows.forEach((row, index) => {
+                const statusElement = row.querySelector('.status-indicator');
+                const weekNum = index + 1;
+                
+                if (weekNum < currentWeekNum) {
+                    statusElement.className = 'status-indicator status-completed';
+                    statusElement.textContent = 'Completed';
+                } else if (weekNum === currentWeekNum) {
+                    statusElement.className = 'status-indicator status-current';
+                    statusElement.textContent = 'Current Week';
+                } else {
+                    statusElement.className = 'status-indicator status-upcoming';
+                    statusElement.textContent = 'Upcoming';
+                }
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            
+            // Set current week as default if course has started
+            if (currentDate >= courseStart && currentDate <= courseEnd) {
+                const currentWeekNum = getCurrentWeek();
+                showWeek(currentWeekNum);
+            }
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(event) {
+                if (event.altKey) {
+                    if (event.key === 'ArrowRight' && currentView === 'weekly' && currentWeek < 8) {
+                        showWeek(currentWeek + 1);
+                    } else if (event.key === 'ArrowLeft' && currentView === 'weekly' && currentWeek > 1) {
+                        showWeek(currentWeek - 1);
+                    } else if (event.key === 'Enter') {
+                        toggleFullSchedule();
+                    }
+                }
+            });
+
+            // Add hover effects to assignment cards
+            const assignmentCards = document.querySelectorAll('.assignment-card');
+            assignmentCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click effects to topic tags
+            const topicTags = document.querySelectorAll('.topic-tag');
+            topicTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.style.background = 'linear-gradient(135deg, #4caf50, #66bb6a)';
+                    this.style.color = 'white';
+                    this.style.transform = 'scale(1.05)';
+                    
+                    setTimeout(() => {
+                        this.style.background = 'linear-gradient(135deg, #e8f5e8, #c8e6c9)';
+                        this.style.color = '#1b5e20';
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+
+            // Add progress animation on load
+            setTimeout(() => {
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.transition = 'width 2s ease-in-out';
+            }, 500);
+        });
+
+        // Auto-update progress every hour
+        setInterval(updateProgress, 3600000);
+    </script>
+</body>
+</html>
