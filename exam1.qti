@@ -1,179 +1,689 @@
-1. Which layer of the OSI model is responsible for routing?
-a) Physical
-b) Data Link
-*c) Network
-d) Transport
-
-2. What device operates primarily at Layer 2 of the OSI model?
-a) Router
-*b) Switch
-c) Firewall
-d) Repeater
-
-3. Which protocol is used for secure remote terminal access?
-a) Telnet
-*b) SSH
-c) FTP
-d) HTTP
-
-4. What is the function of a proxy server?
-a) To filter incoming traffic
-b) To load balance requests
-*c) To act as an intermediary for requests
-d) To attach storage to the network
-
-5. Which cloud deployment model allows infrastructure to be used by multiple organizations but is managed privately?
-a) Public
-b) Private
-c) Hybrid
-*d) Community
-
-6. Which port is used by the Simple Mail Transfer Protocol (SMTP)?
-a) 22
-*b) 25
-c) 53
-d) 80
-
-7. What type of IP address is 255.255.255.255?
-a) Unicast
-b) Multicast
-*c) Broadcast
-d) Anycast
-
-8. What cable is characterized by a copper conductor surrounded by insulation and shielding, commonly used for broadband internet?
-a) Fiber optic
-*b) Coaxial
-c) Twisted pair
-d) Single-mode fiber
-
-9. Which connector type is commonly used with twisted pair Ethernet cables?
-a) SC
-b) LC
-*c) RJ-45
-d) BNC
-
-10. Which wireless standard operates in the 5 GHz band and provides higher data rates than 802.11b?
-*a) 802.11a
-b) 802.11b
-c) 802.11g
-d) 802.11n
-
-11. Which network topology connects each device to a central device?
-a) Mesh
-*b) Star
-c) Bus
-d) Ring
-
-12. In IPv4 addressing, which class supports 16-bit network portion and 16-bit host portion?
-a) Class A
-*b) Class B
-c) Class C
-d) Class D
-
-13. What is the purpose of VLANs?
-*a) To divide a physical network into logical subnets
-b) To extend the wireless range
-c) To provide physical security
-d) To increase bandwidth
-
-14. Which device provides functions like intrusion detection and prevention?
-a) Load balancer
-*b) IDS/IPS
-c) Proxy server
-d) Firewall
-
-15. What is the role of the transport layer in the OSI model?
-*a) Establishes, maintains, and terminates connections
-b) Routes data between devices
-c) Encrypts data
-d) Defines the physical means of transmission
-
-16. Which cloud service model provides hardware and networking resources but no middleware?
-a) SaaS
-b) PaaS
-*c) IaaS
-d) FaaS
-
-17. Which Layer 1 technology allows multiple fibers to be pulled through a single connector?
-*a) MPO
-b) SC
-c) LC
-d) ST
-
-18. What is the primary use of the TTL (Time to Live) field in an IP packet?
-a) Control packet priority
-*b) Limit packet lifespan to prevent routing loops
-c) Encrypt data
-d) Authenticate source
-
-19. Which protocol is commonly used to automatically assign IP addresses?
-a) DNS
-*b) DHCP
-c) FTP
-d) SNMP
-
-20. What type of traffic is sent to all devices in a subnet simultaneously?
-a) Unicast
-*b) Broadcast
-c) Multicast
-d) Anycast
-
-21. Which protocol secures IP communications by authenticating and encrypting each IP packet?
-a) GRE
-*b) IPSec
-c) TCP
-d) UDP
-
-22. Which wireless technology uses a star topology with a central controller managing access points?
-a) Wi-Fi Ad hoc
-*b) Infrastructure mode
-c) Wired Equivalent Privacy
-d) Mesh
-
-23. Which cloud connectivity option provides a dedicated private connection between a customer and cloud provider?
-a) VPN
-*b) Direct Connect
-c) NAT Gateway
-d) Internet Gateway
-
-24. Which network device balances incoming network traffic to optimize resource use?
-a) Firewall
-*b) Load balancer
-c) IDS
-d) Proxy
-
-25. Which protocol is used to transfer files securely over a network using SSH?
-a) FTP
-*b) SFTP
-c) TFTP
-d) Telnet
-
-26. Which of the following are valid IPv4 address classes?
-[*] Class A
-[*] Class B
-[*] Class C
-[ ] Class E
-
-27. Which of the following are transmission media types?
-[*] Coaxial cable
-[*] 802.11 wireless
-[*] Fiber optic
-[ ] Bluetooth
-
-28. Which protocols use port 22?
-[*] SSH
-[*] SFTP
-[ ] Telnet
-[ ] FTP
-
-29. Which of these are cloud deployment models?
-[*] Public
-[*] Private
-[*] Hybrid
-[ ] Multi-cloud
-
-30. Which of the following are functions of network appliances?
-[*] Router
-[*] NAS
-[*] Firewall
-[ ] VoIP Phone
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <!-- 1 -->
+  <item title="Which layer of the OSI model is responsible for routing?" ident="q1">
+    <presentation>
+      <material><mattext>Which layer of the OSI model is responsible for routing?</mattext></material>
+      <response_lid ident="resp1" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Physical</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Data Link</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Network</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Transport</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp1">choiceC</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 2 -->
+  <item title="What device operates primarily at Layer 2 of the OSI model?" ident="q2">
+    <presentation>
+      <material><mattext>What device operates primarily at Layer 2 of the OSI model?</mattext></material>
+      <response_lid ident="resp2" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Router</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Switch</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Firewall</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Repeater</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp2">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 3 -->
+  <item title="Which protocol is used for secure remote terminal access?" ident="q3">
+    <presentation>
+      <material><mattext>Which protocol is used for secure remote terminal access?</mattext></material>
+      <response_lid ident="resp3" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Telnet</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>SSH</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>FTP</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>HTTP</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp3">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 4 -->
+  <item title="What is the function of a proxy server?" ident="q4">
+    <presentation>
+      <material><mattext>What is the function of a proxy server?</mattext></material>
+      <response_lid ident="resp4" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>To filter incoming traffic</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>To load balance requests</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>To act as an intermediary for requests</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>To attach storage to the network</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp4">choiceC</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 5 -->
+  <item title="Which cloud deployment model allows infrastructure to be used by multiple organizations but is managed privately?" ident="q5">
+    <presentation>
+      <material><mattext>Which cloud deployment model allows infrastructure to be used by multiple organizations but is managed privately?</mattext></material>
+      <response_lid ident="resp5" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Public</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Private</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Hybrid</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Community</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp5">choiceD</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 6 -->
+  <item title="Which port is used by the Simple Mail Transfer Protocol (SMTP)?" ident="q6">
+    <presentation>
+      <material><mattext>Which port is used by the Simple Mail Transfer Protocol (SMTP)?</mattext></material>
+      <response_lid ident="resp6" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>22</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>25</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>53</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>80</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp6">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 7 -->
+  <item title="What type of IP address is 255.255.255.255?" ident="q7">
+    <presentation>
+      <material><mattext>What type of IP address is 255.255.255.255?</mattext></material>
+      <response_lid ident="resp7" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Unicast</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Multicast</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Broadcast</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Anycast</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp7">choiceC</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 8 -->
+  <item title="What cable is characterized by a copper conductor surrounded by insulation and shielding, commonly used for broadband internet?" ident="q8">
+    <presentation>
+      <material><mattext>What cable is characterized by a copper conductor surrounded by insulation and shielding, commonly used for broadband internet?</mattext></material>
+      <response_lid ident="resp8" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Fiber optic</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Coaxial</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Twisted pair</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Single-mode fiber</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp8">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 9 -->
+  <item title="Which connector type is commonly used with twisted pair Ethernet cables?" ident="q9">
+    <presentation>
+      <material><mattext>Which connector type is commonly used with twisted pair Ethernet cables?</mattext></material>
+      <response_lid ident="resp9" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>SC</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>LC</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>RJ-45</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>BNC</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp9">choiceC</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 10 -->
+  <item title="Which wireless standard operates in the 5 GHz band and provides higher data rates than 802.11b?" ident="q10">
+    <presentation>
+      <material><mattext>Which wireless standard operates in the 5 GHz band and provides higher data rates than 802.11b?</mattext></material>
+      <response_lid ident="resp10" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>802.11a</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>802.11b</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>802.11g</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>802.11n</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp10">choiceA</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 11 -->
+  <item title="Which network topology connects each device to a central device?" ident="q11">
+    <presentation>
+      <material><mattext>Which network topology connects each device to a central device?</mattext></material>
+      <response_lid ident="resp11" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Mesh</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Star</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Bus</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Ring</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp11">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 12 -->
+  <item title="In IPv4 addressing, which class supports 16-bit network portion and 16-bit host portion?" ident="q12">
+    <presentation>
+      <material><mattext>In IPv4 addressing, which class supports 16-bit network portion and 16-bit host portion?</mattext></material>
+      <response_lid ident="resp12" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Class A</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Class B</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Class C</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Class D</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp12">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 13 -->
+  <item title="What is the purpose of VLANs?" ident="q13">
+    <presentation>
+      <material><mattext>What is the purpose of VLANs?</mattext></material>
+      <response_lid ident="resp13" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>To divide a physical network into logical subnets</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>To extend the wireless range</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>To provide physical security</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>To increase bandwidth</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp13">choiceA</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 14 -->
+  <item title="Which device provides functions like intrusion detection and prevention?" ident="q14">
+    <presentation>
+      <material><mattext>Which device provides functions like intrusion detection and prevention?</mattext></material>
+      <response_lid ident="resp14" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Load balancer</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>IDS/IPS</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Proxy server</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Firewall</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp14">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 15 -->
+  <item title="What is the role of the transport layer in the OSI model?" ident="q15">
+    <presentation>
+      <material><mattext>What is the role of the transport layer in the OSI model?</mattext></material>
+      <response_lid ident="resp15" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Establishes, maintains, and terminates connections</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Routes data between devices</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Encrypts data</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Defines the physical means of transmission</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp15">choiceA</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 16 -->
+  <item title="Which cloud service model provides hardware and networking resources but no middleware?" ident="q16">
+    <presentation>
+      <material><mattext>Which cloud service model provides hardware and networking resources but no middleware?</mattext></material>
+      <response_lid ident="resp16" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>SaaS</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>PaaS</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>IaaS</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>FaaS</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp16">choiceC</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 17 -->
+  <item title="Which Layer 1 technology allows multiple fibers to be pulled through a single connector?" ident="q17">
+    <presentation>
+      <material><mattext>Which Layer 1 technology allows multiple fibers to be pulled through a single connector?</mattext></material>
+      <response_lid ident="resp17" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>MPO</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>SC</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>LC</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>ST</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp17">choiceA</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 18 -->
+  <item title="What is the primary use of the TTL (Time to Live) field in an IP packet?" ident="q18">
+    <presentation>
+      <material><mattext>What is the primary use of the TTL (Time to Live) field in an IP packet?</mattext></material>
+      <response_lid ident="resp18" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Control packet priority</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Limit packet lifespan to prevent routing loops</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Encrypt data</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Authenticate source</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp18">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 19 -->
+  <item title="Which protocol is commonly used to automatically assign IP addresses?" ident="q19">
+    <presentation>
+      <material><mattext>Which protocol is commonly used to automatically assign IP addresses?</mattext></material>
+      <response_lid ident="resp19" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>DNS</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>DHCP</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>FTP</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>SNMP</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp19">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 20 -->
+  <item title="What type of traffic is sent to all devices in a subnet simultaneously?" ident="q20">
+    <presentation>
+      <material><mattext>What type of traffic is sent to all devices in a subnet simultaneously?</mattext></material>
+      <response_lid ident="resp20" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Unicast</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Broadcast</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Multicast</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Anycast</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp20">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 21 -->
+  <item title="Which protocol secures IP communications by authenticating and encrypting each IP packet?" ident="q21">
+    <presentation>
+      <material><mattext>Which protocol secures IP communications by authenticating and encrypting each IP packet?</mattext></material>
+      <response_lid ident="resp21" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>GRE</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>IPSec</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>TCP</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>UDP</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp21">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 22 -->
+  <item title="Which wireless technology uses a star topology with a central controller managing access points?" ident="q22">
+    <presentation>
+      <material><mattext>Which wireless technology uses a star topology with a central controller managing access points?</mattext></material>
+      <response_lid ident="resp22" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Wi-Fi Ad hoc</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Infrastructure mode</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Wired Equivalent Privacy</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Mesh</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp22">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 23 -->
+  <item title="Which cloud connectivity option provides a dedicated private connection between a customer and cloud provider?" ident="q23">
+    <presentation>
+      <material><mattext>Which cloud connectivity option provides a dedicated private connection between a customer and cloud provider?</mattext></material>
+      <response_lid ident="resp23" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>VPN</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Direct Connect</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>NAT Gateway</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Internet Gateway</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp23">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 24 -->
+  <item title="Which network device balances incoming network traffic to optimize resource use?" ident="q24">
+    <presentation>
+      <material><mattext>Which network device balances incoming network traffic to optimize resource use?</mattext></material>
+      <response_lid ident="resp24" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Firewall</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Load balancer</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>IDS</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Proxy</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp24">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 25 -->
+  <item title="Which protocol is used to transfer files securely over a network using SSH?" ident="q25">
+    <presentation>
+      <material><mattext>Which protocol is used to transfer files securely over a network using SSH?</mattext></material>
+      <response_lid ident="resp25" rcardinality="Single">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>FTP</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>SFTP</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>TFTP</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Telnet</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="resp25">choiceB</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Set">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 26 -->
+  <item title="Which of the following are valid IPv4 address classes?" ident="q26" maxchoices="3">
+    <presentation>
+      <material><mattext>Which of the following are valid IPv4 address classes?</mattext></material>
+      <response_lid ident="resp26" rcardinality="Multiple">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Class A</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Class B</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Class C</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Class E</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp26">choiceA</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp26">choiceB</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp26">choiceC</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 27 -->
+  <item title="Which of the following are transmission media types?" ident="q27" maxchoices="3">
+    <presentation>
+      <material><mattext>Which of the following are transmission media types?</mattext></material>
+      <response_lid ident="resp27" rcardinality="Multiple">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Coaxial cable</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>802.11 wireless</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Fiber optic</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Bluetooth</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp27">choiceA</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp27">choiceB</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp27">choiceC</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 28 -->
+  <item title="Which protocols use port 22?" ident="q28" maxchoices="2">
+    <presentation>
+      <material><mattext>Which protocols use port 22?</mattext></material>
+      <response_lid ident="resp28" rcardinality="Multiple">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>SSH</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>SFTP</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Telnet</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>FTP</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp28">choiceA</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp28">choiceB</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 29 -->
+  <item title="Which of these are cloud deployment models?" ident="q29" maxchoices="3">
+    <presentation>
+      <material><mattext>Which of these are cloud deployment models?</mattext></material>
+      <response_lid ident="resp29" rcardinality="Multiple">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Public</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>Private</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Hybrid</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>Multi-cloud</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp29">choiceA</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp29">choiceB</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp29">choiceC</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- 30 -->
+  <item title="Which of the following are functions of network appliances?" ident="q30" maxchoices="3">
+    <presentation>
+      <material><mattext>Which of the following are functions of network appliances?</mattext></material>
+      <response_lid ident="resp30" rcardinality="Multiple">
+        <render_choice>
+          <response_label ident="choiceA"><material><mattext>Router</mattext></material></response_label>
+          <response_label ident="choiceB"><material><mattext>NAS</mattext></material></response_label>
+          <response_label ident="choiceC"><material><mattext>Firewall</mattext></material></response_label>
+          <response_label ident="choiceD"><material><mattext>VoIP Phone</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp30">choiceA</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp30">choiceB</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar><varequal respident="resp30">choiceC</varequal></conditionvar>
+        <setvar varname="SCORE" action="Add">1</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+</questestinterop>
