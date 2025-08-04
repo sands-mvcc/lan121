@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAN121 - Network Essentials Interactive Syllabus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            background-color: #1b5e20;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-button:hover {
+            background-color: #4caf50;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            z-index: 1;
+            border: 2px solid #2e7d32;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #e8f5e8;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #2e7d32;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2e7d32;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card {
+            background-color: #f8f8f8;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-card h3 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .schedule-table th {
+            background-color: #2e7d32;
+            color: white;
+            font-weight: bold;
+        }
+
+        .schedule-table tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        .schedule-table tr:hover {
+            background-color: #e8f5e8;
+        }
+
+        .grade-scale {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .grade-item {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background-color: #e8f5e8;
+            border: 2px solid #4caf50;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .objectives-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .objectives-list li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .footer {
+            background-color: #1b5e20;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .content-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LAN121 - Network Essentials</h1>
+        <p>Fall 2025 • Dr. John Sands • Moraine Valley Community College</p>
+    </div>
+
+    <nav class="navigation">
+        <div class="nav-container">
+            <div class="dropdown">
+                <button class="dropdown-button">Navigate Syllabus ▼</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="showSection('instructor-info')">Instructor & Registration Info</a>
+                    <a href="#" onclick="showSection('course-info')">Course Information</a>
+                    <a href="#" onclick="showSection('learning-objectives')">Learning Objectives</a>
+                    <a href="#" onclick="showSection('policies')">Instructor Policies</a>
+                    <a href="#" onclick="showSection('materials')">Books & Materials</a>
+                    <a href="#" onclick="showSection('assignments')">Grading & Assignments</a>
+                    <a href="#" onclick="showSection('schedule')">Course Schedule</a>
+                    <a href="#" onclick="showSection('integrity')">Academic Integrity</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Instructor Information Section -->
+        <div id="instructor-info" class="content-section active">
+            <h2 class="section-title">Instructor & Registration Information</h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Instructor Details</h3>
+                    <p><strong>Name:</strong> Dr. John Sands</p>
+                    <p><strong>Email:</strong> sands@morainevalley.edu</p>
+                    <p><strong>Phone:</strong> 708-974-5426</p>
+                    <p><strong>Office:</strong> T109</p>
+                    <p><strong>Mailbox:</strong> T116</p>
+                    <p><strong>Office Hours:</strong> Tuesday, Wednesday, Thursday, Friday</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Important Dates - Fall 2025</h3>
+                    <p><strong>Last Drop w/ Refund:</strong> August 21, 2025</p>
+                    <p><strong>Last Drop w/ 'W' Grade:</strong> September 28, 2025</p>
+                    <p><strong>Final Exam:</strong> October 7, 2025</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Registration Office Hours</h3>
+                <p><strong>Monday-Tuesday:</strong> 8:30am - 6:00pm</p>
+                <p><strong>Wednesday-Friday:</strong> 8:30am - 5:00pm</p>
+                <p><strong>Location:</strong> Building S, Room 111A</p>
+                <p><strong>Phone:</strong> (708) 974-2110</p>
+            </div>
+        </div>
+
+        <!-- Course Information Section -->
+        <div id="course-info" class="content-section">
+            <h2 class="section-title">Course Information</h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Course Details</h3>
+                    <p><strong>Course Title:</strong> Network Essentials/Network+</p>
+                    <p><strong>Course Number:</strong> LAN121</p>
+                    <p><strong>Section:</strong> 300</p>
+                    <p><strong>Format:</strong> Online (Saturdays)</p>
+                    <p><strong>Credit Hours:</strong> 3</p>
+                    <p><strong>Contact Hours:</strong> 4 (2 Lecture + 2 Lab)</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Prerequisites</h3>
+                    <p><strong>Prerequisites:</strong> None</p>
+                    <p><strong>Corequisites:</strong> None</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Course Description</h3>
+                <p>This course introduces the operation of computer networks and networking devices. The course provides an examination of the evolution of data communications and computer networks. Hardware and software network configurations, operations, and requirements will be discussed. Topics include network media, physical and logical topologies, the OSI model, protocols and standards, network implementation, and network support. This course is designed to prepare the successful student for the Network+ certification.</p>
+            </div>
+        </div>
+
+        <!-- Learning Objectives Section -->
+        <div id="learning-objectives" class="content-section">
+            <h2 class="section-title">Learning Objectives</h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Common Learning Objectives</h3>
+                    <ul class="objectives-list">
+                        <li>Communication: development and expression of ideas to a specific audience</li>
+                        <li>Critical Thinking: analysis of an issue in order to form a judgment</li>
+                        <li>Diverse Perspectives: exploration of differences</li>
+                        <li>Information and Technology Literacy: find, evaluate, and apply information</li>
+                        <li>Quantitative Literacy: competency in working with numerical data</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Program Learning Objectives</h3>
+                    <ul class="objectives-list">
+                        <li>Install, configure, test, operate, maintain and manage information systems including networks, network devices, security devices and mobile devices</li>
+                        <li>Install, configure, manage, update, secure and troubleshoot portable, mobile and smart devices</li>
+                        <li>Participate in the information systems equipment procurement, testing, deployment, operations, maintenance and dispensation of equipment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Course Learning Objectives</h3>
+                <ul class="objectives-list">
+                    <li>Describe history and evolution of data communications and computer networks</li>
+                    <li>Determine hardware and software requirements to operate various types of networks</li>
+                    <li>Describe the various types of data transmission media topologies</li>
+                    <li>Describe Ethernet media access</li>
+                    <li>Categorize network operations in terms of the OSI model</li>
+                    <li>Discuss various types of protocol stacks and their advantages and disadvantages</li>
+                    <li>Analyze various types of network configurations</li>
+                    <li>Use various TCP/IP utilities to troubleshoot and analyze IP networks</li>
+                    <li>Describe the purpose and characteristics of fault tolerance</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Policies Section -->
+        <div id="policies" class="content-section">
+            <h2 class="section-title">Instructor Policies</h2>
+            
+            <div class="warning-box">
+                <h3>⚠️ Important Attendance & Submission Policies</h3>
+                <ul class="objectives-list">
+                    <li>All Online Activities (OLAs) are due Sunday night at midnight of the assigned week</li>
+                    <li>OLAs not submitted by the due date will result in a deduction unless given permission by email</li>
+                    <li>Attendance is expected and required - instructors may assign points for attendance and participation</li>
+                    <li>Final Exam attendance is mandatory - there will be no make-up dates</li>
+                </ul>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Academic Expectations</h3>
+                    <ul class="objectives-list">
+                        <li>Be courteous of others at all times</li>
+                        <li>Be prepared and participate in class discussions and labs</li>
+                        <li>Stay focused and pay attention during lecture</li>
+                        <li>Work well with others during group labs and activities</li>
+                        <li>Complete all assignments by due dates</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Academic Integrity</h3>
+                    <ul class="objectives-list">
+                        <li>Cheating and plagiarism are not allowed</li>
+                        <li>Violations may result in immediate dismissal from class</li>
+                        <li>May result in a grade of "F" in the course</li>
+                        <li>Students must adhere to the Code of Student Conduct</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Final Exam Information</h3>
+                <p><strong>Date:</strong> October 7, 2025</p>
+                <p><strong>Format:</strong> Lab component + Written exam on Canvas</p>
+                <p><strong>Style:</strong> Similar to quizzes given throughout the class</p>
+                <p><strong>Attendance:</strong> Mandatory - no make-up dates available</p>
+            </div>
+        </div>
+
+        <!-- Materials Section -->
+        <div id="materials" class="content-section">
+            <h2 class="section-title">Books & Materials</h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Required Textbook</h3>
+                    <p><strong>Title:</strong> CompTIA Network+ N10-009 Cert Guide</p>
+                    <p><strong>Type:</strong> Certification Guide</p>
+                    <p><strong>Status:</strong> Required</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Optional Resources</h3>
+                    <p><strong>Website:</strong> www.myemates.org</p>
+                    <p><strong>Additional:</strong> Videos</p>
+                    <p><strong>Status:</strong> Optional</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Withdrawal Policy</h3>
+                <p>A student who does not withdraw officially from a course may receive a grade of 'F', depending on course progress and attendance, which will become part of the student's permanent record. The withdrawal date is listed in the General Information sheet.</p>
+            </div>
+        </div>
+
+        <!-- Assignments Section -->
+        <div id="assignments" class="content-section">
+            <h2 class="section-title">Grading & Assignments</h2>
+            
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Assignment Type</th>
+                        <th>Quantity</th>
+                        <th>Percentage of Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Graded Activities</td>
+                        <td>8</td>
+                        <td>20%</td>
+                    </tr>
+                    <tr>
+                        <td>Chapter Exams</td>
+                        <td>6</td>
+                        <td>30%</td>
+                    </tr>
+                    <tr>
+                        <td>Labs</td>
+                        <td>6</td>
+                        <td>40%</td>
+                    </tr>
+                    <tr>
+                        <td>Final Exam</td>
+                        <td>1</td>
+                        <td>10%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h3>Grade Scale</h3>
+                <div class="grade-scale">
+                    <div class="grade-item">A<br>92-100%</div>
+                    <div class="grade-item">B<br>85-91%</div>
+                    <div class="grade-item">C<br>77-84%</div>
+                    <div class="grade-item">D<br>70-76%</div>
+                    <div class="grade-item">F<br>Below 70%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div id="schedule" class="content-section">
+            <h2 class="section-title">Course Schedule - CompTIA Network+ N10-009</h2>
+            
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Domain & Topics</th>
+                        <th>Assignments</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Week 1</td>
+                        <td><strong>Domain 1 - Network Concepts (23%)</strong><br>
+                            OSI Model, Devices, Cloud Concepts, Protocols, Physical Layer, Networking Concepts, Addressing, WAN Protocols</td>
+                        <td>Activity 1 - OSI Activity</td>
+                        <td>8/25/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 2</td>
+                        <td><strong>Domain 1 Continued</strong><br>
+                            Protocols, Physical Layer, Networking Concepts, Addressing, WAN Protocols</td>
+                        <td>Activity 2 - Computer Math<br>Lab 1 - SOHO IPv4 Network<br>Exam Domain 1</td>
+                        <td>9/1/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 3</td>
+                        <td><strong>Domain 2 - Network Implementation (20%)</strong><br>
+                            Physical and Data Link Layers, Switching, Wireless</td>
+                        <td>Activity 3<br>Activity 4</td>
+                        <td>9/8/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 4</td>
+                        <td><strong>Domain 2 Continued</strong><br>
+                            Network Layer, Routing</td>
+                        <td>Lab 2 - VLANs and Trunking<br>Activity 5<br>Exam Domain 2</td>
+                        <td>9/15/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 5</td>
+                        <td><strong>Domain 3 - Network Operations (19%)</strong><br>
+                            Processes and Procedures, Monitoring, DR, Addressing, Network Management</td>
+                        <td>Lab 3 - DHCP and NAT<br>Activity 6<br>Exam Domain 3</td>
+                        <td>9/22/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 6</td>
+                        <td><strong>Domain 4 - Network Security (14%)</strong><br>
+                            Network Security Concepts, Attacks, Solutions</td>
+                        <td>Lab 4 - DNS, FTP, Email, HTTP/HTTPS<br>Activity 7<br>Exam Domain 4</td>
+                        <td>9/29/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 7</td>
+                        <td><strong>Domain 5 - Network Troubleshooting (24%)</strong><br>
+                            Troubleshooting Methodology, Physical and Data Link Layers</td>
+                        <td>Lab 5 - Static and Dynamic IPv4 Routing<br>Activity 8<br>Exam Domain 5</td>
+                        <td>10/6/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Week 8</td>
+                        <td><strong>Domain 5 Continued</strong><br>
+                            Network Layer, Performance Issues, Troubleshooting Protocols</td>
+                        <td>Lab 6 - Wireless Network<br><strong>Final Exam</strong></td>
+                        <td>10/10/2025</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Academic Integrity Section -->
+        <div id="integrity" class="content-section">
+            <h2 class="section-title">Academic Integrity</h2>
+            
+            <div class="highlight-box">
+                <h3>Computer-Integrated Technologies Department Code of Academic Integrity</h3>
+                <p>The faculty of the Computer-Integrated Technologies Department believes that the Moraine Valley Community College Code of Academic Integrity is important because of the professional, academic, and ethical requirements that align the departmental curriculum to the expectations of the occupational environment that our students will be entering.</p>
+                
+                <p>Students are expected to complete all course requirements in a way that reflects the values of the Code of Academic Integrity and encourage others to do the same. Adherence to the Code of Academic Integrity will enable students to participate gainfully in a collegiate learning environment with a high degree of professional ethics and standards, thereby empowering them to be successful after leaving Moraine Valley Community College.</p>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Student Acknowledgment Required</h3>
+                <p>Students must sign acknowledgment forms confirming they have read and understand:</p>
+                <ul class="objectives-list">
+                    <li>The complete syllabus and class grading policies</li>
+                    <li>That this is a hybrid class with mandatory in-classroom sessions</li>
+                    <li>All assignments are due within one week</li>
+                    <li>Late work results in a grade of zero</li>
+                    <li>The Code of Academic Integrity</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Moraine Valley Community College - Computer-Integrated Technologies Department</p>
+        <p>LAN121 - Network Essentials | Dr. John Sands</p>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to info cards
+            const infoCards = document.querySelectorAll('.info-card');
+            infoCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Add click functionality to table rows for better interaction
+            const tableRows = document.querySelectorAll('.schedule-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    // Remove previous highlights
+                    tableRows.forEach(r => r.style.backgroundColor = '');
+                    // Highlight clicked row
+                    this.style.backgroundColor = '#c8e6c9';
+                });
+            });
+
+            // Add a progress indicator for the course
+            const currentDate = new Date();
+            const startDate = new Date('2025-08-18');
+            const endDate = new Date('2025-10-10');
+            
+            if (currentDate >= startDate && currentDate <= endDate) {
+                const progress = ((currentDate - startDate) / (endDate - startDate)) * 100;
+                const progressBar = document.createElement('div');
+                progressBar.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: ${progress}%;
+                    height: 4px;
+                    background: linear-gradient(90deg, #2e7d32, #4caf50);
+                    z-index: 9999;
+                    transition: width 0.3s ease;
+                `;
+                document.body.appendChild(progressBar);
+            }
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.altKey) {
+                const sections = ['instructor-info', 'course-info', 'learning-objectives', 'policies', 'materials', 'assignments', 'schedule', 'integrity'];
+                const currentActive = document.querySelector('.content-section.active');
+                const currentIndex = sections.findIndex(id => document.getElementById(id) === currentActive);
+                
+                if (event.key === 'ArrowRight' && currentIndex < sections.length - 1) {
+                    showSection(sections[currentIndex + 1]);
+                } else if (event.key === 'ArrowLeft' && currentIndex > 0) {
+                    showSection(sections[currentIndex - 1]);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
