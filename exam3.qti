@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <!-- Multiple Choice Questions -->
+  <!-- Q1 -->
+  <item title="Documentation Diagram Types" ident="Q1">
+    <presentation>
+      <material>
+        <mattext>Which of the following represents a logical network diagram?</mattext>
+      </material>
+      <response_lid ident="response1">
+        <render_choice>
+          <response_label ident="A">
+            <material><mattext>A map showing physical cable runs between network hardware</mattext></material>
+          </response_label>
+          <response_label ident="B">
+            <material><mattext>A flowchart showing VLAN segmentation and routing relationships</mattext></material>
+          </response_label>
+          <response_label ident="C">
+            <material><mattext>Rack elevation diagram showing device placements</mattext></material>
+          </response_label>
+          <response_label ident="D">
+            <material><mattext>Table listing warranty expiration dates for switches</mattext></material>
+          </response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response1">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q2 -->
+  <item title="Asset Inventory" ident="Q2">
+    <presentation>
+      <material>
+        <mattext>Which of the following would NOT be included in an asset inventory?</mattext>
+      </material>
+      <response_lid ident="response2">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Device serial numbers</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Software version numbers</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Employee vacation schedules</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>License keys</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response2">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q3 -->
+  <item title="Change Management Process" ident="Q3">
+    <presentation>
+      <material>
+        <mattext>What is the purpose of a change management request in network operations?</mattext>
+      </material>
+      <response_lid ident="response3">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Documenting cabling topologies</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Recording pending configuration changes for review and approval</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Monitoring live network traffic</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Tracking server patch levels</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response3">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q4 -->
+  <item title="Configuration Management" ident="Q4">
+    <presentation>
+      <material>
+        <mattext>Which configuration represents a tested and stable version used as a baseline?</mattext>
+      </material>
+      <response_lid ident="response4">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Production configuration</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Backup configuration</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Golden configuration</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Development configuration</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response4">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q5 -->
+  <item title="SNMP Role" ident="Q5">
+    <presentation>
+      <material>
+        <mattext>What is the primary purpose of SNMP within network operations?</mattext>
+      </material>
+      <response_lid ident="response5">
+        <render_choice>
+          <response_label ident="A"><material><mattext>File transfer</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Log aggregation</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Monitoring and managing network devices</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Providing DNS resolution</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response5">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q6 -->
+  <item title="Syslog Collector" ident="Q6">
+    <presentation>
+      <material>
+        <mattext>Which network monitoring solution is used for collecting log messages from multiple devices?</mattext>
+      </material>
+      <response_lid ident="response6">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Flow collector</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Syslog collector</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>API gateway</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>NTP server</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response6">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q7 -->
+  <item title="Network Baseline" ident="Q7">
+    <presentation>
+      <material>
+        <mattext>What metric is essential as a reference for anomaly alerting in a network?</mattext>
+      </material>
+      <response_lid ident="response7">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Peak bandwidth</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Average packet size</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Baseline metrics</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Subnet mask</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response7">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q8 -->
+  <item title="Performance Monitoring" ident="Q8">
+    <presentation>
+      <material>
+        <mattext>Which solution helps identify bandwidth bottlenecks?</mattext>
+      </material>
+      <response_lid ident="response8">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Rack diagram</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Performance monitoring</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Rack elevation chart</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Logical diagram</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response8">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q9 -->
+  <item title="Disaster Recovery Metric" ident="Q9">
+    <presentation>
+      <material>
+        <mattext>Which DR metric specifies the maximum acceptable amount of data loss measured in time?</mattext>
+      </material>
+      <response_lid ident="response9">
+        <render_choice>
+          <response_label ident="A"><material><mattext>RTO</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>MTTR</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>MTBF</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>RPO</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response9">D</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q10 -->
+  <item title="Warm DR Site" ident="Q10">
+    <presentation>
+      <material>
+        <mattext>Which type of disaster recovery site is partially equipped and requires less setup time compared to a cold site?</mattext>
+      </material>
+      <response_lid ident="response10">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Hot site</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Warm site</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Inactive site</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Remote site</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response10">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q11 -->
+  <item title="High Availability" ident="Q11">
+    <presentation>
+      <material>
+        <mattext>Which high-availability approach involves all nodes sharing the workload simultaneously?</mattext>
+      </material>
+      <response_lid ident="response11">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Active-passive</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Round-robin</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Active-active</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Semi-active</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response11">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q12 -->
+  <item title="Dynamic Addressing" ident="Q12">
+    <presentation>
+      <material>
+        <mattext>Which protocol provides dynamic IPv4 addressing for hosts?</mattext>
+      </material>
+      <response_lid ident="response12">
+        <render_choice>
+          <response_label ident="A"><material><mattext>DNS</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>DHCP</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>SLAAC</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>RADIUS</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response12">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q13 -->
+  <item title="DNSSEC Purpose" ident="Q13">
+    <presentation>
+      <material>
+        <mattext>What is the main purpose of DNSSEC in DNS services?</mattext>
+      </material>
+      <response_lid ident="response13">
+        <render_choice>
+          <response_label ident="A"><material><mattext>To encrypt all DNS queries</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>To securely manage IP scopes</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>To authenticate DNS responses</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>To filter web traffic</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response13">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q14 -->
+  <item title="NTP Role" ident="Q14">
+    <presentation>
+      <material>
+        <mattext>Network Time Protocol (NTP) is used to:</mattext>
+      </material>
+      <response_lid ident="response14">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Synchronize system clocks</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Configure routing tables</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Provide site-to-site VPN</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Update firmware remotely</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response14">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q15 -->
+  <item title="Site-to-Site VPN" ident="Q15">
+    <presentation>
+      <material>
+        <mattext>The primary purpose of a site-to-site VPN is to:</mattext>
+      </material>
+      <response_lid ident="response15">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Enable secure direct connections between branch offices</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Allow multiple users to use Wi-Fi simultaneously</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Provide backup internet connectivity</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Monitor endpoint bandwidth</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response15">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q16 -->
+  <item title="Jump Host Function" ident="Q16">
+    <presentation>
+      <material>
+        <mattext>What is the function of a jump host (jump box) in network management?</mattext>
+      </material>
+      <response_lid ident="response16">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Acts as an intermediate secured system for remote management</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Hosts DHCP services</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Monitors SNMP traffic only</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Generates network baselines</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response16">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q17 -->
+  <item title="Out-of-Band Management" ident="Q17">
+    <presentation>
+      <material>
+        <mattext>Which method allows managing networking devices when the primary network is unavailable?</mattext>
+      </material>
+      <response_lid ident="response17">
+        <render_choice>
+          <response_label ident="A"><material><mattext>In-band management</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Out-of-band management</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>API integration</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>SNMP polling</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response17">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q18 -->
+  <item title="Service-level Agreement" ident="Q18">
+    <presentation>
+      <material>
+        <mattext>What is the purpose of a service-level agreement (SLA) in a networking context?</mattext>
+      </material>
+      <response_lid ident="response18">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Lists all inventory assets</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Describes cabling standards</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Specifies expectations for network performance and uptime</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Tracks patch deployment</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response18">C</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q19 -->
+  <item title="Wireless Heat Map" ident="Q19">
+    <presentation>
+      <material>
+        <mattext>In wireless networking, what is a heat map used for?</mattext>
+      </material>
+      <response_lid ident="response19">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Visualizes coverage strength and signal areas</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Tracks DHCP lease times</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Displays IP routing paths</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Monitors packet loss statistics</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response19">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q20 -->
+  <item title="Primary and Secondary DNS" ident="Q20">
+    <presentation>
+      <material>
+        <mattext>What is the main difference between primary and secondary DNS servers?</mattext>
+      </material>
+      <response_lid ident="response20">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Primary servers handle DHCP, secondary do not</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Primary servers host the original zone data; secondary are read-only copies</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Secondary servers provide DNSSEC only</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Secondary servers handle IPv6 exclusively</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response20">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q21 -->
+  <item title="Baseline Configuration" ident="Q21">
+    <presentation>
+      <material>
+        <mattext>Why is maintaining a backup configuration important for network devices?</mattext>
+      </material>
+      <response_lid ident="response21">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Prevents overheating</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Ensures rapid device recovery in case of failure</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Improves Wi-Fi password security</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Allows VLAN stretching</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response21">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q22 -->
+  <item title="SLAAC Purpose" ident="Q22">
+    <presentation>
+      <material>
+        <mattext>Stateless Address Autoconfiguration (SLAAC) is used with:</mattext>
+      </material>
+      <response_lid ident="response22">
+        <render_choice>
+          <response_label ident="A"><material><mattext>IPv4 autoconfiguration</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>IPv6 address assignment</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>DNS replication</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Remote management</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response22">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q23 -->
+  <item title="DHCP Reservation" ident="Q23">
+    <presentation>
+      <material>
+        <mattext>What is the benefit of using DHCP reservations?</mattext>
+      </material>
+      <response_lid ident="response23">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Assigns static DNS records</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Ensures a device always receives the same IP address</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Secures VPN tunnels</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Improves Wi-Fi roaming</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response23">B</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q24 -->
+  <item title="Management Method Comparison" ident="Q24">
+    <presentation>
+      <material>
+        <mattext>Which of the following is a benefit of API-based network management over traditional CLI?</mattext>
+      </material>
+      <response_lid ident="response24">
+        <render_choice>
+          <response_label ident="A"><material><mattext>API access allows automation of repetitive tasks</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>CLI requires no authentication</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>API disables monitoring</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>CLI supports only wireless devices</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response24">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q25 -->
+  <item title="Log Aggregation Purpose" ident="Q25">
+    <presentation>
+      <material>
+        <mattext>Why is log aggregation critical in modern networks?</mattext>
+      </material>
+      <response_lid ident="response25">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Centralizes logs for monitoring and alerting</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Eliminates the need for baselines</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Makes patching unnecessary</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Reduces backup frequency</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <varequal respident="response25">A</varequal>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  
+  <!-- Multiple Answer Questions -->
+  <!-- Q26 -->
+  <item title="Network Documentation" ident="Q26">
+    <presentation>
+      <material>
+        <mattext>Select all types of network documentation diagrams. (Choose two)</mattext>
+      </material>
+      <response_lid ident="response26">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Physical diagram</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Logical diagram</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Bandwidth monitor</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Performance report</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <and>
+            <varequal respident="response26">A</varequal>
+            <varequal respident="response26">B</varequal>
+          </and>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q27 -->
+  <item title="Network Monitoring Technologies" ident="Q27">
+    <presentation>
+      <material>
+        <mattext>Which of the following are network monitoring methods? (Choose two)</mattext>
+      </material>
+      <response_lid ident="response27">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Packet capture</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Port mirroring</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Unmanaged switch</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Asset inventory</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <and>
+            <varequal respident="response27">A</varequal>
+            <varequal respident="response27">B</varequal>
+          </and>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q28 -->
+  <item title="Disaster Recovery Sites" ident="Q28">
+    <presentation>
+      <material>
+        <mattext>Select all valid disaster recovery site types. (Choose two)</mattext>
+      </material>
+      <response_lid ident="response28">
+        <render_choice>
+          <response_label ident="A"><material><mattext>Hot site</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>Cloud site</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>Cold site</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>Static site</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <and>
+            <varequal respident="response28">A</varequal>
+            <varequal respident="response28">C</varequal>
+          </and>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q29 -->
+  <item title="DNS Record Types" ident="Q29">
+    <presentation>
+      <material>
+        <mattext>Which DNS record types are used for email delivery and server aliasing? (Choose two)</mattext>
+      </material>
+      <response_lid ident="response29">
+        <render_choice>
+          <response_label ident="A"><material><mattext>MX</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>CNAME</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>PTR</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>A</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <and>
+            <varequal respident="response29">A</varequal>
+            <varequal respident="response29">B</varequal>
+          </and>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+  <!-- Q30 -->
+  <item title="Network Access Management" ident="Q30">
+    <presentation>
+      <material>
+        <mattext>Select all valid network access management connection methods. (Choose two)</mattext>
+      </material>
+      <response_lid ident="response30">
+        <render_choice>
+          <response_label ident="A"><material><mattext>SSH</mattext></material></response_label>
+          <response_label ident="B"><material><mattext>API</mattext></material></response_label>
+          <response_label ident="C"><material><mattext>IPV4</mattext></material></response_label>
+          <response_label ident="D"><material><mattext>DHCP</mattext></material></response_label>
+        </render_choice>
+      </response_lid>
+    </presentation>
+    <resprocessing>
+      <respcondition continue="No">
+        <conditionvar>
+          <and>
+            <varequal respident="response30">A</varequal>
+            <varequal respident="response30">B</varequal>
+          </and>
+        </conditionvar>
+        <setvar action="Set" varname="SCORE">100</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+</questestinterop>
