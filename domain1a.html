@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Concepts Study Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #2d5a27 0%, #1a3d17 100%);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h1 {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 2px solid #4a7c59;
+            padding-bottom: 15px;
+        }
+
+        .nav-item {
+            background: rgba(255,255,255,0.1);
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #4a7c59;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: #4a7c59;
+            border-color: #6ba36f;
+        }
+
+        .nav-item h3 {
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 300px;
+            flex: 1;
+            padding: 40px;
+            background: white;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(45, 90, 39, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content-card {
+            background: white;
+            border: 2px solid #e8f5e8;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            border-color: #4a7c59;
+            box-shadow: 0 4px 20px rgba(74, 124, 89, 0.1);
+        }
+
+        .layer-card {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            border-left: 5px solid #4a7c59;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .layer-card:hover {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            transform: translateX(10px);
+        }
+
+        .layer-number {
+            background: #2d5a27;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            float: left;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        .protocol-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .protocol-table th {
+            background: #2d5a27;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .protocol-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e8f5e8;
+        }
+
+        .protocol-table tr:hover {
+            background: #f8fff8;
+        }
+
+        .quiz-button {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(45, 90, 39, 0.3);
+        }
+
+        .quiz-button:hover {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5a27 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 90, 39, 0.4);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+            margin: 15px 0;
+        }
+
+        .appliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .appliance-card {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            border: 2px solid #d4edda;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .appliance-card:hover {
+            border-color: #4a7c59;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(74, 124, 89, 0.2);
+        }
+
+        .cloud-model {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e8f5e8;
+            border-radius: 25px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #4a7c59;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h1>Domain One<br>Network Concepts</h1>
+            
+            <div class="nav-item active" data-section="osi-model">
+                <h3>1.1 - OSI Model</h3>
+            </div>
+            
+            <div class="nav-item" data-section="networking-appliances">
+                <h3>1.2 - Networking Appliances</h3>
+            </div>
+            
+            <div class="nav-item" data-section="cloud-concepts">
+                <h3>1.3 - Cloud Concepts</h3>
+            </div>
+            
+            <div class="nav-item" data-section="protocols-ports">
+                <h3>1.4 - Protocols & Ports</h3>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button class="quiz-button" onclick="startQuiz()">🧠 Quiz Mode</button>
+                <button class="quiz-button" onclick="toggleStudyMode()">📚 Study Mode</button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <input type="text" class="search-box" placeholder="🔍 Search content..." onkeyup="searchContent(this.value)">
+
+            <!-- OSI Model Section -->
+            <section id="osi-model" class="section active">
+                <div class="section-header">
+                    <h2>1.1 The OSI Model</h2>
+                    <p>Understanding the seven layers of network communication</p>
+                </div>
+
+                <div class="content-card">
+                    <h3>Open Systems Interconnection Model</h3>
+                    <p>The OSI model is a conceptual framework that standardizes the functions of a telecommunication or computing system into seven abstraction layers. Each layer has a specific role in transmitting data across a network.</p>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer7')">
+                    <div class="layer-number">7</div>
+                    <h4>Application Layer</h4>
+                    <p>Provides network services to applications - HTTP, FTP, SMTP, DNS</p>
+                    <div id="layer7" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Protocols:</strong> HTTP, FTP, SMTP, DNS<br>
+                        <strong>Function:</strong> Interface with applications and users<br>
+                        <strong>Examples:</strong> Web browsers, email clients, file transfer
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer6')">
+                    <div class="layer-number">6</div>
+                    <h4>Presentation Layer</h4>
+                    <p>Handles data formatting, encryption, and decryption - SSL/TLS, ASCII, MP3, PDF</p>
+                    <div id="layer6" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Functions:</strong> Data compression, data encryption (SSL/TLS)<br>
+                        <strong>Encoding/Decoding:</strong> ASCII, MP3, PDF<br>
+                        <strong>Purpose:</strong> Ensures data is in a format applications can understand
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer5')">
+                    <div class="layer-number">5</div>
+                    <h4>Session Layer</h4>
+                    <p>Manages connections between applications - NetBIOS, SIP</p>
+                    <div id="layer5" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Functions:</strong> Authentication, authorization, session management<br>
+                        <strong>Protocols:</strong> NetBIOS, Session Initiation Protocol (SIP)<br>
+                        <strong>Purpose:</strong> Establishes, maintains, and terminates sessions
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer4')">
+                    <div class="layer-number">4</div>
+                    <h4>Transport Layer</h4>
+                    <p>Provides reliable data delivery - TCP, UDP</p>
+                    <div id="layer4" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Protocols:</strong> Transmission Control Protocol (TCP), User Datagram Protocol (UDP)<br>
+                        <strong>Functions:</strong> Flow control, congestion control, segmentation<br>
+                        <strong>Purpose:</strong> Reliable or unreliable delivery between applications
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer3')">
+                    <div class="layer-number">3</div>
+                    <h4>Network Layer</h4>
+                    <p>Handles routing between networks - IP, ICMP</p>
+                    <div id="layer3" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Protocols:</strong> Internet Protocol (IP), Internet Control Message Protocol (ICMP)<br>
+                        <strong>Addressing:</strong> IP Addresses<br>
+                        <strong>Devices:</strong> Routers<br>
+                        <strong>Purpose:</strong> Routing data packets between different networks
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer2')">
+                    <div class="layer-number">2</div>
+                    <h4>Data Link Layer</h4>
+                    <p>Error-free transmission between nodes - Ethernet, PPP</p>
+                    <div id="layer2" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Sublayers:</strong> MAC (Media Access Control), LLC (Logical Link Control)<br>
+                        <strong>Protocols:</strong> Ethernet, Point-to-Point Protocol (PPP)<br>
+                        <strong>Devices:</strong> Network Interface Cards (NICs), switches<br>
+                        <strong>Purpose:</strong> Error detection and correction
+                    </div>
+                </div>
+
+                <div class="layer-card" onclick="toggleLayerDetails('layer1')">
+                    <div class="layer-number">1</div>
+                    <h4>Physical Layer</h4>
+                    <p>Physical connection and hardware - Cables, wireless, voltages</p>
+                    <div id="layer1" class="layer-details" style="display:none; margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                        <strong>Cabling:</strong> Ethernet cables (Cat5e, Cat6), fiber optic cables<br>
+                        <strong>Wireless:</strong> Bluetooth, WiFi, 5G<br>
+                        <strong>Topologies:</strong> Bus, star, ring, mesh<br>
+                        <strong>Purpose:</strong> Physical transmission of raw bits
+                    </div>
+                </div>
+            </section>
+
+            <!-- Networking Appliances Section -->
+            <section id="networking-appliances" class="section">
+                <div class="section-header">
+                    <h2>1.2 Networking Appliances, Applications, and Functions</h2>
+                    <p>Essential network devices and their functions</p>
+                </div>
+
+                <div class="content-card">
+                    <h3>Networking Appliances</h3>
+                    <div class="appliance-grid">
+                        <div class="appliance-card">
+                            <h4>🔀 Router</h4>
+                            <p>Forwards data packets between different networks using routing tables to determine the best path.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🔌 Switch</h4>
+                            <p>Forwards data frames within a LAN using MAC addresses to reach correct destinations.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🛡️ Firewall</h4>
+                            <p>Network security system that monitors and controls traffic based on security rules.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🔍 IDS/IPS</h4>
+                            <p>Systems that monitor network traffic for malicious activity. IDS detects, IPS prevents.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>⚖️ Load Balancer</h4>
+                            <p>Distributes network traffic across multiple servers to prevent overload.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🔄 Proxy</h4>
+                            <p>Intermediary server providing security, caching, and content filtering.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>💾 NAS</h4>
+                            <p>Network-Attached Storage provides file-level data access to network clients.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🏗️ SAN</h4>
+                            <p>Storage Area Network provides high-speed block-level access to storage devices.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>📡 Wireless AP</h4>
+                            <p>Allows wireless devices to connect to a wired network.</p>
+                        </div>
+                        <div class="appliance-card">
+                            <h4>🎛️ Wireless Controller</h4>
+                            <p>Manages and configures multiple wireless access points.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>Key Functions</h3>
+                    <div class="highlight">
+                        <h4>🔐 Virtual Private Network (VPN)</h4>
+                        <p>Creates a secure connection over a public network, allowing users to access resources as if they were on a private network.</p>
+                    </div>
+                    <div class="highlight">
+                        <h4>🚦 Quality of Service (QoS)</h4>
+                        <p>A set of techniques to manage network resources and prioritize traffic based on its importance.</p>
+                    </div>
+                    <div class="highlight">
+                        <h4>⏰ Time to Live (TTL)</h4>
+                        <p>A mechanism that limits the lifespan of data packets to prevent them from circulating indefinitely.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cloud Concepts Section -->
+            <section id="cloud-concepts" class="section">
+                <div class="section-header">
+                    <h2>1.3 Cloud Concepts and Connectivity Options</h2>
+                    <p>Modern cloud computing concepts and deployment models</p>
+                </div>
+
+                <div class="content-card">
+                    <h3>Cloud Service Models</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div class="cloud-model">
+                            <h4>☁️ SaaS</h4>
+                            <p><strong>Software as a Service</strong><br>
+                            Software licensed on subscription, accessed online</p>
+                        </div>
+                        <div class="cloud-model">
+                            <h4>🛠️ PaaS</h4>
+                            <p><strong>Platform as a Service</strong><br>
+                            Platform for app development, running, and management</p>
+                        </div>
+                        <div class="cloud-model">
+                            <h4>🖥️ IaaS</h4>
+                            <p><strong>Infrastructure as a Service</strong><br>
+                            Access to computing resources over the internet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>Deployment Models</h3>
+                    <div class="cloud-model" style="background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%); border-color: #28a745;">
+                        <h4>🌐 Public Cloud</h4>
+                        <p>Cloud resources owned and operated by third-party providers, available to the general public. Offers scalability and cost-effectiveness but may raise security concerns.</p>
+                    </div>
+                    <div class="cloud-model" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-color: #ffc107;">
+                        <h4>🏢 Private Cloud</h4>
+                        <p>Cloud resources used exclusively by a single organization. Provides enhanced security and control but can be more expensive.</p>
+                    </div>
+                    <div class="cloud-model" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-color: #dc3545;">
+                        <h4>🔀 Hybrid Cloud</h4>
+                        <p>Combination of public and private cloud resources. Balances cost and security by combining public and private resources.</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>Cloud Networking Concepts</h3>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: #f8fff8; border-left: 4px solid #4a7c59;">
+                            <strong>🌐 Virtual Private Cloud (VPC):</strong> Logically isolated section of public cloud for launching resources
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #f8fff8; border-left: 4px solid #4a7c59;">
+                            <strong>🛡️ Network Security Groups:</strong> Virtual firewalls controlling VM traffic
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #f8fff8; border-left: 4px solid #4a7c59;">
+                            <strong>📋 Network Security Lists:</strong> Similar to security groups but operate at subnet level
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #f8fff8; border-left: 4px solid #4a7c59;">
+                            <strong>🚪 Internet Gateway:</strong> Enables VPC communication with the internet
+                        </li>
+                        <li style="margin: 10px 0; padding: 10px; background: #f8fff8; border-left: 4px solid #4a7c59;">
+                            <strong>🔄 NAT Gateway:</strong> Allows private subnet instances to connect outbound
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Protocols and Ports Section -->
+            <section id="protocols-ports" class="section">
+                <div class="section-header">
+                    <h2>1.4 Networking Ports, Protocols, Services, and Traffic Types</h2>
+                    <p>Essential protocols and their corresponding port numbers</p>
+                </div>
+
+                <div class="content-card">
+                    <h3>Common Protocols and Ports</h3>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr>
+                                <th>Protocol</th>
+                                <th>Port(s)</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>FTP</td><td>20/21</td><td>File Transfer Protocol</td></tr>
+                            <tr><td>SSH/SFTP</td><td>22</td><td>Secure Shell / Secure File Transfer</td></tr>
+                            <tr><td>Telnet</td><td>23</td><td>Remote Terminal Access</td></tr>
+                            <tr><td>SMTP</td><td>25</td><td>Simple Mail Transfer Protocol</td></tr>
+                            <tr><td>DNS</td><td>53</td><td>Domain Name System</td></tr>
+                            <tr><td>DHCP</td><td>67/68</td><td>Dynamic Host Configuration</td></tr>
+                            <tr><td>TFTP</td><td>69</td><td>Trivial File Transfer Protocol</td></tr>
+                            <tr><td>HTTP</td><td>80</td><td>Hypertext Transfer Protocol</td></tr>
+                            <tr><td>NTP</td><td>123</td><td>Network Time Protocol</td></tr>
+                            <tr><td>SNMP</td><td>161/162</td><td>Simple Network Management</td></tr>
+                            <tr><td>LDAP</td><td>389</td><td>Lightweight Directory Access</td></tr>
+                            <tr><td>HTTPS</td><td>443</td><td>HTTP Secure</td></tr>
+                            <tr><td>SMB</td><td>445</td><td>Server Message Block</td></tr>
+                            <tr><td>Syslog</td><td>514</td><td>System Logging</td></tr>
+                            <tr><td>SMTPS</td><td>587</td><td>SMTP Secure</td></tr>
+                            <tr><td>LDAPS</td><td>636</td><td>LDAP over SSL</td></tr>
+                            <tr><td>SQL Server</td><td>1433</td><td>Database Server</td></tr>
+                            <tr><td>RDP</td><td>3389</td><td>Remote Desktop Protocol</td></tr>
+                            <tr><td>SIP</td><td>5060/5061</td><td>Session Initiation Protocol</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="content-card">
+                    <h3>Internet Protocol Types</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                            <h4>TCP</h4>
+                            <p>Reliable, connection-oriented data transmission</p>
+                        </div>
+                        <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                            <h4>UDP</h4>
+                            <p>Unreliable, connectionless data transmission</p>
+                        </div>
+                        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                            <h4>ICMP</h4>
+                            <p>Sends error messages and operational information</p>
+                        </div>
+                        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                            <h4>GRE</h4>
+                            <p>Tunneling protocol for encapsulation</p>
+                        </div>
+                        <div style="background: #fce4ec; padding: 15px; border-radius: 8px; border-left: 4px solid #e91e63;">
+                            <h4>IPSec</h4>
+                            <p>Secure communication over IP networks</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all nav items and sections
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked nav item
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Toggle layer details
+        function toggleLayerDetails(layerId) {
+            const details = document.getElementById(layerId);
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                details.style.animation = 'fadeIn 0.3s ease-in';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        // Search functionality
+        function searchContent(query) {
+            const sections = document.querySelectorAll('.section');
+            const searchQuery = query.toLowerCase();
+            
+            sections.forEach(section => {
+                const content = section.textContent.toLowerCase();
+                const cards = section.querySelectorAll('.content-card, .layer-card, .appliance-card, .cloud-model');
+                
+                cards.forEach(card => {
+                    const cardContent = card.textContent.toLowerCase();
+                    if (cardContent.includes(searchQuery) || searchQuery === '') {
+                        card.style.display = 'block';
+                        card.style.opacity = '1';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Quiz functionality
+        const quizQuestions = [
+            {
+                question: "Which OSI layer is responsible for routing packets between networks?",
+                options: ["Physical", "Data Link", "Network", "Transport"],
+                correct: 2,
+                explanation: "The Network Layer (Layer 3) handles routing of data packets between different networks using IP addresses."
+            },
+            {
+                question: "What port does HTTPS use?",
+                options: ["80", "443", "22", "25"],
+                correct: 1,
+                explanation: "HTTPS (HTTP Secure) uses port 443 for secure web communications."
+            },
+            {
+                question: "Which protocol provides reliable, connection-oriented data transmission?",
+                options: ["UDP", "TCP", "ICMP", "GRE"],
+                correct: 1,
+                explanation: "TCP (Transmission Control Protocol) provides reliable, connection-oriented data transmission with error checking."
+            },
+            {
+                question: "What does NAS stand for?",
+                options: ["Network Access Server", "Network-Attached Storage", "Network Authentication Service", "Network Application Server"],
+                correct: 1,
+                explanation: "NAS stands for Network-Attached Storage, which provides file-level data access to network clients."
+            },
+            {
+                question: "Which cloud service model provides software accessed over the internet?",
+                options: ["IaaS", "PaaS", "SaaS", "DaaS"],
+                correct: 2,
+                explanation: "SaaS (Software as a Service) provides software licensed on subscription and accessed online."
+            },
+            {
+                question: "What port does SSH use?",
+                options: ["21", "22", "23", "25"],
+                correct: 1,
+                explanation: "SSH (Secure Shell) uses port 22 for secure remote access and file transfers."
+            },
+            {
+                question: "Which OSI layer handles data encryption and compression?",
+                options: ["Session", "Presentation", "Application", "Transport"],
+                correct: 1,
+                explanation: "The Presentation Layer (Layer 6) handles data formatting, encryption, and compression."
+            },
+            {
+                question: "What does TTL stand for?",
+                options: ["Time To Live", "Total Transfer Limit", "Transport Layer Timeout", "Traffic Timing Logic"],
+                correct: 0,
+                explanation: "TTL stands for Time To Live, which limits the lifespan of data packets to prevent infinite circulation."
+            }
+        ];
+
+        let currentQuiz = 0;
+        let quizScore = 0;
+        let quizMode = false;
+
+        function startQuiz() {
+            quizMode = true;
+            currentQuiz = 0;
+            quizScore = 0;
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentQuiz >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+
+            const question = quizQuestions[currentQuiz];
+            const quizHtml = `
+                <div class="content-card" style="border: 3px solid #2d5a27;">
+                    <h3>📝 Quiz Question ${currentQuiz + 1} of ${quizQuestions.length}</h3>
+                    <h4 style="margin: 20px 0;">${question.question}</h4>
+                    <div id="quiz-options">
+                        ${question.options.map((option, index) => 
+                            `<button class="quiz-button" style="display: block; width: 100%; margin: 10px 0; text-align: left;" 
+                             onclick="selectAnswer(${index})">${String.fromCharCode(65 + index)}. ${option}</button>`
+                        ).join('')}
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="quiz-button" onclick="exitQuiz()" style="background: #dc3545;">Exit Quiz</button>
+                        <span style="float: right; color: #666;">Score: ${quizScore}/${currentQuiz}</span>
+                    </div>
+                </div>
+            `;
+
+            // Hide all sections and show quiz
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Create or update quiz container
+            let quizContainer = document.getElementById('quiz-container');
+            if (!quizContainer) {
+                quizContainer = document.createElement('div');
+                quizContainer.id = 'quiz-container';
+                quizContainer.className = 'section active';
+                document.querySelector('.main-content').appendChild(quizContainer);
+            }
+            
+            quizContainer.innerHTML = `
+                <div class="section-header">
+                    <h2>🧠 Quiz Mode</h2>
+                    <p>Test your knowledge of Network Concepts</p>
+                </div>
+                ${quizHtml}
+            `;
+            quizContainer.style.display = 'block';
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuiz];
+            const isCorrect = selectedIndex === question.correct;
+            
+            if (isCorrect) {
+                quizScore++;
+            }
+
+            // Show explanation
+            const explanationHtml = `
+                <div class="highlight" style="margin-top: 20px; border-left-color: ${isCorrect ? '#28a745' : '#dc3545'};">
+                    <h4>${isCorrect ? '✅ Correct!' : '❌ Incorrect'}</h4>
+                    <p><strong>Correct Answer:</strong> ${question.options[question.correct]}</p>
+                    <p><strong>Explanation:</strong> ${question.explanation}</p>
+                    <button class="quiz-button" onclick="nextQuestion()" style="margin-top: 15px;">
+                        ${currentQuiz + 1 >= quizQuestions.length ? 'Show Results' : 'Next Question'}
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('quiz-options').innerHTML = explanationHtml;
+        }
+
+        function nextQuestion() {
+            currentQuiz++;
+            showQuizQuestion();
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            let grade, message;
+
+            if (percentage >= 90) {
+                grade = "A+";
+                message = "Excellent! You have a strong understanding of networking concepts.";
+            } else if (percentage >= 80) {
+                grade = "A";
+                message = "Great job! You understand most networking concepts well.";
+            } else if (percentage >= 70) {
+                grade = "B";
+                message = "Good work! Review the areas you missed.";
+            } else if (percentage >= 60) {
+                grade = "C";
+                message = "Fair understanding. More study recommended.";
+            } else {
+                grade = "F";
+                message = "Keep studying! Review all sections carefully.";
+            }
+
+            const resultsHtml = `
+                <div class="section-header">
+                    <h2>📊 Quiz Results</h2>
+                    <p>Your performance summary</p>
+                </div>
+                <div class="content-card" style="text-align: center; border: 3px solid #2d5a27;">
+                    <h3 style="font-size: 3em; color: #2d5a27;">${grade}</h3>
+                    <h4>Score: ${quizScore} out of ${quizQuestions.length} (${percentage}%)</h4>
+                    <p style="font-size: 1.2em; margin: 20px 0;">${message}</p>
+                    <div style="margin-top: 30px;">
+                        <button class="quiz-button" onclick="startQuiz()">🔄 Retake Quiz</button>
+                        <button class="quiz-button" onclick="exitQuiz()">📚 Back to Study</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('quiz-container').innerHTML = resultsHtml;
+        }
+
+        function exitQuiz() {
+            quizMode = false;
+            const quizContainer = document.getElementById('quiz-container');
+            if (quizContainer) {
+                quizContainer.remove();
+            }
+            
+            // Show the first section
+            document.querySelector('.nav-item').click();
+        }
+
+        function toggleStudyMode() {
+            const cards = document.querySelectorAll('.layer-card, .appliance-card');
+            cards.forEach(card => {
+                if (card.style.background.includes('linear-gradient')) {
+                    card.style.background = '#f8f9fa';
+                    card.style.border = '2px solid #dee2e6';
+                } else {
+                    card.style.background = 'linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%)';
+                    card.style.border = '2px solid #d4edda';
+                }
+            });
+        }
+
+        // Flash card functionality
+        function createFlashCard(term, definition) {
+            return `
+                <div class="flash-card" style="perspective: 1000px; margin: 10px 0;">
+                    <div class="flash-card-inner" style="position: relative; width: 100%; height: 200px; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer;" onclick="flipCard(this)">
+                        <div class="flash-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
+                            <h4>${term}</h4>
+                        </div>
+                        <div class="flash-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%); color: #333; border-radius: 10px; transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
+                            <p>${definition}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function flipCard(card) {
+            if (card.style.transform === 'rotateY(180deg)') {
+                card.style.transform = 'rotateY(0deg)';
+            } else {
+                card.style.transform = 'rotateY(180deg)';
+            }
+        }
+
+        // Initialize tooltips and interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to protocol table rows
+            const tableRows = document.querySelectorAll('.protocol-table tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add study progress tracking
+            let studyProgress = JSON.parse(localStorage.getItem('studyProgress') || '{}');
+            
+            function updateProgress(section) {
+                studyProgress[section] = new Date().toISOString();
+                localStorage.setItem('studyProgress', JSON.stringify(studyProgress));
+            }
+
+            // Track section visits
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    updateProgress(section);
+                });
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        document.querySelector('[data-section="osi-model"]').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.querySelector('[data-section="networking-appliances"]').click();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        document.querySelector('[data-section="cloud-concepts"]').click();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        document.querySelector('[data-section="protocols-ports"]').click();
+                        break;
+                    case 'q':
+                        e.preventDefault();
+                        startQuiz();
+                        break;
+                }
+            }
+        });
+
+        // Print functionality
+        function printStudyGuide() {
+            window.print();
+        }
+
+        // Add print styles
+        const printStyles = `
+            @media print {
+                .sidebar { display: none; }
+                .main-content { margin-left: 0; }
+                .quiz-button { display: none; }
+                .search-box { display: none; }
+                .section { display: block !important; }
+                .layer-details { display: block !important; }
+            }
+        `;
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = printStyles;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+</html>
