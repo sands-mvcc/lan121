@@ -1,0 +1,294 @@
+<questestinterop>
+  <assessment title="CompTIA Network+ N10-009 Domain 2—Network Implementation">
+
+    <!-- 2.1 Routing Technologies (Questions 1–12) -->
+    <section ident="2.1">
+
+      <!-- Multiple Choice Sample -->
+      <item title="Static Routing Characteristics" ident="Q1">
+        <presentation>
+          <material><mattext>Which statement best describes static routing?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice shuffle="Yes">
+              <response_label ident="A"><material><mattext>Manual route entries that do not change unless updated by an administrator.</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Routes automatically update in response to network changes.</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Utilizes router advertisements for default routes.</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Essential for wireless network expansion.</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Dynamic Routing Protocol Example" ident="Q2">
+        <presentation>
+          <material><mattext>Which protocol is considered a dynamic routing protocol?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice shuffle="Yes">
+              <response_label ident="A"><material><mattext>VLAN</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>OSPF</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>MTU</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Voice VLAN</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">B</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Routing Protocol Suitability" ident="Q3">
+        <presentation>
+          <material><mattext>Which protocol is primarily used for routing between different autonomous systems on the internet?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice shuffle="Yes">
+              <response_label ident="A"><material><mattext>OSPF</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>BGP</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>EIGRP</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>RIP</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">B</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+      
+      <item title="Administrative Distance" ident="Q4">
+        <presentation>
+          <material><mattext>What is the purpose of administrative distance in routing?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>To determine the fastest link speed</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>To select the most trusted route source</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>To set the size of data frames</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>To distinguish switch types</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">B</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Metric in Route Selection" ident="Q5">
+        <presentation>
+          <material><mattext>Which of the following helps routers select the best path when multiple paths exist?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Metric</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>VLAN ID</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>SSID</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Jumbo frame</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+      
+      <item title="NAT Function" ident="Q6">
+        <presentation>
+          <material><mattext>What is the main purpose of Network Address Translation (NAT)?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Converts private IP addresses into public IP addresses</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Encrypts wireless data</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Manages link aggregation</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Creates VLAN tags</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Port Address Translation" ident="Q7">
+        <presentation>
+          <material><mattext>Port Address Translation (PAT) is also known as:</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Dynamic routing</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Static NAT</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Overloading</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Link aggregation</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">C</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+      
+      <item title="First Hop Redundancy" ident="Q8">
+        <presentation>
+          <material><mattext>Which technology allows automatic failover for a gateway IP address?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Jumbo frames</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>FHRP</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>SSID</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>802.1Q</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">B</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Virtual IP" ident="Q9">
+        <presentation>
+          <material><mattext>A Virtual IP address is BEST described as:</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>An IP not tied to a single physical network interface</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>A manually assigned static route</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>A wireless frequency control value</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>A protocol used for mesh networks</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <item title="Subinterface Use Case" ident="Q10">
+        <presentation>
+          <material><mattext>What is a common use case for router subinterfaces?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Managing jumbo frames</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Creating multiple logical interfaces on a single physical interface</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Assigning wireless SSIDs</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Switching frequencies</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">B</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <!-- ... (Add 2 more multiple choice in this subdomain as above: Q11, Q12) ... -->
+
+    </section>
+
+    <!-- 2.2 Switching Technologies/Features (Q13–21) -->
+    <section ident="2.2">
+
+      <item title="VLAN Purpose" ident="Q13">
+        <presentation>
+          <material><mattext>What is the main purpose of a VLAN?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Segregate broadcast domains within a switch</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Increase wireless frequency options</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Expand physical frame size</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>Encrypt Ethernet frames</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <!-- ... (Q14–Q21: Add questions about VLAN database, SVI, trunking/802.1Q, native/voice VLAN, link aggregation, speed/duplex, spanning tree, MTU, jumbo frames) ... -->
+
+    </section>
+
+    <!-- 2.3 Wireless Networking (Q22–30) -->
+    <section ident="2.3">
+
+      <item title="Non-overlapping Wireless Channels" ident="Q22">
+        <presentation>
+          <material><mattext>Why are non-overlapping channels important in wireless?</mattext></material>
+          <response_lid ident="RESPONSE">
+            <render_choice>
+              <response_label ident="A"><material><mattext>They reduce co-channel interference.</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>They increase switch port density.</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>They provide VLAN segmentation.</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>They enhance administrative distance.</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar><varequal respident="RESPONSE">A</varequal></conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <!-- ... (Q23–Q25: MCQs about channel widths, regulatory impacts, frequencies, SSID, network types, encryption, authentication, antennas, AP modes) ... -->
+
+      <!-- Multiple Answers Example for Wireless -->
+      <item title="Wireless Authentication Methods" ident="Q26" maxchoices="2">
+        <presentation>
+          <material><mattext>Select ALL authentication methods supported in enterprise wireless networks.</mattext></material>
+          <response_lid ident="RESPONSE" rcardinality="Multiple">
+            <render_choice>
+              <response_label ident="A"><material><mattext>Pre-Shared Key (PSK)</mattext></material></response_label>
+              <response_label ident="B"><material><mattext>Enterprise/EAP with RADIUS</mattext></material></response_label>
+              <response_label ident="C"><material><mattext>Static routing</mattext></material></response_label>
+              <response_label ident="D"><material><mattext>802.1Q Tagging</mattext></material></response_label>
+            </render_choice>
+          </response_lid>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar>
+              <and>
+                <varequal respident="RESPONSE">A</varequal>
+                <varequal respident="RESPONSE">B</varequal>
+              </and>
+            </conditionvar>
+            <setvar action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+
+      <!-- ... (Q27–Q30: 4 more multiple answer items on routing, switching, and wireless—choose all that apply) ... -->
+
+    </section>
+  </assessment>
+</questestinterop>
