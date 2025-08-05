@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number System Challenge</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        h1 {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            color: #1a202c; /* Dark gray */
+            margin-bottom: 20px;
+        }
+        .score-display {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            color: #4a5568; /* Medium gray */
+            margin-bottom: 25px;
+            padding: 10px 20px;
+            background-color: #edf2f7; /* Lighter gray */
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .problem-area {
+            background-color: #e0f2f7; /* Light cyan */
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #bee3f8;
+        }
+        .problem-text {
+            font-size: 1.75rem; /* 28px */
+            font-weight: 700;
+            color: #2c5282; /* Darker blue */
+            margin-bottom: 15px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        input[type="text"] {
+            width: calc(100% - 40px); /* Full width minus padding */
+            max-width: 300px;
+            padding: 15px 20px;
+            font-size: 1.25rem; /* 20px */
+            border: 2px solid #a0aec0; /* Gray border */
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            color: #2d3748;
+        }
+        input[type="text"]:focus {
+            border-color: #4299e1; /* Blue focus */
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.25rem; /* 20px */
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        button.submit-btn {
+            background-color: #48bb78; /* Green */
+            color: white;
+            background-image: linear-gradient(to right, #48bb78, #38a169);
+        }
+        button.submit-btn:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        button.submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button.new-game-btn {
+            background-color: #63b3ed; /* Light blue */
+            color: white;
+            background-image: linear-gradient(to right, #63b3ed, #4299e1);
+            margin-top: 20px;
+        }
+        button.new-game-btn:hover {
+            background-color: #4299e1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        button.new-game-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .feedback-message {
+            margin-top: 20px;
+            font-size: 1.1rem; /* 18px */
+            font-weight: 600;
+            min-height: 25px; /* Reserve space */
+        }
+        .feedback-message.correct {
+            color: #38a169; /* Darker green */
+        }
+        .feedback-message.incorrect {
+            color: #e53e3e; /* Red */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.75rem; /* 28px */
+            }
+            .score-display {
+                font-size: 1.2rem; /* 19.2px */
+            }
+            .problem-text {
+                font-size: 1.5rem; /* 24px */
+            }
+            input[type="text"], button {
+                font-size: 1rem; /* 16px */
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Number System Challenge</h1>
+        <div class="score-display">Score: <span id="score">0</span></div>
+
+        <div class="problem-area">
+            <div id="problem" class="problem-text"></div>
+            <div class="input-group">
+                <input type="text" id="answerInput" placeholder="Your Answer" autocomplete="off">
+                <button id="submitBtn" class="submit-btn">Submit Answer</button>
+            </div>
+        </div>
+
+        <div id="feedback" class="feedback-message"></div>
+        <button id="newGameBtn" class="new-game-btn">New Game</button>
+    </div>
+
+    <script>
+        // Game state variables
+        let score = 0;
+        let currentProblem = {};
+        let problemTypes = [
+            'binToDec', 'decToBin', 'binToHex', 'hexToBin', 'hexToDec', 'decToHex',
+            'addBin', 'addHex'
+        ];
+
+        // DOM elements
+        const scoreDisplay = document.getElementById('score');
+        const problemDisplay = document.getElementById('problem');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const feedbackDisplay = document.getElementById('feedback');
+
+        // Helper functions for conversions and additions
+        function binToDec(bin) {
+            return parseInt(bin, 2);
+        }
+
+        function decToBin(dec) {
+            return dec.toString(2);
+        }
+
+        function binToHex(bin) {
+            return parseInt(bin, 2).toString(16).toUpperCase();
+        }
+
+        function hexToBin(hex) {
+            // Pad start with zeros to ensure correct binary length for each hex digit
+            return parseInt(hex, 16).toString(2).padStart(hex.length * 4, '0');
+        }
+
+        function hexToDec(hex) {
+            return parseInt(hex, 16);
+        }
+
+        function decToHex(dec) {
+            return dec.toString(16).toUpperCase();
+        }
+
+        function addBin(bin1, bin2) {
+            const decSum = parseInt(bin1, 2) + parseInt(bin2, 2);
+            return decSum.toString(2);
+        }
+
+        function addHex(hex1, hex2) {
+            const decSum = parseInt(hex1, 16) + parseInt(hex2, 16);
+            return decSum.toString(16).toUpperCase();
+        }
+
+        // Function to generate a random problem
+        function generateProblem() {
+            const type = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+            let problemText = '';
+            let correctAnswer = '';
+
+            switch (type) {
+                case 'binToDec':
+                    // Binary numbers with 4-8 digits
+                    const binDec = Math.floor(Math.random() * (255 - 16) + 16).toString(2); // Dec 16-255
+                    problemText = `Convert binary ${binDec} to decimal:`;
+                    correctAnswer = binToDec(binDec).toString();
+                    break;
+                case 'decToBin':
+                    // Decimal numbers between 16 and 255
+                    const decBin = Math.floor(Math.random() * (255 - 16) + 16);
+                    problemText = `Convert decimal ${decBin} to binary:`;
+                    correctAnswer = decToBin(decBin);
+                    break;
+                case 'binToHex':
+                    // Binary numbers with 8 digits (one byte)
+                    const binHexDec = Math.floor(Math.random() * (255 - 64) + 64); // Dec 64-255
+                    const binHex = binHexDec.toString(2).padStart(8, '0');
+                    problemText = `Convert binary ${binHex} to hexadecimal:`;
+                    correctAnswer = binToHex(binHex);
+                    break;
+                case 'hexToBin':
+                    // Hex numbers with 1-2 digits
+                    const hexBinDec = Math.floor(Math.random() * (255 - 16) + 16); // Dec 16-255
+                    const hexBin = hexBinDec.toString(16).toUpperCase();
+                    problemText = `Convert hexadecimal ${hexBin} to binary:`;
+                    correctAnswer = hexToBin(hexBin);
+                    // For hexToBin, ensure the output is padded to match 4 bits per hex digit if it's a single hex digit.
+                    // E.g., 'F' -> '1111', not '1111'. '1F' -> '00011111'
+                    if (hexBin.length === 1) {
+                         correctAnswer = correctAnswer.padStart(4, '0');
+                    } else if (hexBin.length === 2) {
+                         correctAnswer = correctAnswer.padStart(8, '0');
+                    }
+                    break;
+                case 'hexToDec':
+                    // Hex numbers with 1-2 digits
+                    const hexDec = Math.floor(Math.random() * (255 - 16) + 16); // Dec 16-255
+                    const hexVal = hexDec.toString(16).toUpperCase();
+                    problemText = `Convert hexadecimal ${hexVal} to decimal:`;
+                    correctAnswer = hexToDec(hexVal).toString();
+                    break;
+                case 'decToHex':
+                    // Decimal numbers between 16 and 255
+                    const decHex = Math.floor(Math.random() * (255 - 16) + 16);
+                    problemText = `Convert decimal ${decHex} to hexadecimal:`;
+                    correctAnswer = decToHex(decHex);
+                    break;
+                case 'addBin':
+                    // Two binary numbers, each 4-6 digits long
+                    const binAdd1 = Math.floor(Math.random() * (31 - 8) + 8).toString(2); // Dec 8-31
+                    const binAdd2 = Math.floor(Math.random() * (31 - 8) + 8).toString(2); // Dec 8-31
+                    problemText = `Add binary ${binAdd1} + ${binAdd2}:`;
+                    correctAnswer = addBin(binAdd1, binAdd2);
+                    break;
+                case 'addHex':
+                    // Two hex numbers, each 1-2 digits long
+                    const hexAdd1 = Math.floor(Math.random() * (255 - 16) + 16).toString(16).toUpperCase(); // Dec 16-255
+                    const hexAdd2 = Math.floor(Math.random() * (255 - 16) + 16).toString(16).toUpperCase(); // Dec 16-255
+                    problemText = `Add hexadecimal ${hexAdd1} + ${hexAdd2}:`;
+                    correctAnswer = addHex(hexAdd1, hexAdd2);
+                    break;
+            }
+
+            currentProblem = { problemText, correctAnswer: correctAnswer.toLowerCase() }; // Store correct answer in lowercase for case-insensitive comparison
+            problemDisplay.textContent = problemText;
+            answerInput.value = ''; // Clear input field
+            feedbackDisplay.textContent = ''; // Clear feedback
+            answerInput.focus(); // Focus on input for quick entry
+        }
+
+        // Function to check the user's answer
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase(); // Trim and convert to lowercase for comparison
+
+            if (userAnswer === '') {
+                feedbackDisplay.textContent = 'Please enter an answer!';
+                feedbackDisplay.className = 'feedback-message incorrect';
+                return;
+            }
+
+            if (userAnswer === currentProblem.correctAnswer) {
+                score++;
+                scoreDisplay.textContent = score;
+                feedbackDisplay.textContent = 'Correct! 🎉';
+                feedbackDisplay.className = 'feedback-message correct';
+            } else {
+                feedbackDisplay.textContent = `Incorrect. The correct answer was ${currentProblem.correctAnswer.toUpperCase()}. 🙁`;
+                feedbackDisplay.className = 'feedback-message incorrect';
+            }
+            // Generate a new problem after a short delay to allow user to see feedback
+            setTimeout(generateProblem, 1500);
+        }
+
+        // Event Listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        newGameBtn.addEventListener('click', startGame);
+
+        // Function to start a new game
+        function startGame() {
+            score = 0;
+            scoreDisplay.textContent = score;
+            generateProblem();
+        }
+
+        // Initialize the game when the window loads
+        window.onload = startGame;
+
+    </script>
+</body>
+</html>
