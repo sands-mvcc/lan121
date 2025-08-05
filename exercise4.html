@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Network Configuration Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #000000 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2d5a2d 0%, #1a4a1a 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #a8d8a8;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+            border-bottom: 2px solid #4a8a4a;
+            padding-bottom: 10px;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            margin-bottom: 8px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .task-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-left: 3px solid #a8d8a8;
+            transform: translateX(5px);
+        }
+
+        .task-item.active {
+            background: #4a8a4a;
+            border-left: 3px solid #a8d8a8;
+        }
+
+        .task-item.completed {
+            background: #2d5a2d;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a8a4a 0%, #2d5a2d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .task-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: 2px solid #e8f5e8;
+        }
+
+        .task-content h3 {
+            color: #2d5a2d;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .simulator-panel {
+            background: #f8f9fa;
+            border: 2px solid #e8f5e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .config-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4a8a4a;
+        }
+
+        .config-section h4 {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d5a2d;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e8f5e8;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4a8a4a;
+            box-shadow: 0 0 5px rgba(74, 138, 74, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a8a4a 0%, #2d5a2d 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 138, 74, 0.4);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+        }
+
+        .result-panel {
+            background: #e8f5e8;
+            border: 2px solid #4a8a4a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-panel h5 {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .progress-bar {
+            background: #e8f5e8;
+            height: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a8a4a, #2d5a2d);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .network-diagram {
+            background: white;
+            border: 2px solid #e8f5e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .device {
+            background: #4a8a4a;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px;
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border-left: 4px solid #4a8a4a;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .error {
+            background: #ffe6e6;
+            border-left: 4px solid #d32f2f;
+            color: #d32f2f;
+        }
+
+        .success {
+            background: #e8f5e8;
+            border-left: 4px solid #4a8a4a;
+            color: #2d5a2d;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #4a8a4a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>WiFi Configuration Tasks</h2>
+            <ul class="task-list" id="taskList">
+                <li class="task-item active" data-task="1">1. WiFi Standards Overview</li>
+                <li class="task-item" data-task="2">2. Basic Network Setup</li>
+                <li class="task-item" data-task="3">3. Security Configuration</li>
+                <li class="task-item" data-task="4">4. Channel Management</li>
+                <li class="task-item" data-task="5">5. Bandwidth Optimization</li>
+                <li class="task-item" data-task="6">6. Access Point Setup</li>
+                <li class="task-item" data-task="7">7. Advanced Security</li>
+                <li class="task-item" data-task="8">8. Performance Monitoring</li>
+                <li class="task-item" data-task="9">9. Troubleshooting</li>
+                <li class="task-item" data-task="10">10. Network Assessment</li>
+            </ul>
+            <div style="margin-top: 20px; text-align: center;">
+                <div>Progress: <span id="progressText">0/10</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>WiFi Network Configuration Simulator</h1>
+                <p>Interactive Learning Platform for Modern Wireless Networks</p>
+            </div>
+
+            <!-- Task 1: WiFi Standards Overview -->
+            <div id="task1" class="task-content">
+                <h3>Task 1: WiFi Standards Overview</h3>
+                <p>Learn about the evolution and features of modern WiFi standards.</p>
+                
+                <div class="info-box">
+                    <strong>Learning Objectives:</strong>
+                    <ul>
+                        <li>Understand WiFi 6, 6E, and 7 specifications</li>
+                        <li>Compare theoretical and real-world performance</li>
+                        <li>Identify key technological improvements</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Standard</th>
+                            <th>IEEE Name</th>
+                            <th>Max Speed</th>
+                            <th>Frequency Bands</th>
+                            <th>Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>WiFi 6</td>
+                            <td>802.11ax</td>
+                            <td>9.6 Gbps</td>
+                            <td>2.4GHz, 5GHz</td>
+                            <td>OFDMA, MU-MIMO, 1024-QAM</td>
+                        </tr>
+                        <tr>
+                            <td>WiFi 6E</td>
+                            <td>802.11ax</td>
+                            <td>9.6 Gbps</td>
+                            <td>2.4GHz, 5GHz, 6GHz</td>
+                            <td>6GHz band, 160MHz channels</td>
+                        </tr>
+                        <tr>
+                            <td>WiFi 7</td>
+                            <td>802.11be</td>
+                            <td>46 Gbps</td>
+                            <td>2.4GHz, 5GHz, 6GHz</td>
+                            <td>320MHz channels, 4096-QAM, MLO</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="simulator-panel">
+                    <h4>WiFi Standard Comparison Tool</h4>
+                    <div class="form-group">
+                        <label>Select Standards to Compare:</label>
+                        <select id="standard1">
+                            <option value="wifi6">WiFi 6 (802.11ax)</option>
+                            <option value="wifi6e">WiFi 6E</option>
+                            <option value="wifi7">WiFi 7 (802.11be)</option>
+                        </select>
+                        <select id="standard2">
+                            <option value="wifi6e">WiFi 6E</option>
+                            <option value="wifi6">WiFi 6 (802.11ax)</option>
+                            <option value="wifi7">WiFi 7 (802.11be)</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="compareStandards()">Compare Standards</button>
+                    <div id="comparisonResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="completeTask(1)">Complete Task 1</button>
+            </div>
+
+            <!-- Task 2: Basic Network Setup -->
+            <div id="task2" class="task-content hidden">
+                <h3>Task 2: Basic Network Setup</h3>
+                <p>Configure fundamental network parameters for a WiFi access point.</p>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>Network Identity</h4>
+                        <div class="form-group">
+                            <label>Network Name (SSID):</label>
+                            <input type="text" id="ssid" placeholder="MyWiFiNetwork" maxlength="32">
+                        </div>
+                        <div class="form-group">
+                            <label>Country/Region:</label>
+                            <select id="country">
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="DE">Germany</option>
+                                <option value="JP">Japan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>WiFi Standard Selection</h4>
+                        <div class="form-group">
+                            <label>WiFi Standard:</label>
+                            <select id="wifiStandard">
+                                <option value="802.11ax">WiFi 6 (802.11ax)</option>
+                                <option value="802.11ax-6e">WiFi 6E</option>
+                                <option value="802.11be">WiFi 7 (802.11be)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Band Configuration:</label>
+                            <select id="bandConfig">
+                                <option value="dual">Dual Band (2.4GHz + 5GHz)</option>
+                                <option value="tri">Tri Band (2.4GHz + 5GHz + 6GHz)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="applyBasicConfig()">Apply Configuration</button>
+                    <div id="basicConfigResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <div class="network-diagram" id="networkDiagram">
+                    <div class="device">Router/AP</div>
+                </div>
+
+                <button class="btn" onclick="completeTask(2)">Complete Task 2</button>
+            </div>
+
+            <!-- Task 3: Security Configuration -->
+            <div id="task3" class="task-content hidden">
+                <h3>Task 3: Security Configuration</h3>
+                <p>Configure WPA3 security protocols and authentication methods.</p>
+
+                <div class="info-box">
+                    <strong>Security Best Practices:</strong>
+                    <ul>
+                        <li>Use WPA3 Personal for home networks</li>
+                        <li>Enable Protected Management Frames (PMF)</li>
+                        <li>Use strong, unique passphrases</li>
+                        <li>Consider WPA2/WPA3 transition mode for compatibility</li>
+                    </ul>
+                </div>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>Security Protocol</h4>
+                        <div class="form-group">
+                            <label>Security Type:</label>
+                            <select id="securityType">
+                                <option value="wpa3">WPA3 Personal</option>
+                                <option value="wpa2-wpa3">WPA2/WPA3 Transition</option>
+                                <option value="wpa3-enterprise">WPA3 Enterprise</option>
+                                <option value="wpa2">WPA2 Personal (Legacy)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Network Password:</label>
+                            <input type="password" id="networkPassword" placeholder="Enter strong password (8+ characters)">
+                            <small>Password strength: <span id="passwordStrength">Not set</span></small>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>Advanced Security Settings</h4>
+                        <div class="form-group">
+                            <label>Protected Management Frames (PMF):</label>
+                            <select id="pmf">
+                                <option value="required">Required</option>
+                                <option value="capable">Capable</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Group Key Update Interval (seconds):</label>
+                            <input type="number" id="groupKeyInterval" value="3600" min="300" max="86400">
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="applySecurity()">Apply Security Settings</button>
+                    <div id="securityResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="completeTask(3)">Complete Task 3</button>
+            </div>
+
+            <!-- Task 4: Channel Management -->
+            <div id="task4" class="task-content hidden">
+                <h3>Task 4: Channel Management</h3>
+                <p>Configure optimal channel settings for maximum performance and minimal interference.</p>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>2.4GHz Band Settings</h4>
+                        <div class="form-group">
+                            <label>Channel:</label>
+                            <select id="channel24">
+                                <option value="auto">Auto</option>
+                                <option value="1">Channel 1 (2412 MHz)</option>
+                                <option value="6">Channel 6 (2437 MHz)</option>
+                                <option value="11">Channel 11 (2462 MHz)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Channel Width:</label>
+                            <select id="width24">
+                                <option value="20">20 MHz</option>
+                                <option value="40">40 MHz</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>5GHz Band Settings</h4>
+                        <div class="form-group">
+                            <label>Channel:</label>
+                            <select id="channel5">
+                                <option value="auto">Auto</option>
+                                <option value="36">Channel 36 (5180 MHz)</option>
+                                <option value="149">Channel 149 (5745 MHz)</option>
+                                <option value="161">Channel 161 (5805 MHz)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Channel Width:</label>
+                            <select id="width5">
+                                <option value="80">80 MHz</option>
+                                <option value="40">40 MHz</option>
+                                <option value="160">160 MHz</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>6GHz Band Settings (WiFi 6E/7)</h4>
+                        <div class="form-group">
+                            <label>Channel:</label>
+                            <select id="channel6">
+                                <option value="auto">Auto</option>
+                                <option value="37">Channel 37 (6185 MHz)</option>
+                                <option value="85">Channel 85 (6425 MHz)</option>
+                                <option value="133">Channel 133 (6665 MHz)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Channel Width:</label>
+                            <select id="width6">
+                                <option value="160">160 MHz</option>
+                                <option value="80">80 MHz</option>
+                                <option value="320">320 MHz (WiFi 7)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="scanChannels()">Scan for Interference</button>
+                    <button class="btn" onclick="applyChannels()">Apply Channel Settings</button>
+                    <div id="channelResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="completeTask(4)">Complete Task 4</button>
+            </div>
+
+            <!-- Task 5: Bandwidth Optimization -->
+            <div id="task5" class="task-content hidden">
+                <h3>Task 5: Bandwidth Optimization</h3>
+                <p>Configure advanced features to maximize network throughput and efficiency.</p>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>WiFi 6/7 Advanced Features</h4>
+                        <div class="form-group">
+                            <label>OFDMA (Orthogonal Frequency Division Multiple Access):</label>
+                            <select id="ofdma">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>MU-MIMO (Multi-User MIMO):</label>
+                            <select id="mumimo">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Wake Time (TWT):</label>
+                            <select id="twt">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>QAM Modulation:</label>
+                            <select id="qam">
+                                <option value="1024">1024-QAM (WiFi 6)</option>
+                                <option value="4096">4096-QAM (WiFi 7)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>Multi-Link Operation (WiFi 7)</h4>
+                        <div class="form-group">
+                            <label>MLO Mode:</label>
+                            <select id="mlo">
+                                <option value="disabled">Disabled</option>
+                                <option value="enabled">Enabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Band Steering:</label>
+                            <select id="bandSteering">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="optimizeBandwidth()">Apply Optimization</button>
+                    <div id="optimizationResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="completeTask(5)">Complete Task 5</button>
+            </div>
+
+            <!-- Task 6: Access Point Setup -->
+            <div id="task6" class="task-content hidden">
+                <h3>Task 6: Access Point Setup</h3>
+                <p>Configure multiple access points for enterprise deployment.</p>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>Access Point Configuration</h4>
+                        <div class="form-group">
+                            <label>AP Management Mode:</label>
+                            <select id="apMode">
+                                <option value="standalone">Standalone</option>
+                                <option value="controller">Controller-based</option>
+                                <option value="cloud">Cloud-managed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Transmission Power:</label>
+                            <select id="txPower">
+                                <option value="high">High (100%)</option>
+                                <option value="medium">Medium (50%)</option>
+                                <option value="low">Low (25%)</option>
+                                <option value="auto">Auto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Load Balancing:</label>
+                            <select id="loadBalancing">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>Fast Roaming Settings</h4>
+                        <div class="form-group">
+                            <label>802.11r (Fast BSS Transition):</label>
+                            <select id="fastRoaming">
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Mobility Domain ID:</label>
+                            <input type="text" id="mobilityDomain" placeholder="A1B2" maxlength="4">
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="deployAPs()">Deploy Access Points</button>
+                    <div id="apResult" class="result-panel" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="completeTask(6)">Complete Task 6</button>
+            </div>
+
+            <!-- Task 7: Advanced Security -->
+            <div id="task7" class="task-content hidden">
+                <h3>Task 7: Advanced Security</h3>
+                <p>Implement enterprise-grade security features and access control.</p>
+
+                <div class="simulator-panel">
+                    <div class="config-section">
+                        <h4>Enterprise Authentication</h4>
+                        <div class="form-group">
+                            <label>RADIUS Server IP:</label>
+                            <input type="text" id="radiusIP" placeholder="192.168.1.100">
+                        </div>
+                        <div class="form-group">
+                            <label>RADIUS Port:</label>
+                            <input type="number" id="radiusPort" value="1812">
+                        </div>
+                        <div class="form-group">
+                            <label>Shared Secret:</label>
+                            <input type="password" id="radiusSecret" placeholder="Enter RADIUS shared secret">
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h4>Access Control</h4>
+                        <div class="form-group">
+                            <label>MAC Address Filtering:</label>
+                            <select id="macFiltering">
+                                <option value="disabled">Disabled</option>
+                                <option value="allow">Allow List</option>
+                                <option value="deny">Deny List</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Guest Network:</label>
+                            <select id="guestNetwork">
+                                <option value="disabled">Disabled</option>
+                                <option value="enabled">Enabled</option>
+                            </select>
+                
