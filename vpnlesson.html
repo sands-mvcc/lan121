@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive VPN Concepts Lesson</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+    }
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: #058c42;
+      color: #fff;
+      width: 230px;
+      min-width: 170px;
+      padding: 30px 0;
+      box-shadow: 2px 0 6px #abf5c7;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .sidebar h2 {
+      margin: 0 0 32px 0;
+      text-align: center;
+      font-size: 1.6em;
+      letter-spacing: 1px;
+      color: #fff;
+      font-weight: bold;
+    }
+    .nav-link {
+      background: transparent;
+      color: #fff;
+      text-align: left;
+      font-size: 1.16em;
+      padding: 15px 32px;
+      margin: 4px 0;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      border-left: 5px solid transparent;
+      transition: background 0.2s, border-left 0.2s, color 0.2s;
+    }
+    .nav-link.active, .nav-link:hover {
+      background: #e8faef;
+      color: #058c42;
+      border-left: 5px solid #1f3b24;
+    }
+    .content {
+      flex: 1;
+      padding: 48px 36px 36px 48px;
+      background: #fff;
+      color: #111;
+      min-height: 100vh;
+    }
+    .content h1 {
+      color: #058c42;
+      margin-top: 0;
+    }
+    .highlight {
+      color: #00983d;
+      font-weight: bold;
+    }
+    ul, ol {
+      color: #111;
+      margin-left: 18px;
+      margin-bottom: 18px;
+    }
+    .example-box {
+      border: 1.5px solid #00983d;
+      background: #f6fef8;
+      padding: 18px 18px 10px 18px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      color: #333;
+    }
+    a {
+      color: #058c42;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <h2>VPN Lessons</h2>
+      <button class="nav-link active" onclick="showSection('purpose')">Purpose of VPNs</button>
+      <button class="nav-link" onclick="showSection('types')">Types of VPNs</button>
+      <button class="nav-link" onclick="showSection('protocols')">VPN Protocols</button>
+      <button class="nav-link" onclick="showSection('config')">Configuration Options</button>
+    </nav>
+    <main class="content">
+      <section id="purpose" class="lesson-section">
+        <h1>Purpose of VPNs</h1>
+        <p>
+          <span class="highlight">Virtual Private Networks (VPNs)</span> provide a secure connection between remote users or sites and a private network over the internet.<br>
+          Main purposes include:
+        </p>
+        <ul>
+          <li><b>Privacy:</b> VPNs encrypt traffic, hiding user data from eavesdropping and ISPs.</li>
+          <li><b>Security:</b> VPNs secure sensitive business or personal data from cyber threats, especially on public Wi-Fi.</li>
+          <li><b>Remote Access:</b> Employees can access their organization’s internal resources securely from anywhere.</li>
+          <li><b>Bypass Restrictions:</b> Users can access geo-restricted content or bypass censorship by routing traffic through remote servers.</li>
+        </ul>
+        <div class="example-box">
+          <b>Example:</b> A company’s employee works from home and connects to the corporate network securely using a VPN, ensuring confidential files are protected.
+        </div>
+      </section>
+      <section id="types" class="lesson-section" style="display:none;">
+        <h1>Types of VPNs</h1>
+        <ul>
+          <li>
+            <b>Remote Access VPN</b><br>
+            Connects individual users to a private network from anywhere via encrypted tunnels.<br>
+            <i>Use case:</i> Remote workers connecting securely to their office resources.
+          </li>
+          <li>
+            <b>Site-to-Site VPN (Router-to-Router)</b><br>
+            Connects entire office networks in different locations over the internet.<br>
+            <i>Use case:</i> Two company branches securely sharing internal data.
+          </li>
+          <li>
+            <b>Client-to-Site (SSL VPN)</b><br>
+            Uses a web browser or app for users to connect to internal web resources.<br>
+            <i>Example:</i> Employees accessing internal applications through a secure portal.
+          </li>
+        </ul>
+        <div class="example-box">
+          <b>More:</b> Large organizations may use <span class="highlight">Hybrid VPNs</span>, combining both Remote Access and Site-to-Site VPNs.
+        </div>
+      </section>
+      <section id="protocols" class="lesson-section" style="display:none;">
+        <h1>VPN Protocols</h1>
+        <ul>
+          <li>
+            <b>IPSec (Internet Protocol Security):</b> 
+            Used for both Site-to-Site and Remote Access VPNs. Provides strong encryption and authentication.
+          </li>
+          <li>
+            <b>OpenVPN:</b> 
+            Open-source, highly secure, and flexible. Uses SSL/TLS for key exchange. Supports most operating systems.
+          </li>
+          <li>
+            <b>L2TP/IPSec (Layer 2 Tunneling Protocol):</b> 
+            Combines L2TP and IPSec for enhanced security. Frequently used in enterprise VPNs.
+          </li>
+          <li>
+            <b>PPTP (Point-to-Point Tunneling Protocol):</b> 
+            One of the oldest protocols. Fast, but considered weak in security.
+          </li>
+          <li>
+            <b>WireGuard:</b> 
+            Modern, lightweight, and fast protocol. Gaining popularity for its simplicity and security.
+          </li>
+        </ul>
+        <div class="example-box">
+          <b>Tip:</b> <span class="highlight">OpenVPN</span> and <span class="highlight">WireGuard</span> are widely used today, as they balance strong security with speed.
+        </div>
+      </section>
+      <section id="config" class="lesson-section" style="display:none;">
+        <h1>VPN Configuration Options</h1>
+        <ul>
+          <li><b>Server Address:</b> The VPN gateway's IP or domain name to connect to.</li>
+          <li><b>Authentication:</b> Passwords, pre-shared keys (PSK), or certificates for verifying identity.</li>
+          <li><b>Encryption Algorithm:</b> Choice of cipher (e.g., AES-256, ChaCha20) for securing data.</li>
+          <li><b>Tunneling Protocol:</b> Protocol selected (see Protocols tab) for encapsulating traffic.</li>
+          <li><b>Split Tunnel or Full Tunnel:</b> Choose whether to route all traffic or only specific resources through the VPN.</li>
+          <li><b>Client Settings:</b> Software/app and OS compatibility, auto-connect options.</li>
+        </ul>
+        <div class="example-box">
+          <b>Common Setup:</b> A VPN may require the user to enter the server address, a username, and a pre-shared key, then select the protocol (like <b>IPSec</b>), and encryption level before making a secure connection.
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    function showSection(id) {
+      // Hide all lesson sections
+      var sections = document.getElementsByClassName('lesson-section');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].style.display = 'none';
+      }
+      // Remove active class from all nav-links
+      var links = document.getElementsByClassName('nav-link');
+      for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove('active');
+      }
+      // Show selected section and highlight link
+      document.getElementById(id).style.display = 'block';
+      // Find and highlight the correct button
+      var sidebar = document.querySelector('.sidebar');
+      var buttons = sidebar.getElementsByTagName('button');
+      for (var j = 0; j < buttons.length; j++) {
+        if (buttons[j].getAttribute('onclick').includes(id)) {
+          buttons[j].classList.add('active');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
