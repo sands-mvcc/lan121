@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Study Guide - Objectives 1.5-1.8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #2c5234 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c5234 0%, #1a3120 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h1 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #a8d4a8;
+            text-align: center;
+            border-bottom: 2px solid #4a7c4a;
+            padding-bottom: 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            color: #e8f5e8;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+        }
+
+        .nav-link:hover {
+            background: rgba(168, 212, 168, 0.2);
+            color: #a8d4a8;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #4a7c4a;
+            color: white;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2c5234;
+            border-bottom: 3px solid #4a7c4a;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #1a3120;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            background: linear-gradient(90deg, rgba(76, 124, 74, 0.1) 0%, transparent 100%);
+            padding: 10px 15px;
+            border-left: 4px solid #4a7c4a;
+        }
+
+        h4 {
+            color: #2c5234;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border: 2px solid #4a7c4a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(76, 124, 74, 0.1);
+        }
+
+        .key-point {
+            background: #2c5234;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 5px solid #a8d4a8;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: #2c5234;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e8f5e8;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8fdf8;
+        }
+
+        .comparison-table tr:hover {
+            background: #e8f5e8;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e8 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 2px solid #4a7c4a;
+        }
+
+        .quiz-question {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #2c5234;
+        }
+
+        .quiz-options {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .quiz-option {
+            margin: 8px 0;
+            padding: 10px;
+            background: #f8fdf8;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid #e8f5e8;
+        }
+
+        .quiz-option:hover {
+            background: #e8f5e8;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #4a7c4a;
+            color: #1a3120;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .flashcard {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 2px solid #4a7c4a;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(76, 124, 74, 0.2);
+        }
+
+        .flashcard-front {
+            font-weight: bold;
+            color: #2c5234;
+        }
+
+        .flashcard-back {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e8f5e8;
+            color: #1a3120;
+        }
+
+        .flashcard.flipped .flashcard-back {
+            display: block;
+        }
+
+        .subnet-calculator {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #4a7c4a;
+        }
+
+        .subnet-input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px solid #e8f5e8;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .subnet-input:focus {
+            border-color: #4a7c4a;
+            outline: none;
+        }
+
+        .subnet-button {
+            background: #2c5234;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+        }
+
+        .subnet-button:hover {
+            background: #1a3120;
+        }
+
+        .subnet-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 5px;
+            border-left: 4px solid #4a7c4a;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e8f5e8;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7c4a 0%, #2c5234 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .topology-diagram {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fdf8;
+            border-radius: 10px;
+            border: 2px solid #e8f5e8;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h1>Network+ Study Guide</h1>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">📚 Study Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="obj15">1.5 Transmission Media & Transceivers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="obj16">1.6 Network Topologies & Architectures</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="obj17">1.7 IPv4 Network Addressing</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="obj18">1.8 Modern Network Environments</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="flashcards">🔄 Flashcards</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="calculator">🧮 Subnet Calculator</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="quiz">❓ Practice Quiz</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <h2>📚 CompTIA Network+ Study Guide</h2>
+                <div class="highlight-box">
+                    <h3>Welcome to Your Interactive Study Guide!</h3>
+                    <p>This comprehensive guide covers four critical CompTIA Network+ exam objectives (1.5-1.8). Use the navigation menu to explore each topic, practice with flashcards, test your knowledge with quizzes, and use the subnet calculator for hands-on practice.</p>
+                </div>
+
+                <h3>Study Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overallProgress"></div>
+                </div>
+                <p id="progressText">Complete each section to track your progress!</p>
+
+                <h3>Objectives Covered</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Objective</th>
+                            <th>Topic</th>
+                            <th>Key Focus Areas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.5</strong></td>
+                            <td>Transmission Media & Transceivers</td>
+                            <td>Cables, connectors, fiber optics, copper media</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1.6</strong></td>
+                            <td>Network Topologies & Architectures</td>
+                            <td>Mesh, star, hybrid, spine-leaf, three-tier</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1.7</strong></td>
+                            <td>IPv4 Network Addressing</td>
+                            <td>Subnetting, VLSM, CIDR, address classes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1.8</strong></td>
+                            <td>Modern Network Environments</td>
+                            <td>Cloud, SDN, NFV, edge computing</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-point">
+                    <strong>💡 Study Tip:</strong> Focus on understanding the practical applications of each concept. The Network+ exam emphasizes real-world scenarios and problem-solving skills.
+                </div>
+            </section>
+
+            <!-- Objective 1.5 Section -->
+            <section id="obj15" class="content-section">
+                <h2>1.5 Compare and Contrast Transmission Media and Transceivers</h2>
+
+                <h3>🔌 Transmission Media Types</h3>
+                
+                <h4>Copper Media</h4>
+                <div class="highlight-box">
+                    <strong>Twisted Pair Cable:</strong>
+                    <ul>
+                        <li><strong>UTP (Unshielded Twisted Pair):</strong> Most common, categories CAT5e, CAT6, CAT6a, CAT8</li>
+                        <li><strong>STP (Shielded Twisted Pair):</strong> Additional shielding to reduce EMI</li>
+                        <li><strong>Cable Length:</strong> Maximum 100 meters (328 feet) for Ethernet</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Cable Type</th>
+                            <th>Max Speed</th>
+                            <th>Max Distance</th>
+                            <th>Common Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CAT5e</td>
+                            <td>1 Gbps</td>
+                            <td>100m</td>
+                            <td>Basic Ethernet</td>
+                        </tr>
+                        <tr>
+                            <td>CAT6</td>
+                            <td>1 Gbps (10 Gbps short distance)</td>
+                            <td>100m (55m for 10G)</td>
+                            <td>Gigabit Ethernet</td>
+                        </tr>
+                        <tr>
+                            <td>CAT6a</td>
+                            <td>10 Gbps</td>
+                            <td>100m</td>
+                            <td>10 Gigabit Ethernet</td>
+                        </tr>
+                        <tr>
+                            <td>CAT8</td>
+                            <td>25/40 Gbps</td>
+                            <td>30m</td>
+                            <td>Data center applications</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Coaxial Cable</h4>
+                <div class="key-point">
+                    <strong>Legacy Technology:</strong> Used in cable TV and older Ethernet (10BASE2, 10BASE5). Features a central conductor, insulation, braided shield, and outer jacket.
+                </div>
+
+                <h3>💡 Fiber Optic Media</h3>
+                
+                <h4>Single-mode vs. Multimode Fiber</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Core Size</th>
+                            <th>Distance</th>
+                            <th>Cost</th>
+                            <th>Applications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Single-mode (SMF)</strong></td>
+                            <td>9 microns</td>
+                            <td>Up to 100km+</td>
+                            <td>Higher</td>
+                            <td>Long-distance, WAN</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multimode (MMF)</strong></td>
+                            <td>50/62.5 microns</td>
+                            <td>Up to 2km</td>
+                            <td>Lower</td>
+                            <td>Short-distance, LAN</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🔗 Connectors and Transceivers</h3>
+                
+                <div class="highlight-box">
+                    <h4>Common Fiber Connectors:</h4>
+                    <ul>
+                        <li><strong>SC (Subscriber/Standard Connector):</strong> Square, push-pull mechanism</li>
+                        <li><strong>LC (Local Connector):</strong> Small form factor, similar to RJ45</li>
+                        <li><strong>ST (Straight Tip):</strong> Round, twist-lock mechanism</li>
+                        <li><strong>MPO/MTP:</strong> Multi-fiber connector for high-density applications</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Copper Connectors:</h4>
+                    <ul>
+                        <li><strong>RJ45:</strong> 8-pin modular connector for Ethernet</li>
+                        <li><strong>RJ11:</strong> 6-pin connector for telephone</li>
+                        <li><strong>BNC:</strong> Bayonet connector for coaxial cable</li>
+                        <li><strong>F-type:</strong> Threaded connector for cable TV</li>
+                    </ul>
+                </div>
+
+                <h3>📡 Transceivers</h3>
+                <div class="key-point">
+                    <strong>Key Transceiver Types:</strong>
+                    <ul>
+                        <li><strong>SFP (Small Form-factor Pluggable):</strong> Up to 5 Gbps</li>
+                        <li><strong>SFP+:</strong> Up to 16 Gbps</li>
+                        <li><strong>QSFP (Quad SFP):</strong> Up to 40 Gbps using four channels</li>
+                        <li><strong>GBIC:</strong> Legacy gigabit interface converter</li>
+                    </ul>
+                </div>
+
+                <h3>🏢 Cable Considerations</h3>
+                <div class="highlight-box">
+                    <h4>Plenum vs. Non-Plenum:</h4>
+                    <ul>
+                        <li><strong>Plenum Grade:</strong> Fire-resistant, low-smoke, required in air circulation spaces</li>
+                        <li><strong>PVC:</strong> Standard grade, cheaper, for non-plenum areas</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Objective 1.6 Section -->
+            <section id="obj16" class="content-section">
+                <h2>1.6 Compare and Contrast Network Topologies, Architectures, and Types</h2>
+
+                <h3>🌐 Physical Topologies</h3>
+
+                <h4>Star/Hub and Spoke</h4>
+                <div class="highlight-box">
+                    <div class="topology-diagram">
+                        <p><strong>⭐ STAR TOPOLOGY ⭐</strong></p>
+                        <p>Central device (switch/hub) connects all nodes</p>
+                        <p>🖥️ ← → 🔄 ← → 🖥️</p>
+                        <p>🖥️ ← ↙ ↘ → 🖥️</p>
+                    </div>
+                    <ul>
+                        <li><strong>Advantages:</strong> Easy to troubleshoot, expandable, fault isolation</li>
+                        <li><strong>Disadvantages:</strong> Single point of failure (central device)</li>
+                        <li><strong>Use Cases:</strong> Ethernet LANs, small to medium networks</li>
+                    </ul>
+                </div>
+
+                <h4>Mesh Topology</h4>
+                <div class="key-point">
+                    <strong>Types of Mesh:</strong>
+                    <ul>
+                        <li><strong>Full Mesh:</strong> Every device connects to every other device</li>
+                        <li><strong>Partial Mesh:</strong> Some devices have multiple connections</li>
+                        <li><strong>Benefits:</strong> Redundancy, fault tolerance, load balancing</li>
+                        <li><strong>Drawbacks:</strong> Complex, expensive, difficult to manage</li>
+                    </ul>
+                </div>
+
+                <h4>Hybrid Topology</h4>
+                <div class="highlight-box">
+                    <p><strong>Definition:</strong> Combination of two or more different topologies</p>
+                    <ul>
+                        <li>Star-Bus combinations</li>
+                        <li>Star-Ring combinations</li>
+                        <li>Multiple topologies in different network segments</li>
+                    </ul>
+                </div>
+
+                <h4>Point-to-Point</h4>
+                <div class="key-point">
+                    <strong>Characteristics:</strong> Direct connection between two devices with no intermediary devices. Common in WAN links like T1/E1 connections.
+                </div>
+
+                <h3>🏗️ Network Architectures</h3>
+
+                <h4>Three-Tier Hierarchical Model</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Function</th>
+                            <th>Devices</th>
+                            <th>Characteristics</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Core</strong></td>
+                            <td>High-speed backbone</td>
+                            <td>Core routers/switches</td>
+                            <td>Fast packet forwarding, redundancy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Distribution</strong></td>
+                            <td>Policy enforcement, aggregation</td>
+                            <td>Layer 3 switches</td>
+                            <td>Routing, filtering, QoS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Access</strong></td>
+                            <td>End-device connectivity</td>
+                            <td>Access switches</td>
+                            <td>Port density, PoE, security</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Collapsed Core</h4>
+                <div class="highlight-box">
+                    <p><strong>Two-Tier Model:</strong> Combines core and distribution layers into a single layer. Used in smaller networks where full three-tier is unnecessary.</p>
+                </div>
+
+                <h4>Spine and Leaf</h4>
+                <div class="key-point">
+                    <strong>Data Center Architecture:</strong>
+                    <ul>
+                        <li><strong>Spine:</strong> Top-tier switches providing backbone connectivity</li>
+                        <li><strong>Leaf:</strong> Access switches connecting to servers and spine</li>
+                        <li><strong>Benefits:</strong> Predictable performance, easy scaling, non-blocking</li>
+                    </ul>
+                </div>
+
+                <h3>🌊 Traffic Flows</h3>
+
+                <h4>North-South Traffic</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Definition:</strong> Traffic between internal network and external networks (Internet)</li>
+                        <li><strong>Examples:</strong> Web browsing, email, cloud services</li>
+                        <li><strong>Security:</strong> Typically passes through firewalls and gateways</li>
+                    </ul>
+                </div>
+
+                <h4>East-West Traffic</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Definition:</strong> Traffic between devices within the same network/data center</li>
+                        <li><strong>Examples:</strong> Server-to-server communication, internal APIs</li>
+                        <li><strong>Trend:</strong> Increasing with microservices and distributed applications</li>
+                    </ul>
+                </div>
+
+                <h3>📱 Network Types</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Scope</th>
+                            <th>Examples</th>
+                            <th>Technologies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PAN</strong></td>
+                            <td>Personal Area</td>
+                            <td>Bluetooth, IR, NFC</td>
+                            <td>Short-range wireless</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LAN</strong></td>
+                            <td>Local Area</td>
+                            <td>Office, building</td>
+                            <td>Ethernet, Wi-Fi</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MAN</strong></td>
+                            <td>Metropolitan Area</td>
+                            <td>City, campus</td>
+                            <td>Fiber, microwave</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WAN</strong></td>
+                            <td>Wide Area</td>
+                            <td>Internet, MPLS</td>
+                            <td>Various technologies</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SAN</strong></td>
+                            <td>Storage Area</td>
+                            <td>Storage networks</td>
+                            <td>Fibre Channel, iSCSI</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Objective 1.7 Section -->
+            <section id="obj17" class="content-section">
+                <h2>1.7 Given a Scenario, Use Appropriate IPv4 Network Addressing</h2>
+
+                <h3>🌐 IPv4 Address Structure</h3>
+                
+                <div class="highlight-box">
+                    <h4>IPv4 Basics</h4>
+                    <ul>
+                        <li><strong>Format:</strong> 32-bit address written as four octets (192.168.1.1)</li>
+                        <li><strong>Network Portion:</strong> Identifies the network</li>
+                        <li><strong>Host Portion:</strong> Identifies the specific device</li>
+                        <li><strong>Subnet Mask:</strong> Separates network and host portions</li>
+                    </ul>
+                </div>
+
+                <h3>📊 Address Classes</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Range</th>
+                            <th>Default Mask</th>
+                            <th>CIDR</th>
+                            <th>Networks</th>
+                            <th>Hosts per Network</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>A</strong></td>
+                            <td>1.0.0.0 - 126.255.255.255</td>
+                            <td>255.0.0.0</td>
+                            <td>/8</td>
+                            <td>126</td>
+                            <td>16,777,214</td>
+                        </tr>
+                        <tr>
+                            <td><strong>B</strong></td>
+                            <td>128.0.0.0 - 191.255.255.255</td>
+                            <td>255.255.0.0</td>
+                            <td>/16</td>
+                            <td>16,384</td>
+                            <td>65,534</td>
+                        </tr>
+                        <tr>
+                            <td><strong>C</strong></td>
+                            <td>192.0.0.0 - 223.255.255.255</td>
+                            <td>255.255.255.0</td>
+                            <td>/24</td>
+                            <td>2,097,152</td>
+                            <td>254</td>
+                        </tr>
+                        <tr>
+                            <td><strong>D</strong></td>
+                            <td>224.0.0.0 - 239.255.255.255</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td>Multicast</td>
+                            <td>N/A</td>
+                        </tr>
+                        <tr>
+                            <td><strong>E</strong></td>
+                            <td>240.0.0.0 - 255.255.255.255</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td>Experimental</td>
+                            <td>N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🏠 Public vs. Private Addressing</h3>
+
+                <h4>Private Address Ranges (RFC 1918)</h4>
+                <div class="highlight-box">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Private Range</th>
+                                <th>CIDR Notation</th>
+                                <th>Addresses Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Class A</td>
+                                <td>10.0.0.0 - 10.255.255.255</td>
+                                <td>10.0.0.0/8</td>
+                                <td>16,777,216</td>
+                            </tr>
+                            <tr>
+                                <td>Class B</td>
+                                <td>172.16.0.0 - 172.31.255.255</td>
+                                <td>172.16.0.0/12</td>
+                                <td>1,048,576</td>
+                            </tr>
+                            <tr>
+                                <td>Class C</td>
+                                <td>192.168.0.0 - 192.168.255.255</td>
+                                <td>192.168.0.0/16</td>
+                                <td>65,536</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Special Addresses</h4>
+                <div class="key-point">
+                    <ul>
+                        <li><strong>APIPA (Automatic Private IP Addressing):</strong> 169.254.0.1 - 169.254.255.254</li>
+                        <li><strong>Loopback:</strong> 127.0.0.0/8 (commonly 127.0.0.1)</li>
+                        <li><strong>Link-Local:</strong> 169.254.0.0/16 (same as APIPA range)</li>
+                        <li><strong>Multicast:</strong> 224.0.0.0 - 239.255.255.255</li>
+                        <li><strong>Broadcast:</strong> All host bits set to 1</li>
+                    </ul>
+                </div>
+
+                <h3>🔢 Subnetting Concepts</h3>
+
+                <h4>CIDR (Classless Inter-Domain Routing)</h4>
+                <div class="highlight-box">
+                    <p><strong>CIDR Notation:</strong> IP address followed by slash and number of network bits</p>
+                    <ul>
+                        <li>192.168.1.0/24 = 255.255.255.0 subnet mask</li>
+                        <li>172.16.0.0/16 = 255.255.0.0 subnet mask</li>
+                        <li>10.0.0.0/8 = 255.0.0.0 subnet mask</li>
+                    </ul>
+                </div>
+
+                <h4>Subnet Calculation Formulas</h4>
+                <div class="key-point">
+                    <ul>
+                        <li><strong>Number of Subnets:</strong> 2^(borrowed bits)</li>
+                        <li><strong>Hosts per Subnet:</strong> 2^(host bits) - 2</li>
+                        <li><strong>Subnet Increment:</strong> 256 - subnet mask value</li>
+                        <li><strong>Valid Host Range:</strong> Network address + 1 to Broadcast - 1</li>
+                    </ul>
+                </div>
+
+                <h3>📐 VLSM (Variable Length Subnet Masking)</h3>
+                <div class="highlight-box">
+                    <h4>VLSM Benefits:</h4>
+                    <ul>
+                        <li><strong>Efficient Address Utilization:</strong> Different subnet sizes for different needs</li>
+                        <li><strong>Hierarchical Addressing:</strong> Supports route summarization</li>
+                        <li><strong>Flexibility:</strong> Can subnet a subnet</li>
+                    </ul>
+                    
+                    <h4>VLSM Process:</h4>
+                    <ol>
+                        <li>Start with largest subnet requirement</li>
+                        <li>Determine required subnet mask</li>
+                        <li>Assign address block</li>
+                        <li>Repeat with remaining requirements</li>
+                    </ol>
+                </div>
+
+                <h3>🌊 Subnetting Examples</h3>
+                <div class="quiz-section">
+                    <h4>Example: Subnetting 192.168.1.0/24</h4>
+                    <p><strong>Requirement:</strong> Create 4 subnets</p>
+                    <ul>
+                        <li><strong>Borrowed Bits:</strong> 2 bits (2² = 4 subnets)</li>
+                        <li><strong>New Subnet Mask:</strong> /26 (255.255.255.192)</li>
+                        <li><strong>Subnet Increment:</strong> 64 (256 - 192)</li>
+                        <li><strong>Hosts per Subnet:</strong> 62 (2⁶ - 2)</li>
+                    </ul>
+                    
+                    <table class="comparison-table" style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>Subnet</th>
+                                <th>Network Address</th>
+                                <th>Host Range</th>
+                                <th>Broadcast</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>192.168.1.0/26</td>
+                                <td>192.168.1.1 - 192.168.1.62</td>
+                                <td>192.168.1.63</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>192.168.1.64/26</td>
+                                <td>192.168.1.65 - 192.168.1.126</td>
+                                <td>192.168.1.127</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>192.168.1.128/26</td>
+                                <td>192.168.1.129 - 192.168.1.190</td>
+                                <td>192.168.1.191</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>192.168.1.192/26</td>
+                                <td>192.168.1.193 - 192.168.1.254</td>
+                                <td>192.168.1.255</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Objective 1.8 Section -->
+            <section id="obj18" class="content-section">
+                <h2>1.8 Summarize Evolving Use Cases for Modern Network Environments</h2>
+
+                <h3>☁️ Cloud Computing Models</h3>
+
+                <h4>Service Models</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Full Name</th>
+                            <th>Provider Manages</th>
+                            <th>Customer Manages</th>
+                            <th>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>SaaS</strong></td>
+                            <td>Software as a Service</td>
+                            <td>Everything</td>
+                            <td>User data, access</td>
+                            <td>Office 365, Gmail, Salesforce</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PaaS</strong></td>
+                            <td>Platform as a Service</td>
+                            <td>Runtime, OS, infrastructure</td>
+                            <td>Applications, data</td>
+                            <td>Azure App Service, Heroku</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IaaS</strong></td>
+                            <td>Infrastructure as a Service</td>
+                            <td>Virtualization, servers, storage</td>
+                            <td>OS, applications, data</td>
+                            <td>AWS EC2, Azure VMs</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Deployment Models</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Public Cloud:</strong> Services over the public internet, shared infrastructure</li>
+                        <li><strong>Private Cloud:</strong> Dedicated infrastructure for a single organization</li>
+                        <li><strong>Hybrid Cloud:</strong> Combination of public and private clouds</li>
+                        <li><strong>Community Cloud:</strong> Shared infrastructure for specific community</li>
+                    </ul>
+                </div>
+
+                <h3>🌐 Software-Defined Networking (SDN)</h3>
+                
+                <div class="key-point">
+                    <h4>SDN Principles:</h4>
+                    <ul>
+                        <li><strong>Centralized Control:</strong> Control plane separated from data plane</li>
+                        <li><strong>Programmability:</strong> Network behavior defined by software</li>
+                        <li><strong>Abstraction:</strong> Applications interact with logical network view</li>
+                        <li><strong>Open Standards:</strong> OpenFlow protocol for communication</li>
+                    </ul>
+                </div>
+
+                <h4>SDN Architecture Layers</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Function</th>
+                            <th>Components</th>
+                            <th>Interface</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Application</strong></td>
+                            <td>Network applications and services</td>
+                            <td>Network apps, business logic</td>
+                            <td>Northbound APIs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Control</strong></td>
+                            <td>Network intelligence and control</td>
+                            <td>SDN controller</td>
+                            <td>Southbound APIs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Infrastructure</strong></td>
+                            <td>Data forwarding</td>
+                            <td>OpenFlow switches</td>
+                            <td>OpenFlow protocol</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🔧 Network Function Virtualization (NFV)</h3>
+                
+                <div class="highlight-box">
+                    <h4>NFV Concepts:</h4>
+                    <ul>
+                        <li><strong>Virtualized Network Functions (VNFs):</strong> Software implementations of network functions</li>
+                        <li><strong>NFV Infrastructure (NFVI):</strong> Hardware and software infrastructure</li>
+                        <li><strong>Management and Orchestration (MANO):</strong> Manages VNF lifecycle</li>
+                    </ul>
+                </div>
+
+                <h4>Traditional vs. NFV Approach</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Traditional</th>
+                            <th>NFV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Hardware</strong></td>
+                            <td>Dedicated appliances</td>
+                            <td>Standard servers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deployment</strong></td>
+                            <td>Manual, time-consuming</td>
+                            <td>Automated, rapid</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scaling</strong></td>
+                            <td>Hardware upgrade required</td>
+                            <td>Software-based scaling</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cost</strong></td>
+                            <td>High CAPEX</td>
+                            <td>Lower CAPEX, OPEX optimization</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🌊 SD-WAN (Software-Defined WAN)</h3>
+                
+                <div class="key-point">
+                    <h4>SD-WAN Benefits:</h4>
+                    <ul>
+                        <li><strong>Centralized Management:</strong> Single pane of glass for WAN management</li>
+                        <li><strong>Dynamic Path Selection:</strong> Intelligent traffic routing</li>
+                        <li><strong>Application Optimization:</strong> QoS and traffic shaping</li>
+                        <li><strong>Cost Reduction:</strong> Use of internet and broadband connections</li>
+                    </ul>
+                </div>
+
+                <h3>🏢 Edge Computing</h3>
+                
+                <div class="highlight-box">
+                    <h4>Edge Computing Characteristics:</h4>
+                    <ul>
+                        <li><strong>Location:</strong> Computing closer to data sources</li>
+                        <li><strong>Latency:</strong> Reduced latency for real-time applications</li>
+                        <li><strong>Bandwidth:</strong> Reduced bandwidth usage to central cloud</li>
+                        <li><strong>Use Cases:</strong> IoT, autonomous vehicles, AR/VR</li>
+                    </ul>
+                </div>
+
+                <h4>Edge vs. Cloud Computing</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Cloud Computing</th>
+                            <th>Edge Computing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Location</strong></td>
+                            <td>Centralized data centers</td>
+                            <td>Distributed edge locations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Latency</strong></td>
+                            <td>Higher (network distance)</td>
+                            <td>Lower (proximity to users)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Processing Power</strong></td>
+                            <td>High (massive resources)</td>
+                            <td>Limited (constrained resources)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Connectivity</strong></td>
+                            <td>Dependent on WAN</td>
+                            <td>Can operate with limited connectivity</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🌍 Modern Network Trends</h3>
+                
+                <div class="quiz-section">
+                    <h4>Emerging Technologies:</h4>
+                    <ul>
+                        <li><strong>5G Networks:</strong> Ultra-low latency, high bandwidth mobile networks</li>
+                        <li><strong>IoT (Internet of Things):</strong> Massive device connectivity</li>
+                        <li><strong>AI/ML in Networking:</strong> Intelligent network optimization</li>
+                        <li><strong>Intent-Based Networking:</strong> High-level policy automation</li>
+                        <li><strong>Zero Trust Architecture:</strong> "Never trust, always verify" security model</li>
+                    </ul>
+                </div>
+
+                <div class="key-point">
+                    <strong>💡 Industry Impact:</strong> These technologies enable digital transformation, improve operational efficiency, and create new business models across industries.
+                </div>
+            </section>
+
+            <!-- Flashcards Section -->
+            <section id="flashcards" class="content-section">
+                <h2>🔄 Interactive Flashcards</h2>
+                <p>Click on any flashcard to reveal the answer. Test your knowledge across all objectives!</p>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What is the maximum cable length for Ethernet over twisted pair?
+                    </div>
+                    <div class="flashcard-back">
+                        100 meters (328 feet) for standard Ethernet applications
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What are the three private IP address ranges defined in RFC 1918?
+                    </div>
+                    <div class="flashcard-back">
+                        10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What is the difference between single-mode and multimode fiber?
+                    </div>
+                    <div class="flashcard-back">
+                        Single-mode has a 9-micron core for long distances (100km+), while multimode has 50/62.5-micron core for shorter distances (up to 2km)
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What does APIPA stand for and what address range does it use?
+                    </div>
+                    <div class="flashcard-back">
+                        Automatic Private IP Addressing - uses 169.254.0.1 to 169.254.255.254
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What are the three layers in a three-tier hierarchical network model?
+                    </div>
+                    <div class="flashcard-back">
+                        Core (backbone), Distribution (policy enforcement), and Access (end-device connectivity)
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What is the main advantage of VLSM over traditional subnetting?
+                    </div>
+                    <div class="flashcard-back">
+                        VLSM allows different subnet sizes within the same network, providing more efficient address utilization
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What does SDN separate in network architecture?
+                    </div>
+                    <div class="flashcard-back">
+                        SDN separates the control plane from the data plane, centralizing network intelligence
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What is the difference between North-South and East-West traffic?
+                    </div>
+                    <div class="flashcard-back">
+                        North-South: traffic between internal network and external networks. East-West: traffic between devices within the same network
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What are the three cloud service models?
+                    </div>
+                    <div class="flashcard-back">
+                        SaaS (Software as a Service), PaaS (Platform as a Service), and IaaS (Infrastructure as a Service)
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        What connector types are commonly used with fiber optic cables?
+                    </div>
+                    <div class="flashcard-back">
+                        SC (Square Connector), LC (Local Connector), ST (Straight Tip), and MPO/MTP (Multi-fiber)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calculator Section -->
+            <section id="calculator" class="content-section">
+                <h2>🧮 IPv4 Subnet Calculator</h2>
+                <p>Practice your subnetting skills with this interactive calculator!</p>
+
+                <div class="subnet-calculator">
+                    <h3>Subnet Calculator</h3>
+                    <div>
+                        <label for="ipAddress">IP Address:</label><br>
+                        <input type="text" id="ipAddress" class="subnet-input" placeholder="192.168.1.0" value="192.168.1.0">
+                    </div>
+                    <div>
+                        <label for="subnetMask">Subnet Mask (CIDR):</label><br>
+                        <input type="number" id="subnetMask" class="subnet-input" placeholder="24" value="24" min="1" max="30">
+                    </div>
+                    <div>
+                        <label for="requiredSubnets">Required Subnets:</label><br>
+                        <input type="number" id="requiredSubnets" class="subnet-input" placeholder="4" value="4" min="2" max="256">
+                    </div>
+                    <button class="subnet-button" onclick="calculateSubnets()">Calculate Subnets</button>
+                    <button class="subnet-button" onclick="clearCalculator()">Clear</button>
+                    
+                    <div id="subnetResults" class="subnet-result" style="display: none;">
+                        <!-- Results will be displayed here -->
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🎓 Subnetting Quick Reference</h3>
+                    <h4>Common Subnet Masks:</h4>
+                    <ul>
+                        <li>/24 = 255.255.255.0 (254 hosts)</li>
+                        <li>/25 = 255.255.255.128 (126 hosts)</li>
+                        <li>/26 = 255.255.255.192 (62 hosts)</li>
+                        <li>/27 = 255.255.255.224 (30 hosts)</li>
+                        <li>/28 = 255.255.255.240 (14 hosts)</li>
+                        <li>/29 = 255.255.255.248 (6 hosts)</li>
+                        <li>/30 = 255.255.255.252 (2 hosts)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quiz" class="content-section">
+                <h2>❓ Practice Quiz</h2>
+                <p>Test your knowledge with these practice questions covering all objectives!</p>
+
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <strong>Question 1:</strong> Which cable category supports 10 Gbps over the full 100-meter distance?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">A) CAT5e</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">B) CAT6</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">C) CAT6a</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">D) CAT7</li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question">
+                        <strong>Question 2:</strong> What topology provides the highest level of redundancy?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">A) Star</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">B) Full Mesh</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">C) Ring</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">D) Bus</li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question">
+                        <strong>Question 3:</strong> How many host addresses are available in a /26 subnet?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">A) 64</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">B) 62</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">C) 30</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">D) 126</li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question">
+                        <strong>Question 4:</strong> Which technology separates the control plane from the data plane?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">A) SDN</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">B) NFV</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">C) MPLS</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">D) VPN</li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question">
+                        <strong>Question 5:</strong> What is the APIPA address range?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">A) 10.0.0.0/8</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">B) 172.16.0.0/12</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">C) 192.168.0.0/16</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">D) 169.254.0.0/16</li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question">
+                        <strong>Question 6:</strong> In a spine-and-leaf architecture, what connects to the spine switches?
+                        <ul class="quiz-options">
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">A) End devices directly</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, true)">B) Leaf switches</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">C) Core routers</li>
+                            <li class="quiz-option" onclick="selectAnswer(this, false)">D) Access points</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="key-point">
+                    <strong>💡 Study Tip:</strong> Review any questions you missed and focus on those topic areas. Practice with real equipment or simulators when possible!
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Remove active class from all links and sections
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link and target section
+                    this.classList.add('active');
+                    document.getElementById(targetSection).classList.add('active');
+                    
+                    // Update progress
+                    updateProgress();
+                });
+            });
+            
+            // Initialize progress
+            updateProgress();
+        });
+
+        // Flashcard functionality
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Quiz functionality
+        function selectAnswer(option, isCorrect) {
+            const allOptions = option.parentNode.querySelectorAll('.quiz-option');
+            allOptions.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt === option) {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (opt.onclick.toString().includes('true')) {
+                    opt.classList.add('correct');
+                }
+            });
+        }
+
+        // Subnet Calculator functionality
+        function calculateSubnets() {
+            const ipInput = document.getElementById('ipAddress').value;
+            const cidrInput = parseInt(document.getElementById('subnetMask').value);
+            const requiredSubnets = parseInt(document.getElementById('requiredSubnets').value);
+            const resultsDiv = document.getElementById('subnetResults');
+            
+            try {
+                // Validate inputs
+                if (!isValidIP(ipInput)) {
+                    throw new Error('Invalid IP address format');
+                }
+                
+                if (cidrInput < 1 || cidrInput > 30) {
+                    throw new Error('CIDR must be between 1 and 30');
+                }
+                
+                // Calculate required bits for subnets
+                const subnetBits = Math.ceil(Math.log2(requiredSubnets));
+                const newCIDR = cidrInput + subnetBits;
+                
+                if (newCIDR > 30) {
+                    throw new Error('Not enough host bits available for the required number of subnets');
+                }
+                
+                // Calculate subnet information
+                const hostBits = 32 - newCIDR;
+                const hostsPerSubnet = Math.pow(2, hostBits) - 2;
+                const subnetIncrement = Math.pow(2, hostBits);
+                const actualSubnets = Math.pow(2, subnetBits);
+                
+                // Generate subnet table
+                let html = `
+                    <h4>Subnet Calculation Results</h4>
+                    <p><strong>Original Network:</strong> ${ipInput}/${cidrInput}</p>
+                    <p><strong>New Subnet Mask:</strong> /${newCIDR} (${cidrToSubnetMask(newCIDR)})</p>
+                    <p><strong>Subnets Created:</strong> ${actualSubnets}</p>
+                    <p><strong>Hosts per Subnet:</strong> ${hostsPerSubnet}</p>
+                    <p><strong>Subnet Increment:</strong> ${subnetIncrement}</p>
+                    
+                    <table class="comparison-table" style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>Subnet #</th>
+                                <th>Network Address</th>
+                                <th>First Host</th>
+                                <th>Last Host</th>
+                                <th>Broadcast</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                const ipParts = ipInput.split('.').map(Number);
+                const baseIP = (ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3];
+                
+                for (let i = 0; i < Math.min(actualSubnets, 8); i++) {
+                    const networkIP = baseIP + (i * subnetIncrement);
+                    const firstHost = networkIP + 1;
+                    const broadcast = networkIP + subnetIncrement - 1;
+                    const lastHost = broadcast - 1;
+                    
+                    html += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${ipToString(networkIP)}/${newCIDR}</td>
+                            <td>${ipToString(firstHost)}</td>
+                            <td>${ipToString(lastHost)}</td>
+                            <td>${ipToString(broadcast)}</td>
+                        </tr>
+                    `;
+                }
+                
+                if (actualSubnets > 8) {
+                    html += `<tr><td colspan="5" style="text-align: center; font-style: italic;">... and ${actualSubnets - 8} more subnets</td></tr>`;
+                }
+                
+                html += '</tbody></table>';
+                
+                resultsDiv.innerHTML = html;
+                resultsDiv.style.display = 'block';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;"><strong>Error:</strong> ${error.message}</p>`;
+                resultsDiv.style.display = 'block';
+            }
+        }
+        
+        function clearCalculator() {
+            document.getElementById('ipAddress').value = '192.168.1.0';
+            document.getElementById('subnetMask').value = '24';
+            document.getElementById('requiredSubnets').value = '4';
+            document.getElementById('subnetResults').style.display = 'none';
+        }
+        
+        function isValidIP(ip) {
+            const parts = ip.split('.');
+            if (parts.length !== 4) return false;
+            return parts.every(part => {
+                const num = parseInt(part);
+                return num >= 0 && num <= 255 && part === num.toString();
+            });
+        }
+        
+        function cidrToSubnetMask(cidr) {
+            const mask = (0xFFFFFFFF << (32 - cidr)) >>> 0;
+            return [
+                (mask >>> 24) & 0xFF,
+                (mask >>> 16) & 0xFF,
+                (mask >>> 8) & 0xFF,
+                mask & 0xFF
+            ].join('.');
+        }
+        
+        function ipToString(ip) {
+            return [
+                (ip >>> 24) & 0xFF,
+                (ip >>> 16) & 0xFF,
+                (ip >>> 8) & 0xFF,
+                ip & 0xFF
+            ].join('.');
+        }
+
+        // Progress tracking
+        function updateProgress() {
+            const completedSections = document.querySelectorAll('.nav-link.visited').length;
+            const totalSections = 7; // Total study sections (excluding overview)
+            const progress = (completedSections / totalSections) * 100;
+            
+            document.getElementById('overallProgress').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `Progress: ${completedSections}/${totalSections} sections completed (${Math.round(progress)}%)`;
+        }
+
+        // Mark sections as visited when viewed
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (!this.classList.contains('visited') && this.getAttribute('data-section') !== 'overview') {
+                        this.classList.add('visited');
+                        updateProgress();
+                    }
+                });
+            });
+        });
+
+        // Add some interactive elements
+        function showHint(element, hint) {
+            element.title = hint;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey) {
+                switch(e.key) {
+                    case '1':
+                        document.querySelector('[data-section="obj15"]').click();
+                        break;
+                    case '2':
+                        document.querySelector('[data-section="obj16"]').click();
+                        break;
+                    case '3':
+                        document.querySelector('[data-section="obj17"]').click();
+                        break;
+                    case '4':
+                        document.querySelector('[data-section="obj18"]').click();
+                        break;
+                    case 'f':
+                        document.querySelector('[data-section="flashcards"]').click();
+                        break;
+                    case 'c':
+                        document.querySelector('[data-section="calculator"]').click();
+                        break;
+                    case 'q':
+                        document.querySelector('[data-section="quiz"]').click();
+                        break;
+                }
+            }
+        });
+
+        // Add tooltips for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add keyboard shortcut hints
+            const shortcuts = [
+                {selector: '[data-section="obj15"]', hint: 'Alt+1: Jump to Objective 1.5'},
+                {selector: '[data-section="obj16"]', hint: 'Alt+2: Jump to Objective 1.6'},
+                {selector: '[data-section="obj17"]', hint: 'Alt+3: Jump to Objective 1.7'},
+                {selector: '[data-section="obj18"]', hint: 'Alt+4: Jump to Objective 1.8'},
+                {selector: '[data-section="flashcards"]', hint: 'Alt+F: Jump to Flashcards'},
+                {selector: '[data-section="calculator"]', hint: 'Alt+C: Jump to Calculator'},
+                {selector: '[data-section="quiz"]', hint: 'Alt+Q: Jump to Quiz'}
+            ];
+            
+            shortcuts.forEach(shortcut => {
+                const element = document.querySelector(shortcut.selector);
+                if (element) {
+                    element.title = shortcut.hint;
+                }
+            });
+        });
+
+        // Auto-save progress to localStorage (but inform user about the limitation)
+        function saveProgress() {
+            const visited = Array.from(document.querySelectorAll('.nav-link.visited')).map(link => 
+                link.getAttribute('data-section')
+            );
+            // Note: In a real implementation, this would use localStorage
+            // but in Claude.ai artifacts, localStorage is not available
+            console.log('Progress would be saved:', visited);
+        }
+
+        // Study session timer
+        let studyStartTime = Date.now();
+        
+        function getStudyTime() {
+            const elapsed = Date.now() - studyStartTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Update study time every minute
+        setInterval(function() {
+            const timeElement = document.getElementById('studyTime');
+            if (timeElement) {
+                timeElement.textContent = `Study Time: ${getStudyTime()}`;
+            }
+        }, 60000);
+
+        // Add study time display to overview
+        document.addEventListener('DOMContentLoaded', function() {
+            const overviewSection = document.getElementById('overview');
+            if (overviewSection) {
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'key-point';
+                timeDiv.innerHTML = '<strong id="studyTime">Study Time: 0:00</strong><br>Stay focused and take breaks every 45-60 minutes for optimal learning!';
+                overviewSection.appendChild(timeDiv);
+            }
+        });
+    </script>
+</body>
+</html> 
+                
