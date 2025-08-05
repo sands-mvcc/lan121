@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Study Guide - Domain 3.0 Network Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #27ae60;
+            font-size: 1.4em;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .nav-item:hover {
+            background: rgba(39, 174, 96, 0.2);
+            border-left-color: #27ae60;
+        }
+
+        .nav-item.active {
+            background: rgba(39, 174, 96, 0.3);
+            border-left-color: #27ae60;
+        }
+
+        .nav-item h3 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .nav-item p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-header h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .topic-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .topic-card h3 {
+            color: #27ae60;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .topic-card h3::before {
+            content: "📚";
+            margin-right: 10px;
+        }
+
+        .subtopic {
+            background: white;
+            border-left: 4px solid #27ae60;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .subtopic h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .quiz-container {
+            background: #e8f5e8;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .quiz-question {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #27ae60;
+        }
+
+        .quiz-options {
+            margin-top: 15px;
+        }
+
+        .quiz-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            background: #e8f5e8;
+            border-color: #27ae60;
+        }
+
+        .quiz-option.selected {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .quiz-option.correct {
+            background: #27ae60;
+            color: white;
+        }
+
+        .quiz-option.incorrect {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            background: #229954;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #27ae60;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .key-terms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .term-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .term-card:hover {
+            background: #e8f5e8;
+            border-color: #27ae60;
+        }
+
+        .term-card h4 {
+            color: #27ae60;
+            margin-bottom: 8px;
+        }
+
+        .term-definition {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        .term-card.expanded .term-definition {
+            display: block;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .list-styled {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list-styled li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .list-styled li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <div class="sidebar">
+            <h2>Network+ Domain 3.0</h2>
+            
+            <div class="nav-item active" onclick="showSection('overview')">
+                <h3>📋 Overview</h3>
+                <p>Domain 3.0 Introduction</p>
+            </div>
+            
+            <div class="nav-item" onclick="showSection('obj31')">
+                <h3>📄 Objective 3.1</h3>
+                <p>Organizational Processes</p>
+            </div>
+            
+            <div class="nav-item" onclick="showSection('obj32')">
+                <h3>📊 Objective 3.2</h3>
+                <p>Network Monitoring</p>
+            </div>
+            
+            <div class="nav-item" onclick="showSection('obj33')">
+                <h3>🔄 Objective 3.3</h3>
+                <p>Disaster Recovery</p>
+            </div>
+            
+            <div class="nav-item" onclick="showSection('quiz')">
+                <h3>🎯 Practice Quiz</h3>
+                <p>Test Your Knowledge</p>
+            </div>
+            
+            <div class="nav-item" onclick="showSection('flashcards')">
+                <h3>🃏 Flashcards</h3>
+                <p>Key Terms Review</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Overview Section -->
+            <div class="content-section active" id="overview">
+                <div class="section-header">
+                    <h1>CompTIA Network+ Domain 3.0: Network Operations</h1>
+                    <p>Comprehensive study guide for objectives 3.1, 3.2, and 3.3 - representing 19% of the N10-009 exam</p>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Exam Weight:</strong> Domain 3.0 Network Operations accounts for 19% of the CompTIA Network+ N10-009 exam, making it a critical area of study.
+                </div>
+
+                <div class="topic-card">
+                    <h3>Domain Overview</h3>
+                    <p>Network Operations focuses on the day-to-day management, monitoring, and maintenance of network infrastructure. This domain covers essential skills needed by network professionals to ensure business continuity and optimal network performance.</p>
+                    
+                    <div class="subtopic">
+                        <h4>What You'll Learn:</h4>
+                        <ul class="list-styled">
+                            <li>Organizational documentation and procedures</li>
+                            <li>Network monitoring technologies and methodologies</li>
+                            <li>Disaster recovery concepts and planning</li>
+                            <li>High availability and business continuity strategies</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Study Strategy</h3>
+                    <div class="subtopic">
+                        <h4>Recommended Approach:</h4>
+                        <ul class="list-styled">
+                            <li>Start with Objective 3.1 to understand documentation requirements</li>
+                            <li>Progress to Objective 3.2 for hands-on monitoring techniques</li>
+                            <li>Master Objective 3.3 disaster recovery metrics and concepts</li>
+                            <li>Use the practice quiz to test your understanding</li>
+                            <li>Review flashcards for key terminology retention</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objective 3.1 Section -->
+            <div class="content-section" id="obj31">
+                <div class="section-header">
+                    <h1>Objective 3.1: Organizational Processes and Procedures</h1>
+                    <p>Explain the purpose of organizational processes and procedures</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Documentation</h3>
+                    <div class="subtopic">
+                        <h4>Physical vs. Logical Diagrams</h4>
+                        <p><strong>Physical Diagrams:</strong> Show actual physical layout of network components, including cable runs, rack locations, and hardware placement.</p>
+                        <p><strong>Logical Diagrams:</strong> Display network topology, IP addressing schemes, VLANs, and data flow without regard to physical location.</p>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Essential Network Documentation</h4>
+                        <ul class="list-styled">
+                            <li><strong>Rack Diagrams:</strong> Visual representation of equipment placement in server racks</li>
+                            <li><strong>Cable Maps:</strong> Document cable runs, termination points, and labeling schemes</li>
+                            <li><strong>Network Diagrams:</strong> Layer 1 (Physical), Layer 2 (Data Link), Layer 3 (Network)</li>
+                            <li><strong>Asset Inventory:</strong> Hardware, software, licensing, and warranty tracking</li>
+                            <li><strong>IP Address Management (IPAM):</strong> Systematic tracking of IP address assignments</li>
+                            <li><strong>Service Level Agreements (SLA):</strong> Define expected service levels and penalties</li>
+                            <li><strong>Wireless Surveys/Heat Maps:</strong> Document wireless coverage and signal strength</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Life-cycle Management</h3>
+                    <div class="subtopic">
+                        <h4>End-of-Life (EOL) vs. End-of-Support (EOS)</h4>
+                        <p><strong>EOL:</strong> Manufacturer stops producing the product but may continue support.</p>
+                        <p><strong>EOS:</strong> Manufacturer discontinues all support services for the product.</p>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Software Management</h4>
+                        <ul class="list-styled">
+                            <li><strong>Patches and Bug Fixes:</strong> Regular updates to address security vulnerabilities</li>
+                            <li><strong>Operating System Updates:</strong> Major OS upgrades and maintenance</li>
+                            <li><strong>Firmware Management:</strong> Device-level software updates</li>
+                            <li><strong>Decommissioning:</strong> Proper removal and disposal of outdated equipment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Change Management</h3>
+                    <div class="subtopic">
+                        <h4>Change Control Process</h4>
+                        <p>Formal process to minimize risk of unscheduled downtime by implementing changes in a planned and controlled manner.</p>
+                        <ul class="list-styled">
+                            <li>Request tracking and documentation</li>
+                            <li>Impact assessment and approval process</li>
+                            <li>Implementation scheduling and rollback plans</li>
+                            <li>Post-implementation review and validation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Configuration Management</h3>
+                    <div class="subtopic">
+                        <h4>Configuration Types</h4>
+                        <ul class="list-styled">
+                            <li><strong>Production Configuration:</strong> Live, operational device settings</li>
+                            <li><strong>Backup Configuration:</strong> Saved copies for disaster recovery</li>
+                            <li><strong>Baseline/Golden Configuration:</strong> Standard template configurations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objective 3.2 Section -->
+            <div class="content-section" id="obj32">
+                <div class="section-header">
+                    <h1>Objective 3.2: Network Monitoring Technologies</h1>
+                    <p>Given a scenario, use network monitoring technologies</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>SNMP (Simple Network Management Protocol)</h3>
+                    <div class="subtopic">
+                        <h4>SNMP Components</h4>
+                        <ul class="list-styled">
+                            <li><strong>Manager:</strong> System that monitors and controls network devices</li>
+                            <li><strong>Agent:</strong> Software running on managed devices</li>
+                            <li><strong>MIB (Management Information Base):</strong> Database of manageable objects</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>SNMP Versions</h4>
+                        <p><strong>SNMPv1:</strong> Original version, no authentication, plain text</p>
+                        <p><strong>SNMPv2c:</strong> Improved bulk transfers, still uses community strings</p>
+                        <p><strong>SNMPv3:</strong> Adds authentication, encryption, and message integrity</p>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>SNMP Operations</h4>
+                        <ul class="list-styled">
+                            <li><strong>GET:</strong> Retrieve specific object values</li>
+                            <li><strong>SET:</strong> Modify object values</li>
+                            <li><strong>TRAP:</strong> Unsolicited notifications from agents</li>
+                            <li><strong>Community Strings:</strong> Authentication mechanism (SNMPv1/v2c)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Flow Data and Packet Capture</h3>
+                    <div class="subtopic">
+                        <h4>NetFlow Technology</h4>
+                        <p>Network protocol for collecting IP traffic information and monitoring network traffic patterns.</p>
+                        <ul class="list-styled">
+                            <li>Provides detailed traffic analytics</li>
+                            <li>Helps identify bandwidth usage patterns</li>
+                            <li>Supports security monitoring and forensics</li>
+                            <li>Enables capacity planning and optimization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Packet Capture Techniques</h4>
+                        <ul class="list-styled">
+                            <li><strong>Port Mirroring:</strong> Copy network traffic to analysis port</li>
+                            <li><strong>Network TAPs:</strong> Physical devices for traffic capture</li>
+                            <li><strong>Protocol Analyzers:</strong> Software tools like Wireshark</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Monitoring Methods</h3>
+                    <div class="subtopic">
+                        <h4>Baseline Metrics</h4>
+                        <p>Establish normal network performance patterns to identify anomalies and trends.</p>
+                        <ul class="list-styled">
+                            <li>Bandwidth utilization patterns</li>
+                            <li>Response time measurements</li>
+                            <li>Error rate thresholds</li>
+                            <li>Device performance metrics</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Log Aggregation and SIEM</h4>
+                        <ul class="list-styled">
+                            <li><strong>Syslog Collector:</strong> Centralized log collection system</li>
+                            <li><strong>SIEM (Security Information and Event Management):</strong> Real-time analysis of security alerts</li>
+                            <li><strong>API Integration:</strong> Automated data collection and analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Monitoring Solutions</h3>
+                    <div class="subtopic">
+                        <h4>Network Discovery</h4>
+                        <ul class="list-styled">
+                            <li><strong>Ad Hoc:</strong> Manual, on-demand discovery</li>
+                            <li><strong>Scheduled:</strong> Automated, regular discovery scans</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Performance and Availability Monitoring</h4>
+                        <ul class="list-styled">
+                            <li><strong>Traffic Analysis:</strong> Monitor bandwidth usage and patterns</li>
+                            <li><strong>Performance Monitoring:</strong> Track response times and throughput</li>
+                            <li><strong>Availability Monitoring:</strong> Ensure services are accessible</li>
+                            <li><strong>Configuration Monitoring:</strong> Track configuration changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objective 3.3 Section -->
+            <div class="content-section" id="obj33">
+                <div class="section-header">
+                    <h1>Objective 3.3: Disaster Recovery Concepts</h1>
+                    <p>Explain disaster recovery (DR) concepts</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Disaster Recovery Metrics</h3>
+                    <div class="subtopic">
+                        <h4>Recovery Point Objective (RPO)</h4>
+                        <p>The maximum acceptable amount of data loss measured in time. RPO defines how much data you can afford to lose.</p>
+                        <div class="alert alert-info">
+                            <strong>Example:</strong> If your RPO is 2 hours, you can lose up to 2 hours of data in a disaster scenario.
+                        </div>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Recovery Time Objective (RTO)</h4>
+                        <p>The maximum acceptable time to restore services after a disaster. RTO defines how long services can be down.</p>
+                        <div class="alert alert-info">
+                            <strong>Example:</strong> If your RTO is 4 hours, services must be restored within 4 hours of an outage.
+                        </div>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Mean Time to Repair (MTTR)</h4>
+                        <p>The average time required to repair a failed component and restore it to operational status.</p>
+                        <ul class="list-styled">
+                            <li>Includes detection, diagnosis, and repair time</li>
+                            <li>Used for capacity planning and resource allocation</li>
+                            <li>Helps set realistic recovery expectations</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Mean Time Between Failures (MTBF)</h4>
+                        <p>The predicted time between inherent failures of a system during operation.</p>
+                        <ul class="list-styled">
+                            <li>Represents equipment reliability and life expectancy</li>
+                            <li>Used for maintenance scheduling</li>
+                            <li>Helps in budget planning for replacements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Disaster Recovery Sites</h3>
+                    <div class="subtopic">
+                        <h4>Cold Site</h4>
+                        <p>Basic facility with power, HVAC, and network connectivity but no installed equipment.</p>
+                        <ul class="list-styled">
+                            <li>Lowest cost option</li>
+                            <li>Longest recovery time</li>
+                            <li>Requires equipment installation and configuration</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Warm Site</h4>
+                        <p>Facility with some pre-installed equipment and infrastructure, but not fully operational.</p>
+                        <ul class="list-styled">
+                            <li>Moderate cost and recovery time</li>
+                            <li>Requires data restoration and final configuration</li>
+                            <li>Balance between cost and recovery speed</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Hot Site</h4>
+                        <p>Fully operational facility with real-time data replication and immediate failover capability.</p>
+                        <ul class="list-styled">
+                            <li>Highest cost option</li>
+                            <li>Fastest recovery time</li>
+                            <li>Minimal data loss and downtime</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>High-Availability Approaches</h3>
+                    <div class="subtopic">
+                        <h4>Active-Active Configuration</h4>
+                        <p>Multiple systems operate simultaneously, sharing the workload and providing redundancy.</p>
+                        <ul class="list-styled">
+                            <li>Load is distributed across all active systems</li>
+                            <li>No resources sit idle</li>
+                            <li>Automatic failover when one system fails</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Active-Passive Configuration</h4>
+                        <p>One system handles all traffic while backup systems remain on standby.</p>
+                        <ul class="list-styled">
+                            <li>Passive systems activate only during failure</li>
+                            <li>Simpler configuration and management</li>
+                            <li>Some resources remain unused during normal operation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Disaster Recovery Testing</h3>
+                    <div class="subtopic">
+                        <h4>Tabletop Exercises</h4>
+                        <p>Discussion-based sessions where team members review and discuss their roles during a disaster scenario.</p>
+                        <ul class="list-styled">
+                            <li>Cost-effective testing method</li>
+                            <li>Identifies gaps in procedures</li>
+                            <li>Improves team coordination</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Validation Tests</h4>
+                        <p>Actual testing of backup systems and recovery procedures to ensure they work as expected.</p>
+                        <ul class="list-styled">
+                            <li>Verify backup integrity</li>
+                            <li>Test recovery procedures</li>
+                            <li>Measure actual recovery times</li>
+                            <li>Identify and resolve issues before disasters occur</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="content-section" id="quiz">
+                <div class="section-header">
+                    <h1>Practice Quiz</h1>
+                    <p>Test your knowledge of Network Operations objectives 3.1, 3.2, and 3.3</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quizProgress"></div>
+                </div>
+                
+                <div class="quiz-container" id="quizContainer">
+                    <!-- Quiz questions will be populated by JavaScript -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+                    <button class="btn btn-secondary" onclick="resetQuiz()">Reset Quiz</button>
+                </div>
+            </div>
+
+            <!-- Flashcards Section -->
+            <div class="content-section" id="flashcards">
+                <div class="section-header">
+                    <h1>Key Terms Flashcards</h1>
+                    <p>Click on any term to reveal its definition</p>
+                </div>
+                
+                <div class="key-terms" id="flashcardsContainer">
+                    <!-- Flashcards will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Quiz functionality
+        const quizQuestions = [
+            {
+                question: "What is the primary difference between RPO and RTO in disaster recovery?",
+                options: [
+                    "RPO measures time to repair, RTO measures time between failures",
+                    "RPO measures acceptable data loss, RTO measures acceptable downtime",
+                    "RPO is for hardware failures, RTO is for software failures",
+                    "RPO and RTO are identical metrics with different names"
+                ],
+                correct: 1,
+                explanation: "RPO (Recovery Point Objective) defines how much data loss is acceptable, while RTO (Recovery Time Objective) defines how long services can be down."
+            },
+            {
+                question: "Which SNMP version provides authentication and encryption?",
+                options: [
+                    "SNMPv1",
+                    "SNMPv2c",
+                    "SNMPv3",
+                    "All SNMP versions provide encryption"
+                ],
+                correct: 2,
+                explanation: "SNMPv3 is the only SNMP version that provides authentication, encryption, and message integrity. Earlier versions use plain text communication."
+            },
+            {
+                question: "What type of disaster recovery site has equipment installed but requires data restoration?",
+                options: [
+                    "Cold Site",
+                    "Warm Site",
+                    "Hot Site",
+                    "Backup Site"
+                ],
+                correct: 1,
+                explanation: "A Warm Site has some equipment pre-installed but requires data restoration and final configuration before becoming operational."
+            },
+            {
+                question: "In an Active-Active high availability configuration, what happens during normal operation?",
+                options: [
+                    "Only one system processes traffic while others wait",
+                    "All systems share the workload simultaneously",
+                    "Systems alternate handling requests",
+                    "Backup systems are powered off"
+                ],
+                correct: 1,
+                explanation: "In Active-Active configuration, all systems operate simultaneously and share the workload, providing both performance benefits and redundancy."
+            },
+            {
+                question: "What is the primary purpose of a Management Information Base (MIB) in SNMP?",
+                options: [
+                    "Store network passwords",
+                    "Define the structure of manageable objects",
+                    "Encrypt SNMP communications",
+                    "Create network topology maps"
+                ],
+                correct: 1,
+                explanation: "A MIB (Management Information Base) defines the structure and organization of manageable objects that can be monitored and controlled via SNMP."
+            },
+            {
+                question: "Which document type shows the actual physical layout of network cables and equipment?",
+                options: [
+                    "Logical Network Diagram",
+                    "Physical Network Diagram",
+                    "Network Flow Chart",
+                    "Asset Inventory"
+                ],
+                correct: 1,
+                explanation: "Physical Network Diagrams show the actual physical layout, including cable runs, equipment placement, and rack locations."
+            },
+            {
+                question: "What does MTBF measure in network equipment?",
+                options: [
+                    "Maximum time before failure",
+                    "Mean time to repair failures",
+                    "Predicted time between failures",
+                    "Minimum time between failures"
+                ],
+                correct: 2,
+                explanation: "MTBF (Mean Time Between Failures) measures the predicted average time between inherent failures during normal operation."
+            },
+            {
+                question: "Which monitoring method copies network traffic to a designated analysis port?",
+                options: [
+                    "Network TAP",
+                    "Port Mirroring",
+                    "SNMP Polling",
+                    "Flow Analysis"
+                ],
+                correct: 1,
+                explanation: "Port Mirroring (also called SPAN) copies network traffic from source ports to a destination port for analysis."
+            },
+            {
+                question: "What is the main advantage of NetFlow over traditional packet capture?",
+                options: [
+                    "Higher security",
+                    "Lower storage requirements",
+                    "Faster transmission",
+                    "Better encryption"
+                ],
+                correct: 1,
+                explanation: "NetFlow provides traffic analysis with much lower storage requirements compared to full packet capture, while still providing valuable network insights."
+            },
+            {
+                question: "In change management, what should be done before implementing any network changes?",
+                options: [
+                    "Notify all users immediately",
+                    "Create a rollback plan and get approval",
+                    "Schedule during peak hours",
+                    "Test in production environment"
+                ],
+                correct: 1,
+                explanation: "Proper change management requires creating rollback plans, impact assessments, and obtaining approval before implementing any changes."
+            }
+        ];
+
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizStarted = false;
+
+        function startQuiz() {
+            currentQuiz = [...quizQuestions].sort(() => Math.random() - 0.5); // Shuffle questions
+            currentQuestionIndex = 0;
+            score = 0;
+            quizStarted = true;
+            showQuestion();
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            quizStarted = false;
+            document.getElementById('quizContainer').innerHTML = '<p style="text-align: center; color: #7f8c8d;">Click "Start Quiz" to begin testing your knowledge!</p>';
+            document.getElementById('quizProgress').style.width = '0%';
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= currentQuiz.length) {
+                showQuizResults();
+                return;
+            }
+
+            const question = currentQuiz[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / currentQuiz.length) * 100;
+            document.getElementById('quizProgress').style.width = progress + '%';
+
+            const quizHTML = `
+                <div class="quiz-question">
+                    <h3>Question ${currentQuestionIndex + 1} of ${currentQuiz.length}</h3>
+                    <p style="font-size: 1.1em; margin: 15px 0;"><strong>${question.question}</strong></p>
+                    <div class="quiz-options" id="options-${currentQuestionIndex}">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option" onclick="selectOption(${index})" data-index="${index}">
+                                ${String.fromCharCode(65 + index)}. ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn" onclick="submitAnswer()" id="submitBtn" disabled>Submit Answer</button>
+                        <button class="btn btn-secondary" onclick="nextQuestion()" id="nextBtn" style="display: none;">Next Question</button>
+                    </div>
+                    <div id="explanation-${currentQuestionIndex}" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;"></div>
+                </div>
+            `;
+
+            document.getElementById('quizContainer').innerHTML = quizHTML;
+        }
+
+        let selectedOption = -1;
+
+        function selectOption(index) {
+            selectedOption = index;
+            const options = document.querySelectorAll(`#options-${currentQuestionIndex} .quiz-option`);
+            options.forEach(option => option.classList.remove('selected'));
+            options[index].classList.add('selected');
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            const question = currentQuiz[currentQuestionIndex];
+            const options = document.querySelectorAll(`#options-${currentQuestionIndex} .quiz-option`);
+            
+            // Disable all options
+            options.forEach(option => option.style.pointerEvents = 'none');
+            
+            // Show correct/incorrect styling
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedOption && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Update score
+            if (selectedOption === question.correct) {
+                score++;
+            }
+
+            // Show explanation
+            const explanationDiv = document.getElementById(`explanation-${currentQuestionIndex}`);
+            explanationDiv.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+            explanationDiv.style.display = 'block';
+
+            // Update buttons
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            selectedOption = -1;
+            showQuestion();
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((score / currentQuiz.length) * 100);
+            let message = '';
+            let messageClass = '';
+            
+            if (percentage >= 80) {
+                message = 'Excellent! You have a strong understanding of Network Operations concepts.';
+                messageClass = 'alert-success';
+            } else if (percentage >= 60) {
+                message = 'Good job! Review the areas where you missed questions to improve further.';
+                messageClass = 'alert-info';
+            } else {
+                message = 'Keep studying! Focus on the key concepts and try the quiz again.';
+                messageClass = 'alert-info';
+            }
+
+            const resultsHTML = `
+                <div style="text-align: center;">
+                    <h2>Quiz Complete!</h2>
+                    <div style="font-size: 3em; color: #27ae60; margin: 20px 0;">${percentage}%</div>
+                    <p style="font-size: 1.2em;">You scored ${score} out of ${currentQuiz.length} questions correctly.</p>
+                    <div class="alert ${messageClass}" style="margin: 20px 0;">${message}</div>
+                    <button class="btn" onclick="startQuiz()">Retry Quiz</button>
+                    <button class="btn btn-secondary" onclick="resetQuiz()">Back to Start</button>
+                </div>
+            `;
+
+            document.getElementById('quizContainer').innerHTML = resultsHTML;
+            document.getElementById('quizProgress').style.width = '100%';
+        }
+
+        // Flashcards functionality
+        const flashcards = [
+            {
+                term: "RPO (Recovery Point Objective)",
+                definition: "The maximum acceptable amount of data loss measured in time. Defines how much data you can afford to lose in a disaster scenario."
+            },
+            {
+                term: "RTO (Recovery Time Objective)",
+                definition: "The maximum acceptable time to restore services after a disaster. Defines how long services can be down before business impact becomes unacceptable."
+            },
+            {
+                term: "MTTR (Mean Time to Repair)",
+                definition: "The average time required to repair a failed component and restore it to operational status, including detection, diagnosis, and repair time."
+            },
+            {
+                term: "MTBF (Mean Time Between Failures)",
+                definition: "The predicted time between inherent failures of a system during operation. Represents equipment reliability and life expectancy."
+            },
+            {
+                term: "SNMP (Simple Network Management Protocol)",
+                definition: "An Internet-standard protocol for collecting and organizing information about managed devices on IP networks and for modifying that information to change device behavior."
+            },
+            {
+                term: "MIB (Management Information Base)",
+                definition: "A database used for managing the entities in a communications network, defining the structure of manageable objects that can be monitored via SNMP."
+            },
+            {
+                term: "NetFlow",
+                definition: "A network protocol developed by Cisco for collecting IP traffic information and monitoring network traffic patterns with lower storage requirements than packet capture."
+            },
+            {
+                term: "Port Mirroring",
+                definition: "A method of monitoring network traffic by copying packets from source ports to a destination port for analysis, also known as SPAN (Switched Port Analyzer)."
+            },
+            {
+                term: "Cold Site",
+                definition: "A disaster recovery site with basic infrastructure (power, HVAC, network) but no installed equipment. Lowest cost option with longest recovery time."
+            },
+            {
+                term: "Warm Site",
+                definition: "A disaster recovery site with some pre-installed equipment and infrastructure, but not fully operational. Requires data restoration and final configuration."
+            },
+            {
+                term: "Hot Site",
+                definition: "A fully operational disaster recovery site with real-time data replication and immediate failover capability. Highest cost with fastest recovery time."
+            },
+            {
+                term: "Active-Active",
+                definition: "A high availability configuration where multiple systems operate simultaneously, sharing the workload and providing redundancy without idle resources."
+            },
+            {
+                term: "Active-Passive",
+                definition: "A high availability configuration where one system handles all traffic while backup systems remain on standby, activating only during failure."
+            },
+            {
+                term: "SIEM (Security Information and Event Management)",
+                definition: "Software solution that aggregates and analyzes activity from many different resources across your IT infrastructure for real-time security monitoring."
+            },
+            {
+                term: "Change Management",
+                definition: "A formal process to minimize risk of unscheduled downtime by implementing changes in a planned and controlled manner with proper documentation and approval."
+            },
+            {
+                term: "Configuration Management",
+                definition: "The process of maintaining computer systems, servers, and software in a desired, consistent state through systematic tracking and control of changes."
+            },
+            {
+                term: "IPAM (IP Address Management)",
+                definition: "The administration of DNS and DHCP, which are each services that assign network parameters to devices across an IP network."
+            },
+            {
+                term: "SLA (Service Level Agreement)",
+                definition: "A contract between a service provider and customer that defines the level of service expected from the service provider, including performance metrics and penalties."
+            },
+            {
+                term: "Baseline Metrics",
+                definition: "Established normal network performance patterns used to identify anomalies, trends, and capacity planning requirements."
+            },
+            {
+                term: "Network TAP",
+                definition: "A hardware device that allows you to access data flowing across a computer network by creating a copy of the traffic for analysis without impacting the network."
+            }
+        ];
+
+        function initializeFlashcards() {
+            const container = document.getElementById('flashcardsContainer');
+            const flashcardsHTML = flashcards.map((card, index) => `
+                <div class="term-card" onclick="toggleDefinition(${index})">
+                    <h4>${card.term}</h4>
+                    <div class="term-definition" id="definition-${index}">
+                        ${card.definition}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = flashcardsHTML;
+        }
+
+        function toggleDefinition(index) {
+            const card = document.querySelector(`.term-card:nth-child(${index + 1})`);
+            card.classList.toggle('expanded');
+        }
+
+        // Initialize flashcards when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFlashcards();
+            resetQuiz();
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && quizStarted) {
+                const submitBtn = document.getElementById('submitBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                if (submitBtn && !submitBtn.disabled && submitBtn.style.display !== 'none') {
+                    submitAnswer();
+                } else if (nextBtn && nextBtn.style.display !== 'none') {
+                    nextQuestion();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
