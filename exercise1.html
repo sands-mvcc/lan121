@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Prep</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            background-color: #F0F0F0; /* Light gray to complement the white */
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #222; /* Black */
+            color: #fff;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+        }
+        .sidebar h2 {
+            color: #4CAF50; /* Green */
+            text-align: center;
+        }
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            border-left: 5px solid transparent;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #333;
+            border-left: 5px solid #4CAF50; /* Green highlight */
+        }
+        .content {
+            margin-left: 250px;
+            padding: 40px;
+            flex-grow: 1;
+            background-color: #fff;
+        }
+        .task-container {
+            display: none;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .task-container.active {
+            display: block;
+        }
+        h1, h3 {
+            color: #333;
+        }
+        .quiz-container {
+            background-color: #e9e9e9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .quiz-question {
+            margin-bottom: 15px;
+        }
+        .quiz-question p {
+            font-weight: bold;
+            color: #333;
+        }
+        .quiz-question input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .quiz-question button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .quiz-question button:hover {
+            background-color: #45a049;
+        }
+        #quiz-results {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>CompTIA Network+</h2>
+        <a href="#" onclick="showTask('details')">Exam Details</a>
+        <a href="#" onclick="showTask('activity')">Prep Activity</a>
+    </div>
+
+    <div class="content">
+        <div id="details" class="task-container active">
+            <h1>CompTIA Network+ Certification Exam</h1>
+            <p>Welcome to the CompTIA Network+ preparation page. Use this site to learn about the exam and test your knowledge!</p>
+            <h3>Exam Overview</h3>
+            <p>The CompTIA Network+ certification is designed for IT professionals who want to demonstrate their skills in managing, maintaining, troubleshooting, and configuring basic network infrastructure. This vendor-neutral certification is a stepping stone to more advanced certifications and a solid foundation for a career in networking.</p>
+            <h3>Exam Objectives</h3>
+            <ul>
+                <li>Networking Concepts</li>
+                <li>Network Infrastructure</li>
+                <li>Network Operations</li>
+                <li>Network Security</li>
+                <li>Network Troubleshooting and Tools</li>
+            </ul>
+        </div>
+
+        <div id="activity" class="task-container">
+            <h1>Prep Activity</h1>
+            <p>Answer the following 10 questions to test your knowledge of the CompTIA Network+ exam details. Type your answer in the box provided and click "Submit" to see your results.</p>
+            
+            <div class="quiz-container">
+                <div class="quiz-question">
+                    <p>1. What is the current exam code for the CompTIA Network+ certification?</p>
+                    <input type="text" id="q1">
+                </div>
+                <div class="quiz-question">
+                    <p>2. How many questions are on the CompTIA Network+ exam?</p>
+                    <input type="text" id="q2">
+                </div>
+                <div class="quiz-question">
+                    <p>3. What is the maximum time in minutes you have to complete the exam?</p>
+                    <input type="text" id="q3">
+                </div>
+                <div class="quiz-question">
+                    <p>4. What is the approximate cost of the exam in USD?</p>
+                    <input type="text" id="q4">
+                </div>
+                <div class="quiz-question">
+                    <p>5. What is the passing score for the exam on a scale of 100-900?</p>
+                    <input type="text" id="q5">
+                </div>
+                <div class="quiz-question">
+                    <p>6. What is one of the two question types on the exam?</p>
+                    <input type="text" id="q6">
+                </div>
+                <div class="quiz-question">
+                    <p>7. What is the recommended prior certification before taking Network+?</p>
+                    <input type="text" id="q7">
+                </div>
+                <div class="quiz-question">
+                    <p>8. What is one of the five domains covered by the exam objectives?</p>
+                    <input type="text" id="q8">
+                </div>
+                <div class="quiz-question">
+                    <p>9. What is the name for the hands-on question type on the exam?</p>
+                    <input type="text" id="q9">
+                </div>
+                <div class="quiz-question">
+                    <p>10. How many months of hands-on experience does CompTIA recommend?</p>
+                    <input type="text" id="q10">
+                </div>
+
+                <button onclick="checkAnswers()">Submit</button>
+            </div>
+
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+        function showTask(taskId) {
+            // Hide all task containers
+            document.querySelectorAll('.task-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            // Show the selected task container
+            document.getElementById(taskId).classList.add('active');
+        }
+
+        function checkAnswers() {
+            const answers = {
+                'q1': 'N10-009',
+                'q2': '90',
+                'q3': '90',
+                'q4': '369',
+                'q5': '720',
+                'q6': ['Multiple-choice', 'Performance-based', 'PBQs'],
+                'q7': 'CompTIA A+',
+                'q8': ['Networking Concepts', 'Network Infrastructure', 'Network Operations', 'Network Security', 'Network Troubleshooting and Tools'],
+                'q9': ['Performance-based', 'PBQ', 'PBQs'],
+                'q10': ['9 to 12', '9-12', '9-12 months', '9 to 12 months']
+            };
+
+            let score = 0;
+            let resultsHtml = '<h3>Your Results:</h3>';
+            
+            for (let i = 1; i <= 10; i++) {
+                const questionId = `q${i}`;
+                const userAnswer = document.getElementById(questionId).value.trim();
+                const correctAnswer = answers[questionId];
+                
+                let isCorrect = false;
+
+                if (Array.isArray(correctAnswer)) {
+                    isCorrect = correctAnswer.some(ans => userAnswer.toLowerCase().includes(ans.toLowerCase()));
+                } else {
+                    isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                }
+
+                if (isCorrect) {
+                    score++;
+                    resultsHtml += `<p style="color: green;">Question ${i}: Correct!</p>`;
+                } else {
+                    resultsHtml += `<p style="color: red;">Question ${i}: Incorrect. The correct answer is: ${Array.isArray(correctAnswer) ? correctAnswer[0] : correctAnswer}</p>`;
+                }
+            }
+
+            resultsHtml += `<h4>Your final score is: ${score} out of 10</h4>`;
+            document.getElementById('quiz-results').innerHTML = resultsHtml;
+        }
+    </script>
+
+</body>
+</html>
