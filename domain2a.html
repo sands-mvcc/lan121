@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Study Guide - Routing & Switching</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #2c3e2c 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #2c3e2c 0%, #1a251a 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .nav-item {
+            margin: 10px 0;
+            padding: 12px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(76, 175, 80, 0.3);
+            border-left: 3px solid #4CAF50;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(76, 175, 80, 0.4);
+            border-left: 3px solid #4CAF50;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 30px;
+            width: calc(100% - 250px);
+        }
+
+        .section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid #e8f5e8;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h1 {
+            color: #2c3e2c;
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .section h2 {
+            color: #4CAF50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .section h3 {
+            color: #2c3e2c;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            border: 1px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
+        }
+
+        .quiz-button {
+            background: linear-gradient(135deg, #4CAF50 0%, #2c3e2c 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .quiz-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .quiz-container {
+            background: #f8fff8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { max-height: 0; opacity: 0; }
+            to { max-height: 500px; opacity: 1; }
+        }
+
+        .quiz-question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e2c;
+        }
+
+        .quiz-option {
+            margin: 8px 0;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .flashcard {
+            background: white;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .flashcard:hover {
+            transform: rotateY(5deg);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .flashcard.flipped {
+            background: #2c3e2c;
+            color: white;
+        }
+
+        .key-points {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .key-points h4 {
+            color: #2c3e2c;
+            margin-bottom: 10px;
+        }
+
+        .key-points ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .key-points li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .key-points li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50 0%, #2c3e2c 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .study-stats {
+            background: #2c3e2c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #2c3e2c;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8fff8;
+        }
+
+        .comparison-table tr:hover {
+            background: #e8f5e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CompTIA Network+ N10-009</h2>
+            <div class="nav-item active" data-section="overview">Study Overview</div>
+            <div class="nav-item" data-section="routing-21">2.1 Routing Technologies</div>
+            <div class="nav-item" data-section="switching-22">2.2 Switching Technologies</div>
+            <div class="nav-item" data-section="practice-quiz">Practice Quiz</div>
+            <div class="nav-item" data-section="flashcards">Flashcards</div>
+            <div class="nav-item" data-section="comparison">Protocol Comparison</div>
+        </div>
+
+        <div class="content">
+            <!-- Study Overview Section -->
+            <div class="section active" id="overview">
+                <h1>CompTIA Network+ Study Guide</h1>
+                <div class="study-stats">
+                    <h3>Objectives 2.1 & 2.2 - Routing and Switching Technologies</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress"></div>
+                    </div>
+                    <p>Progress: <span id="progress-text">0%</span></p>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Welcome to Your Network+ Study Session</h2>
+                    <p>This interactive study guide covers CompTIA Network+ exam objectives 2.1 (Routing Technologies) and 2.2 (Switching Technologies). Use the navigation menu to explore each topic in detail.</p>
+                    
+                    <div class="key-points">
+                        <h4>Study Features:</h4>
+                        <ul>
+                            <li>Comprehensive coverage of routing protocols (BGP, EIGRP, OSPF)</li>
+                            <li>Detailed switching concepts (VLANs, STP, Link Aggregation)</li>
+                            <li>Interactive quizzes and flashcards</li>
+                            <li>Protocol comparison tables</li>
+                            <li>Real-world scenarios and examples</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button class="quiz-button" onclick="startStudySession()">Begin Study Session</button>
+            </div>
+
+            <!-- Routing Technologies Section -->
+            <div class="section" id="routing-21">
+                <h1>2.1 Routing Technologies</h1>
+
+                <div class="topic-card">
+                    <h2>Static vs Dynamic Routing</h2>
+                    <h3>Static Routing</h3>
+                    <p><strong>Definition:</strong> Routes manually configured by network administrators that don't change automatically.</p>
+                    <div class="key-points">
+                        <h4>Characteristics:</h4>
+                        <ul>
+                            <li>Administrative Distance: 1</li>
+                            <li>No protocol overhead</li>
+                            <li>Predictable routing paths</li>
+                            <li>Suitable for small, stable networks</li>
+                            <li>Requires manual updates when topology changes</li>
+                        </ul>
+                    </div>
+
+                    <h3>Dynamic Routing</h3>
+                    <p><strong>Definition:</strong> Routes automatically calculated and updated by routing protocols based on network topology changes.</p>
+                    <div class="key-points">
+                        <h4>Types:</h4>
+                        <ul>
+                            <li>Distance Vector (RIP, EIGRP)</li>
+                            <li>Link State (OSPF, IS-IS)</li>
+                            <li>Path Vector (BGP)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Dynamic Routing Protocols</h2>
+                    
+                    <h3>Enhanced Interior Gateway Routing Protocol (EIGRP)</h3>
+                    <p><strong>Type:</strong> Hybrid/Advanced Distance Vector</p>
+                    <div class="key-points">
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li>Administrative Distance: 90</li>
+                            <li>Cisco proprietary (now open standard)</li>
+                            <li>Uses DUAL algorithm</li>
+                            <li>Supports unequal-cost load balancing</li>
+                            <li>Fast convergence</li>
+                            <li>Metric: Bandwidth, Delay, Load, Reliability, MTU</li>
+                        </ul>
+                    </div>
+
+                    <h3>Open Shortest Path First (OSPF)</h3>
+                    <p><strong>Type:</strong> Link State</p>
+                    <div class="key-points">
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li>Administrative Distance: 110</li>
+                            <li>Open standard (RFC 2328)</li>
+                            <li>Uses Dijkstra's SPF algorithm</li>
+                            <li>Hierarchical design with areas</li>
+                            <li>Fast convergence</li>
+                            <li>Metric: Cost (based on bandwidth)</li>
+                        </ul>
+                    </div>
+
+                    <h3>Border Gateway Protocol (BGP)</h3>
+                    <p><strong>Type:</strong> Path Vector (External Gateway Protocol)</p>
+                    <div class="key-points">
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li>Administrative Distance: 20 (eBGP), 200 (iBGP)</li>
+                            <li>Internet routing protocol</li>
+                            <li>Policy-based routing</li>
+                            <li>Path attributes for route selection</li>
+                            <li>Used between Autonomous Systems</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Route Selection</h2>
+                    
+                    <h3>Administrative Distance</h3>
+                    <p>Used to rank routes from different routing protocols (lower is better):</p>
+                    <div class="key-points">
+                        <ul>
+                            <li>Connected Interface: 0</li>
+                            <li>Static Route: 1</li>
+                            <li>EIGRP: 90</li>
+                            <li>OSPF: 110</li>
+                            <li>RIP: 120</li>
+                        </ul>
+                    </div>
+
+                    <h3>Prefix Length (Longest Match)</h3>
+                    <p>Routes with longer subnet masks (more specific) are preferred over less specific routes.</p>
+
+                    <h3>Metric</h3>
+                    <p>Used by routing protocols to determine the best path when multiple routes exist to the same destination.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Address Translation</h2>
+                    
+                    <h3>Network Address Translation (NAT)</h3>
+                    <p>Translates private IP addresses to public IP addresses for internet connectivity.</p>
+                    
+                    <h3>Port Address Translation (PAT)</h3>
+                    <p>Also known as NAT Overload - maps multiple private addresses to a single public address using different port numbers.</p>
+                    <div class="key-points">
+                        <h4>Benefits:</h4>
+                        <ul>
+                            <li>Conserves public IP addresses</li>
+                            <li>Provides security through address hiding</li>
+                            <li>Allows multiple devices to share single public IP</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>First Hop Redundancy Protocol (FHRP)</h2>
+                    <p>Provides gateway redundancy by allowing multiple routers to share a virtual IP address.</p>
+                    
+                    <h3>Virtual IP (VIP)</h3>
+                    <p>A shared IP address used by FHRP that can be moved between routers for redundancy.</p>
+                    
+                    <div class="key-points">
+                        <h4>Common FHRP Protocols:</h4>
+                        <ul>
+                            <li>HSRP (Hot Standby Router Protocol) - Cisco</li>
+                            <li>VRRP (Virtual Router Redundancy Protocol) - Standard</li>
+                            <li>GLBP (Gateway Load Balancing Protocol) - Cisco</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Subinterfaces</h2>
+                    <p>Virtual interfaces that allow a single physical interface to be divided into multiple logical interfaces.</p>
+                    <div class="key-points">
+                        <h4>Use Cases:</h4>
+                        <ul>
+                            <li>VLAN routing (Router-on-a-stick)</li>
+                            <li>Multiple IP subnets on one interface</li>
+                            <li>Frame Relay subinterfaces</li>
+                            <li>Point-to-point connections</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Switching Technologies Section -->
+            <div class="section" id="switching-22">
+                <h1>2.2 Switching Technologies</h1>
+
+                <div class="topic-card">
+                    <h2>Virtual Local Area Networks (VLANs)</h2>
+                    <p>Logical grouping of devices on the same broadcast domain, regardless of physical location.</p>
+                    
+                    <h3>VLAN Database</h3>
+                    <p>Stores VLAN configuration information on the switch, including VLAN IDs, names, and port assignments.</p>
+                    
+                    <h3>Switch Virtual Interface (SVI)</h3>
+                    <p>Virtual Layer 3 interface that provides IP connectivity for a VLAN.</p>
+                    <div class="key-points">
+                        <h4>SVI Functions:</h4>
+                        <ul>
+                            <li>Default gateway for VLAN hosts</li>
+                            <li>Inter-VLAN routing</li>
+                            <li>Management access to switch</li>
+                            <li>Layer 3 services for VLAN</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Interface Configuration</h2>
+                    
+                    <h3>Native VLAN</h3>
+                    <p>VLAN that carries untagged traffic on a trunk link (default VLAN 1).</p>
+                    
+                    <h3>Voice VLAN</h3>
+                    <p>Separate VLAN for VoIP traffic to ensure quality of service and security separation.</p>
+                    
+                    <h3>802.1Q Tagging</h3>
+                    <p>Standard method for VLAN identification in Ethernet frames.</p>
+                    <div class="key-points">
+                        <h4>802.1Q Frame Fields:</h4>
+                        <ul>
+                            <li>TPID (Tag Protocol Identifier): 0x8100</li>
+                            <li>Priority: 3 bits for QoS</li>
+                            <li>CFI (Canonical Format Indicator): 1 bit</li>
+                            <li>VLAN ID: 12 bits (4096 possible VLANs)</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Link Aggregation</h3>
+                    <p>Combining multiple physical links into a single logical link for increased bandwidth and redundancy.</p>
+                    <div class="key-points">
+                        <h4>Technologies:</h4>
+                        <ul>
+                            <li>LACP (Link Aggregation Control Protocol) - IEEE 802.3ad</li>
+                            <li>PAgP (Port Aggregation Protocol) - Cisco proprietary</li>
+                            <li>Static aggregation (manual configuration)</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Speed and Duplex</h3>
+                    <p><strong>Speed:</strong> Data transmission rate (10/100/1000 Mbps, 10 Gbps, etc.)</p>
+                    <p><strong>Duplex:</strong> Communication direction capability</p>
+                    <div class="key-points">
+                        <ul>
+                            <li>Half Duplex: One direction at a time</li>
+                            <li>Full Duplex: Both directions simultaneously</li>
+                            <li>Auto-negotiation: Automatic speed/duplex detection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Spanning Tree Protocol (STP)</h2>
+                    <p>Prevents Layer 2 loops in switched networks by blocking redundant paths.</p>
+                    <div class="key-points">
+                        <h4>STP Variants:</h4>
+                        <ul>
+                            <li>STP (802.1D) - Original standard</li>
+                            <li>RSTP (802.1w) - Rapid Spanning Tree</li>
+                            <li>MSTP (802.1s) - Multiple Spanning Tree</li>
+                            <li>PVST+ - Per-VLAN Spanning Tree Plus (Cisco)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="key-points">
+                        <h4>Port States:</h4>
+                        <ul>
+                            <li>Blocking: Receives BPDUs only</li>
+                            <li>Listening: Processes BPDUs</li>
+                            <li>Learning: Learns MAC addresses</li>
+                            <li>Forwarding: Full operation</li>
+                            <li>Disabled: Administratively down</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Maximum Transmission Unit (MTU)</h2>
+                    <p>Largest size packet/frame that can be transmitted over a network interface.</p>
+                    
+                    <div class="key-points">
+                        <h4>Standard MTU Sizes:</h4>
+                        <ul>
+                            <li>Ethernet: 1500 bytes</li>
+                            <li>PPPoE: 1492 bytes</li>
+                            <li>Token Ring: 4464 bytes</li>
+                            <li>FDDI: 4352 bytes</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Jumbo Frames</h3>
+                    <p>Ethernet frames larger than the standard 1500-byte MTU, typically up to 9000 bytes.</p>
+                    <div class="key-points">
+                        <h4>Benefits:</h4>
+                        <ul>
+                            <li>Reduced CPU overhead</li>
+                            <li>Improved throughput for large transfers</li>
+                            <li>Better efficiency in data centers</li>
+                            <li>Reduced frame processing overhead</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Quiz Section -->
+            <div class="section" id="practice-quiz">
+                <h1>Practice Quiz</h1>
+                <div class="topic-card">
+                    <h2>Test Your Knowledge</h2>
+                    <p>Click the questions below to test your understanding of routing and switching concepts.</p>
+                    
+                    <button class="quiz-button" onclick="showQuiz('quiz1')">Routing Protocols Quiz</button>
+                    <button class="quiz-button" onclick="showQuiz('quiz2')">VLAN & Switching Quiz</button>
+                    <button class="quiz-button" onclick="showQuiz('quiz3')">Mixed Topics Quiz</button>
+                </div>
+
+                <div class="quiz-container" id="quiz1">
+                    <div class="quiz-question">1. Which routing protocol has the lowest administrative distance?</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">A) OSPF (110)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">B) EIGRP (90)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">C) RIP (120)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) BGP (200)</div>
+                </div>
+
+                <div class="quiz-container" id="quiz2">
+                    <div class="quiz-question">2. What is the default native VLAN on most switches?</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">A) VLAN 1</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">B) VLAN 10</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">C) VLAN 100</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) VLAN 999</div>
+                </div>
+
+                <div class="quiz-container" id="quiz3">
+                    <div class="quiz-question">3. What is the maximum size of a jumbo frame?</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">A) 1500 bytes</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">B) 4096 bytes</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">C) 9000 bytes</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) 65535 bytes</div>
+                </div>
+            </div>
+
+            <!-- Flashcards Section -->
+            <div class="section" id="flashcards">
+                <h1>Study Flashcards</h1>
+                <div class="topic-card">
+                    <h2>Interactive Flashcards</h2>
+                    <p>Click each card to reveal the answer. Test your recall of key concepts!</p>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What is EIGRP?</div>
+                    <div class="back" style="display:none;">Enhanced Interior Gateway Routing Protocol - A Cisco hybrid routing protocol that uses DUAL algorithm with AD of 90</div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What does SVI stand for?</div>
+                    <div class="back" style="display:none;">Switch Virtual Interface - A virtual Layer 3 interface that provides IP connectivity for a VLAN</div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What is the purpose of Spanning Tree Protocol?</div>
+                    <div class="back" style="display:none;">STP prevents Layer 2 loops in switched networks by blocking redundant paths and maintaining a loop-free topology</div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What is PAT?</div>
+                    <div class="back" style="display:none;">Port Address Translation (NAT Overload) - Maps multiple private addresses to a single public address using different port numbers</div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What is 802.1Q?</div>
+                    <div class="back" style="display:none;">IEEE standard for VLAN tagging in Ethernet frames, adding a 4-byte tag with VLAN ID information</div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="front">What is FHRP?</div>
+                    <div class="back" style="display:none;">First Hop Redundancy Protocol - Provides gateway redundancy using protocols like HSRP, VRRP, and GLBP with Virtual IP addresses</div>
+                </div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div class="section" id="comparison">
+                <h1>Protocol Comparison Tables</h1>
+                
+                <div class="topic-card">
+                    <h2>Routing Protocols Comparison</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Protocol</th>
+                                <th>Type</th>
+                                <th>Admin Distance</th>
+                                <th>Metric</th>
+                                <th>Convergence</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>EIGRP</strong></td>
+                                <td>Hybrid</td>
+                                <td>90</td>
+                                <td>Composite (BW, Delay)</td>
+                                <td>Fast</td>
+                                <td>Cisco networks, medium-large</td>
+                            </tr>
+                            <tr>
+                                <td><strong>OSPF</strong></td>
+                                <td>Link State</td>
+                                <td>110</td>
+                                <td>Cost (Bandwidth)</td>
+                                <td>Fast</td>
+                                <td>Enterprise networks, hierarchical</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BGP</strong></td>
+                                <td>Path Vector</td>
+                                <td>20 (eBGP), 200 (iBGP)</td>
+                                <td>Path Attributes</td>
+                                <td>Slow</td>
+                                <td>Internet, ISP connections</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RIP v2</strong></td>
+                                <td>Distance Vector</td>
+                                <td>120</td>
+                                <td>Hop Count</td>
+                                <td>Slow</td>
+                                <td>Small networks, legacy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Static</strong></td>
+                                <td>Manual</td>
+                                <td>1</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>Small, stable networks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="topic-card">
+                    <h2>VLAN Types and Features</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>VLAN Type</th>
+                                <th>Range</th>
+                                <th>Purpose</th>
+                                <th>Characteristics</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Default VLAN</strong></td>
+                                <td>VLAN 1</td>
+                                <td>Management</td>
+                                <td>Cannot be deleted, native VLAN</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Normal Range</strong></td>
+                                <td>1-1005</td>
+                                <td>Standard use</td>
+                                <td>Stored in vlan.dat file</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Extended Range</strong></td>
+                                <td>1006-4094</td>
+                                <td>Service provider</td>
+                                <td>Requires VTP transparent mode</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Voice VLAN</strong></td>
+                                <td>Any</td>
+                                <td>VoIP traffic</td>
+                                <td>QoS priority, separate from data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Native VLAN</strong></td>
+                                <td>Usually 1</td>
+                                <td>Untagged traffic</td>
+                                <td>Default for trunk ports</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="topic-card">
+                    <h2>Spanning Tree Protocol Variants</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>STP Variant</th>
+                                <th>Standard</th>
+                                <th>Convergence Time</th>
+                                <th>Features</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>STP</strong></td>
+                                <td>IEEE 802.1D</td>
+                                <td>30-50 seconds</td>
+                                <td>Basic loop prevention</td>
+                                <td>Legacy networks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RSTP</strong></td>
+                                <td>IEEE 802.1w</td>
+                                <td>1-6 seconds</td>
+                                <td>Fast convergence, edge ports</td>
+                                <td>Modern networks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MSTP</strong></td>
+                                <td>IEEE 802.1s</td>
+                                <td>1-6 seconds</td>
+                                <td>Multiple instances, VLAN mapping</td>
+                                <td>Large VLAN environments</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PVST+</strong></td>
+                                <td>Cisco proprietary</td>
+                                <td>30-50 seconds</td>
+                                <td>Per-VLAN instances</td>
+                                <td>Cisco environments</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rapid PVST+</strong></td>
+                                <td>Cisco proprietary</td>
+                                <td>1-6 seconds</td>
+                                <td>Per-VLAN + rapid convergence</td>
+                                <td>Modern Cisco networks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="topic-card">
+                    <h2>MTU Sizes by Technology</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Technology</th>
+                                <th>Standard MTU</th>
+                                <th>Maximum MTU</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Ethernet</strong></td>
+                                <td>1500 bytes</td>
+                                <td>9000 bytes (Jumbo)</td>
+                                <td>Most common LAN technology</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PPPoE</strong></td>
+                                <td>1492 bytes</td>
+                                <td>1492 bytes</td>
+                                <td>8 bytes PPPoE overhead</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Token Ring</strong></td>
+                                <td>4464 bytes</td>
+                                <td>17914 bytes</td>
+                                <td>Legacy technology</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FDDI</strong></td>
+                                <td>4352 bytes</td>
+                                <td>4352 bytes</td>
+                                <td>Fiber network standard</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Frame Relay</strong></td>
+                                <td>1500 bytes</td>
+                                <td>4096 bytes</td>
+                                <td>WAN technology</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let visitedSections = new Set(['overview']);
+        let quizScores = {};
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+                
+                // Update active navigation
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Track visited sections
+                visitedSections.add(sectionId);
+                updateProgress();
+            });
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function updateProgress() {
+            const totalSections = 6;
+            const progress = (visitedSections.size / totalSections) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+        }
+
+        function startStudySession() {
+            showSection('routing-21');
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelector('[data-section="routing-21"]').classList.add('active');
+            visitedSections.add('routing-21');
+            updateProgress();
+        }
+
+        // Quiz functionality
+        function showQuiz(quizId) {
+            // Hide all quizzes
+            document.querySelectorAll('.quiz-container').forEach(quiz => {
+                quiz.classList.remove('active');
+            });
+            
+            // Show selected quiz
+            document.getElementById(quizId).classList.add('active');
+        }
+
+        function selectAnswer(element, isCorrect) {
+            // Remove previous selections in this quiz
+            const quizContainer = element.closest('.quiz-container');
+            quizContainer.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            // Mark the selected answer
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback('Correct! Well done!', 'success');
+            } else {
+                element.classList.add('incorrect');
+                // Also highlight the correct answer
+                const correctAnswer = Array.from(quizContainer.querySelectorAll('.quiz-option')).find(option => 
+                    option.onclick.toString().includes('true')
+                );
+                if (correctAnswer) {
+                    correctAnswer.classList.add('correct');
+                }
+                showFeedback('Incorrect. The correct answer is highlighted in green.', 'error');
+            }
+        }
+
+        function showFeedback(message, type) {
+            // Create feedback element
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                ${type === 'success' ? 'background: #28a745;' : 'background: #dc3545;'}
+            `;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                feedback.remove();
+            }, 3000);
+        }
+
+        // Flashcard functionality
+        function flipCard(card) {
+            const front = card.querySelector('.front');
+            const back = card.querySelector('.back');
+            
+            if (card.classList.contains('flipped')) {
+                card.classList.remove('flipped');
+                front.style.display = 'block';
+                back.style.display = 'none';
+            } else {
+                card.classList.add('flipped');
+                front.style.display = 'none';
+                back.style.display = 'block';
+            }
+        }
+
+        // Add CSS animation keyframes dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); }
+                to { transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize progress
+        updateProgress();
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                // Navigate to previous section
+                const currentActive = document.querySelector('.nav-item.active');
+                const prevSibling = currentActive.previousElementSibling;
+                if (prevSibling) {
+                    prevSibling.click();
+                }
+            } else if (e.key === 'ArrowRight') {
+                // Navigate to next section
+                const currentActive = document.querySelector('.nav-item.active');
+                const nextSibling = currentActive.nextElementSibling;
+                if (nextSibling) {
+                    nextSibling.click();
+                }
+            }
+        });
+
+        // Add study timer
+        let studyStartTime = Date.now();
+        function updateStudyTime() {
+            const elapsed = Math.floor((Date.now() - studyStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            // You could display this somewhere if desired
+            // console.log(`Study time: ${minutes}:${seconds.toString().padStart(2, '0')}`);
+        }
+        
+        setInterval(updateStudyTime, 1000);
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                setTimeout(() => {
+                    document.querySelector('.content').scrollTop = 0;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
