@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VPN Simulator Training Lab</title>
+  <style>
+    body {
+      background: #fff;
+      color: #222;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1 {
+      color: #058c42;
+      text-align: center;
+    }
+    .vpn-box {
+      border: 2px solid #222;
+      border-radius: 12px;
+      margin: 25px 5px;
+      padding: 24px 18px;
+      display: inline-block;
+      vertical-align: top;
+      background: #e8faef;
+      width: 330px;
+    }
+    .vpn-box label {
+      display: block;
+      margin: 12px 0 2px 0;
+      font-weight: bold;
+      color: #00983d;
+    }
+    .vpn-box input, .vpn-box select {
+      width: 95%;
+      padding: 5px;
+      border: 1px solid #00983d;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 16px;
+      background: #fff;
+    }
+    #connectBtn {
+      background: #00983d;
+      color: #fff;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: background 0.2s;
+      box-shadow: 2px 2px 6px #aaa;
+    }
+    #connectBtn:active {
+      background: #00471c;
+    }
+    #status {
+      margin-top: 32px;
+      font-size: 20px;
+      padding: 15px;
+      text-align: center;
+      border-radius: 10px;
+      border: 2px solid #222;
+      background: #f0fff5;
+      color: #222;
+      min-height: 35px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .success { background: #83f28f; color: #013500; border-color: #058c42; }
+    .fail { background: #ffeded; color: #b30017; border-color: #b30017;}
+    .vpn-container { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>VPN Configuration Simulator</h1>
+  <p style="text-align:center;max-width:650px;margin:0 auto 40px;">
+    <b>Simulate</b> setting up a site-to-site VPN. Configure the VPN device on each side and click <b>Establish VPN</b>. If settings match, a tunnel forms! Experiment with mismatched settings to see how real-world configuration errors cause failures.
+  </p>
+  <div class="vpn-container">
+    <div class="vpn-box" id="left">
+      <h2 style="color:#00983d;">Left VPN Device</h2>
+      <label>Remote Address</label>
+      <input type="text" id="left-remote" placeholder="e.g., 192.168.2.1">
+      <label>Pre-Shared Key</label>
+      <input type="password" id="left-psk" placeholder="e.g., secret123">
+      <label>VPN Protocol</label>
+      <select id="left-proto">
+        <option value="IPSec">IPSec</option>
+        <option value="OpenVPN">OpenVPN</option>
+        <option value="L2TP">L2TP</option>
+      </select>
+      <label>Encryption</label>
+      <select id="left-encrypt">
+        <option value="AES-256">AES-256</option>
+        <option value="3DES">3DES</option>
+        <option value="ChaCha20">ChaCha20</option>
+      </select>
+    </div>
+    <div class="vpn-box" id="right">
+      <h2 style="color:#00983d;">Right VPN Device</h2>
+      <label>Remote Address</label>
+      <input type="text" id="right-remote" placeholder="e.g., 192.168.1.1">
+      <label>Pre-Shared Key</label>
+      <input type="password" id="right-psk" placeholder="e.g., secret123">
+      <label>VPN Protocol</label>
+      <select id="right-proto">
+        <option value="IPSec">IPSec</option>
+        <option value="OpenVPN">OpenVPN</option>
+        <option value="L2TP">L2TP</option>
+      </select>
+      <label>Encryption</label>
+      <select id="right-encrypt">
+        <option value="AES-256">AES-256</option>
+        <option value="3DES">3DES</option>
+        <option value="ChaCha20">ChaCha20</option>
+      </select>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <button id="connectBtn">Establish VPN Tunnel</button>
+    <div id="status"></div>
+  </div>
+  <script>
+    function checkVPN() {
+      const left = {
+        remote: document.getElementById('left-remote').value.trim(),
+        psk: document.getElementById('left-psk').value.trim(),
+        proto: document.getElementById('left-proto').value,
+        encrypt: document.getElementById('left-encrypt').value
+      };
+      const right = {
+        remote: document.getElementById('right-remote').value.trim(),
+        psk: document.getElementById('right-psk').value.trim(),
+        proto: document.getElementById('right-proto').value,
+        encrypt: document.getElementById('right-encrypt').value
+      };
+      let messages = [];
+
+      // Basic validation and feedback
+      if (!left.remote || !right.remote || !left.psk || !right.psk) {
+        setStatus("Both sides must fill all fields.", "fail");
+        return;
+      }
+      if (left.psk !== right.psk) {
+        messages.push("Pre-Shared Keys do not match.");
+      }
+      if (left.proto !== right.proto) {
+        messages.push("Protocols are not the same.");
+      }
+      if (left.encrypt !== right.encrypt) {
+        messages.push("Encryption algorithms are different.");
+      }
+      // Simulate remote address linking
+      if (left.remote === right.remote) {
+        messages.push("Remote addresses cannot be identical (must point to the other side).");
+      }
+      // TUNNEL ESTABLISHED if all critical components match
+      if (messages.length === 0) {
+        setStatus("✅ VPN Tunnel Established Successfully!<br><span style='color:#025f25;'>Traffic is now secured and encrypted between sites.</span>", "success");
+      } else {
+        setStatus("❌ VPN Tunnel Failed.<br>" + messages.join("<br>"), "fail");
+      }
+    }
+    function setStatus(msg, cls) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = cls;
+      statusDiv.innerHTML = msg;
+    }
+    document.getElementById('connectBtn').onclick = checkVPN;
+  </script>
+</body>
+</html>
