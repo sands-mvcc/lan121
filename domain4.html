@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Domain 4: Network Security Study Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 50%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2d5016 0%, #1a3009 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+            font-size: 1.2em;
+            border-bottom: 2px solid #4a7c59;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #4a7c59 0%, #2d5016 100%);
+            border-left: 4px solid #7dd87d;
+        }
+
+        .nav-subitem {
+            padding: 10px 40px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-left: 5px solid #4a7c59;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            color: #2d5016;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #7dd87d;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #4a7c59;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+            background: linear-gradient(90deg, #f0f8f0 0%, transparent 100%);
+            padding: 10px 15px;
+            border-left: 4px solid #7dd87d;
+        }
+
+        .section h4 {
+            color: #2d5016;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f8e8 100%);
+            border: 2px solid #7dd87d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .concept-box h4 {
+            color: #2d5016;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .attack-card {
+            background: linear-gradient(135deg, #fff8f8 0%, #ffe8e8 100%);
+            border: 2px solid #ff7d7d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .attack-card h4 {
+            color: #8b0000;
+            margin-bottom: 10px;
+        }
+
+        .defense-card {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e0f0ff 100%);
+            border: 2px solid #7db8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .defense-card h4 {
+            color: #004080;
+            margin-bottom: 10px;
+        }
+
+        .key-points {
+            background: #f9f9f9;
+            border-left: 5px solid #2d5016;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .key-points h4 {
+            color: #2d5016;
+            margin-bottom: 10px;
+        }
+
+        .key-points ul {
+            margin-left: 20px;
+        }
+
+        .key-points li {
+            margin-bottom: 8px;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffe0b3 100%);
+            border: 2px solid #ffb366;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+        }
+
+        .quiz-question h4 {
+            color: #cc6600;
+            margin-bottom: 15px;
+        }
+
+        .quiz-options {
+            margin-left: 20px;
+        }
+
+        .quiz-options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .quiz-options label:hover {
+            background-color: rgba(255, 179, 102, 0.2);
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .quiz-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a7c59 0%, #7dd87d 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .exam-tips {
+            background: linear-gradient(135deg, #e8f4fd 0%, #bee5eb 100%);
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .exam-tips h4 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar scrollbar-custom">
+            <h2>Domain 4: Network Security</h2>
+            <a href="#" class="nav-item active" data-section="overview">Overview</a>
+            <a href="#" class="nav-item" data-section="4.1">4.1 Basic Security Concepts</a>
+            <a href="#" class="nav-item nav-subitem" data-section="logical-security">• Logical Security</a>
+            <a href="#" class="nav-item nav-subitem" data-section="physical-security">• Physical Security</a>
+            <a href="#" class="nav-item nav-subitem" data-section="compliance">• Compliance & Audits</a>
+            <a href="#" class="nav-item" data-section="4.2">4.2 Attack Types</a>
+            <a href="#" class="nav-item nav-subitem" data-section="network-attacks">• Network Attacks</a>
+            <a href="#" class="nav-item nav-subitem" data-section="social-engineering">• Social Engineering</a>
+            <a href="#" class="nav-item" data-section="4.3">4.3 Security Solutions</a>
+            <a href="#" class="nav-item nav-subitem" data-section="device-hardening">• Device Hardening</a>
+            <a href="#" class="nav-item nav-subitem" data-section="access-control">• Access Control</a>
+            <a href="#" class="nav-item nav-subitem" data-section="security-zones">• Security Zones</a>
+            <a href="#" class="nav-item" data-section="practice-quiz">Practice Quiz</a>
+            <a href="#" class="nav-item" data-section="exam-tips">Exam Tips</a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Domain 4: Network Security</h1>
+                <p>14% of the CompTIA Network+ N10-009 Exam</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section class="section active" id="overview">
+                <h2>Domain 4 Overview</h2>
+                <p>Network Security is a critical domain representing 14% of the CompTIA Network+ exam. This domain covers fundamental security concepts, attack types, and defensive measures essential for protecting modern networks.</p>
+                
+                <div class="key-points">
+                    <h4>Key Learning Objectives:</h4>
+                    <ul>
+                        <li><strong>4.1</strong> - Explain the importance of basic network security concepts</li>
+                        <li><strong>4.2</strong> - Summarize various types of attacks and their impact to the network</li>
+                        <li><strong>4.3</strong> - Given a scenario, apply network security features, defense techniques, and solutions</li>
+                    </ul>
+                </div>
+
+                <div class="exam-tips">
+                    <h4>Study Strategy for Domain 4:</h4>
+                    <p>Focus on understanding both theoretical concepts and practical implementation. Know the CIA triad, various attack vectors, and how to implement appropriate security controls. Pay special attention to scenario-based questions involving network segmentation and access control.</p>
+                </div>
+            </section>
+
+            <!-- 4.1 Basic Security Concepts -->
+            <section class="section" id="4.1">
+                <h2>4.1 Basic Network Security Concepts</h2>
+                <p>Understanding fundamental security principles is crucial for implementing effective network protection strategies.</p>
+
+                <h3>CIA Triad</h3>
+                <div class="concept-box">
+                    <h4>Confidentiality, Integrity, and Availability (CIA)</h4>
+                    <p><strong>Confidentiality:</strong> Ensuring information is accessible only to authorized users</p>
+                    <p><strong>Integrity:</strong> Maintaining accuracy and completeness of data</p>
+                    <p><strong>Availability:</strong> Ensuring information and resources are accessible when needed</p>
+                </div>
+
+                <h3>Common Security Terminology</h3>
+                <div class="concept-box">
+                    <h4>Risk</h4>
+                    <p>The potential for loss or damage when a threat exploits a vulnerability</p>
+                </div>
+                <div class="concept-box">
+                    <h4>Vulnerability</h4>
+                    <p>A weakness in a system that can be exploited by a threat</p>
+                </div>
+                <div class="concept-box">
+                    <h4>Threat</h4>
+                    <p>Any potential danger that could exploit a vulnerability</p>
+                </div>
+                <div class="concept-box">
+                    <h4>Exploit</h4>
+                    <p>A method used to take advantage of a vulnerability</p>
+                </div>
+            </section>
+
+            <!-- Logical Security -->
+            <section class="section" id="logical-security">
+                <h2>Logical Security</h2>
+                
+                <h3>Encryption</h3>
+                <div class="concept-box">
+                    <h4>Data in Transit</h4>
+                    <p>Protecting data while it moves across networks using protocols like TLS/SSL, IPSec, and VPNs</p>
+                </div>
+                <div class="concept-box">
+                    <h4>Data at Rest</h4>
+                    <p>Protecting stored data using disk encryption, database encryption, and file-level encryption</p>
+                </div>
+
+                <h3>Certificates and PKI</h3>
+                <div class="concept-box">
+                    <h4>Public Key Infrastructure (PKI)</h4>
+                    <p>Framework for managing digital certificates and public key encryption. Includes Certificate Authorities (CAs), Registration Authorities (RAs), and certificate repositories.</p>
+                </div>
+                <div class="concept-box">
+                    <h4>Self-signed Certificates</h4>
+                    <p>Certificates signed by the same entity that created them, not by a trusted CA. Often used in testing environments or internal networks.</p>
+                </div>
+
+                <h3>Identity and Access Management (IAM)</h3>
+                <div class="concept-box">
+                    <h4>Authentication Methods</h4>
+                    <ul>
+                        <li><strong>Multifactor Authentication (MFA):</strong> Using multiple authentication factors</li>
+                        <li><strong>Single Sign-On (SSO):</strong> One login for multiple systems</li>
+                        <li><strong>RADIUS:</strong> Remote Authentication Dial-in User Service</li>
+                        <li><strong>LDAP:</strong> Lightweight Directory Access Protocol</li>
+                        <li><strong>SAML:</strong> Security Assertion Markup Language</li>
+                        <li><strong>TACACS+:</strong> Terminal Access Controller Access Control System Plus</li>
+                        <li><strong>Time-based Authentication:</strong> Time-sensitive tokens (TOTP)</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Authorization Concepts</h4>
+                    <ul>
+                        <li><strong>Least Privilege:</strong> Users get minimum access needed</li>
+                        <li><strong>Role-based Access Control:</strong> Access based on user roles</li>
+                    </ul>
+                </div>
+
+                <h3>Geofencing</h3>
+                <div class="concept-box">
+                    <h4>Location-based Security</h4>
+                    <p>Creating virtual boundaries to control access based on geographic location. Used to restrict access to sensitive resources when users are outside approved areas.</p>
+                </div>
+            </section>
+
+            <!-- Physical Security -->
+            <section class="section" id="physical-security">
+                <h2>Physical Security</h2>
+                
+                <div class="concept-box">
+                    <h4>Cameras</h4>
+                    <p>Video surveillance systems for monitoring and recording physical access to network infrastructure. Types include IP cameras, analog cameras, and PTZ (Pan-Tilt-Zoom) cameras.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Locks</h4>
+                    <p>Physical access controls including:</p>
+                    <ul>
+                        <li>Traditional key locks</li>
+                        <li>Electronic locks with keypads</li>
+                        <li>Smart cards and proximity readers</li>
+                        <li>Biometric locks</li>
+                        <li>Cable locks for equipment</li>
+                    </ul>
+                </div>
+
+                <h3>Deception Technologies</h3>
+                <div class="concept-box">
+                    <h4>Honeypot</h4>
+                    <p>A decoy system designed to attract and detect attackers. Appears to be a legitimate target but is monitored and isolated from production systems.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Honeynet</h4>
+                    <p>A network of honeypots that simulates a complete network environment to study attack patterns and techniques.</p>
+                </div>
+            </section>
+
+            <!-- Compliance -->
+            <section class="section" id="compliance">
+                <h2>Audits and Regulatory Compliance</h2>
+                
+                <div class="concept-box">
+                    <h4>Data Locality</h4>
+                    <p>Requirements for where data can be stored and processed based on legal and regulatory requirements. Important for cloud deployments and international operations.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Payment Card Industry Data Security Standards (PCI DSS)</h4>
+                    <p>Security standards for organizations that handle credit card data. Includes requirements for:</p>
+                    <ul>
+                        <li>Secure network architecture</li>
+                        <li>Cardholder data protection</li>
+                        <li>Vulnerability management</li>
+                        <li>Access control measures</li>
+                        <li>Network monitoring</li>
+                        <li>Information security policies</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <h4>General Data Protection Regulation (GDPR)</h4>
+                    <p>European Union regulation governing data protection and privacy. Key requirements include:</p>
+                    <ul>
+                        <li>Data subject consent</li>
+                        <li>Right to erasure (right to be forgotten)</li>
+                        <li>Data portability</li>
+                        <li>Privacy by design</li>
+                        <li>Breach notification requirements</li>
+                    </ul>
+                </div>
+
+                <h3>Network Segmentation Enforcement</h3>
+                <div class="concept-box">
+                    <h4>Internet of Things (IoT) and Industrial IoT (IIoT)</h4>
+                    <p>Segmenting IoT devices due to their often weak security posture and need for isolation from critical network resources.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>SCADA, ICS, and OT</h4>
+                    <p><strong>SCADA:</strong> Supervisory Control and Data Acquisition systems</p>
+                    <p><strong>ICS:</strong> Industrial Control Systems</p>
+                    <p><strong>OT:</strong> Operational Technology</p>
+                    <p>These systems require special security considerations and network segmentation due to their critical nature and legacy protocols.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Guest Networks</h4>
+                    <p>Isolated network segments for temporary users, preventing access to internal resources while providing internet connectivity.</p>
+                </div>
+
+                <div class="concept-box">
+                    <h4>Bring Your Own Device (BYOD)</h4>
+                    <p>Security policies and network segmentation for personal devices used for business purposes. Often involves device registration, policy enforcement, and limited network access.</p>
+                </div>
+            </section>
+
+            <!-- 4.2 Attack Types -->
+            <section class="section" id="4.2">
+                <h2>4.2 Types of Network Attacks</h2>
+                <p>Understanding various attack vectors helps in implementing appropriate defensive measures.</p>
+            </section>
+
+            <!-- Network Attacks -->
+            <section class="section" id="network-attacks">
+                <h2>Network-Based Attacks</h2>
+                
+                <div class="attack-card">
+                    <h4>Denial-of-Service (DoS) / Distributed Denial-of-Service (DDoS)</h4>
+                    <p><strong>DoS:</strong> Attack from a single source overwhelming a target system</p>
+                    <p><strong>DDoS:</strong> Coordinated attack from multiple sources (botnet)</p>
+                    <p><strong>Impact:</strong> Service unavailability, resource exhaustion, business disruption</p>
+                    <p><strong>Common Types:</strong> TCP SYN flood, UDP flood, ping flood, amplification attacks</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>VLAN Hopping</h4>
+                    <p>Attack where an attacker gains access to traffic on other VLANs that should be segmented</p>
+                    <p><strong>Methods:</strong> Switch spoofing, double tagging</p>
+                    <p><strong>Impact:</strong> Unauthorized access to segmented network resources</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Media Access Control (MAC) Flooding</h4>
+                    <p>Overwhelming a switch's MAC address table with fake MAC addresses</p>
+                    <p><strong>Impact:</strong> Switch operates in fail-open mode, broadcasting all traffic</p>
+                    <p><strong>Result:</strong> Network becomes like a hub, allowing traffic sniffing</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Address Resolution Protocol (ARP) Poisoning/Spoofing</h4>
+                    <p><strong>ARP Poisoning:</strong> Corrupting ARP cache with false MAC-IP mappings</p>
+                    <p><strong>ARP Spoofing:</strong> Sending fake ARP responses to redirect traffic</p>
+                    <p><strong>Impact:</strong> Man-in-the-middle attacks, traffic interception</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>DNS Poisoning/Spoofing</h4>
+                    <p><strong>DNS Poisoning:</strong> Corrupting DNS cache with false DNS records</p>
+                    <p><strong>DNS Spoofing:</strong> Providing false DNS responses to queries</p>
+                    <p><strong>Impact:</strong> Redirecting users to malicious websites, data theft</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Rogue Devices and Services</h4>
+                    <p><strong>Rogue DHCP:</strong> Unauthorized DHCP server providing malicious network configuration</p>
+                    <p><strong>Rogue AP:</strong> Unauthorized wireless access point potentially intercepting traffic</p>
+                    <p><strong>Impact:</strong> Network compromise, data interception, malicious redirection</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Evil Twin</h4>
+                    <p>Malicious wireless access point that mimics a legitimate Wi-Fi network</p>
+                    <p><strong>Purpose:</strong> Trick users into connecting to capture credentials and data</p>
+                    <p><strong>Impact:</strong> Credential harvesting, traffic interception, malware distribution</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>On-path Attack (Man-in-the-Middle)</h4>
+                    <p>Attacker intercepts communication between two parties</p>
+                    <p><strong>Methods:</strong> ARP spoofing, DNS hijacking, Wi-Fi eavesdropping</p>
+                    <p><strong>Impact:</strong> Data theft, credential harvesting, transaction manipulation</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Malware</h4>
+                    <p>Malicious software designed to damage or gain unauthorized access</p>
+                    <p><strong>Types:</strong> Viruses, worms, Trojans, ransomware, rootkits, botnets</p>
+                    <p><strong>Impact:</strong> Data theft, system compromise, service disruption, financial loss</p>
+                </div>
+            </section>
+
+            <!-- Social Engineering -->
+            <section class="section" id="social-engineering">
+                <h2>Social Engineering Attacks</h2>
+                
+                <div class="attack-card">
+                    <h4>Phishing</h4>
+                    <p>Fraudulent emails or messages designed to trick users into revealing sensitive information</p>
+                    <p><strong>Types:</strong> Email phishing, spear phishing, whaling, smishing (SMS), vishing (voice)</p>
+                    <p><strong>Impact:</strong> Credential theft, malware installation, financial fraud</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Dumpster Diving</h4>
+                    <p>Searching through trash and discarded materials for sensitive information</p>
+                    <p><strong>Targets:</strong> Printed documents, backup media, hardware components</p>
+                    <p><strong>Impact:</strong> Information disclosure, identity theft, system access</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Shoulder Surfing</h4>
+                    <p>Observing someone entering passwords, PINs, or other sensitive information</p>
+                    <p><strong>Methods:</strong> Direct observation, cameras, binoculars</p>
+                    <p><strong>Impact:</strong> Credential theft, unauthorized access</p>
+                </div>
+
+                <div class="attack-card">
+                    <h4>Tailgating</h4>
+                    <p>Following authorized personnel through secure entry points without proper authentication</p>
+                    <p><strong>Also known as:</strong> Piggybacking</p>
+                    <p><strong>Impact:</strong> Unauthorized physical access, facility compromise</p>
+                </div>
+            </section>
+
+            <!-- 4.3 Security Solutions -->
+            <section class="section" id="4.3">
+                <h2>4.3 Network Security Features and Solutions</h2>
+                <p>Implementing appropriate security controls to protect against identified threats and vulnerabilities.</p>
+            </section>
+
+            <!-- Device Hardening -->
+            <section class="section" id="device-hardening">
+                <h2>Device Hardening</h2>
+                
+                <div class="defense-card">
+                    <h4>Disable Unused Ports and Services</h4>
+                    <p>Remove or disable unnecessary network services, protocols, and physical ports</p>
+                    <p><strong>Benefits:</strong> Reduces attack surface, improves performance, simplifies management</p>
+                    <p><strong>Examples:</strong> Disabling Telnet, unused routing protocols, unnecessary physical switch ports</p>
+                </div>
+
+                <div class="defense-card">
+                    <h4>Change Default Passwords</h4>
+                    <p>Replace manufacturer default passwords with strong, unique credentials</p>
+                    <p><strong>Best Practices:</strong></p>
+                    <ul>
+                        <li>Use complex passwords with minimum 12 characters</li>
+                        <li>Include uppercase, lowercase, numbers, and symbols</li>
+                        <li>Avoid dictionary words and personal information</li>
+                        <li>Use unique passwords for each device</li>
+                        <li>Implement regular password rotation policies</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Access Control -->
+            <section class="section" id="access-control">
+                <h2>Network Access Control (NAC)</h2>
+                
+                <div class="defense-card">
+                    <h4>Port Security</h4>
+                    <p>Controls access to switch ports based on MAC addresses</p>
+                    <p><strong>Features:</strong></p>
+                    <ul>
+                        <li>MAC address limiting (maximum devices per port)</li>
+                        <li>Static MAC address assignment</li>
+                        <li>Dynamic MAC learning</li>
+                        <li>Sticky MAC addresses (learned addresses saved to config)</li>
+                        <li>Violation actions: shutdown, restrict, protect</li>
+                    </ul>
+                </div>
+
+                <div class="defense-card">
+                    <h4>802.1X Port-Based Authentication</h4>
+                    <p>IEEE standard for port-based network access control</p>
+                    <p><strong>Components:</strong></p>
+                    <ul>
+                        <li><strong>Supplicant:</strong> Client device requesting access</li>
+                        <li><strong>Authenticator:</strong> Network device (switch/AP) controlling access</li>
+                        <li><strong>Authentication Server:</strong> RADIUS server validating credentials</li>
+                    </ul>
+                    <p><strong>Process:</strong> EAP (Extensible Authentication Protocol) over LAN</p>
+                </div>
+
+                <div class="defense-card">
+                    <h4>MAC Filtering</h4>
+                    <p>Allow or deny network access based on device MAC addresses</p>
+                    <p><strong>Limitations:</strong> MAC addresses can be spoofed, difficult to manage at scale</p>
+                    <p><strong>Use Cases:</strong> Small networks, additional security layer, device whitelisting</p>
+                </div>
+
+                <h3>Key Management</h3>
+                <div class="defense-card">
+                    <h4>Encryption Key Management</h4>
+                    <p>Secure generation, distribution, storage, and disposal of cryptographic keys</p>
+                    <p><strong>Key Lifecycle:</strong></p>
+                    <ul>
+                        <li>Generation using strong random number generators</li>
+                        <li>Secure distribution through established channels</li>
+                        <li>Storage in hardware security modules (HSMs) or secure key stores</li>
+                        <li>Regular rotation based on security policies</li>
+                        <li>Secure disposal when keys are no longer needed</li>
+                    </ul>
+                </div>
+
+                <h3>Security Rules</h3>
+                <div class="defense-card">
+                    <h4>Access Control Lists (ACLs)</h4>
+                    <p>Rules that define which users or systems can access specific resources</p>
+                    <p><strong>Types:</strong></p>
+                    <ul>
+                        <li><strong>Standard ACLs:</strong> Filter based on source IP address</li>
+                        <li><strong>Extended ACLs:</strong> Filter based on source/destination IP, ports, protocols</li>
+                        <li><strong>Named ACLs:</strong> Use descriptive names instead of numbers</li>
+                    </ul>
+                    <p><strong>Best Practices:</strong> Implicit deny, most specific rules first, regular review</p>
+                </div>
+
+                <div class="defense-card">
+                    <h4>URL Filtering</h4>
+                    <p>Controlling access to websites based on URLs, categories, or content</p>
+                    <p><strong>Methods:</strong></p>
+                    <ul>
+                        <li>Blacklist (deny specific URLs/categories)</li>
+                        <li>Whitelist (allow only specific URLs/categories)</li>
+                        <li>Category-based filtering (social media, gaming, adult content)</li>
+                        <li>Real-time content analysis</li>
+                    </ul>
+                </div>
+
+                <div class="defense-card">
+                    <h4>Content Filtering</h4>
+                    <p>Examining and controlling data based on content characteristics</p>
+                    <p><strong>Applications:</strong></p>
+                    <ul>
+                        <li>Email filtering (spam, malware, data loss prevention)</li>
+                        <li>Web content filtering (inappropriate content, malware)</li>
+                        <li>File type restrictions</li>
+                        <li>Data loss prevention (DLP) based on content patterns</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Security Zones -->
+            <section class="section" id="security-zones">
+                <h2>Security Zones</h2>
+                
+                <div class="defense-card">
+                    <h4>Trusted vs. Untrusted Networks</h4>
+                    <p><strong>Trusted Zone:</strong> Internal network with higher security assurance</p>
+                    <ul>
+                        <li>Corporate LAN</li>
+                        <li>Management networks</li>
+                        <li>Internal servers and databases</li>
+                    </ul>
+                    <p><strong>Untrusted Zone:</strong> External networks with unknown security posture</p>
+                    <ul>
+                        <li>Internet</li>
+                        <li>Partner networks</li>
+                        <li>Guest networks</li>
+                    </ul>
+                </div>
+
+                <div class="defense-card">
+                    <h4>Screened Subnet (DMZ)</h4>
+                    <p>Semi-trusted network zone between internal and external networks</p>
+                    <p><strong>Purpose:</strong> Host public services while protecting internal network</p>
+                    <p><strong>Common Services:</strong></p>
+                    <ul>
+                        <li>Web servers</li>
+                        <li>Email servers</li>
+                        <li>DNS servers</li>
+                        <li>FTP servers</li>
+                        <li>VPN concentrators</li>
+                    </ul>
+                    <p><strong>Security:</strong> Dual firewall architecture or single firewall with multiple interfaces</p>
+                </div>
+            </section>
+
+            <!-- Practice Quiz -->
+            <section class="section" id="practice-quiz">
+                <h2>Practice Quiz</h2>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <h4>Question 1: Which component of the CIA triad ensures that data remains accurate and unmodified?</h4>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q1" value="a"> A) Confidentiality</label>
+                            <label><input type="radio" name="q1" value="b"> B) Integrity</label>
+                            <label><input type="radio" name="q1" value="c"> C) Availability</label>
+                            <label><input type="radio" name="q1" value="d"> D) Authentication</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What type of attack involves overwhelming a switch's MAC address table?</h4>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q2" value="a"> A) ARP poisoning</label>
+                            <label><input type="radio" name="q2" value="b"> B) VLAN hopping</label>
+                            <label><input type="radio" name="q2" value="c"> C) MAC flooding</label>
+                            <label><input type="radio" name="q2" value="d"> D) DNS spoofing</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: In 802.1X authentication, what is the role of the authenticator?</h4>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q3" value="a"> A) The client device requesting access</label>
+                            <label><input type="radio" name="q3" value="b"> B) The RADIUS server validating credentials</label>
+                            <label><input type="radio" name="q3" value="c"> C) The network device controlling port access</label>
+                            <label><input type="radio" name="q3" value="d"> D) The certificate authority</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What is the primary purpose of a screened subnet (DMZ)?</h4>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q4" value="a"> A) To provide internet access to internal users</label>
+                            <label><input type="radio" name="q4" value="b"> B) To host public services while protecting the internal network</label>
+                            <label><input type="radio" name="q4" value="c"> C) To store backup data securely</label>
+                            <label><input type="radio" name="q4" value="d"> D) To provide wireless access to guests</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Which social engineering attack involves following authorized personnel through secure entry points?</h4>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q5" value="a"> A) Phishing</label>
+                            <label><input type="radio" name="q5" value="b"> B) Shoulder surfing</label>
+                            <label><input type="radio" name="q5" value="c"> C) Tailgating</label>
+                            <label><input type="radio" name="q5" value="d"> D) Dumpster diving</label>
+                        </div>
+                    </div>
+
+                    <button class="quiz-btn" onclick="checkQuiz()">Submit Quiz</button>
+                    <button class="quiz-btn" onclick="resetQuiz()">Reset</button>
+                    
+                    <div class="quiz-result" id="quiz-result"></div>
+                </div>
+            </section>
+
+            <!-- Exam Tips -->
+            <section class="section" id="exam-tips">
+                <h2>Exam Tips for Domain 4</h2>
+                
+                <div class="exam-tips">
+                    <h4>Key Study Focus Areas:</h4>
+                    <ul>
+                        <li><strong>CIA Triad:</strong> Know all three components and their practical applications</li>
+                        <li><strong>Attack Types:</strong> Understand the methods, impacts, and mitigation strategies</li>
+                        <li><strong>802.1X:</strong> Know the three components and the authentication process</li>
+                        <li><strong>Network Segmentation:</strong> Understand DMZ, VLANs, and zone-based security</li>
+                        <li><strong>Compliance:</strong> Basic understanding of PCI DSS and GDPR requirements</li>
+                    </ul>
+                </div>
+
+                <div class="exam-tips">
+                    <h4>Common Exam Question Types:</h4>
+                    <ul>
+                        <li>Scenario-based questions about implementing security controls</li>
+                        <li>Attack identification and appropriate countermeasures</li>
+                        <li>Security zone design and implementation</li>
+                        <li>Authentication and authorization methods</li>
+                        <li>Physical security considerations</li>
+                    </ul>
+                </div>
+
+                <div class="exam-tips">
+                    <h4>Performance-Based Question Preparation:</h4>
+                    <ul>
+                        <li>Practice configuring ACLs on routers and switches</li>
+                        <li>Understand VLAN configuration and security implications</li>
+                        <li>Know how to implement port security features</li>
+                        <li>Be familiar with firewall rule configuration</li>
+                        <li>Understand wireless security configuration (WPA2/WPA3, enterprise authentication)</li>
+                    </ul>
+                </div>
+
+                <div class="key-points">
+                    <h4>Memory Aids:</h4>
+                    <ul>
+                        <li><strong>CIA:</strong> Confidentiality, Integrity, Availability</li>
+                        <li><strong>802.1X:</strong> Supplicant, Authenticator, Authentication Server</li>
+                        <li><strong>AAA:</strong> Authentication, Authorization, Accounting</li>
+                        <li><strong>Social Engineering:</strong> People are often the weakest link</li>
+                        <li><strong>Defense in Depth:</strong> Multiple layers of security controls</li>
+                    </ul>
+                </div>
+
+                <div class="exam-tips">
+                    <h4>Final Preparation Tips:</h4>
+                    <ul>
+                        <li>Review real-world security incidents and their causes</li>
+                        <li>Practice identifying attack types from network traffic patterns</li>
+                        <li>Understand the business impact of different security breaches</li>
+                        <li>Know when to escalate security incidents</li>
+                        <li>Practice with hands-on labs for configuration tasks</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        const progressFill = document.getElementById('progress-fill');
+        
+        let visitedSections = new Set();
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSection = this.getAttribute('data-section');
+                
+                // Remove active class from all nav items
+                navItems.forEach(nav => nav.classList.remove('active'));
+                
+                // Add active class to clicked nav item
+                this.classList.add('active');
+                
+                // Hide all sections
+                sections.forEach(section => section.classList.remove('active'));
+                
+                // Show target section
+                const target = document.getElementById(targetSection);
+                if (target) {
+                    target.classList.add('active');
+                    visitedSections.add(targetSection);
+                    updateProgress();
+                }
+            });
+        });
+
+        function updateProgress() {
+            const totalSections = sections.length - 1; // Excluding overview
+            const progress = (visitedSections.size / totalSections) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        // Quiz functionality
+        const quizAnswers = {
+            q1: 'b', // Integrity
+            q2: 'c', // MAC flooding
+            q3: 'c', // Network device controlling port access
+            q4: 'b', // Host public services while protecting internal network
+            q5: 'c'  // Tailgating
+        };
+
+        function checkQuiz() {
+            const resultDiv = document.getElementById('quiz-result');
+            let score = 0;
+            let totalQuestions = Object.keys(quizAnswers).length;
+            let results = [];
+
+            for (let question in quizAnswers) {
+                const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
+                if (selectedAnswer) {
+                    if (selectedAnswer.value === quizAnswers[question]) {
+                        score++;
+                        results.push(`${question.toUpperCase()}: Correct ✓`);
+                    } else {
+                        results.push(`${question.toUpperCase()}: Incorrect ✗ (Correct answer: ${quizAnswers[question].toUpperCase()})`);
+                    }
+                } else {
+                    results.push(`${question.toUpperCase()}: Not answered ✗ (Correct answer: ${quizAnswers[question].toUpperCase()})`);
+                }
+            }
+
+            const percentage = (score / totalQuestions) * 100;
+            let resultClass = percentage >= 70 ? 'correct' : 'incorrect';
+            let resultMessage = percentage >= 70 ? 'Great job! You passed!' : 'Keep studying! You need 70% to pass.';
+
+            resultDiv.innerHTML = `
+                <div class="${resultClass}">
+                    <h4>Quiz Results: ${score}/${totalQuestions} (${percentage.toFixed(1)}%)</h4>
+                    <p>${resultMessage}</p>
+                    <details>
+                        <summary>View Detailed Results</summary>
+                        <ul style="margin-top: 10px;">
+                            ${results.map(result => `<li>${result}</li>`).join('')}
+                        </ul>
+                    </details>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function resetQuiz() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => radio.checked = false);
+            
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.style.display = 'none';
+        }
+
+        // Initialize progress tracking
+        visitedSections.add('overview');
+        updateProgress();
+
+        // Smooth scrolling for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth transitions
+            sections.forEach(section => {
+                section.style.transition = 'all 0.3s ease';
+            });
+        });
+    </script>
+</body>
+</html>
+                    
