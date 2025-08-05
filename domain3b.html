@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Study Guide - Objectives 3.4 & 3.5</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #27ae60;
+        }
+
+        .logo h1 {
+            color: #27ae60;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            transform: translateX(5px);
+        }
+
+        .sub-nav {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .sub-nav .nav-link {
+            font-size: 0.9em;
+            padding: 8px 12px;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            background: white;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .topic-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #27ae60;
+            transition: transform 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .topic-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .topic-card h4 {
+            color: #27ae60;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .topic-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .topic-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .topic-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .topic-list li:before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .topic-list li:last-child {
+            border-bottom: none;
+        }
+
+        .quiz-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .quiz-question h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .quiz-options {
+            list-style: none;
+        }
+
+        .quiz-options li {
+            margin: 10px 0;
+        }
+
+        .quiz-options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .quiz-options label {
+            cursor: pointer;
+            display: block;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .quiz-options label:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .result.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .key-terms {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .key-terms h4 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .term {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 3px solid #2196f3;
+        }
+
+        .term strong {
+            color: #1976d2;
+        }
+
+        @media (max-width: 768px) {
+            .nav-sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <nav class="nav-sidebar">
+            <div class="logo">
+                <h1>Network+</h1>
+                <p>Study Guide</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">📋 Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="objective-3-4">🌐 Objective 3.4</a>
+                    <ul class="sub-nav">
+                        <li><a href="#" class="nav-link" data-section="dhcp">DHCP</a></li>
+                        <li><a href="#" class="nav-link" data-section="dns">DNS</a></li>
+                        <li><a href="#" class="nav-link" data-section="time-protocols">Time Protocols</a></li>
+                        <li><a href="#" class="nav-link" data-section="ipv6-services">IPv6 Services</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="objective-3-5">🔒 Objective 3.5</a>
+                    <ul class="sub-nav">
+                        <li><a href="#" class="nav-link" data-section="vpn">VPN</a></li>
+                        <li><a href="#" class="nav-link" data-section="remote-access">Remote Access</a></li>
+                        <li><a href="#" class="nav-link" data-section="management-methods">Management Methods</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="practice-quiz">🎯 Practice Quiz</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="study-tips">💡 Study Tips</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>CompTIA Network+ N10-009</h1>
+                <p>Study Guide for Objectives 3.4 & 3.5 - Network Services and Access Management</p>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <div class="topic-card">
+                    <h3>📋 Course Overview</h3>
+                    <p>Welcome to the comprehensive study guide for CompTIA Network+ N10-009 objectives 3.4 and 3.5. This interactive guide covers essential network services and access management methods.</p>
+                    
+                    <h4>What You'll Learn:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Objective 3.4:</strong> Implementation of IPv4 and IPv6 network services</li>
+                            <li><strong>Objective 3.5:</strong> Network access and management methods</li>
+                            <li>Dynamic addressing with DHCP and SLAAC</li>
+                            <li>DNS configuration and management</li>
+                            <li>Time synchronization protocols</li>
+                            <li>VPN technologies and configurations</li>
+                            <li>Remote access methods and security</li>
+                            <li>Network management approaches</li>
+                        </ul>
+                    </div>
+
+                    <div class="key-terms">
+                        <h4>🔑 Key Exam Statistics</h4>
+                        <div class="term">
+                            <strong>Domain Weight:</strong> Network Operations (19% of exam)
+                        </div>
+                        <div class="term">
+                            <strong>Question Types:</strong> Multiple-choice and performance-based
+                        </div>
+                        <div class="term">
+                            <strong>Exam Duration:</strong> 90 minutes
+                        </div>
+                        <div class="term">
+                            <strong>Passing Score:</strong> 720 (scale of 100-900)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Objective 3.4 Section -->
+            <section id="objective-3-4" class="content-section">
+                <div class="topic-card">
+                    <h3>🌐 Objective 3.4: Given a scenario, implement IPv4 and IPv6 network services</h3>
+                    <p>This objective focuses on configuring and implementing essential network services that provide dynamic addressing, name resolution, and time synchronization.</p>
+                    
+                    <h4>Core Topics Covered:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Dynamic addressing (DHCP, SLAAC)</li>
+                            <li>Name resolution (DNS, Hosts file)</li>
+                            <li>Time protocols (NTP, PTP, NTS)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DHCP Section -->
+            <section id="dhcp" class="content-section">
+                <div class="topic-card">
+                    <h3>🏠 Dynamic Host Configuration Protocol (DHCP)</h3>
+                    <p>DHCP automatically assigns IP addresses and network configuration to client devices, eliminating manual configuration and reducing errors.</p>
+                    
+                    <h4>DHCP Components:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Reservations:</strong> Static IP mapping to specific MAC addresses</li>
+                            <li><strong>Scope:</strong> Range of available IP addresses for assignment</li>
+                            <li><strong>Lease time:</strong> Duration an IP address assignment remains valid</li>
+                            <li><strong>Options:</strong> Additional configuration parameters (DNS, gateway, etc.)</li>
+                            <li><strong>Relay/IP helper:</strong> Forwards DHCP requests across subnets</li>
+                            <li><strong>Exclusions:</strong> IP addresses within scope that won't be assigned</li>
+                        </ul>
+                    </div>
+
+                    <h4>DHCP Process (DORA):</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>Discover:</strong> Client broadcasts request for IP configuration
+                        </div>
+                        <div class="term">
+                            <strong>Offer:</strong> DHCP server responds with available IP address
+                        </div>
+                        <div class="term">
+                            <strong>Request:</strong> Client formally requests the offered IP address
+                        </div>
+                        <div class="term">
+                            <strong>Acknowledge:</strong> Server confirms and finalizes the lease
+                        </div>
+                    </div>
+
+                    <h4>DHCP Options (Common):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Option 3:</strong> Default Gateway (Router)</li>
+                            <li><strong>Option 6:</strong> DNS Servers</li>
+                            <li><strong>Option 15:</strong> DNS Domain Name</li>
+                            <li><strong>Option 42:</strong> NTP Servers</li>
+                            <li><strong>Option 51:</strong> Lease Time</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DNS Section -->
+            <section id="dns" class="content-section">
+                <div class="topic-card">
+                    <h3>🌍 Domain Name System (DNS)</h3>
+                    <p>DNS translates human-readable domain names into IP addresses, providing critical name resolution services for network communication.</p>
+                    
+                    <h4>DNS Security Extensions:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>DNSSEC:</strong> Cryptographic authentication of DNS responses</li>
+                            <li><strong>DNS over HTTPS (DoH):</strong> Encrypts DNS queries using HTTPS</li>
+                            <li><strong>DNS over TLS (DoT):</strong> Encrypts DNS queries using TLS</li>
+                        </ul>
+                    </div>
+
+                    <h4>DNS Record Types:</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>A Record:</strong> Maps domain name to IPv4 address
+                        </div>
+                        <div class="term">
+                            <strong>AAAA Record:</strong> Maps domain name to IPv6 address
+                        </div>
+                        <div class="term">
+                            <strong>CNAME:</strong> Creates an alias for another domain name
+                        </div>
+                        <div class="term">
+                            <strong>MX Record:</strong> Specifies mail exchange servers
+                        </div>
+                        <div class="term">
+                            <strong>TXT Record:</strong> Stores text-based information
+                        </div>
+                        <div class="term">
+                            <strong>NS Record:</strong> Identifies authoritative name servers
+                        </div>
+                        <div class="term">
+                            <strong>PTR Record:</strong> Reverse DNS lookup (IP to domain)
+                        </div>
+                    </div>
+
+                    <h4>DNS Zone Types:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Forward Zone:</strong> Resolves names to IP addresses</li>
+                            <li><strong>Reverse Zone:</strong> Resolves IP addresses to names</li>
+                            <li><strong>Primary Zone:</strong> Authoritative master copy of zone data</li>
+                            <li><strong>Secondary Zone:</strong> Read-only copy from primary zone</li>
+                        </ul>
+                    </div>
+
+                    <h4>DNS Query Types:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Authoritative:</strong> Response from zone's authoritative server</li>
+                            <li><strong>Non-authoritative:</strong> Cached response from resolver</li>
+                            <li><strong>Recursive:</strong> Server performs complete resolution process</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Protocols Section -->
+            <section id="time-protocols" class="content-section">
+                <div class="topic-card">
+                    <h3>⏰ Time Protocols</h3>
+                    <p>Time synchronization is critical for security, logging, and distributed applications. Multiple protocols ensure accurate timekeeping across networks.</p>
+                    
+                    <h4>Network Time Protocol (NTP):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Most widely used time synchronization protocol</li>
+                            <li>Uses UDP port 123</li>
+                            <li>Hierarchical time source structure (Stratum levels)</li>
+                            <li>Provides millisecond-level accuracy over WAN</li>
+                            <li>Compensates for network delay and jitter</li>
+                        </ul>
+                    </div>
+
+                    <h4>Precision Time Protocol (PTP):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>IEEE 1588 standard for high-precision time sync</li>
+                            <li>Provides sub-microsecond accuracy on LAN</li>
+                            <li>Used in industrial control and financial trading</li>
+                            <li>Requires hardware support for best accuracy</li>
+                        </ul>
+                    </div>
+
+                    <h4>Network Time Security (NTS):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Security extension for NTP</li>
+                            <li>Provides cryptographic authentication</li>
+                            <li>Prevents time-based attacks</li>
+                            <li>Uses TLS for key exchange</li>
+                        </ul>
+                    </div>
+
+                    <div class="key-terms">
+                        <h4>🔑 Time Stratum Levels</h4>
+                        <div class="term">
+                            <strong>Stratum 0:</strong> Reference clocks (GPS, atomic clocks)
+                        </div>
+                        <div class="term">
+                            <strong>Stratum 1:</strong> Primary time servers (directly connected to Stratum 0)
+                        </div>
+                        <div class="term">
+                            <strong>Stratum 2-15:</strong> Secondary servers (synchronized from higher stratum)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- IPv6 Services Section -->
+            <section id="ipv6-services" class="content-section">
+                <div class="topic-card">
+                    <h3>🌐 IPv6 Services</h3>
+                    <p>IPv6 introduces new addressing methods and autoconfiguration capabilities, reducing the need for manual IP address management.</p>
+                    
+                    <h4>Stateless Address Autoconfiguration (SLAAC):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Automatic IPv6 address generation without DHCP server</li>
+                            <li>Uses Router Advertisement (RA) messages</li>
+                            <li>Combines network prefix with interface identifier</li>
+                            <li>EUI-64 format for interface ID generation</li>
+                            <li>Privacy extensions for temporary addresses</li>
+                        </ul>
+                    </div>
+
+                    <h4>DHCPv6 (Dynamic Host Configuration Protocol v6):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Stateful DHCPv6:</strong> Centralized address assignment and tracking</li>
+                            <li><strong>Stateless DHCPv6:</strong> Provides configuration options only</li>
+                            <li>Uses UDP ports 546 (client) and 547 (server)</li>
+                            <li>Can work alongside SLAAC for complete configuration</li>
+                        </ul>
+                    </div>
+
+                    <h4>IPv6 Address Types:</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>Link-Local:</strong> FE80::/10 - Automatic configuration, local subnet only
+                        </div>
+                        <div class="term">
+                            <strong>Unique Local:</strong> FC00::/7 - Private addressing, not routable on internet
+                        </div>
+                        <div class="term">
+                            <strong>Global Unicast:</strong> 2000::/3 - Globally routable addresses
+                        </div>
+                        <div class="term">
+                            <strong>Multicast:</strong> FF00::/8 - One-to-many communication
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Objective 3.5 Section -->
+            <section id="objective-3-5" class="content-section">
+                <div class="topic-card">
+                    <h3>🔒 Objective 3.5: Compare and contrast network access and management methods</h3>
+                    <p>This objective covers secure methods for accessing and managing network infrastructure, including VPN technologies and remote management approaches.</p>
+                    
+                    <h4>Core Topics Covered:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Site-to-site and client-to-site VPN</li>
+                            <li>Connection methods (SSH, GUI, API, Console)</li>
+                            <li>Jump box/host implementation</li>
+                            <li>In-band vs. out-of-band management</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VPN Section -->
+            <section id="vpn" class="content-section">
+                <div class="topic-card">
+                    <h3>🔐 Virtual Private Networks (VPN)</h3>
+                    <p>VPN technology creates secure, encrypted tunnels over public networks, enabling secure remote access and site connectivity.</p>
+                    
+                    <h4>Site-to-Site VPN:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Connects entire networks across WAN links</li>
+                            <li>Always-on encrypted tunnels between sites</li>
+                            <li>Transparent to end users</li>
+                            <li>Typically uses IPSec protocol</li>
+                            <li>Configured on network appliances (firewalls, routers)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Client-to-Site VPN:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Individual user connects to corporate network</li>
+                            <li>On-demand or always-on connections</li>
+                            <li>Requires VPN client software</li>
+                            <li>Supports remote workers and mobile users</li>
+                        </ul>
+                    </div>
+
+                    <h4>VPN Tunnel Types:</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>Full Tunnel:</strong> All traffic routed through VPN tunnel
+                        </div>
+                        <div class="term">
+                            <strong>Split Tunnel:</strong> Only specified traffic uses VPN tunnel
+                        </div>
+                    </div>
+
+                    <h4>Clientless VPN:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Browser-based VPN access using SSL/TLS</li>
+                            <li>No client software installation required</li>
+                            <li>Uses HTTPS (port 443) for connectivity</li>
+                            <li>HTML5 and web cryptography API support</li>
+                            <li>Ideal for public computers and BYOD scenarios</li>
+                        </ul>
+                    </div>
+
+                    <h4>VPN Protocols:</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>IPSec:</strong> Layer 3 security, provides authentication and encryption
+                        </div>
+                        <div class="term">
+                            <strong>SSL/TLS:</strong> Application layer security, browser-compatible
+                        </div>
+                        <div class="term">
+                            <strong>L2TP/IPSec:</strong> Layer 2 tunneling with IPSec encryption
+                        </div>
+                        <div class="term">
+                            <strong>OpenVPN:</strong> Open-source solution using SSL/TLS
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Remote Access Section -->
+            <section id="remote-access" class="content-section">
+                <div class="topic-card">
+                    <h3>🖥️ Remote Access Methods</h3>
+                    <p>Network administrators use various secure methods to remotely access, configure, and manage network infrastructure devices.</p>
+                    
+                    <h4>Secure Shell (SSH):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Encrypted terminal access to remote devices</li>
+                            <li>Uses TCP port 22</li>
+                            <li>Replaces insecure Telnet (port 23)</li>
+                            <li>Supports public key and password authentication</li>
+                            <li>Provides secure file transfer capabilities (SCP, SFTP)</li>
+                            <li>Command-line interface for switches, routers, firewalls</li>
+                        </ul>
+                    </div>
+
+                    <h4>Graphical User Interface (GUI):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Web-based management interfaces</li>
+                            <li>Uses HTTPS (port 443) for secure access</li>
+                            <li>Point-and-click configuration</li>
+                            <li>Visual network monitoring and management</li>
+                            <li>User-friendly for less technical administrators</li>
+                        </ul>
+                    </div>
+
+                    <h4>Application Programming Interface (API):</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Programmatic access to device configuration</li>
+                            <li>Enables automation and scripting</li>
+                            <li>RESTful APIs using HTTP/HTTPS</li>
+                            <li>JSON or XML data formats</li>
+                            <li>Integration with network management systems</li>
+                            <li>Supports Infrastructure as Code (IaC)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Console Access:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Direct physical connection to device</li>
+                            <li>Serial connection (RJ45, DB9, USB)</li>
+                            <li>Out-of-band management capability</li>
+                            <li>Available when network connectivity fails</li>
+                            <li>Initial device configuration and recovery</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Management Methods Section -->
+            <section id="management-methods" class="content-section">
+                <div class="topic-card">
+                    <h3>⚙️ Network Management Methods</h3>
+                    <p>Different approaches to network management provide various levels of security, accessibility, and functionality for administrators.</p>
+                    
+                    <h4>Jump Box/Host:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Secure intermediate server for network access</li>
+                            <li>Single point of entry to internal network</li>
+                            <li>Centralized access control and logging</li>
+                            <li>Reduces direct exposure of internal devices</li>
+                            <li>Requires strong authentication and monitoring</li>
+                            <li>Also called bastion host or jump server</li>
+                        </ul>
+                    </div>
+
+                    <h4>In-Band Management:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Management traffic shares production network</li>
+                            <li>Uses device's IP interface for connectivity</li>
+                            <li>SSH, HTTPS, SNMP over production network</li>
+                            <li>Cost-effective and simple to implement</li>
+                            <li>Vulnerable if production network fails</li>
+                            <li>Security depends on network segmentation</li>
+                        </ul>
+                    </div>
+
+                    <h4>Out-of-Band Management:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>Dedicated management network separate from production</li>
+                            <li>Console servers and management VLANs</li>
+                            <li>Available even when production network fails</li>
+                            <li>Higher security through network isolation</li>
+                            <li>More expensive to implement and maintain</li>
+                            <li>Essential for critical infrastructure</li>
+                        </ul>
+                    </div>
+
+                    <div class="key-terms">
+                        <h4>🔑 Management Method Comparison</h4>
+                        <div class="term">
+                            <strong>In-Band Pros:</strong> Cost-effective, easy setup, uses existing infrastructure
+                        </div>
+                        <div class="term">
+                            <strong>In-Band Cons:</strong> Single point of failure, security concerns, bandwidth competition
+                        </div>
+                        <div class="term">
+                            <strong>Out-of-Band Pros:</strong> High availability, enhanced security, dedicated bandwidth
+                        </div>
+                        <div class="term">
+                            <strong>Out-of-Band Cons:</strong> Higher cost, complex setup, additional infrastructure
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practice Quiz Section -->
+            <section id="practice-quiz" class="content-section">
+                <div class="topic-card">
+                    <h3>🎯 Practice Quiz</h3>
+                    <p>Test your knowledge of objectives 3.4 and 3.5 with these practice questions designed to mirror the actual CompTIA Network+ exam format.</p>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quiz-progress"></div>
+                    </div>
+                    <p id="progress-text">Question 1 of 10</p>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question" id="question-1">
+                        <h4>Question 1: Which DHCP process step involves the client formally requesting an IP address?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q1" value="a" id="q1a"><label for="q1a">Discover</label></li>
+                            <li><input type="radio" name="q1" value="b" id="q1b"><label for="q1b">Offer</label></li>
+                            <li><input type="radio" name="q1" value="c" id="q1c"><label for="q1c">Request</label></li>
+                            <li><input type="radio" name="q1" value="d" id="q1d"><label for="q1d">Acknowledge</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-2" style="display: none;">
+                        <h4>Question 2: Which DNS record type is used for reverse DNS lookups?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q2" value="a" id="q2a"><label for="q2a">A Record</label></li>
+                            <li><input type="radio" name="q2" value="b" id="q2b"><label for="q2b">CNAME Record</label></li>
+                            <li><input type="radio" name="q2" value="c" id="q2c"><label for="q2c">PTR Record</label></li>
+                            <li><input type="radio" name="q2" value="d" id="q2d"><label for="q2d">MX Record</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-3" style="display: none;">
+                        <h4>Question 3: What port does SSH use by default?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q3" value="a" id="q3a"><label for="q3a">21</label></li>
+                            <li><input type="radio" name="q3" value="b" id="q3b"><label for="q3b">22</label></li>
+                            <li><input type="radio" name="q3" value="c" id="q3c"><label for="q3c">23</label></li>
+                            <li><input type="radio" name="q3" value="d" id="q3d"><label for="q3d">25</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-4" style="display: none;">
+                        <h4>Question 4: Which IPv6 autoconfiguration method does NOT require a DHCP server?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q4" value="a" id="q4a"><label for="q4a">DHCPv6</label></li>
+                            <li><input type="radio" name="q4" value="b" id="q4b"><label for="q4b">SLAAC</label></li>
+                            <li><input type="radio" name="q4" value="c" id="q4c"><label for="q4c">Stateful DHCPv6</label></li>
+                            <li><input type="radio" name="q4" value="d" id="q4d"><label for="q4d">Manual Configuration</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-5" style="display: none;">
+                        <h4>Question 5: What is the main advantage of out-of-band management?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q5" value="a" id="q5a"><label for="q5a">Lower cost implementation</label></li>
+                            <li><input type="radio" name="q5" value="b" id="q5b"><label for="q5b">Available when production network fails</label></li>
+                            <li><input type="radio" name="q5" value="c" id="q5c"><label for="q5c">Uses existing network infrastructure</label></li>
+                            <li><input type="radio" name="q5" value="d" id="q5d"><label for="q5d">Easier to configure</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-6" style="display: none;">
+                        <h4>Question 6: Which time protocol provides the highest precision for LAN environments?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q6" value="a" id="q6a"><label for="q6a">NTP</label></li>
+                            <li><input type="radio" name="q6" value="b" id="q6b"><label for="q6b">PTP</label></li>
+                            <li><input type="radio" name="q6" value="c" id="q6c"><label for="q6c">NTS</label></li>
+                            <li><input type="radio" name="q6" value="d" id="q6d"><label for="q6d">SNTP</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-7" style="display: none;">
+                        <h4>Question 7: In a split tunnel VPN configuration, what happens to traffic not destined for the corporate network?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q7" value="a" id="q7a"><label for="q7a">It is blocked</label></li>
+                            <li><input type="radio" name="q7" value="b" id="q7b"><label for="q7b">It goes through the VPN tunnel</label></li>
+                            <li><input type="radio" name="q7" value="c" id="q7c"><label for="q7c">It goes directly to the internet</label></li>
+                            <li><input type="radio" name="q7" value="d" id="q7d"><label for="q7d">It is cached locally</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-8" style="display: none;">
+                        <h4>Question 8: What does DNSSEC provide for DNS queries?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q8" value="a" id="q8a"><label for="q8a">Faster resolution</label></li>
+                            <li><input type="radio" name="q8" value="b" id="q8b"><label for="q8b">Cryptographic authentication</label></li>
+                            <li><input type="radio" name="q8" value="c" id="q8c"><label for="q8c">Load balancing</label></li>
+                            <li><input type="radio" name="q8" value="d" id="q8d"><label for="q8d">Caching improvement</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-9" style="display: none;">
+                        <h4>Question 9: Which management method uses programmatic access for device configuration?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q9" value="a" id="q9a"><label for="q9a">SSH</label></li>
+                            <li><input type="radio" name="q9" value="b" id="q9b"><label for="q9b">Console</label></li>
+                            <li><input type="radio" name="q9" value="c" id="q9c"><label for="q9c">API</label></li>
+                            <li><input type="radio" name="q9" value="d" id="q9d"><label for="q9d">GUI</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-question" id="question-10" style="display: none;">
+                        <h4>Question 10: What is the primary purpose of a jump box in network management?</h4>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q10" value="a" id="q10a"><label for="q10a">Load balancing</label></li>
+                            <li><input type="radio" name="q10" value="b" id="q10b"><label for="q10b">Single point of secure access</label></li>
+                            <li><input type="radio" name="q10" value="c" id="q10c"><label for="q10c">DNS resolution</label></li>
+                            <li><input type="radio" name="q10" value="d" id="q10d"><label for="q10d">DHCP relay</label></li>
+                        </ul>
+                    </div>
+
+                    <div id="quiz-result" style="display: none;"></div>
+
+                    <div class="quiz-controls">
+                        <button class="btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+                        <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()" style="display: none;">Previous</button>
+                        <button class="btn" id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+                        <button class="btn btn-secondary" id="reset-btn" onclick="resetQuiz()" style="display: none;">Retake Quiz</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Study Tips Section -->
+            <section id="study-tips" class="content-section">
+                <div class="topic-card">
+                    <h3>💡 Study Tips & Exam Preparation</h3>
+                    <p>Maximize your exam success with these targeted study strategies for Network+ objectives 3.4 and 3.5.</p>
+                    
+                    <h4>Key Study Strategies:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>Hands-on Practice:</strong> Set up DHCP, DNS, and VPN in lab environments</li>
+                            <li><strong>Command Memorization:</strong> Practice common CLI commands for network devices</li>
+                            <li><strong>Port Numbers:</strong> Memorize key protocol ports (SSH:22, HTTPS:443, etc.)</li>
+                            <li><strong>Process Flows:</strong> Understand DHCP DORA and DNS resolution processes</li>
+                            <li><strong>Security Focus:</strong> Emphasis on secure protocols (SSH vs Telnet, HTTPS vs HTTP)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Common Exam Scenarios:</h4>
+                    <div class="key-terms">
+                        <div class="term">
+                            <strong>DHCP Troubleshooting:</strong> Identify scope exhaustion, relay issues, conflicting servers
+                        </div>
+                        <div class="term">
+                            <strong>DNS Problems:</strong> Resolve forward/reverse lookup failures, record type mismatches
+                        </div>
+                        <div class="term">
+                            <strong>VPN Configuration:</strong> Choose appropriate tunnel types, troubleshoot connectivity
+                        </div>
+                        <div class="term">
+                            <strong>Remote Access:</strong> Select secure management methods, implement jump box solutions
+                        </div>
+                    </div>
+
+                    <h4>Memory Aids:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li><strong>DHCP DORA:</strong> "Don't Offer Requests Acknowledgements" (Discover, Offer, Request, Acknowledge)</li>
+                            <li><strong>DNS Records:</strong> "All Americans Can Make Tacos Pretty Naturally" (A, AAAA, CNAME, MX, TXT, PTR, NS)</li>
+                            <li><strong>OSI + Management:</strong> Remember which protocols operate at which layers</li>
+                            <li><strong>Port Patterns:</strong> Secure protocols often use higher port numbers</li>
+                        </ul>
+                    </div>
+
+                    <h4>Final Preparation Checklist:</h4>
+                    <div class="topic-list">
+                        <ul>
+                            <li>✓ Review all DHCP options and their purposes</li>
+                            <li>✓ Understand DNS record types and zone configurations</li>
+                            <li>✓ Practice VPN terminology and configuration scenarios</li>
+                            <li>✓ Know the differences between management methods</li>
+                            <li>✓ Memorize key protocol ports and security considerations</li>
+                            <li>✓ Take multiple practice exams with time constraints</li>
+                        </ul>
+                    </div>
+
+                    <div class="key-terms">
+                        <h4>🎯 Exam Day Tips</h4>
+                        <div class="term">
+                            <strong>Time Management:</strong> Spend ~1 minute per question, mark difficult ones for review
+                        </div>
+                        <div class="term">
+                            <strong>Read Carefully:</strong> Watch for keywords like "most secure," "best practice," "most likely cause"
+                        </div>
+                        <div class="term">
+                            <strong>Elimination:</strong> Rule out obviously incorrect answers first
+                        </div>
+                        <div class="term">
+                            <strong>Performance-Based:</strong> Allow extra time for simulation questions
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and sections
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const sectionId = this.getAttribute('data-section');
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Quiz functionality
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+        const answers = {
+            q1: 'c', q2: 'c', q3: 'b', q4: 'b', q5: 'b',
+            q6: 'b', q7: 'c', q8: 'b', q9: 'c', q10: 'b'
+        };
+        const explanations = {
+            q1: 'Request is the third step in DHCP DORA process where client formally requests the offered IP address.',
+            q2: 'PTR (Pointer) records are used for reverse DNS lookups, converting IP addresses back to domain names.',
+            q3: 'SSH (Secure Shell) uses TCP port 22 by default, replacing insecure Telnet (port 23).',
+            q4: 'SLAAC (Stateless Address Autoconfiguration) allows IPv6 devices to configure themselves without DHCP.',
+            q5: 'Out-of-band management provides access even when the production network fails, ensuring continuous management capability.',
+            q6: 'PTP (Precision Time Protocol) provides sub-microsecond accuracy on LANs, higher than NTP.',
+            q7: 'In split tunnel VPN, traffic not destined for corporate network goes directly to internet, bypassing the VPN.',
+            q8: 'DNSSEC provides cryptographic authentication to verify DNS responses haven\'t been tampered with.',
+            q9: 'API (Application Programming Interface) provides programmatic access for automated device configuration.',
+            q10: 'Jump box serves as a single, secure point of access to internal network, centralizing access control.'
+        };
+
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `Question ${currentQuestion} of ${totalQuestions}`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                currentQuestion++;
+                document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                updateProgress();
+                
+                if (currentQuestion > 1) {
+                    document.getElementById('prev-btn').style.display = 'inline-block';
+                }
+                
+                if (currentQuestion === totalQuestions) {
+                    document.getElementById('next-btn').style.display = 'none';
+                    document.getElementById('submit-btn').style.display = 'inline-block';
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 1) {
+                document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                currentQuestion--;
+                document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                updateProgress();
+                
+                if (currentQuestion === 1) {
+                    document.getElementById('prev-btn').style.display = 'none';
+                }
+                
+                if (currentQuestion < totalQuestions) {
+                    document.getElementById('next-btn').style.display = 'inline-block';
+                    document.getElementById('submit-btn').style.display = 'none';
+                }
+            }
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            let results = '<div class="topic-card"><h3>Quiz Results</h3>';
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                const userAnswer = document.querySelector(`input[name="q${i}"]:checked`);
+                const correctAnswer = answers[`q${i}`];
+                
+                if (userAnswer && userAnswer.value === correctAnswer) {
+                    score++;
+                    results += `<div class="result correct">Question ${i}: Correct! ${explanations[`q${i}`]}</div>`;
+                } else {
+                    results += `<div class="result incorrect">Question ${i}: Incorrect. ${explanations[`q${i}`]}</div>`;
+                }
+                
+                document.getElementById(`question-${i}`).style.display = 'none';
+            }
+            
+            const percentage = Math.round((score / totalQuestions) * 100);
+            let performanceLevel = '';
+            
+            if (percentage >= 90) {
+                performanceLevel = 'Excellent! You\'re ready for the exam.';
+            } else if (percentage >= 80) {
+                performanceLevel = 'Good job! Review the missed topics.';
+            } else if (percentage >= 70) {
+                performanceLevel = 'Fair. More study needed.';
+            } else {
+                performanceLevel = 'Needs improvement. Review all topics.';
+            }
+            
+            results += `<div class="result ${percentage >= 70 ? 'correct' : 'incorrect'}">
+                Final Score: ${score}/${totalQuestions} (${percentage}%)<br>
+                ${performanceLevel}
+            </div></div>`;
+            
+            document.getElementById('quiz-result').innerHTML = results;
+            document.getElementById('quiz-result').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('prev-btn').style.display = 'none';
+            document.getElementById('reset-btn').style.display = 'inline-block';
+            
+            document.getElementById('progress-text').textContent = `Quiz Complete - ${percentage}%`;
+            document.getElementById('quiz-progress').style.width = '100%';
+        }
+
+        function resetQuiz() {
+            currentQuestion = 1;
+            
+            // Hide all questions and results
+            for (let i = 1; i <= totalQuestions; i++) {
+                document.getElementById(`question-${i}`).style.display = 'none';
+                const inputs = document.querySelectorAll(`input[name="q${i}"]`);
+                inputs.forEach(input => input.checked = false);
+            }
+            
+            // Show first question
+            document.getElementById('question-1').style.display = 'block';
+            document.getElementById('quiz-result').style.display = 'none';
+            
+            // Reset buttons
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('prev-btn').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('reset-btn').style.display = 'none';
+            
+            updateProgress();
+        }
+
+        // Initialize quiz
+        updateProgress();
+    </script>
+</body>
+</html>
+                
