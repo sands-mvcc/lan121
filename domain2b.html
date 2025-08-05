@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Network+ Study Guide - Objectives 2.3 & 2.4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #2c5530 0%, #1a3d1a 100%);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #ffffff, #90ee90);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #90ee90;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(45deg, #90ee90, #ffffff);
+            color: #2c5530;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid #90ee90;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2c5530;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #90ee90;
+            padding-bottom: 10px;
+        }
+
+        .objective-box {
+            background: linear-gradient(135deg, #f0f8f0, #e8f5e8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #2c5530;
+        }
+
+        .study-card {
+            background: white;
+            border: 2px solid #90ee90;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .study-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(44, 85, 48, 0.2);
+        }
+
+        .quiz-container {
+            background: linear-gradient(135deg, #f0f8f0, #ffffff);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #2c5530;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 15px;
+        }
+
+        .answer-option {
+            display: block;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: white;
+            border: 2px solid #90ee90;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-option:hover {
+            background: #e8f5e8;
+            transform: translateX(10px);
+        }
+
+        .answer-option.correct {
+            background: #90ee90;
+            color: #2c5530;
+            font-weight: bold;
+        }
+
+        .answer-option.incorrect {
+            background: #ffcccc;
+            color: #cc0000;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #2c5530, #90ee90);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 85, 48, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #2c5530, #90ee90);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .flashcard {
+            perspective: 1000px;
+            height: 200px;
+            margin: 15px 0;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, #2c5530, #90ee90);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #90ee90, #ffffff);
+            color: #2c5530;
+            transform: rotateY(180deg);
+        }
+
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c5530;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-display {
+            background: linear-gradient(45deg, #2c5530, #90ee90);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #90ee90 0%, #90ee90 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.2em;
+            background-position: 0 88%;
+            transition: background-size 0.25s ease-in;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e8, #ffffff);
+            border: 2px solid #2c5530;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd, #ffffff);
+            border: 2px solid #d4af37;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h1>Network+ Study Guide</h1>
+        <a href="#overview" class="nav-item active" data-section="overview">📚 Exam Overview</a>
+        <a href="#objective23" class="nav-item" data-section="objective23">📡 Objective 2.3: Wireless</a>
+        <a href="#objective24" class="nav-item" data-section="objective24">🏗️ Objective 2.4: Physical Install</a>
+        <a href="#flashcards" class="nav-item" data-section="flashcards">🃏 Flashcards</a>
+        <a href="#quiz" class="nav-item" data-section="quiz">🎯 Practice Quiz</a>
+        <a href="#study-tips" class="nav-item" data-section="study-tips">💡 Study Tips</a>
+        <a href="#progress" class="nav-item" data-section="progress">📈 Progress Tracker</a>
+    </nav>
+
+    <main class="main-content">
+        <!-- Overview Section -->
+        <section id="overview" class="content-section active">
+            <h2 class="section-title">CompTIA Network+ N10-009 Exam Overview</h2>
+            
+            <div class="objective-box">
+                <h3>Exam Details</h3>
+                <ul>
+                    <li><strong>Exam Code:</strong> N10-009</li>
+                    <li><strong>Questions:</strong> Maximum of 90 questions</li>
+                    <li><strong>Duration:</strong> 90 minutes</li>
+                    <li><strong>Passing Score:</strong> 720 (on a scale of 100-900)</li>
+                    <li><strong>Question Types:</strong> Multiple-choice and performance-based</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>Domain 2.0: Network Implementation (20%)</h3>
+                <p>This domain focuses on practical implementation of network technologies, including routing, switching, wireless, and physical installation considerations.</p>
+                
+                <div class="info-box">
+                    <h4>Key Focus Areas:</h4>
+                    <ul>
+                        <li><span class="highlight">Objective 2.3:</span> Wireless device selection and configuration</li>
+                        <li><span class="highlight">Objective 2.4:</span> Physical installation factors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="study-card">
+                <h3>Recommended Experience</h3>
+                <p>CompTIA recommends candidates have:</p>
+                <ul>
+                    <li>CompTIA A+ certification or equivalent knowledge</li>
+                    <li>9-12 months of experience as a junior network administrator or network support technician</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Objective 2.3 Section -->
+        <section id="objective23" class="content-section">
+            <h2 class="section-title">Objective 2.3: Select and Configure Wireless Devices</h2>
+            
+            <div class="objective-box">
+                <h3>Overview</h3>
+                <p>This objective covers the selection and configuration of wireless networking devices and technologies, including channels, frequencies, SSIDs, encryption, and antenna types.</p>
+            </div>
+
+            <div class="study-card">
+                <h3>📡 Channels and Frequencies</h3>
+                <h4>Channel Configuration:</h4>
+                <ul>
+                    <li><strong>Channel Width:</strong> 20MHz, 40MHz, 80MHz, 160MHz</li>
+                    <li><strong>Non-overlapping Channels:</strong> 1, 6, 11 (2.4GHz)</li>
+                    <li><strong>Regulatory Impacts:</strong> 802.11h (Dynamic Frequency Selection)</li>
+                </ul>
+                
+                <h4>Frequency Options:</h4>
+                <ul>
+                    <li><strong>2.4GHz:</strong> Longer range, more interference, 3 non-overlapping channels</li>
+                    <li><strong>5GHz:</strong> Less congested, shorter range, more channels available</li>
+                    <li><strong>6GHz:</strong> Latest band, Wi-Fi 6E, ultra-wide bandwidth</li>
+                    <li><strong>Band Steering:</strong> Automatically directs clients to optimal frequency band</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>🔐 Security and Authentication</h3>
+                <h4>Encryption Standards:</h4>
+                <ul>
+                    <li><strong>WPA2:</strong> AES encryption, still widely used</li>
+                    <li><strong>WPA3:</strong> Enhanced security, SAE (Simultaneous Authentication of Equals)</li>
+                </ul>
+                
+                <h4>Authentication Methods:</h4>
+                <ul>
+                    <li><strong>PSK (Pre-Shared Key):</strong> Simple passphrase authentication</li>
+                    <li><strong>Enterprise:</strong> 802.1X authentication with RADIUS server</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>📶 Network Types and SSIDs</h3>
+                <h4>Service Set Identifiers:</h4>
+                <ul>
+                    <li><strong>SSID:</strong> Network name visible to clients</li>
+                    <li><strong>BSSID:</strong> Basic Service Set Identifier (MAC address of AP)</li>
+                    <li><strong>ESSID:</strong> Extended Service Set Identifier (multiple APs, same network)</li>
+                </ul>
+                
+                <h4>Network Topologies:</h4>
+                <ul>
+                    <li><strong>Infrastructure:</strong> Clients connect through access points</li>
+                    <li><strong>Ad Hoc:</strong> Direct client-to-client communication</li>
+                    <li><strong>Mesh Networks:</strong> Self-healing, multiple paths</li>
+                    <li><strong>Point to Point:</strong> Direct connection between two locations</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>📡 Antennas and Access Points</h3>
+                <h4>Antenna Types:</h4>
+                <ul>
+                    <li><strong>Omnidirectional:</strong> 360° coverage, equal signal in all directions</li>
+                    <li><strong>Directional:</strong> Focused beam, longer range in specific direction</li>
+                </ul>
+                
+                <h4>Access Point Types:</h4>
+                <ul>
+                    <li><strong>Autonomous:</strong> Standalone configuration and management</li>
+                    <li><strong>Lightweight:</strong> Centrally managed by wireless controller</li>
+                </ul>
+                
+                <h4>Guest Networks:</h4>
+                <ul>
+                    <li><strong>Isolation:</strong> Separate network segment for guests</li>
+                    <li><strong>Captive Portals:</strong> Web-based authentication/agreement pages</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Objective 2.4 Section -->
+        <section id="objective24" class="content-section">
+            <h2 class="section-title">Objective 2.4: Physical Installation Factors</h2>
+            
+            <div class="objective-box">
+                <h3>Overview</h3>
+                <p>This objective covers critical considerations for physical network installations, including location planning, power requirements, environmental factors, and infrastructure components.</p>
+            </div>
+
+            <div class="study-card">
+                <h3>🏢 Installation Locations</h3>
+                <h4>Distribution Frames:</h4>
+                <ul>
+                    <li><strong>MDF (Main Distribution Frame):</strong> Central connection point for entire building</li>
+                    <li><strong>IDF (Intermediate Distribution Frame):</strong> Secondary connection points on each floor</li>
+                </ul>
+                
+                <h4>Infrastructure Considerations:</h4>
+                <ul>
+                    <li><strong>Rack Size:</strong> Standard 19" width, various heights (42U common)</li>
+                    <li><strong>Port-side Exhaust/Intake:</strong> Airflow direction for cooling</li>
+                    <li><strong>Lockable:</strong> Physical security for equipment protection</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>🔌 Power Requirements</h3>
+                <h4>Power Infrastructure:</h4>
+                <ul>
+                    <li><strong>UPS (Uninterruptible Power Supply):</strong> Battery backup during outages</li>
+                    <li><strong>PDU (Power Distribution Unit):</strong> Distributes power to multiple devices</li>
+                    <li><strong>Power Load:</strong> Calculate total power consumption requirements</li>
+                    <li><strong>Voltage:</strong> Ensure proper voltage compatibility (120V, 240V, etc.)</li>
+                </ul>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> Always calculate power requirements before installation to prevent overloading circuits and ensure adequate UPS capacity.
+                </div>
+            </div>
+
+            <div class="study-card">
+                <h3>🌡️ Environmental Factors</h3>
+                <h4>Climate Control:</h4>
+                <ul>
+                    <li><strong>Temperature:</strong> Maintain optimal operating temperature (68-72°F)</li>
+                    <li><strong>Humidity:</strong> Control moisture levels (45-55% relative humidity)</li>
+                </ul>
+                
+                <h4>Safety Systems:</h4>
+                <ul>
+                    <li><strong>Fire Suppression:</strong> Clean agent systems (FM-200, Inergen) protect equipment</li>
+                    <li><strong>Environmental Monitoring:</strong> Sensors for temperature, humidity, water detection</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>🔗 Cabling Infrastructure</h3>
+                <h4>Cable Management:</h4>
+                <ul>
+                    <li><strong>Patch Panel:</strong> Organized termination point for copper cables</li>
+                    <li><strong>Fiber Distribution Panel:</strong> Organized termination for fiber optic cables</li>
+                    <li><strong>Cable Routing:</strong> Proper cable management for maintenance and airflow</li>
+                </ul>
+                
+                <div class="info-box">
+                    <h4>Best Practices:</h4>
+                    <ul>
+                        <li>Label all cables and ports clearly</li>
+                        <li>Maintain proper bend radius for fiber cables</li>
+                        <li>Use appropriate cable management hardware</li>
+                        <li>Plan for future expansion and growth</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flashcards Section -->
+        <section id="flashcards" class="content-section">
+            <h2 class="section-title">Study Flashcards</h2>
+            
+            <div class="quiz-container">
+                <p>Click on each flashcard to reveal the answer. Test your knowledge of key concepts!</p>
+                
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            What are the three non-overlapping channels in 2.4GHz?
+                        </div>
+                        <div class="flashcard-back">
+                            Channels 1, 6, and 11
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            What does MDF stand for?
+                        </div>
+                        <div class="flashcard-back">
+                            Main Distribution Frame - Central connection point for entire building
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            What is the difference between WPA2 and WPA3?
+                        </div>
+                        <div class="flashcard-back">
+                            WPA3 uses SAE (Simultaneous Authentication of Equals) for enhanced security vs WPA2's PSK
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            What is band steering?
+                        </div>
+                        <div class="flashcard-back">
+                            Automatically directs wireless clients to the optimal frequency band (2.4GHz vs 5GHz)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            What does UPS stand for and what is its purpose?
+                        </div>
+                        <div class="flashcard-back">
+                            Uninterruptible Power Supply - Provides battery backup power during electrical outages
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="content-section">
+            <h2 class="section-title">Practice Quiz</h2>
+            
+            <div class="timer" id="timer">Time: 10:00</div>
+            <div class="score-display" id="score">Score: 0/0</div>
+            
+            <div class="quiz-container" id="quiz-container">
+                <div class="question" id="question">Click "Start Quiz" to begin!</div>
+                <div id="answers"></div>
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+                <button class="btn" onclick="nextQuestion()" style="display:none;" id="next-btn">Next Question</button>
+                <button class="btn" onclick="resetQuiz()" style="display:none;" id="reset-btn">Reset Quiz</button>
+            </div>
+        </section>
+
+        <!-- Study Tips Section -->
+        <section id="study-tips" class="content-section">
+            <h2 class="section-title">Study Tips & Strategies</h2>
+            
+            <div class="study-card">
+                <h3>🎯 Exam Strategy</h3>
+                <ul>
+                    <li><strong>Time Management:</strong> You have 90 minutes for up to 90 questions</li>
+                    <li><strong>Read Carefully:</strong> Pay attention to key words like "BEST", "MOST", "LEAST"</li>
+                    <li><strong>Performance-Based Questions:</strong> These appear early and don't show a timer</li>
+                    <li><strong>Elimination:</strong> Rule out obviously incorrect answers first</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>📚 Study Methodology</h3>
+                <ul>
+                    <li><strong>Hands-on Practice:</strong> Set up a lab environment with wireless equipment</li>
+                    <li><strong>Documentation:</strong> Create network diagrams and cable maps</li>
+                    <li><strong>Acronym Mastery:</strong> Learn all acronyms in the official list</li>
+                    <li><strong>Real-world Application:</strong> Understand WHY certain configurations are used</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>🔧 Practical Labs</h3>
+                <ul>
+                    <li>Configure different wireless security modes (WPA2/WPA3)</li>
+                    <li>Set up guest networks with captive portals</li>
+                    <li>Practice power calculations for network equipment</li>
+                    <li>Design rack layouts considering airflow and power</li>
+                    <li>Work with different antenna types and placement</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Common Exam Traps</h3>
+                <ul>
+                    <li>Confusing BSSID vs ESSID vs SSID</li>
+                    <li>2.4GHz vs 5GHz characteristics</li>
+                    <li>MDF vs IDF locations and purposes</li>
+                    <li>Autonomous vs lightweight access points</li>
+                    <li>Power calculations and UPS sizing</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Progress Tracker Section -->
+        <section id="progress" class="content-section">
+            <h2 class="section-title">Progress Tracker</h2>
+            
+            <div class="study-card">
+                <h3>Study Checklist - Objective 2.3</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-23" style="width: 0%"></div>
+                </div>
+                <ul>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Wireless channels and frequencies</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> WPA2 vs WPA3 encryption</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> SSID, BSSID, ESSID concepts</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Network types (infrastructure, ad hoc, mesh)</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Antenna types and placement</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Guest networks and captive portals</li>
+                </ul>
+            </div>
+
+            <div class="study-card">
+                <h3>Study Checklist - Objective 2.4</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-24" style="width: 0%"></div>
+                </div>
+                <ul>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> MDF vs IDF locations</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Power requirements (UPS, PDU)</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Environmental factors</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Rack sizing and airflow</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Cable management</li>
+                    <li><input type="checkbox" onchange="updateProgress()" class="progress-item"> Fire suppression systems</li>
+                </ul>
+            </div>
+
+            <div class="score-display" id="overall-progress">
+                Overall Progress: 0%
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Navigation functionality
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.content-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all nav items and sections
+                navItems.forEach(nav => nav.classList.remove('active'));
+                sections.forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked nav item
+                item.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = item.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Flashcard functionality
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Quiz functionality
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 600; // 10 minutes
+
+        const quizQuestions = [
+            {
+                question: "Which wireless encryption standard uses SAE (Simultaneous Authentication of Equals)?",
+                answers: ["WPA", "WPA2", "WPA3", "WEP"],
+                correct: 2,
+                explanation: "WPA3 uses SAE for enhanced security compared to WPA2's PSK method."
+            },
+            {
+                question: "What are the three non-overlapping channels in the 2.4GHz band?",
+                answers: ["1, 6, 11", "1, 5, 9", "2, 7, 12", "3, 8, 13"],
+                correct: 0,
+                explanation: "Channels 1, 6, and 11 are the only non-overlapping channels in 2.4GHz."
+            },
+            {
+                question: "What does MDF stand for in network infrastructure?",
+                answers: ["Master Data Frame", "Main Distribution Frame", "Multi-Device Frame", "Media Distribution Frame"],
+                correct: 1,
+                explanation: "MDF is the Main Distribution Frame - the central connection point for an entire building."
+            },
+            {
+                question: "Which antenna type provides 360-degree coverage?",
+                answers: ["Directional", "Omnidirectional", "Yagi", "Parabolic"],
+                correct: 1,
+                explanation: "Omnidirectional antennas provide equal signal strength in all directions (360 degrees)."
+            },
+            {
+                question: "What is the purpose of a UPS in network installations?",
+                answers: ["Uninterrupted Processing System", "Universal Power Supply", "Uninterruptible Power Supply", "Uniform Power System"],
+                correct: 2,
+                explanation: "UPS provides battery backup power during electrical outages to keep equipment running."
+            },
+            {
+                question: "Which frequency band offers the most available channels?",
+                answers: ["2.4GHz", "5GHz", "6GHz", "All are equal"],
+                correct: 2,
+                explanation: "The 6GHz band (Wi-Fi 6E) offers the most available channels and bandwidth."
+            },
+            {
+                question: "What is band steering in wireless networks?",
+                answers: ["Blocking certain frequency bands", "Automatically directing clients to optimal frequency", "Steering antenna direction", "Controlling bandwidth usage"],
+                correct: 1,
+                explanation: "Band steering automatically directs clients to the optimal frequency band (2.4GHz vs 5GHz)."
+            },
+            {
+                question: "What is the recommended humidity range for network equipment rooms?",
+                answers: ["20-30%", "45-55%", "60-70%", "80-90%"],
+                correct: 1,
+                explanation: "45-55% relative humidity is optimal for network equipment to prevent static and condensation."
+            },
+            {
+                question: "What does IDF stand for?",
+                answers: ["Internal Data Frame", "Intermediate Distribution Frame", "Integrated Device Frame", "Interface Distribution Frame"],
+                correct: 1,
+                explanation: "IDF is an Intermediate Distribution Frame - secondary connection points on each floor."
+            },
+            {
+                question: "Which wireless network type allows direct client-to-client communication?",
+                answers: ["Infrastructure", "Ad Hoc", "Mesh", "Point-to-Point"],
+                correct: 1,
+                explanation: "Ad Hoc networks allow direct communication between wireless clients without an access point."
+            }
+        ];
+
+        function startQuiz() {
+            currentQuiz = [...quizQuestions].sort(() => Math.random() - 0.5);
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 600;
+            
+            // Reset UI
+            document.querySelector('button[onclick="startQuiz()"]').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('reset-btn').style.display = 'inline-block';
+            
+            // Start timer
+            timer = setInterval(updateTimer, 1000);
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= currentQuiz.length) {
+                endQuiz();
+                return;
+            }
+
+            const question = currentQuiz[currentQuestionIndex];
+            document.getElementById('question').textContent = `Question ${currentQuestionIndex + 1}: ${question.question}`;
+            
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.textContent = answer;
+                answerDiv.onclick = () => selectAnswer(index);
+                answersDiv.appendChild(answerDiv);
+            });
+
+            updateScore();
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = currentQuiz[currentQuestionIndex];
+            const answerOptions = document.querySelectorAll('.answer-option');
+            
+            // Disable all options
+            answerOptions.forEach(option => option.onclick = null);
+            
+            // Show correct/incorrect
+            answerOptions.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Update score
+            if (selectedIndex === question.correct) {
+                score++;
+            }
+
+            // Show explanation
+            const explanation = document.createElement('div');
+            explanation.style.marginTop = '15px';
+            explanation.style.padding = '10px';
+            explanation.style.background = '#f0f8f0';
+            explanation.style.borderRadius = '5px';
+            explanation.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+            document.getElementById('answers').appendChild(explanation);
+
+            updateScore();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                endQuiz();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}/${currentQuestionIndex + (currentQuestionIndex < currentQuiz.length ? 0 : 1)}`;
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            const percentage = Math.round((score / currentQuiz.length) * 100);
+            document.getElementById('question').innerHTML = `
+                <h3>Quiz Complete!</h3>
+                <p>Final Score: ${score}/${currentQuiz.length} (${percentage}%)</p>
+                <p>${percentage >= 80 ? '🎉 Excellent work!' : percentage >= 70 ? '👍 Good job!' : '📚 Keep studying!'}</p>
+            `;
+            document.getElementById('answers').innerHTML = '';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function resetQuiz() {
+            clearInterval(timer);
+            document.getElementById('question').textContent = 'Click "Start Quiz" to begin!';
+            document.getElementById('answers').innerHTML = '';
+            document.getElementById('timer').textContent = 'Time: 10:00';
+            document.getElementById('score').textContent = 'Score: 0/0';
+            
+            document.querySelector('button[onclick="startQuiz()"]').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('reset-btn').style.display = 'none';
+        }
+
+        // Progress tracking
+        function updateProgress() {
+            const progressItems = document.querySelectorAll('.progress-item');
+            const totalItems = progressItems.length;
+            let checkedItems = 0;
+            
+            // Count checked items for each objective
+            const obj23Items = document.querySelectorAll('#progress .study-card:first-child .progress-item');
+            const obj24Items = document.querySelectorAll('#progress .study-card:nth-child(2) .progress-item');
+            
+            let obj23Checked = 0;
+            let obj24Checked = 0;
+            
+            obj23Items.forEach(item => {
+                if (item.checked) obj23Checked++;
+            });
+            
+            obj24Items.forEach(item => {
+                if (item.checked) obj24Checked++;
+            });
+            
+            progressItems.forEach(item => {
+                if (item.checked) checkedItems++;
+            });
+            
+            // Update progress bars
+            const obj23Progress = (obj23Checked / obj23Items.length) * 100;
+            const obj24Progress = (obj24Checked / obj24Items.length) * 100;
+            const overallProgress = (checkedItems / totalItems) * 100;
+            
+            document.getElementById('progress-23').style.width = obj23Progress + '%';
+            document.getElementById('progress-24').style.width = obj24Progress + '%';
+            document.getElementById('overall-progress').textContent = `Overall Progress: ${Math.round(overallProgress)}%`;
+            
+            // Save progress to localStorage
+            const progressData = {
+                obj23: obj23Progress,
+                obj24: obj24Progress,
+                overall: overallProgress,
+                checkedItems: Array.from(progressItems).map(item => item.checked)
+            };
+            
+            try {
+                // Note: localStorage is not available in Claude artifacts, so this is for when users copy the code
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('networkPlusProgress', JSON.stringify(progressData));
+                }
+            } catch (e) {
+                // Silently handle localStorage errors in artifact environment
+            }
+        }
+
+        // Load progress on page load
+        function loadProgress() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const savedProgress = localStorage.getItem('networkPlusProgress');
+                    if (savedProgress) {
+                        const progressData = JSON.parse(savedProgress);
+                        const progressItems = document.querySelectorAll('.progress-item');
+                        
+                        progressData.checkedItems.forEach((checked, index) => {
+                            if (progressItems[index]) {
+                                progressItems[index].checked = checked;
+                            }
+                        });
+                        
+                        updateProgress();
+                    }
+                }
+            } catch (e) {
+                // Silently handle localStorage errors in artifact environment
+            }
+        }
+
+        // Initialize progress tracking when page loads
+        document.addEventListener('DOMContentLoaded', loadProgress);
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to study cards
+            const studyCards = document.querySelectorAll('.study-card');
+            studyCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add typing effect to section titles
+            const sectionTitles = document.querySelectorAll('.section-title');
+            sectionTitles.forEach(title => {
+                const originalText = title.textContent;
+                title.textContent = '';
+                let i = 0;
+                
+                const typeWriter = () => {
+                    if (i < originalText.length) {
+                        title.textContent += originalText.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 50);
+                    }
+                };
+                
+                // Start typing effect when section becomes active
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.target.classList.contains('active') && title.textContent === '') {
+                            setTimeout(typeWriter, 300);
+                        }
+                    });
+                });
+                
+                if (title.closest('.content-section')) {
+                    observer.observe(title.closest('.content-section'), {attributes: true});
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Numbers 1-7 to navigate sections
+            if (e.key >= '1' && e.key <= '7') {
+                const navItems = document.querySelectorAll('.nav-item');
+                const index = parseInt(e.key) - 1;
+                if (navItems[index]) {
+                    navItems[index].click();
+                }
+            }
+            
+            // Space bar to flip flashcards
+            if (e.code === 'Space' && document.querySelector('#flashcards.active')) {
+                e.preventDefault();
+                const visibleFlashcards = document.querySelectorAll('#flashcards .flashcard');
+                visibleFlashcards.forEach(card => {
+                    if (!card.classList.contains('flipped')) {
+                        flipCard(card);
+                        return;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
