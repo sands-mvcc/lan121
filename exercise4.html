@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Network Configuration Simulator</title>
+    <title>CompTIA Network+ Domain 5: Network Troubleshooting</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #000000 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 50%, #1a1a1a 100%);
             min-height: 100vh;
             color: #333;
         }
@@ -24,729 +24,1223 @@
         }
 
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #2d5a2d 0%, #1a4a1a 100%);
-            color: white;
+            width: 300px;
+            background: linear-gradient(180deg, #2d5a2d 0%, #1a1a1a 100%);
             padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
             overflow-y: auto;
         }
 
-        .sidebar h2 {
-            color: #a8d8a8;
-            margin-bottom: 20px;
-            font-size: 1.3em;
+        .sidebar h1 {
+            color: white;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
             text-align: center;
-            border-bottom: 2px solid #4a8a4a;
+            border-bottom: 2px solid #4a8c4a;
             padding-bottom: 10px;
         }
 
-        .task-list {
+        .sidebar .subtitle {
+            color: #b8d8b8;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .nav-menu {
             list-style: none;
         }
 
-        .task-item {
+        .nav-item {
             margin-bottom: 8px;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item a {
+            display: block;
+            color: #b8d8b8;
+            text-decoration: none;
+            padding: 12px 15px;
             border-radius: 8px;
-            cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
             border-left: 3px solid transparent;
         }
 
-        .task-item:hover {
-            background: rgba(255,255,255,0.2);
-            border-left: 3px solid #a8d8a8;
+        .nav-item a:hover {
+            background: rgba(74, 140, 74, 0.3);
+            color: white;
+            border-left-color: #4a8c4a;
             transform: translateX(5px);
         }
 
-        .task-item.active {
-            background: #4a8a4a;
-            border-left: 3px solid #a8d8a8;
-        }
-
-        .task-item.completed {
-            background: #2d5a2d;
-            opacity: 0.8;
+        .nav-item.active a {
+            background: #4a8c4a;
+            color: white;
+            border-left-color: white;
         }
 
         .main-content {
+            margin-left: 300px;
             flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
         }
 
-        .header {
-            background: linear-gradient(135deg, #4a8a4a 0%, #2d5a2d 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .task-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border: 2px solid #e8f5e8;
-        }
-
-        .task-content h3 {
-            color: #2d5a2d;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .simulator-panel {
-            background: #f8f9fa;
-            border: 2px solid #e8f5e8;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .config-section {
-            margin-bottom: 25px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #4a8a4a;
-        }
-
-        .config-section h4 {
-            color: #2d5a2d;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #2d5a2d;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e8f5e8;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #4a8a4a;
-            box-shadow: 0 0 5px rgba(74, 138, 74, 0.3);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #4a8a4a 0%, #2d5a2d 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(74, 138, 74, 0.4);
-        }
-
-        .btn.secondary {
-            background: linear-gradient(135deg, #666 0%, #444 100%);
-        }
-
-        .result-panel {
-            background: #e8f5e8;
-            border: 2px solid #4a8a4a;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .result-panel h5 {
-            color: #2d5a2d;
-            margin-bottom: 10px;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .progress-bar {
-            background: #e8f5e8;
-            height: 20px;
-            border-radius: 10px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, #4a8a4a, #2d5a2d);
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 10px;
-        }
-
-        .network-diagram {
-            background: white;
-            border: 2px solid #e8f5e8;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .device {
-            background: #4a8a4a;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px;
-            display: inline-block;
-            min-width: 100px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
-            border-left: 4px solid #4a8a4a;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .error {
-            background: #ffe6e6;
-            border-left: 4px solid #d32f2f;
-            color: #d32f2f;
-        }
-
-        .success {
-            background: #e8f5e8;
-            border-left: 4px solid #4a8a4a;
-            color: #2d5a2d;
-        }
-
-        .warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            color: #856404;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .comparison-table th {
-            background: #4a8a4a;
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
-
-        .comparison-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .comparison-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-            }
-        }
-
-        .hidden {
+        .content-section {
             display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        .content-section.active {
+            display: block;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .section-header {
+            background: linear-gradient(135deg, #2d5a2d, #4a8c4a);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .topic-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #4a8c4a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+        }
+
+        .topic-card h3 {
+            color: #2d5a2d;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e8f5e8;
+            padding-bottom: 8px;
+        }
+
+        .subtopic {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8fdf8;
+            border-radius: 8px;
+            border-left: 3px solid #4a8c4a;
+        }
+
+        .subtopic h4 {
+            color: #2d5a2d;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .subtopic ul {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .subtopic li {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .exam-tip {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4a8c4a;
+        }
+
+        .exam-tip h4 {
+            color: #4a8c4a;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .collapsible {
+            background: #4a8c4a;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            border-radius: 8px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+
+        .collapsible:hover {
+            background: #2d5a2d;
+        }
+
+        .collapsible.active {
+            background: #2d5a2d;
+        }
+
+        .collapsible-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #f8fdf8;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .collapsible-content.active {
+            padding: 15px;
+            max-height: 1000px;
+        }
+
+        .methodology-step {
+            background: white;
+            border: 2px solid #4a8c4a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .methodology-step::before {
+            content: attr(data-step);
+            background: #4a8c4a;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-weight: bold;
+        }
+
+        .methodology-step h4 {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            margin-left: 30px;
+        }
+
+        .command-box {
+            background: #1a1a1a;
+            color: #4a8c4a;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tool-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4a8c4a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tool-item h5 {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            background: #e8f5e8;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a8c4a, #2d5a2d);
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>WiFi Configuration Tasks</h2>
-            <ul class="task-list" id="taskList">
-                <li class="task-item active" data-task="1">1. WiFi Standards Overview</li>
-                <li class="task-item" data-task="2">2. Basic Network Setup</li>
-                <li class="task-item" data-task="3">3. Security Configuration</li>
-                <li class="task-item" data-task="4">4. Channel Management</li>
-                <li class="task-item" data-task="5">5. Bandwidth Optimization</li>
-                <li class="task-item" data-task="6">6. Access Point Setup</li>
-                <li class="task-item" data-task="7">7. Advanced Security</li>
-                <li class="task-item" data-task="8">8. Performance Monitoring</li>
-                <li class="task-item" data-task="9">9. Troubleshooting</li>
-                <li class="task-item" data-task="10">10. Network Assessment</li>
+        <nav class="sidebar">
+            <h1>Network+ Domain 5</h1>
+            <p class="subtitle">Network Troubleshooting</p>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#" onclick="showSection('overview', this)">📚 Domain Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('methodology', this)">🔍 5.1 Troubleshooting Methodology</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('cable-issues', this)">🔌 5.2 Cable Connectivity Issues</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('software-tools', this)">💻 5.3 Network Software Tools</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('wireless-issues', this)">📡 5.4 Wireless Connectivity Issues</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('general-issues', this)">⚙️ 5.5 General Networking Issues</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showSection('study-tips', this)">💡 Study Tips & Practice</a>
+                </li>
             </ul>
-            <div style="margin-top: 20px; text-align: center;">
-                <div>Progress: <span id="progressText">0/10</span></div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <div class="section-header">
+                    <h2>Domain 5: Network Troubleshooting Overview</h2>
+                    <p>Master the systematic approach to identifying, diagnosing, and resolving network issues. This domain represents 22% of the Network+ exam.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Domain Weight: 22% of Exam</h3>
+                    <p>Domain 5 is one of the most practical and important domains on the Network+ exam. It tests your ability to:</p>
+                    <ul style="margin: 15px 0 0 20px; line-height: 1.8;">
+                        <li>Apply systematic troubleshooting methodology</li>
+                        <li>Identify and resolve cable connectivity problems</li>
+                        <li>Use appropriate network software tools and commands</li>
+                        <li>Troubleshoot wireless connectivity issues</li>
+                        <li>Diagnose and fix general networking problems</li>
+                    </ul>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Exam Strategy</h4>
+                    <p>Focus on hands-on practice and understanding the "why" behind each troubleshooting step. Performance-based questions (PBQs) heavily test this domain.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Key Learning Objectives</h3>
+                    <div class="subtopic">
+                        <h4>5.1 - Network Troubleshooting Methodology</h4>
+                        <p>Learn the 7-step systematic approach to problem-solving</p>
+                    </div>
+                    <div class="subtopic">
+                        <h4>5.2 - Cable Connectivity Issues</h4>
+                        <p>Master physical layer troubleshooting tools and techniques</p>
+                    </div>
+                    <div class="subtopic">
+                        <h4>5.3 - Network Software Tools</h4>
+                        <p>Command-line utilities and software-based troubleshooting</p>
+                    </div>
+                    <div class="subtopic">
+                        <h4>5.4 - Wireless Connectivity Issues</h4>
+                        <p>RF-specific problems and wireless troubleshooting methods</p>
+                    </div>
+                    <div class="subtopic">
+                        <h4>5.5 - General Networking Issues</h4>
+                        <p>Common network problems and their solutions</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5.1 Troubleshooting Methodology -->
+            <section id="methodology" class="content-section">
+                <div class="section-header">
+                    <h2>5.1 Network Troubleshooting Methodology</h2>
+                    <p>Master the systematic 7-step approach to network problem solving.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>The CompTIA Troubleshooting Methodology</h3>
+                    
+                    <div class="methodology-step" data-step="1">
+                        <h4>Identify the Problem</h4>
+                        <ul>
+                            <li><strong>Gather information</strong> - Collect symptoms and error messages</li>
+                            <li><strong>Question users</strong> - What were they trying to do? When did it start?</li>
+                            <li><strong>Identify symptoms</strong> - Document all observed issues</li>
+                            <li><strong>Determine if anything has changed</strong> - Recent updates, configurations</li>
+                            <li><strong>Duplicate the problem</strong> - Reproduce to understand scope</li>
+                            <li><strong>Approach multiple problems individually</strong> - One at a time</li>
+                        </ul>
+                    </div>
+
+                    <div class="methodology-step" data-step="2">
+                        <h4>Establish a Theory of Probable Cause</h4>
+                        <ul>
+                            <li><strong>Question the obvious</strong> - Check simple things first</li>
+                            <li><strong>Consider multiple approaches:</strong>
+                                <ul style="margin-top: 8px;">
+                                    <li>Top-to-bottom OSI model (Application → Physical)</li>
+                                    <li>Bottom-to-top OSI model (Physical → Application)</li>
+                                    <li>Divide and conquer (Start at middle layers)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="methodology-step" data-step="3">
+                        <h4>Test the Theory</h4>
+                        <ul>
+                            <li><strong>If confirmed:</strong> Determine next steps to resolve</li>
+                            <li><strong>If not confirmed:</strong> Reestablish new theory or escalate</li>
+                        </ul>
+                    </div>
+
+                    <div class="methodology-step" data-step="4">
+                        <h4>Establish a Plan of Action</h4>
+                        <p>Create a resolution plan and identify potential effects of the solution</p>
+                    </div>
+
+                    <div class="methodology-step" data-step="5">
+                        <h4>Implement the Solution</h4>
+                        <p>Execute the plan or escalate if beyond your authority/expertise</p>
+                    </div>
+
+                    <div class="methodology-step" data-step="6">
+                        <h4>Verify Full System Functionality</h4>
+                        <p>Test the fix thoroughly and implement preventive measures if applicable</p>
+                    </div>
+
+                    <div class="methodology-step" data-step="7">
+                        <h4>Document Everything</h4>
+                        <p>Record findings, actions taken, outcomes, and lessons learned</p>
+                    </div>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Exam Focus</h4>
+                    <p>Memorize the 7 steps in order. Exam questions often present scenarios asking which step comes next or what should be done at each stage.</p>
+                </div>
+            </section>
+
+            <!-- 5.2 Cable Connectivity Issues -->
+            <section id="cable-issues" class="content-section">
+                <div class="section-header">
+                    <h2>5.2 Cable Connectivity Issues</h2>
+                    <p>Troubleshoot physical layer problems using appropriate tools and techniques.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Cable Specifications and Limitations</h3>
+                    <div class="subtopic">
+                        <h4>Key Specifications</h4>
+                        <ul>
+                            <li><strong>Throughput</strong> - Data capacity (bps)</li>
+                            <li><strong>Speed</strong> - Signal propagation rate</li>
+                            <li><strong>Distance</strong> - Maximum cable length before signal degradation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Cable Considerations</h3>
+                    <div class="subtopic">
+                        <h4>Shielded vs. Unshielded</h4>
+                        <ul>
+                            <li><strong>Shielded (STP)</strong> - Better EMI protection, more expensive</li>
+                            <li><strong>Unshielded (UTP)</strong> - Standard Ethernet, cost-effective</li>
+                        </ul>
+                    </div>
+                    <div class="subtopic">
+                        <h4>Plenum vs. Riser-Rated</h4>
+                        <ul>
+                            <li><strong>Plenum-rated</strong> - Fire-resistant, for air handling spaces</li>
+                            <li><strong>Riser-rated</strong> - For vertical runs between floors</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Cable Applications</h3>
+                    <button class="collapsible">Special Purpose Cables</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Rollover/Console Cable</h4>
+                            <p>Used for direct serial connection to network devices for configuration</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Crossover Cable</h4>
+                            <p>Connects similar devices (switch-to-switch, PC-to-PC)</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Power over Ethernet (PoE)</h4>
+                            <p>Delivers both data and power over ethernet cables</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Common Cable Issues</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h5>📉 Attenuation</h5>
+                            <p>Signal weakening over distance. Solution: Use repeaters or shorter cables.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📻 Interference</h5>
+                            <p>EMI/RFI disruption. Solution: Use shielded cables or change routing.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📊 dB Loss</h5>
+                            <p>Signal power reduction. Measure with optical power meter.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🔌 Incorrect Pinout</h5>
+                            <p>Wrong wire arrangement. Test with cable tester or wire map.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>❌ Bad Ports</h5>
+                            <p>Failed network interfaces. Check LED indicators.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>⚡ Open/Short</h5>
+                            <p>Broken or touching wires. Identify with multimeter.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Cable Testing Tools</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h5>🔧 Cable Crimper</h5>
+                            <p>Attaches connectors to cable ends</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>👊 Punchdown Tool</h5>
+                            <p>Terminates wires in patch panels and jacks</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🎵 Tone Generator</h5>
+                            <p>Traces cables through walls and conduits</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🔄 Loopback Adapter</h5>
+                            <p>Tests port functionality by creating loop</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📡 OTDR</h5>
+                            <p>Optical Time-Domain Reflectometer for fiber testing</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>⚡ Multimeter</h5>
+                            <p>Measures electrical properties (voltage, resistance)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Exam Tip</h4>
+                    <p>Know which tool to use for each type of problem. OTDR is for fiber optics, tone generator for cable tracing, multimeter for electrical testing.</p>
+                </div>
+            </section>
+
+            <!-- 5.3 Software Tools -->
+            <section id="software-tools" class="content-section">
+                <div class="section-header">
+                    <h2>5.3 Network Software Tools and Commands</h2>
+                    <p>Master command-line utilities and software-based network troubleshooting tools.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Software Tools</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h5>📶 WiFi Analyzer</h5>
+                            <p>Scans and analyzes wireless networks and signal strength</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📦 Protocol Analyzer/Packet Capture</h5>
+                            <p>Captures and examines network traffic (Wireshark)</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>⚡ Bandwidth Speed Tester</h5>
+                            <p>Measures network throughput and performance</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🔍 Port Scanner</h5>
+                            <p>Identifies open ports on network devices</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📊 iperf</h5>
+                            <p>Network performance measurement tool</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🌊 NetFlow Analyzers</h5>
+                            <p>Analyzes network traffic patterns and usage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Essential Command Line Tools</h3>
+                    
+                    <button class="collapsible">Basic Network Commands</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>ping</h4>
+                            <div class="command-box">ping 8.8.8.8<br>ping -t google.com (Windows continuous)<br>ping -c 4 google.com (Linux 4 packets)</div>
+                            <p>Tests connectivity and measures round-trip time</p>
+                        </div>
+                        
+                        <div class="subtopic">
+                            <h4>ipconfig/ifconfig/ip</h4>
+                            <div class="command-box">ipconfig /all (Windows)<br>ifconfig (Linux/macOS)<br>ip addr show (Modern Linux)</div>
+                            <p>Displays network interface configuration</p>
+                        </div>
+                        
+                        <div class="subtopic">
+                            <h4>nslookup/dig</h4>
+                            <div class="command-box">nslookup google.com<br>dig google.com<br>dig @8.8.8.8 google.com MX</div>
+                            <p>DNS lookup and troubleshooting</p>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Advanced Network Commands</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>traceroute/tracert</h4>
+                            <div class="command-box">tracert google.com (Windows)<br>traceroute google.com (Linux/macOS)</div>
+                            <p>Shows network path and identifies routing issues</p>
+                        </div>
+                        
+                        <div class="subtopic">
+                            <h4>arp</h4>
+                            <div class="command-box">arp -a<br>arp -d * (flush table)</div>
+                            <p>Displays and manages ARP table</p>
+                        </div>
+                        
+                        <div class="subtopic">
+                            <h4>netstat</h4>
+                            <div class="command-box">netstat -an<br>netstat -r (routing table)<br>netstat -s (statistics)</div>
+                            <p>Shows network connections and statistics</p>
+                        </div>
+                        
+                        <div class="subtopic">
+                            <h4>nmap</h4>
+                            <div class="command-box">nmap 192.168.1.1<br>nmap -sn 192.168.1.0/24</div>
+                            <p>Network discovery and port scanning</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Network Platform Commands</h3>
+                    <div class="subtopic">
+                        <h4>Common Switch/Router Commands</h4>
+                        <div class="command-box">show interface<br>show config<br>show route</div>
+                        <p>Essential commands for Cisco and similar network devices</p>
+                    </div>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Command Memorization</h4>
+                    <p>Know the syntax differences between Windows and Linux commands. Practice common switches and parameters for each command.</p>
+                </div>
+            </section>
+
+            <!-- 5.4 Wireless Issues -->
+            <section id="wireless-issues" class="content-section">
+                <div class="section-header">
+                    <h2>5.4 Wireless Connectivity Issues</h2>
+                    <p>Diagnose and resolve wireless network problems and RF-related issues.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Wireless Specifications and Limitations</h3>
+                    <div class="subtopic">
+                        <h4>Key Metrics</h4>
+                        <ul>
+                            <li><strong>Throughput</strong> - Actual data transfer rate</li>
+                            <li><strong>Speed</strong> - Maximum theoretical rate</li>
+                            <li><strong>Distance</strong> - Coverage area and range</li>
+                            <li><strong>RSSI</strong> - Received Signal Strength Indication</li>
+                            <li><strong>EIRP</strong> - Effective Isotropic Radiated Power</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Wireless Considerations</h3>
+                    
+                    <button class="collapsible">Antenna Configuration</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Antenna Placement</h4>
+                            <ul>
+                                <li>Central location for optimal coverage</li>
+                                <li>Avoid interference sources</li>
+                                <li>Consider obstacles and building materials</li>
+                                <li>Height matters - higher is often better</li>
+                            </ul>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Antenna Types</h4>
+                            <ul>
+                                <li><strong>Omnidirectional</strong> - 360° coverage pattern</li>
+                                <li><strong>Directional</strong> - Focused beam for long distances</li>
+                            </ul>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Polarization</h4>
+                            <ul>
+                                <li><strong>Vertical</strong> - Standard for most applications</li>
+                                <li><strong>Horizontal</strong> - Used in specific scenarios</li>
+                                <li>Must match between transmitter and receiver</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Channel Management</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Channel Utilization</h4>
+                            <p>Monitor and optimize channel usage to avoid congestion</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>AP Association Time</h4>
+                            <p>Time required for devices to connect to access points</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Site Survey</h4>
+                            <p>Comprehensive analysis of RF environment and coverage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Common Wireless Issues</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h5>📡 Interference</h5>
+                            <p><strong>Channel Overlap</strong> - Use non-overlapping channels (1, 6, 11 for 2.4GHz)</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📉 Signal Loss</h5>
+                            <p><strong>Antenna Cable Attenuation</strong> - Check cable connections and quality</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📶 RF Attenuation</h5>
+                            <p><strong>Physical Obstacles</strong> - Walls, metal objects blocking signal</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🔐 Authentication Issues</h5>
+                            <p><strong>Wrong SSID/Passphrase</strong> - Verify network name and password</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>🔒 Encryption Mismatch</h5>
+                            <p><strong>Protocol Incompatibility</strong> - WPA/WPA2/WPA3 compatibility</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📍 Coverage Issues</h5>
+                            <p><strong>Insufficient Coverage</strong> - Dead zones or weak signal areas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Advanced Wireless Problems</h3>
+                    <div class="subtopic">
+                        <h4>Captive Portal Issues</h4>
+                        <ul>
+                            <li>Browser redirection problems</li>
+                            <li>Authentication timeouts</li>
+                            <li>HTTPS interference with portal</li>
+                        </ul>
+                    </div>
+                    <div class="subtopic">
+                        <h4>Client Disassociation Issues</h4>
+                        <ul>
+                            <li>Power management settings</li>
+                            <li>Roaming problems between APs</li>
+                            <li>Driver compatibility issues</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Wireless Troubleshooting Strategy</h4>
+                    <p>Start with physical layer (signal strength, interference) then move to logical issues (authentication, encryption). Use WiFi analyzers to visualize the RF environment.</p>
+                </div>
+            </section>
+
+            <!-- 5.5 General Issues -->
+            <section id="general-issues" class="content-section">
+                <div class="section-header">
+                    <h2>5.5 General Networking Issues</h2>
+                    <p>Identify and resolve common network problems across all layers.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Network Analysis Considerations</h3>
+                    <div class="subtopic">
+                        <h4>Essential Review Areas</h4>
+                        <ul>
+                            <li><strong>Device Configuration Review</strong> - Check settings and parameters</li>
+                            <li><strong>Routing Tables</strong> - Verify correct paths to destinations</li>
+                            <li><strong>Interface Status</strong> - Check link state and statistics</li>
+                            <li><strong>VLAN Assignment</strong> - Ensure correct VLAN membership</li>
+                            <li><strong>Network Performance Baselines</strong> - Compare current vs. normal performance</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Layer 2 Issues</h3>
+                    
+                    <button class="collapsible">Switching Problems</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Collisions</h4>
+                            <p>Occur in half-duplex environments. Solution: Use full-duplex or switches instead of hubs.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Broadcast Storm</h4>
+                            <p>Excessive broadcast traffic flooding network. Check for switching loops and STP configuration.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Duplicate MAC Address</h4>
+                            <p>Same MAC on multiple devices. Causes intermittent connectivity issues.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Switching Loops</h4>
+                            <p>Redundant paths without STP. Enable Spanning Tree Protocol.</p>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Advanced Layer 2 Issues</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Multicast Flooding</h4>
+                            <p>Switch treating multicast as broadcast. Configure IGMP snooping.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Incorrect VLAN</h4>
+                            <p>Device in wrong VLAN. Check port VLAN assignment and trunking.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Layer 3 Issues</h3>
+                    
+                    <button class="collapsible">IP Configuration Problems</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Duplicate IP Address</h4>
+                            <p>Two devices with same IP. Use DHCP reservations or better IP management.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>IP Setting Issues</h4>
+                            <ul>
+                                <li><strong>Incorrect Gateway</strong> - Wrong default gateway prevents internet access</li>
+                                <li><strong>Incorrect Subnet Mask</strong> - Affects local network communication</li>
+                                <li><strong>Incorrect IP Address</strong> - Wrong network or host portion</li>
+                                <li><strong>Incorrect DNS</strong> - Name resolution failures</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Routing Issues</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Asymmetrical Routing</h4>
+                            <p>Traffic takes different paths in each direction. Can cause firewall issues.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Routing Loops</h4>
+                            <p>Circular routing paths. Check routing protocol configuration and metrics.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Missing Route</h4>
+                            <p>No path to destination network. Add static route or fix routing protocol.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>DHCP Issues</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h5>🔄 Rogue DHCP Server</h5>
+                            <p>Unauthorized DHCP server causing conflicts. Use DHCP snooping to prevent.</p>
+                        </div>
+                        <div class="tool-item">
+                            <h5>📊 DHCP Scope Exhaustion</h5>
+                            <p>No available IP addresses in pool. Expand scope or reduce lease time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Infrastructure Issues</h3>
+                    
+                    <button class="collapsible">Physical and Environmental</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Low Optical Link Budget</h4>
+                            <p>Insufficient light power in fiber connections. Check connectors and cable quality.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Hardware Failure</h4>
+                            <p>Failed network components. Check LED indicators and replace faulty hardware.</p>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Security and Access Issues</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Certificate Issues</h4>
+                            <p>Expired or invalid certificates causing HTTPS/VPN problems.</p>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Firewall Settings</h4>
+                            <ul>
+                                <li><strong>Host-based</strong> - Local firewall blocking traffic</li>
+                                <li><strong>Network-based</strong> - Network firewall rules</li>
+                                <li><strong>Blocked Services/Ports</strong> - Specific applications blocked</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Service Issues</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>DNS Issues</h4>
+                            <ul>
+                                <li>DNS server unavailable</li>
+                                <li>Incorrect DNS configuration</li>
+                                <li>DNS cache poisoning</li>
+                            </ul>
+                        </div>
+                        <div class="subtopic">
+                            <h4>NTP Issues</h4>
+                            <ul>
+                                <li>Time synchronization problems</li>
+                                <li>Authentication failures due to time drift</li>
+                                <li>Incorrect time zone settings</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Modern Network Challenges</h3>
+                    <div class="subtopic">
+                        <h4>BYOD Challenges</h4>
+                        <ul>
+                            <li>Device compatibility issues</li>
+                            <li>Security policy enforcement</li>
+                            <li>Network access control</li>
+                        </ul>
+                    </div>
+                    <div class="subtopic">
+                        <h4>Licensed Feature Issues</h4>
+                        <ul>
+                            <li>Expired software licenses</li>
+                            <li>Feature limitations in trial versions</li>
+                            <li>Capacity restrictions</li>
+                        </ul>
+                    </div>
+                    <div class="subtopic">
+                        <h4>Network Performance Issues</h4>
+                        <ul>
+                            <li>Bandwidth saturation</li>
+                            <li>Latency problems</li>
+                            <li>Jitter affecting VoIP/video</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="exam-tip">
+                    <h4>🎯 Troubleshooting Approach</h4>
+                    <p>Use the OSI model to systematically isolate issues. Start with physical connectivity, then work up through the layers. Document symptoms before making changes.</p>
+                </div>
+            </section>
+
+            <!-- Study Tips Section -->
+            <section id="study-tips" class="content-section">
+                <div class="section-header">
+                    <h2>Study Tips & Practice</h2>
+                    <p>Maximize your exam preparation with focused study strategies and hands-on practice.</p>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Domain 5 Study Strategy</h3>
+                    <div class="subtopic">
+                        <h4>🎯 High-Priority Topics</h4>
+                        <ul>
+                            <li><strong>Troubleshooting Methodology</strong> - Memorize all 7 steps in order</li>
+                            <li><strong>Command-line Tools</strong> - Know syntax for ping, ipconfig, tracert, nslookup</li>
+                            <li><strong>Cable Testing Tools</strong> - Match tools to specific problems</li>
+                            <li><strong>Common Network Issues</strong> - Symptoms and solutions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Hands-On Practice</h3>
+                    
+                    <button class="collapsible">Lab Exercises</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Command Practice</h4>
+                            <div class="command-box">
+# Practice these commands daily:<br>
+ping -t 8.8.8.8<br>
+ipconfig /all<br>
+tracert google.com<br>
+nslookup google.com<br>
+arp -a<br>
+netstat -an
+                            </div>
+                        </div>
+                        <div class="subtopic">
+                            <h4>Scenario Practice</h4>
+                            <ul>
+                                <li>Create network problems in lab environment</li>
+                                <li>Practice the 7-step methodology</li>
+                                <li>Use packet capture tools like Wireshark</li>
+                                <li>Simulate cable problems and test with tools</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Virtual Labs</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>Recommended Platforms</h4>
+                            <ul>
+                                <li><strong>Packet Tracer</strong> - Cisco's network simulator</li>
+                                <li><strong>GNS3</strong> - Advanced network emulation</li>
+                                <li><strong>VirtualBox/VMware</strong> - Create multi-host scenarios</li>
+                                <li><strong>Cloud Labs</strong> - AWS/Azure networking labs</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Exam-Specific Tips</h3>
+                    <div class="exam-tip">
+                        <h4>Performance-Based Questions (PBQs)</h4>
+                        <ul style="color: white; margin-left: 20px; line-height: 1.6;">
+                            <li>Expect 2-3 PBQs testing troubleshooting scenarios</li>
+                            <li>Practice with network simulators and command-line tools</li>
+                            <li>Read scenarios carefully - identify the problem first</li>
+                            <li>Use systematic approach, don't guess randomly</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="subtopic">
+                        <h4>Common Exam Scenarios</h4>
+                        <ul>
+                            <li><strong>Connectivity Issues</strong> - Can't reach website/server</li>
+                            <li><strong>Performance Problems</strong> - Slow network speeds</li>
+                            <li><strong>Wireless Issues</strong> - Can't connect to WiFi</li>
+                            <li><strong>DHCP Problems</strong> - No IP address assignment</li>
+                            <li><strong>DNS Resolution</strong> - Can ping IP but not hostname</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Memory Aids</h3>
+                    
+                    <button class="collapsible">Troubleshooting Methodology Mnemonic</button>
+                    <div class="collapsible-content">
+                        <div class="subtopic">
+                            <h4>"I Eat Tacos Every Thursday Very Deliberately"</h4>
+                            <ol style="margin-left: 20px; line-height: 1.8;">
+                                <li><strong>I</strong>dentify the problem</li>
+                                <li><strong>E</strong>stablish theory of probable cause</li>
+                                <li><strong>T</strong>est the theory</li>
+                                <li><strong>E</strong>stablish plan of action</li>
+                                <li><strong>T</strong>ake action (implement solution)</li>
+                                <li><strong>V</strong>erify full system functionality</li>
+                                <li><strong>D</strong>ocument findings and actions</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <button class="collapsible">Command Quick Reference</button>
+                    <div class="collapsible-content">
+                        <div class="command-box">
+Connectivity: ping, tracert/traceroute<br>
+Configuration: ipconfig, ifconfig<br>
+Name Resolution: nslookup, dig<br>
+Network Tables: arp, netstat, route<br>
+Discovery: nmap<br>
+Packet Analysis: tcpdump, wireshark
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-card">
+                    <h3>Final Review Checklist</h3>
+                    <div class="subtopic">
+                        <h4>Before the Exam</h4>
+                        <ul>
+                            <li>✅ Can recite 7-step methodology from memory</li>
+                            <li>✅ Know basic syntax of key commands</li>
+                            <li>✅ Understand OSI model troubleshooting approaches</li>
+                            <li>✅ Can match tools to specific cable problems</li>
+                            <li>✅ Familiar with common network issues and solutions</li>
+                            <li>✅ Practiced PBQ scenarios in lab environment</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-fill" style="width: 100%"></div>
                 </div>
-            </div>
-        </div>
+                <p style="text-align: center; margin-top: 10px; color: #2d5a2d; font-weight: bold;">
+                    Domain 5 Study Progress: Complete! 🎉
+                </p>
+            </section>
+        </main>
+    </div>
 
-        <div class="main-content">
-            <div class="header">
-                <h1>WiFi Network Configuration Simulator</h1>
-                <p>Interactive Learning Platform for Modern Wireless Networks</p>
-            </div>
+    <script>
+        function showSection(sectionId, clickedElement) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
 
-            <!-- Task 1: WiFi Standards Overview -->
-            <div id="task1" class="task-content">
-                <h3>Task 1: WiFi Standards Overview</h3>
-                <p>Learn about the evolution and features of modern WiFi standards.</p>
-                
-                <div class="info-box">
-                    <strong>Learning Objectives:</strong>
-                    <ul>
-                        <li>Understand WiFi 6, 6E, and 7 specifications</li>
-                        <li>Compare theoretical and real-world performance</li>
-                        <li>Identify key technological improvements</li>
-                    </ul>
-                </div>
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
 
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Standard</th>
-                            <th>IEEE Name</th>
-                            <th>Max Speed</th>
-                            <th>Frequency Bands</th>
-                            <th>Key Features</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>WiFi 6</td>
-                            <td>802.11ax</td>
-                            <td>9.6 Gbps</td>
-                            <td>2.4GHz, 5GHz</td>
-                            <td>OFDMA, MU-MIMO, 1024-QAM</td>
-                        </tr>
-                        <tr>
-                            <td>WiFi 6E</td>
-                            <td>802.11ax</td>
-                            <td>9.6 Gbps</td>
-                            <td>2.4GHz, 5GHz, 6GHz</td>
-                            <td>6GHz band, 160MHz channels</td>
-                        </tr>
-                        <tr>
-                            <td>WiFi 7</td>
-                            <td>802.11be</td>
-                            <td>46 Gbps</td>
-                            <td>2.4GHz, 5GHz, 6GHz</td>
-                            <td>320MHz channels, 4096-QAM, MLO</td>
-                        </tr>
-                    </tbody>
-                </table>
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
 
-                <div class="simulator-panel">
-                    <h4>WiFi Standard Comparison Tool</h4>
-                    <div class="form-group">
-                        <label>Select Standards to Compare:</label>
-                        <select id="standard1">
-                            <option value="wifi6">WiFi 6 (802.11ax)</option>
-                            <option value="wifi6e">WiFi 6E</option>
-                            <option value="wifi7">WiFi 7 (802.11be)</option>
-                        </select>
-                        <select id="standard2">
-                            <option value="wifi6e">WiFi 6E</option>
-                            <option value="wifi6">WiFi 6 (802.11ax)</option>
-                            <option value="wifi7">WiFi 7 (802.11be)</option>
-                        </select>
-                    </div>
-                    <button class="btn" onclick="compareStandards()">Compare Standards</button>
-                    <div id="comparisonResult" class="result-panel" style="display: none;"></div>
-                </div>
+            // Add active class to clicked nav item
+            if (clickedElement) {
+                clickedElement.parentElement.classList.add('active');
+            } else {
+                // Fallback: find the nav item by section id
+                const targetNavItem = document.querySelector(`a[onclick*="${sectionId}"]`);
+                if (targetNavItem) {
+                    targetNavItem.parentElement.classList.add('active');
+                }
+            }
 
-                <button class="btn" onclick="completeTask(1)">Complete Task 1</button>
-            </div>
+            // Scroll to top of content
+            document.querySelector('.main-content').scrollTop = 0;
+        }
 
-            <!-- Task 2: Basic Network Setup -->
-            <div id="task2" class="task-content hidden">
-                <h3>Task 2: Basic Network Setup</h3>
-                <p>Configure fundamental network parameters for a WiFi access point.</p>
+        // Initialize collapsible functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            
+            collapsibles.forEach(function(collapsible) {
+                collapsible.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    
+                    if (content.classList.contains('active')) {
+                        content.classList.remove('active');
+                    } else {
+                        content.classList.add('active');
+                    }
+                });
+            });
 
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>Network Identity</h4>
-                        <div class="form-group">
-                            <label>Network Name (SSID):</label>
-                            <input type="text" id="ssid" placeholder="MyWiFiNetwork" maxlength="32">
-                        </div>
-                        <div class="form-group">
-                            <label>Country/Region:</label>
-                            <select id="country">
-                                <option value="US">United States</option>
-                                <option value="CA">Canada</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="DE">Germany</option>
-                                <option value="JP">Japan</option>
-                            </select>
-                        </div>
-                    </div>
+            // Animate progress bar on study tips section
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const progressFill = entry.target.querySelector('.progress-fill');
+                        if (progressFill) {
+                            setTimeout(function() {
+                                progressFill.style.width = '100%';
+                            }, 500);
+                        }
+                    }
+                });
+            });
 
-                    <div class="config-section">
-                        <h4>WiFi Standard Selection</h4>
-                        <div class="form-group">
-                            <label>WiFi Standard:</label>
-                            <select id="wifiStandard">
-                                <option value="802.11ax">WiFi 6 (802.11ax)</option>
-                                <option value="802.11ax-6e">WiFi 6E</option>
-                                <option value="802.11be">WiFi 7 (802.11be)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Band Configuration:</label>
-                            <select id="bandConfig">
-                                <option value="dual">Dual Band (2.4GHz + 5GHz)</option>
-                                <option value="tri">Tri Band (2.4GHz + 5GHz + 6GHz)</option>
-                            </select>
-                        </div>
-                    </div>
+            const studyTipsSection = document.getElementById('study-tips');
+            if (studyTipsSection) {
+                observer.observe(studyTipsSection);
+            }
+        });
 
-                    <button class="btn" onclick="applyBasicConfig()">Apply Configuration</button>
-                    <div id="basicConfigResult" class="result-panel" style="display: none;"></div>
-                </div>
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close any open collapsibles
+                const activeCollapsibles = document.querySelectorAll('.collapsible-content.active');
+                activeCollapsibles.forEach(function(content) {
+                    content.classList.remove('active');
+                    content.previousElementSibling.classList.remove('active');
+                });
+            }
+        });
 
-                <div class="network-diagram" id="networkDiagram">
-                    <div class="device">Router/AP</div>
-                </div>
-
-                <button class="btn" onclick="completeTask(2)">Complete Task 2</button>
-            </div>
-
-            <!-- Task 3: Security Configuration -->
-            <div id="task3" class="task-content hidden">
-                <h3>Task 3: Security Configuration</h3>
-                <p>Configure WPA3 security protocols and authentication methods.</p>
-
-                <div class="info-box">
-                    <strong>Security Best Practices:</strong>
-                    <ul>
-                        <li>Use WPA3 Personal for home networks</li>
-                        <li>Enable Protected Management Frames (PMF)</li>
-                        <li>Use strong, unique passphrases</li>
-                        <li>Consider WPA2/WPA3 transition mode for compatibility</li>
-                    </ul>
-                </div>
-
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>Security Protocol</h4>
-                        <div class="form-group">
-                            <label>Security Type:</label>
-                            <select id="securityType">
-                                <option value="wpa3">WPA3 Personal</option>
-                                <option value="wpa2-wpa3">WPA2/WPA3 Transition</option>
-                                <option value="wpa3-enterprise">WPA3 Enterprise</option>
-                                <option value="wpa2">WPA2 Personal (Legacy)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Network Password:</label>
-                            <input type="password" id="networkPassword" placeholder="Enter strong password (8+ characters)">
-                            <small>Password strength: <span id="passwordStrength">Not set</span></small>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>Advanced Security Settings</h4>
-                        <div class="form-group">
-                            <label>Protected Management Frames (PMF):</label>
-                            <select id="pmf">
-                                <option value="required">Required</option>
-                                <option value="capable">Capable</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Group Key Update Interval (seconds):</label>
-                            <input type="number" id="groupKeyInterval" value="3600" min="300" max="86400">
-                        </div>
-                    </div>
-
-                    <button class="btn" onclick="applySecurity()">Apply Security Settings</button>
-                    <div id="securityResult" class="result-panel" style="display: none;"></div>
-                </div>
-
-                <button class="btn" onclick="completeTask(3)">Complete Task 3</button>
-            </div>
-
-            <!-- Task 4: Channel Management -->
-            <div id="task4" class="task-content hidden">
-                <h3>Task 4: Channel Management</h3>
-                <p>Configure optimal channel settings for maximum performance and minimal interference.</p>
-
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>2.4GHz Band Settings</h4>
-                        <div class="form-group">
-                            <label>Channel:</label>
-                            <select id="channel24">
-                                <option value="auto">Auto</option>
-                                <option value="1">Channel 1 (2412 MHz)</option>
-                                <option value="6">Channel 6 (2437 MHz)</option>
-                                <option value="11">Channel 11 (2462 MHz)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Channel Width:</label>
-                            <select id="width24">
-                                <option value="20">20 MHz</option>
-                                <option value="40">40 MHz</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>5GHz Band Settings</h4>
-                        <div class="form-group">
-                            <label>Channel:</label>
-                            <select id="channel5">
-                                <option value="auto">Auto</option>
-                                <option value="36">Channel 36 (5180 MHz)</option>
-                                <option value="149">Channel 149 (5745 MHz)</option>
-                                <option value="161">Channel 161 (5805 MHz)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Channel Width:</label>
-                            <select id="width5">
-                                <option value="80">80 MHz</option>
-                                <option value="40">40 MHz</option>
-                                <option value="160">160 MHz</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>6GHz Band Settings (WiFi 6E/7)</h4>
-                        <div class="form-group">
-                            <label>Channel:</label>
-                            <select id="channel6">
-                                <option value="auto">Auto</option>
-                                <option value="37">Channel 37 (6185 MHz)</option>
-                                <option value="85">Channel 85 (6425 MHz)</option>
-                                <option value="133">Channel 133 (6665 MHz)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Channel Width:</label>
-                            <select id="width6">
-                                <option value="160">160 MHz</option>
-                                <option value="80">80 MHz</option>
-                                <option value="320">320 MHz (WiFi 7)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button class="btn" onclick="scanChannels()">Scan for Interference</button>
-                    <button class="btn" onclick="applyChannels()">Apply Channel Settings</button>
-                    <div id="channelResult" class="result-panel" style="display: none;"></div>
-                </div>
-
-                <button class="btn" onclick="completeTask(4)">Complete Task 4</button>
-            </div>
-
-            <!-- Task 5: Bandwidth Optimization -->
-            <div id="task5" class="task-content hidden">
-                <h3>Task 5: Bandwidth Optimization</h3>
-                <p>Configure advanced features to maximize network throughput and efficiency.</p>
-
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>WiFi 6/7 Advanced Features</h4>
-                        <div class="form-group">
-                            <label>OFDMA (Orthogonal Frequency Division Multiple Access):</label>
-                            <select id="ofdma">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>MU-MIMO (Multi-User MIMO):</label>
-                            <select id="mumimo">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Target Wake Time (TWT):</label>
-                            <select id="twt">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>QAM Modulation:</label>
-                            <select id="qam">
-                                <option value="1024">1024-QAM (WiFi 6)</option>
-                                <option value="4096">4096-QAM (WiFi 7)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>Multi-Link Operation (WiFi 7)</h4>
-                        <div class="form-group">
-                            <label>MLO Mode:</label>
-                            <select id="mlo">
-                                <option value="disabled">Disabled</option>
-                                <option value="enabled">Enabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Band Steering:</label>
-                            <select id="bandSteering">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button class="btn" onclick="optimizeBandwidth()">Apply Optimization</button>
-                    <div id="optimizationResult" class="result-panel" style="display: none;"></div>
-                </div>
-
-                <button class="btn" onclick="completeTask(5)">Complete Task 5</button>
-            </div>
-
-            <!-- Task 6: Access Point Setup -->
-            <div id="task6" class="task-content hidden">
-                <h3>Task 6: Access Point Setup</h3>
-                <p>Configure multiple access points for enterprise deployment.</p>
-
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>Access Point Configuration</h4>
-                        <div class="form-group">
-                            <label>AP Management Mode:</label>
-                            <select id="apMode">
-                                <option value="standalone">Standalone</option>
-                                <option value="controller">Controller-based</option>
-                                <option value="cloud">Cloud-managed</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Transmission Power:</label>
-                            <select id="txPower">
-                                <option value="high">High (100%)</option>
-                                <option value="medium">Medium (50%)</option>
-                                <option value="low">Low (25%)</option>
-                                <option value="auto">Auto</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Load Balancing:</label>
-                            <select id="loadBalancing">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>Fast Roaming Settings</h4>
-                        <div class="form-group">
-                            <label>802.11r (Fast BSS Transition):</label>
-                            <select id="fastRoaming">
-                                <option value="enabled">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Mobility Domain ID:</label>
-                            <input type="text" id="mobilityDomain" placeholder="A1B2" maxlength="4">
-                        </div>
-                    </div>
-
-                    <button class="btn" onclick="deployAPs()">Deploy Access Points</button>
-                    <div id="apResult" class="result-panel" style="display: none;"></div>
-                </div>
-
-                <button class="btn" onclick="completeTask(6)">Complete Task 6</button>
-            </div>
-
-            <!-- Task 7: Advanced Security -->
-            <div id="task7" class="task-content hidden">
-                <h3>Task 7: Advanced Security</h3>
-                <p>Implement enterprise-grade security features and access control.</p>
-
-                <div class="simulator-panel">
-                    <div class="config-section">
-                        <h4>Enterprise Authentication</h4>
-                        <div class="form-group">
-                            <label>RADIUS Server IP:</label>
-                            <input type="text" id="radiusIP" placeholder="192.168.1.100">
-                        </div>
-                        <div class="form-group">
-                            <label>RADIUS Port:</label>
-                            <input type="number" id="radiusPort" value="1812">
-                        </div>
-                        <div class="form-group">
-                            <label>Shared Secret:</label>
-                            <input type="password" id="radiusSecret" placeholder="Enter RADIUS shared secret">
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>Access Control</h4>
-                        <div class="form-group">
-                            <label>MAC Address Filtering:</label>
-                            <select id="macFiltering">
-                                <option value="disabled">Disabled</option>
-                                <option value="allow">Allow List</option>
-                                <option value="deny">Deny List</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Guest Network:</label>
-                            <select id="guestNetwork">
-                                <option value="disabled">Disabled</option>
-                                <option value="enabled">Enabled</option>
-                            </select>
-                
+        // Add search functionality (bonus feature)
+        function searchContent(query) {
+            const sections = document.querySelectorAll('.content-section');
+            let found = false;
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase()) && query.length > 2) {
+                    // Highlight matching sections
+                    section.style.border = '2px solid #4a8c4a';
+                    found = true;
+                } else {
+                    section.style.border = 'none';
+                }
+            });
+            
+            return found;
+        }
+    </script>
+</body>
+</html>
