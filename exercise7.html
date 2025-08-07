@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFlow Systems Network Security Assessment Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016, #4a7c23);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 100px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a1a, #2c2c2c);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(74, 124, 35, 0.3);
+            border-left-color: #4a7c23;
+            transform: translateX(8px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #4a7c23, rgba(74, 124, 35, 0.1));
+            border-left-color: #6aa03f;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #4a7c23;
+        }
+
+        .card h2 {
+            color: #2d5016;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .card h3 {
+            color: #4a7c23;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.4rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .threat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .threat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .threat-high {
+            border-left: 5px solid #dc3545;
+        }
+
+        .threat-medium {
+            border-left: 5px solid #ffc107;
+        }
+
+        .threat-low {
+            border-left: 5px solid #28a745;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .risk-high {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .risk-medium {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .risk-low {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #5a8c33, #3d6526);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .asset-table th {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .asset-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .asset-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #4a7c23;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .task-header {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .objective-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .objective-list li {
+            background: white;
+            margin: 0.5rem 0;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #4a7c23;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .threat-generator {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls-panel {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #4a7c23;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #2d5016;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7c23, #6aa03f);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .scenario-panel {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .assessment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+            
+            .nav-item {
+                display: inline-block;
+                padding: 0.5rem 1rem;
+                margin: 0.25rem;
+            }
+            
+            .assessment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FreshFlow Systems Network Security Assessment Tool</h1>
+        <p>CompTIA Network+ Domain 4.0 - Network Security Educational Platform</p>
+    </div>
+
+    <div class="container">
+        <nav class="sidebar">
+            <a href="#overview" class="nav-item active" onclick="showSection('overview')">
+                📊 Organization Overview
+            </a>
+            <a href="#threats" class="nav-item" onclick="showSection('threats')">
+                ⚠️ Threat Generator
+            </a>
+            <a href="#assets" class="nav-item" onclick="showSection('assets')">
+                🏭 Asset Analysis
+            </a>
+            <a href="#security" class="nav-item" onclick="showSection('security')">
+                🔒 Security Controls
+            </a>
+            <a href="#tasks" class="nav-item" onclick="showSection('tasks')">
+                📝 Assessment Tasks
+            </a>
+        </nav>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <div id="overview" class="content-section active">
+                <div class="card">
+                    <h2>FreshFlow Systems - Company Profile</h2>
+                    <p><strong>Industry:</strong> Food Processing and Packaging</p>
+                    <p><strong>Employees:</strong> 64 staff across 3 facilities</p>
+                    <p><strong>Annual Growth:</strong> 125%</p>
+                    <p><strong>Founded:</strong> 2018</p>
+                    
+                    <h3>Executive Leadership</h3>
+                    <div class="grid">
+                        <div class="threat-card">
+                            <strong>CEO:</strong> Carla Jennings<br>
+                            <strong>COO:</strong> Marcus Lee<br>
+                            <strong>CISO:</strong> Dr. Nia Clarke<br>
+                            <strong>Finance Director:</strong> Elaine Harper
+                        </div>
+                    </div>
+
+                    <h3>Facility Overview</h3>
+                    <div class="grid">
+                        <div class="threat-card">
+                            <h4>🏢 Headquarters Building</h4>
+                            <p><strong>Location:</strong> 1247 Industrial Parkway, Lima, Ohio</p>
+                            <p><strong>Staff:</strong> 22 employees</p>
+                            <p><strong>Functions:</strong> Executive offices, R&D labs, quality control, IT operations</p>
+                        </div>
+                        <div class="threat-card">
+                            <h4>📦 Packaging Facility</h4>
+                            <p><strong>Location:</strong> 1251 Industrial Parkway, Lima, Ohio</p>
+                            <p><strong>Staff:</strong> 28 employees</p>
+                            <p><strong>Functions:</strong> Automated packaging lines, quality inspection</p>
+                        </div>
+                        <div class="threat-card">
+                            <h4>🚚 Warehouse & Shipping</h4>
+                            <p><strong>Location:</strong> 1255 Industrial Parkway, Lima, Ohio</p>
+                            <p><strong>Staff:</strong> 14 employees</p>
+                            <p><strong>Functions:</strong> Inventory management, order fulfillment</p>
+                        </div>
+                    </div>
+
+                    <h3>CompTIA Network+ Domain 4.0 - Network Security Focus Areas</h3>
+                    <ul class="objective-list">
+                        <li><strong>4.1:</strong> Explain the importance of basic network security concepts</li>
+                        <li><strong>4.2:</strong> Summarize various types of attacks and their impact to the network</li>
+                        <li><strong>4.3:</strong> Given a scenario, apply network security features, defense techniques, and solutions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Threat Generator Section -->
+            <div id="threats" class="content-section">
+                <div class="threat-generator">
+                    <h2>🎯 Interactive Threat Generator</h2>
+                    <p>Generate realistic security threats and risks specific to FreshFlow Systems infrastructure.</p>
+                    
+                    <div class="controls-panel">
+                        <div class="form-group">
+                            <label for="threatType">Threat Category:</label>
+                            <select id="threatType">
+                                <option value="random">Random Threat</option>
+                                <option value="dos">DoS/DDoS Attacks</option>
+                                <option value="network">Network-based Attacks</option>
+                                <option value="social">Social Engineering</option>
+                                <option value="physical">Physical Security</option>
+                                <option value="malware">Malware & Rogue Devices</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="targetFacility">Target Facility:</label>
+                            <select id="targetFacility">
+                                <option value="random">Any Facility</option>
+                                <option value="headquarters">Headquarters Building</option>
+                                <option value="packaging">Packaging Facility</option>
+                                <option value="warehouse">Warehouse & Shipping</option>
+                            </select>
+                        </div>
+                        <button class="button" onclick="generateThreat()">🎲 Generate New Threat</button>
+                        <button class="button" onclick="generateMultipleThreats()">⚡ Generate Scenario</button>
+                    </div>
+
+                    <div id="threatDisplay" class="grid">
+                        <!-- Generated threats will appear here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Threat Scenarios</h3>
+                    <div id="scenarioHistory"></div>
+                </div>
+            </div>
+
+            <!-- Asset Analysis Section -->
+            <div id="assets" class="content-section">
+                <div class="card">
+                    <h2>🏭 FreshFlow Systems Asset Inventory</h2>
+                    
+                    <h3>Operational Technology (OT) Assets</h3>
+                    <table class="asset-table">
+                        <thead>
+                            <tr>
+                                <th>Asset ID</th>
+                                <th>Asset Name</th>
+                                <th>Facility</th>
+                                <th>Quantity</th>
+                                <th>Risk Level</th>
+                                <th>Security Concerns</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="showAssetDetails('OT-001')">
+                                <td>OT-001</td>
+                                <td>Rockwell PLCs (ControlLogix)</td>
+                                <td>Packaging Facility</td>
+                                <td>12</td>
+                                <td><span class="risk-badge risk-high">High</span></td>
+                                <td>Network segmentation, firmware updates</td>
+                            </tr>
+                            <tr onclick="showAssetDetails('OT-002')">
+                                <td>OT-002</td>
+                                <td>HMI Terminals</td>
+                                <td>Packaging Facility</td>
+                                <td>3</td>
+                                <td><span class="risk-badge risk-high">High</span></td>
+                                <td>Authentication, access control</td>
+                            </tr>
+                            <tr onclick="showAssetDetails('OT-003')">
+                                <td>OT-003</td>
+                                <td>Label Printers (Zebra Industrial)</td>
+                                <td>Packaging Facility</td>
+                                <td>4</td>
+                                <td><span class="risk-badge risk-medium">Medium</span></td>
+                                <td>Default credentials, network exposure</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Information Technology (IT) Assets</h3>
+                    <table class="asset-table">
+                        <thead>
+                            <tr>
+                                <th>Asset ID</th>
+                                <th>Asset Name</th>
+                                <th>Facility</th>
+                                <th>Quantity</th>
+                                <th>Risk Level</th>
+                                <th>Security Concerns</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="showAssetDetails('IT-001')">
+                                <td>IT-001</td>
+                                <td>Workstations (HP EliteDesk)</td>
+                                <td>All sites</td>
+                                <td>40</td>
+                                <td><span class="risk-badge risk-medium">Medium</span></td>
+                                <td>Endpoint protection, patch management</td>
+                            </tr>
+                            <tr onclick="showAssetDetails('IT-002')">
+                                <td>IT-002</td>
+                                <td>Laptops (Dell Latitude)</td>
+                                <td>HQ / R&D</td>
+                                <td>20</td>
+                                <td><span class="risk-badge risk-high">High</span></td>
+                                <td>Mobile device security, encryption</td>
+                            </tr>
+                            <tr onclick="showAssetDetails('IT-003')">
+                                <td>IT-003</td>
+                                <td>Servers (VMware Cluster)</td>
+                                <td>HQ Data Center</td>
+                                <td>5</td>
+                                <td><span class="risk-badge risk-high">High</span></td>
+                                <td>Virtualization security, access control</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Security Controls Section -->
+            <div id="security" class="content-section">
+                <div class="card">
+                    <h2>🔒 Network Security Framework Analysis</h2>
+                    
+                    <h3>Current Security Controls (CompTIA Network+ Domain 4.3)</h3>
+                    <div class="grid">
+                        <div class="threat-card">
+                            <h4>🔐 Identity & Access Management</h4>
+                            <p><strong>Status:</strong> Partially Implemented</p>
+                            <ul>
+                                <li>RADIUS for network authentication</li>
+                                <li>LDAP integration planned</li>
+                                <li>MFA enforcement pending (Q3 2025)</li>
+                            </ul>
+                        </div>
+                        <div class="threat-card">
+                            <h4>🌐 Network Segmentation</h4>
+                            <p><strong>Status:</strong> Needs Improvement</p>
+                            <ul>
+                                <li>OT network segmentation audit required</li>
+                                <li>Guest network isolation needed</li>
+                                <li>IoT device segmentation planning</li>
+                            </ul>
+                        </div>
+                        <div class="threat-card">
+                            <h4>🛡️ Device Hardening</h4>
+                            <p><strong>Status:</strong> In Progress</p>
+                            <ul>
+                                <li>Patch management deployment</li>
+                                <li>Default password changes</li>
+                                <li>Unused ports/services review</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Security Team Structure</h3>
+                    <div class="grid">
+                        <div class="threat-card">
+                            <strong>Dr. Nia Clarke</strong><br>
+                            Chief Information Security Officer
+                        </div>
+                        <div class="threat-card">
+                            <strong>Jason Trujillo</strong><br>
+                            Network Administrator
+                        </div>
+                        <div class="threat-card">
+                            <strong>Regina Moore</strong><br>
+                            OT Systems Engineer
+                        </div>
+                        <div class="threat-card">
+                            <strong>Rachel Li</strong><br>
+                            Compliance & Risk Officer
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assessment Tasks Section -->
+            <div id="tasks" class="content-section">
+                <div class="card">
+                    <h2>📝 Network Security Assessment Tasks</h2>
+                    <p>Complete these five tasks to demonstrate your understanding of Network+ Domain 4.0 concepts applied to FreshFlow Systems.</p>
+                </div>
+
+                <!-- Task 1 -->
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-number">Task 1: Network Security Concepts Analysis</div>
+                        <p>Apply CompTIA Network+ Domain 4.1 concepts to FreshFlow Systems</p>
+                    </div>
+                    
+                    <h4>Scenario:</h4>
+                    <p>Dr. Nia Clarke has asked you to prepare a security briefing for the executive team. You need to analyze FreshFlow's current security posture using the CIA triad and identify logical vs. physical security considerations.</p>
+                    
+                    <h4>Your Tasks:</h4>
+                    <ol>
+                        <li>Evaluate how FreshFlow's assets relate to Confidentiality, Integrity, and Availability requirements</li>
+                        <li>Identify the distinction between logical and physical security controls needed</li>
+                        <li>Recommend authentication methods suitable for different user groups (executives, operators, contractors)</li>
+                        <li>Assess the need for network segmentation across the three facilities</li>
+                    </ol>
+                    
+                    <button class="button" onclick="startTask(1)">📋 Start Task 1</button>
+                </div>
+
+                <!-- Task 2 -->
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-number">Task 2: Threat Assessment & Attack Analysis</div>
+                        <p>Apply CompTIA Network+ Domain 4.2 concepts to identify potential attacks</p>
+                    </div>
+                    
+                    <h4>Scenario:</h4>
+                    <p>FreshFlow has experienced unusual network activity. The packaging facility's PLCs have been responding slowly, and there are reports of unauthorized devices on the network. You must investigate potential attack vectors.</p>
+                    
+                    <h4>Your Tasks:</h4>
+                    <ol>
+                        <li>Analyze potential DoS/DDoS attack scenarios against OT systems</li>
+                        <li>Investigate possible VLAN hopping attacks between IT and OT networks</li>
+                        <li>Assess risks from rogue DHCP servers and evil twin access points</li>
+                        <li>Evaluate social engineering vulnerabilities across all three facilities</li>
+                    </ol>
+                    
+                    <button class="button" onclick="startTask(2)">🔍 Start Task 2</button>
+                </div>
+
+                <!-- Task 3 -->
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-number">Task 3: Security Controls Implementation</div>
+                        <p>Apply CompTIA Network+ Domain 4.3 concepts for defense strategies</p>
+                    </div>
+                    
+                    <h4>Scenario:</h4>
+                    <p>Following the security assessment, you need to design and implement network security features and defense techniques appropriate for FreshFlow's mixed IT/OT environment.</p>
+                    
+                    <h4>Your Tasks:</h4>
+                    <ol>
+                        <li>Design network access control (NAC) policies for different asset types</li>
+                        <li>Configure device hardening procedures for PLCs, HMIs, and IT systems</li>
+                        <li>Implement appropriate security zones (trusted vs. untrusted) and screened subnets</li>
+                        <li>Design ACLs and content filtering rules for the industrial network</li>
+                    </ol>
+                    
+                    <button class="button" onclick="startTask(3)">⚙️ Start Task 3</button>
+                </div>
+
+                <!-- Task 4 -->
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-number">Task 4: Compliance & Risk Management</div>
+                        <p>Integrate regulatory requirements with network security</p>
+                    </div>
+                    
+                    <h4>Scenario:</h4>
+                    <p>Rachel Li needs help ensuring FreshFlow meets food safety regulations, PCI DSS requirements for payment processing, and industrial security standards while maintaining operational efficiency.</p>
+                    
+                    <h4>Your Tasks:</h4>
+                    <ol>
+                        <li>Map PCI DSS requirements to network security controls</li>
+                        <li>Identify food safety data protection requirements</li>
+                        <li>Implement audit logging and monitoring for regulatory compliance</li>
+                        <li>Design incident response procedures for security events affecting production</li>
+                    </ol>
+                    
+                    <button class="button" onclick="startTask(4)">📊 Start Task 4</button>
+                </div>
+
+                <!-- Task 5 -->
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-number">Task 5: Comprehensive Security Architecture</div>
+                        <p>Design end-to-end security architecture for future growth</p>
+                    </div>
+                    
+                    <h4>Scenario:</h4>
+                    <p>With 125% annual growth, FreshFlow needs a scalable security architecture that can support expansion while maintaining security standards. Design a comprehensive security framework for the next 3 years.</p>
+                    
+                    <h4>Your Tasks:</h4>
+                    <ol>
+                        <li>Design zero-trust architecture principles for FreshFlow's expanding network</li>
+                        <li>Plan security automation and orchestration for growing infrastructure</li>
+                        <li>Create a phased implementation roadmap with priority controls</li>
+                        <li>Develop security metrics and KPIs for ongoing assessment</li>
+                    </ol>
+                    
+                    <button class="button" onclick="startTask(5)">🏗️ Start Task 5</button>
+                </div>
+
+                <div class="card">
+                    <h3>Assessment Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgress"></div>
+                    </div>
+                    <p id="progressText">0 of 5 tasks completed</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Asset Details -->
+    <div id="assetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="assetDetails"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Task Workflow -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTaskModal()">&times;</span>
+            <div id="taskContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentThreats = [];
+        let completedTasks = new Set();
+        let scenarioHistory = [];
+
+        // Threat Database
+        const threatDatabase = {
+            dos: [
+                {
+                    name: "DDoS Attack on PLCs",
+                    description: "Coordinated attack overwhelming Rockwell ControlLogix PLCs with network traffic, causing production line shutdown.",
+                    facility: "Packaging Facility",
+                    riskLevel: "high",
+                    impact: "Production stoppage, potential equipment damage, revenue loss up to $50,000/hour",
+                    mitigation: "Implement rate limiting, network segmentation, DDoS protection appliances"
+                },
+                {
+                    name: "DNS Amplification Attack",
+                    description: "Attackers exploiting DNS servers to amplify traffic against FreshFlow's external-facing services.",
+                    facility: "Headquarters Building",
+                    riskLevel: "medium",
+                    impact: "Internet connectivity issues, email disruption, remote access problems",
+                    mitigation: "Configure DNS rate limiting, implement anti-spoofing measures"
+                }
+            ],
+            network: [
+                {
+                    name: "VLAN Hopping Attack",
+                    description: "Attacker gaining access to OT network by exploiting VLAN configuration weaknesses in switch infrastructure.",
+                    facility: "Packaging Facility",
+                    riskLevel: "high",
+                    impact: "Unauthorized access to industrial controls, potential sabotage of production processes",
+                    mitigation: "Implement 802.1Q security, disable unused VLANs, enforce VLAN ACLs"
+                },
+                {
+                    name: "ARP Poisoning Attack",
+                    description: "Man-in-the-middle attack targeting communication between HMI terminals and PLCs.",
+                    facility: "Packaging Facility",
+                    riskLevel: "high",
+                    impact: "Intercepted control commands, falsified sensor data, production quality issues",
+                    mitigation: "Enable dynamic ARP inspection, implement static ARP entries for critical devices"
+                },
+                {
+                    name: "MAC Flooding Attack",
+                    description: "Overwhelming switch CAM tables to force failover to hub mode, enabling traffic sniffing.",
+                    facility: "Warehouse & Shipping",
+                    riskLevel: "medium",
+                    impact: "Network performance degradation, potential data interception",
+                    mitigation: "Configure port security, limit MAC addresses per port"
+                }
+            ],
+            social: [
+                {
+                    name: "Spear Phishing Campaign",
+                    description: "Targeted emails to executives containing malicious attachments designed to steal credentials.",
+                    facility: "Headquarters Building",
+                    riskLevel: "high",
+                    impact: "Credential theft, lateral movement, access to financial systems",
+                    mitigation: "Security awareness training, email filtering, MFA implementation"
+                },
+                {
+                    name: "Tailgating Attack",
+                    description: "Unauthorized individual following employees into secure areas of the packaging facility.",
+                    facility: "Packaging Facility",
+                    riskLevel: "medium",
+                    impact: "Physical access to critical systems, potential sabotage or data theft",
+                    mitigation: "Access control systems, security awareness training, visitor management"
+                },
+                {
+                    name: "Dumpster Diving",
+                    description: "Attackers searching waste containers for discarded documents containing sensitive information.",
+                    facility: "All Facilities",
+                    riskLevel: "low",
+                    impact: "Information disclosure, social engineering intelligence gathering",
+                    mitigation: "Secure document disposal, shredding policies, clean desk protocols"
+                }
+            ],
+            physical: [
+                {
+                    name: "Unauthorized Access to Server Room",
+                    description: "Breach of physical security allowing access to critical IT infrastructure and data servers.",
+                    facility: "Headquarters Building",
+                    riskLevel: "high",
+                    impact: "Data theft, system manipulation, installation of malicious hardware",
+                    mitigation: "Biometric access controls, security cameras, environmental monitoring"
+                },
+                {
+                    name: "USB Drop Attack",
+                    description: "Malicious USB devices left in parking areas and common spaces to entice employees to plug them in.",
+                    facility: "All Facilities",
+                    riskLevel: "medium",
+                    impact: "Malware installation, network compromise, data exfiltration",
+                    mitigation: "USB port blocking, endpoint protection, security awareness training"
+                }
+            ],
+            malware: [
+                {
+                    name: "Industrial Malware Attack",
+                    description: "Specialized malware targeting SCADA systems and PLCs, similar to Stuxnet-style attacks.",
+                    facility: "Packaging Facility",
+                    riskLevel: "high",
+                    impact: "Production disruption, equipment damage, safety hazards, multi-million dollar losses",
+                    mitigation: "Air-gapped networks, application whitelisting, regular firmware updates"
+                },
+                {
+                    name: "Rogue Access Point",
+                    description: "Unauthorized wireless access point installed to bypass network security controls.",
+                    facility: "Warehouse & Shipping",
+                    riskLevel: "medium",
+                    impact: "Unauthorized network access, data interception, lateral movement",
+                    mitigation: "Wireless intrusion detection, regular RF surveys, rogue AP detection"
+                },
+                {
+                    name: "Evil Twin Attack",
+                    description: "Fake wireless network mimicking legitimate FreshFlow WiFi to steal credentials.",
+                    facility: "All Facilities",
+                    riskLevel: "medium",
+                    impact: "Credential theft, session hijacking, man-in-the-middle attacks",
+                    mitigation: "Enterprise WPA3, certificate-based authentication, user education"
+                }
+            ]
+        };
+
+        // Asset Details Database
+        const assetDetails = {
+            'OT-001': {
+                name: "Rockwell PLCs (ControlLogix)",
+                description: "Industrial control systems managing automated packaging processes",
+                vulnerabilities: [
+                    "Default passwords on some units",
+                    "Unencrypted communications",
+                    "Outdated firmware versions",
+                    "Direct network connectivity to IT systems"
+                ],
+                controls: [
+                    "Network segmentation (planned)",
+                    "Firmware update program (in progress)",
+                    "Access control implementation",
+                    "Communication encryption"
+                ],
+                compliance: "IEC 62443 Security Level 2 required"
+            },
+            'OT-002': {
+                name: "HMI Terminals",
+                description: "Human-Machine Interface systems for operator control",
+                vulnerabilities: [
+                    "Shared operator accounts",
+                    "No session timeouts",
+                    "Physical access risks",
+                    "Legacy Windows OS"
+                ],
+                controls: [
+                    "Individual user accounts",
+                    "Role-based access control",
+                    "Physical security locks",
+                    "OS hardening and updates"
+                ],
+                compliance: "Multi-factor authentication recommended"
+            },
+            'OT-003': {
+                name: "Label Printers (Zebra Industrial)",
+                description: "High-speed industrial label printing systems",
+                vulnerabilities: [
+                    "Default SNMP community strings",
+                    "Telnet access enabled",
+                    "No firmware validation",
+                    "Network discovery enabled"
+                ],
+                controls: [
+                    "Change default credentials",
+                    "Disable unnecessary services",
+                    "Firmware integrity checking",
+                    "Network access restrictions"
+                ],
+                compliance: "Device hardening standards"
+            },
+            'IT-001': {
+                name: "Workstations (HP EliteDesk)",
+                description: "Employee desktop computers across all facilities",
+                vulnerabilities: [
+                    "Inconsistent patch levels",
+                    "Local admin rights",
+                    "USB port access",
+                    "No endpoint encryption"
+                ],
+                controls: [
+                    "Centralized patch management",
+                    "Least privilege access",
+                    "USB port controls",
+                    "Full disk encryption"
+                ],
+                compliance: "NIST SP 800-171 compliance target"
+            },
+            'IT-002': {
+                name: "Laptops (Dell Latitude)",
+                description: "Mobile computing devices for R&D and executive staff",
+                vulnerabilities: [
+                    "Remote access risks",
+                    "Data theft potential",
+                    "Unsecured WiFi connections",
+                    "Physical theft risk"
+                ],
+                controls: [
+                    "VPN mandatory access",
+                    "Device encryption",
+                    "WiFi security policies",
+                    "Remote wipe capabilities"
+                ],
+                compliance: "Mobile device management (MDM) required"
+            },
+            'IT-003': {
+                name: "Servers (VMware Cluster)",
+                description: "Virtualized server infrastructure hosting critical applications",
+                vulnerabilities: [
+                    "Hypervisor security gaps",
+                    "VM sprawl management",
+                    "Backup security",
+                    "Virtual network isolation"
+                ],
+                controls: [
+                    "Hypervisor hardening",
+                    "VM lifecycle management",
+                    "Encrypted backups",
+                    "Micro-segmentation"
+                ],
+                compliance: "SOC 2 Type II controls"
+            }
+        };
+
+        // Task Templates
+        const taskTemplates = {
+            1: {
+                title: "Network Security Concepts Analysis",
+                steps: [
+                    {
+                        title: "CIA Triad Assessment",
+                        description: "Analyze FreshFlow's assets for Confidentiality, Integrity, and Availability requirements",
+                        questions: [
+                            "Which assets require the highest level of confidentiality protection?",
+                            "What are the integrity requirements for production control systems?",
+                            "What is the maximum acceptable downtime for each facility?"
+                        ]
+                    },
+                    {
+                        title: "Logical vs Physical Security",
+                        description: "Categorize security controls into logical and physical domains",
+                        questions: [
+                            "What logical controls protect network communications?",
+                            "What physical controls protect OT systems?",
+                            "How do logical and physical controls work together?"
+                        ]
+                    },
+                    {
+                        title: "Authentication Strategy",
+                        description: "Design authentication methods for different user groups",
+                        questions: [
+                            "What authentication is appropriate for executives accessing financial data?",
+                            "How should operators authenticate to HMI systems?",
+                            "What controls are needed for contractor access?"
+                        ]
+                    }
+                ]
+            },
+            2: {
+                title: "Threat Assessment & Attack Analysis",
+                steps: [
+                    {
+                        title: "DoS/DDoS Analysis",
+                        description: "Evaluate denial of service attack risks against OT systems",
+                        questions: [
+                            "How would a DDoS attack affect PLC communications?",
+                            "What are the business impacts of OT system downtime?",
+                            "What detection mechanisms are needed?"
+                        ]
+                    },
+                    {
+                        title: "Network Attack Vectors",
+                        description: "Analyze VLAN hopping and ARP poisoning risks",
+                        questions: [
+                            "How could an attacker hop from IT to OT VLANs?",
+                            "What protocols are vulnerable to poisoning attacks?",
+                            "How would you detect these attacks?"
+                        ]
+                    },
+                    {
+                        title: "Rogue Device Threats",
+                        description: "Assess risks from unauthorized network devices",
+                        questions: [
+                            "Where might rogue access points be installed?",
+                            "How would you detect rogue DHCP servers?",
+                            "What policies prevent evil twin attacks?"
+                        ]
+                    }
+                ]
+            },
+            3: {
+                title: "Security Controls Implementation",
+                steps: [
+                    {
+                        title: "Network Access Control Design",
+                        description: "Create NAC policies for different asset types",
+                        questions: [
+                            "What 802.1X policies are needed for different devices?",
+                            "How should MAC filtering be implemented?",
+                            "What port security settings are appropriate?"
+                        ]
+                    },
+                    {
+                        title: "Device Hardening Procedures",
+                        description: "Develop hardening procedures for OT and IT systems",
+                        questions: [
+                            "What services should be disabled on PLCs?",
+                            "How should default passwords be managed?",
+                            "What firmware update procedures are needed?"
+                        ]
+                    },
+                    {
+                        title: "Security Zones and ACLs",
+                        description: "Design network segmentation and access controls",
+                        questions: [
+                            "How should trusted and untrusted zones be defined?",
+                            "What traffic should be allowed between zones?",
+                            "What content filtering rules are needed?"
+                        ]
+                    }
+                ]
+            },
+            4: {
+                title: "Compliance & Risk Management",
+                steps: [
+                    {
+                        title: "PCI DSS Mapping",
+                        description: "Map PCI DSS requirements to network security controls",
+                        questions: [
+                            "What network controls are required for cardholder data?",
+                            "How should payment processing be segmented?",
+                            "What monitoring is required for compliance?"
+                        ]
+                    },
+                    {
+                        title: "Food Safety Data Protection",
+                        description: "Identify food safety regulatory requirements",
+                        questions: [
+                            "What data must be protected for FDA compliance?",
+                            "How long must audit logs be retained?",
+                            "What integrity controls are required?"
+                        ]
+                    },
+                    {
+                        title: "Incident Response Planning",
+                        description: "Design incident response for production environments",
+                        questions: [
+                            "How should security incidents affecting production be handled?",
+                            "What communication procedures are needed?",
+                            "How should business continuity be maintained?"
+                        ]
+                    }
+                ]
+            },
+            5: {
+                title: "Comprehensive Security Architecture",
+                steps: [
+                    {
+                        title: "Zero-Trust Architecture",
+                        description: "Design zero-trust principles for FreshFlow's network",
+                        questions: [
+                            "How should 'never trust, always verify' be implemented?",
+                            "What micro-segmentation is needed?",
+                            "How should device identity be managed?"
+                        ]
+                    },
+                    {
+                        title: "Security Automation",
+                        description: "Plan automation and orchestration for growing infrastructure",
+                        questions: [
+                            "What security processes can be automated?",
+                            "How should threat intelligence be integrated?",
+                            "What orchestration tools are appropriate?"
+                        ]
+                    },
+                    {
+                        title: "Implementation Roadmap",
+                        description: "Create a phased implementation plan with priorities",
+                        questions: [
+                            "What are the highest priority security controls?",
+                            "How should implementation be phased over 3 years?",
+                            "What metrics will measure success?"
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Navigation Functions
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Threat Generation Functions
+        function generateThreat() {
+            const threatType = document.getElementById('threatType').value;
+            const facility = document.getElementById('targetFacility').value;
+            
+            let selectedThreats = [];
+            
+            if (threatType === 'random') {
+                // Select from all threat categories
+                Object.keys(threatDatabase).forEach(category => {
+                    selectedThreats = selectedThreats.concat(threatDatabase[category]);
+                });
+            } else {
+                selectedThreats = threatDatabase[threatType] || [];
+            }
+            
+            if (facility !== 'random') {
+                selectedThreats = selectedThreats.filter(threat => 
+                    threat.facility.toLowerCase().includes(facility) || threat.facility === 'All Facilities'
+                );
+            }
+            
+            if (selectedThreats.length === 0) {
+                showNotification('No threats found for selected criteria');
+                return;
+            }
+            
+            const randomThreat = selectedThreats[Math.floor(Math.random() * selectedThreats.length)];
+            displayThreat(randomThreat);
+            
+            currentThreats = [randomThreat];
+            addToScenarioHistory(randomThreat);
+        }
+
+        function generateMultipleThreats() {
+            const scenarios = [
+                {
+                    title: "Coordinated Cyber Attack",
+                    threats: [
+                        threatDatabase.social[0], // Spear phishing
+                        threatDatabase.network[0], // VLAN hopping
+                        threatDatabase.malware[0]  // Industrial malware
+                    ]
+                },
+                {
+                    title: "Insider Threat Scenario",
+                    threats: [
+                        threatDatabase.physical[1], // USB drop
+                        threatDatabase.social[1],   // Tailgating
+                        threatDatabase.network[1]   // ARP poisoning
+                    ]
+                },
+                {
+                    title: "Advanced Persistent Threat",
+                    threats: [
+                        threatDatabase.malware[1], // Rogue AP
+                        threatDatabase.malware[2], // Evil twin
+                        threatDatabase.dos[0]      // DDoS on PLCs
+                    ]
+                }
+            ];
+            
+            const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            displayScenario(randomScenario);
+            
+            currentThreats = randomScenario.threats;
+            addScenarioToHistory(randomScenario);
+        }
+
+        function displayThreat(threat) {
+            const threatDisplay = document.getElementById('threatDisplay');
+            threatDisplay.innerHTML = `
+                <div class="threat-card threat-${threat.riskLevel}">
+                    <div class="risk-badge risk-${threat.riskLevel}">${threat.riskLevel.toUpperCase()} RISK</div>
+                    <h4>${threat.name}</h4>
+                    <p><strong>Target:</strong> ${threat.facility}</p>
+                    <p><strong>Description:</strong> ${threat.description}</p>
+                    <p><strong>Impact:</strong> ${threat.impact}</p>
+                    <p><strong>Mitigation:</strong> ${threat.mitigation}</p>
+                </div>
+            `;
+        }
+
+        function displayScenario(scenario) {
+            const threatDisplay = document.getElementById('threatDisplay');
+            let scenarioHTML = `<div class="scenario-panel">
+                <h3>🎯 ${scenario.title}</h3>
+                <p>A complex multi-stage attack targeting FreshFlow Systems:</p>
+            </div>`;
+            
+            scenario.threats.forEach((threat, index) => {
+                scenarioHTML += `
+                    <div class="threat-card threat-${threat.riskLevel}">
+                        <div class="risk-badge risk-${threat.riskLevel}">Stage ${index + 1} - ${threat.riskLevel.toUpperCase()}</div>
+                        <h4>${threat.name}</h4>
+                        <p><strong>Target:</strong> ${threat.facility}</p>
+                        <p><strong>Description:</strong> ${threat.description}</p>
+                        <p><strong>Impact:</strong> ${threat.impact}</p>
+                        <p><strong>Mitigation:</strong> ${threat.mitigation}</p>
+                    </div>
+                `;
+            });
+            
+            threatDisplay.innerHTML = scenarioHTML;
+        }
+
+        function addToScenarioHistory(threat) {
+            const historyDiv = document.getElementById('scenarioHistory');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'threat-card threat-' + threat.riskLevel;
+            historyItem.innerHTML = `
+                <small>${timestamp}</small>
+                <h5>${threat.name}</h5>
+                <p>${threat.facility} - ${threat.riskLevel.toUpperCase()} risk</p>
+            `;
+            
+            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+            
+            // Keep only last 5 items
+            while (historyDiv.children.length > 5) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+        }
+
+        function addScenarioToHistory(scenario) {
+            const historyDiv = document.getElementById('scenarioHistory');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'scenario-panel';
+            historyItem.innerHTML = `
+                <small>${timestamp}</small>
+                <h5>${scenario.title}</h5>
+                <p>${scenario.threats.length} coordinated threats</p>
+            `;
+            
+            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+            
+            // Keep only last 3 scenarios
+            while (historyDiv.children.length > 3) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+        }
+
+        // Asset Management Functions
+        function showAssetDetails(assetId) {
+            const asset = assetDetails[assetId];
+            if (!asset) return;
+            
+            const modal = document.getElementById('assetModal');
+            const detailsDiv = document.getElementById('assetDetails');
+            
+            let vulnerabilityList = asset.vulnerabilities.map(v => `<li>${v}</li>`).join('');
+            let controlsList = asset.controls.map(c => `<li>${c}</li>`).join('');
+            
+            detailsDiv.innerHTML = `
+                <h2>${asset.name}</h2>
+                <p><strong>Description:</strong> ${asset.description}</p>
+                
+                <h3>Current Vulnerabilities</h3>
+                <ul class="objective-list">${vulnerabilityList}</ul>
+                
+                <h3>Recommended Controls</h3>
+                <ul class="objective-list">${controlsList}</ul>
+                
+                <h3>Compliance Requirements</h3>
+                <p><strong>${asset.compliance}</strong></p>
+                
+                <button class="button" onclick="generateAssetThreat('${assetId}')">🎯 Generate Asset-Specific Threats</button>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function generateAssetThreat(assetId) {
+            // Generate threats specific to the selected asset
+            const assetSpecificThreats = {
+                'OT-001': [threatDatabase.malware[0], threatDatabase.network[1], threatDatabase.dos[0]],
+                'OT-002': [threatDatabase.physical[0], threatDatabase.social[1], threatDatabase.network[1]],
+                'OT-003': [threatDatabase.network[2], threatDatabase.physical[1]],
+                'IT-001': [threatDatabase.malware[1], threatDatabase.social[0], threatDatabase.physical[1]],
+                'IT-002': [threatDatabase.social[0], threatDatabase.malware[2], threatDatabase.physical[1]],
+                'IT-003': [threatDatabase.physical[0], threatDatabase.malware[0], threatDatabase.network[0]]
+            };
+            
+            const threats = assetSpecificThreats[assetId] || [];
+            if (threats.length > 0) {
+                const randomThreat = threats[Math.floor(Math.random() * threats.length)];
+                closeModal();
+                showSection('threats');
+                setTimeout(() => displayThreat(randomThreat), 500);
+                showNotification(`Generated threat for ${assetDetails[assetId].name}`);
+            }
+        }
+
+        // Task Management Functions
+        function startTask(taskNumber) {
+            const task = taskTemplates[taskNumber];
+            if (!task) return;
+            
+            const modal = document.getElementById('taskModal');
+            const content = document.getElementById('taskContent');
+            
+            let stepsHTML = '';
+            task.steps.forEach((step, index) => {
+                let questionsHTML = step.questions.map(q => `<li>${q}</li>`).join('');
+                stepsHTML += `
+                    <div class="card">
+                        <h4>Step ${index + 1}: ${step.title}</h4>
+                        <p>${step.description}</p>
+                        <h5>Key Questions to Address:</h5>
+                        <ul>${questionsHTML}</ul>
+                        <button class="button" onclick="completeStep(${taskNumber}, ${index})">✅ Complete Step</button>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = `
+                <h2>Task ${taskNumber}: ${task.title}</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="taskProgress${taskNumber}" style="width: 0%"></div>
+                </div>
+                <p id="taskProgressText${taskNumber}">0 of ${task.steps.length} steps completed</p>
+                ${stepsHTML}
+                <button class="button" onclick="completeTask(${taskNumber})" id="completeTaskBtn${taskNumber}" style="display: none;">🎉 Complete Task ${taskNumber}</button>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function completeStep(taskNumber, stepIndex) {
+            const progressBar = document.getElementById(`taskProgress${taskNumber}`);
+            const progressText = document.getElementById(`taskProgressText${taskNumber}`);
+            const task = taskTemplates[taskNumber];
+            
+            const completedSteps = stepIndex + 1;
+            const progressPercent = (completedSteps / task.steps.length) * 100;
+            
+            progressBar.style.width = progressPercent + '%';
+            progressText.textContent = `${completedSteps} of ${task.steps.length} steps completed`;
+            
+            if (completedSteps === task.steps.length) {
+                document.getElementById(`completeTaskBtn${taskNumber}`).style.display = 'block';
+            }
+            
+            showNotification(`Step ${stepIndex + 1} completed!`);
+        }
+
+        function completeTask(taskNumber) {
+            completedTasks.add(taskNumber);
+            updateOverallProgress();
+            closeTaskModal();
+            showNotification(`Task ${taskNumber} completed successfully!`);
+        }
+
+        function updateOverallProgress() {
+            const progressBar = document.getElementById('overallProgress');
+            const progressText = document.getElementById('progressText');
+            const totalTasks = 5;
+            const completed = completedTasks.size;
+            const progressPercent = (completed / totalTasks) * 100;
+            
+            progressBar.style.width = progressPercent + '%';
+            progressText.textContent = `${completed} of ${totalTasks} tasks completed`;
+            
+            if (completed === totalTasks) {
+                showNotification('🎉 All assessment tasks completed! Excellent work!');
+            }
+        }
+
+        // Modal Functions
+        function closeModal() {
+            document.getElementById('assetModal').style.display = 'none';
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').style.display = 'none';
+        }
+
+        // Utility Functions
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const assetModal = document.getElementById('assetModal');
+            const taskModal = document.getElementById('taskModal');
+            if (event.target === assetModal) {
+                assetModal.style.display = 'none';
+            }
+            if (event.target === taskModal) {
+                taskModal.style.display = 'none';
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            showNotification('FreshFlow Systems Security Assessment Tool loaded successfully!');
+            
+            // Generate an initial threat for demonstration
+            setTimeout(() => {
+                generateThreat();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
