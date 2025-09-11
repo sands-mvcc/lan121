@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network+ Domain 5: Network Troubleshooting</title>
+    <title>CompTIA Network+ Troubleshooting Methodology</title>
     <style>
         * {
             margin: 0;
@@ -13,82 +13,82 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 50%, #e8f5e8 100%);
-            min-height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            color: #333;
+            line-height: 1.6;
         }
 
         .container {
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         /* Navigation Sidebar */
-        .nav-sidebar {
+        .navbar {
             width: 280px;
-            background: linear-gradient(180deg, #2d5a2d 0%, #1a3d1a 100%);
+            background: linear-gradient(180deg, #2d5016 0%, #1a3009 100%);
             color: white;
             padding: 20px;
             box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
             overflow-y: auto;
         }
 
         .nav-title {
-            color: #90ee90;
-            font-size: 18px;
+            font-size: 1.4em;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: center;
-            padding: 10px;
-            border-bottom: 2px solid #90ee90;
-        }
-
-        .nav-section {
-            margin-bottom: 15px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 15px;
         }
 
         .nav-item {
             display: block;
-            padding: 12px 15px;
-            background: rgba(255,255,255,0.1);
-            border: none;
             color: white;
             text-decoration: none;
+            padding: 12px 15px;
+            margin: 8px 0;
             border-radius: 8px;
-            margin: 5px 0;
-            cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 14px;
-            text-align: left;
-            width: 100%;
+            cursor: pointer;
+            border: 2px solid transparent;
         }
 
         .nav-item:hover {
-            background: rgba(144,238,144,0.3);
+            background-color: #4CAF50;
             transform: translateX(5px);
+            border-color: #66BB6A;
         }
 
         .nav-item.active {
-            background: #90ee90;
-            color: #1a3d1a;
-            font-weight: bold;
+            background-color: #4CAF50;
+            border-color: #66BB6A;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
         }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background: white;
-            border-left: 3px solid #90ee90;
+            margin-left: 280px;
+            padding: 40px;
+            flex-grow: 1;
+            max-width: calc(100% - 280px);
         }
 
-        .content-section {
+        .section {
             display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid #4CAF50;
         }
 
-        .content-section.active {
+        .section.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.5s ease-in;
         }
 
         @keyframes fadeIn {
@@ -96,984 +96,851 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .section-header {
-            background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(45,90,45,0.3);
+        h1 {
+            color: #2d5016;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
-        .section-title {
-            font-size: 28px;
-            margin-bottom: 10px;
+        h2 {
+            color: #2d5016;
+            font-size: 2em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
         }
 
-        .section-subtitle {
-            font-size: 16px;
-            opacity: 0.9;
+        h3 {
+            color: #1a3009;
+            font-size: 1.4em;
+            margin: 20px 0 10px 0;
         }
 
-        .content-box {
-            background: #f8fffe;
-            border-left: 5px solid #90ee90;
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .objective-box {
-            background: linear-gradient(135deg, #f0f8f0, #e8f5e8);
-            border: 2px solid #90ee90;
+        .step-box {
+            background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%);
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
             padding: 20px;
             margin: 15px 0;
-            border-radius: 10px;
-        }
-
-        .objective-title {
-            color: #2d5a2d;
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .osi-layer {
-            background: #2d5a2d;
-            color: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 5px solid #90ee90;
-        }
-
-        .methodology-step {
-            background: #f8fffe;
-            border: 1px solid #90ee90;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 4px solid #2d5a2d;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2);
         }
 
         .step-number {
-            background: #2d5a2d;
+            background: #2d5016;
             color: white;
-            display: inline-block;
-            padding: 5px 10px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
+            margin-right: 15px;
         }
 
-        .tool-category {
-            background: #e8f5e8;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 4px solid #4a8b4a;
+        .tool-demo {
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
         }
 
-        .issue-type {
-            background: #fff8f0;
-            border: 2px solid #90ee90;
+        .command {
+            background: #000;
+            color: #4CAF50;
             padding: 15px;
-            margin: 10px 0;
             border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .output {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        /* Interactive Elements */
+        .interactive-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .interactive-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+        }
+
+        .scenario-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #FF9800;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.2);
         }
 
         /* Assessment Styles */
-        .assessment-container {
-            background: #f0f8f0;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border: 2px solid #2d5a2d;
-        }
-
-        .question-box {
+        .question {
             background: white;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
             padding: 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border-left: 4px solid #90ee90;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
-        .question-number {
-            background: #2d5a2d;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
+        .question h4 {
+            color: #2d5016;
             margin-bottom: 15px;
-            font-weight: bold;
+            font-size: 1.2em;
         }
 
         .option {
-            background: #f8fffe;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .option:hover {
             background: #e8f5e8;
-            border-color: #90ee90;
+            transform: translateX(5px);
         }
 
-        .option.selected {
-            background: #90ee90;
-            border-color: #2d5a2d;
-            color: #1a3d1a;
+        .option input {
+            margin-right: 10px;
         }
 
-        .option.correct {
-            background: #d4edda;
-            border-color: #28a745;
-            color: #155724;
-        }
-
-        .option.incorrect {
-            background: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 15px 0;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background: linear-gradient(135deg, #4a8b4a, #2d5a2d);
-            transform: translateY(-2px);
-        }
-
-        .explanation {
-            background: #e8f5e8;
+        .result {
+            margin-top: 20px;
             padding: 15px;
             border-radius: 8px;
-            margin-top: 10px;
             display: none;
         }
 
+        .correct {
+            background: #d4edda;
+            border: 2px solid #4CAF50;
+            color: #155724;
+        }
+
+        .incorrect {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
         .score-display {
-            background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
+            background: linear-gradient(135deg, #2d5016 0%, #4CAF50 100%);
             color: white;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 1.2em;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
         }
 
-        ul, ol {
-            margin: 10px 0;
-            padding-left: 30px;
-        }
-
-        li {
-            margin: 5px 0;
-        }
-
-        .highlight {
-            background: #90ee90;
-            color: #1a3d1a;
-            padding: 2px 6px;
+        /* Progress indicator */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
             border-radius: 4px;
-            font-weight: bold;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Navigation Sidebar -->
-        <nav class="nav-sidebar">
-            <div class="nav-title">Domain 5<br>Network Troubleshooting</div>
-            
-            <div class="nav-section">
-                <button class="nav-item active" onclick="showSection('overview')">Overview</button>
-                <button class="nav-item" onclick="showSection('objectives')">Learning Objectives</button>
-                <button class="nav-item" onclick="showSection('methodology')">Troubleshooting Methodology</button>
-                <button class="nav-item" onclick="showSection('layer1')">Layer 1 Issues</button>
-                <button class="nav-item" onclick="showSection('software-tools')">Software Tools</button>
-                <button class="nav-item" onclick="showSection('wireless-issues')">Wireless Issues</button>
-                <button class="nav-item" onclick="showSection('network-issues')">General Network Issues</button>
-                <button class="nav-item" onclick="showSection('assessments')">Task Assessments</button>
-            </div>
+        <nav class="navbar">
+            <div class="nav-title">CompTIA Network+<br>Troubleshooting</div>
+            <a href="#" class="nav-item active" onclick="showSection('intro')">Introduction</a>
+            <a href="#" class="nav-item" onclick="showSection('methodology')">6-Step Methodology</a>
+            <a href="#" class="nav-item" onclick="showSection('tools')">Command Line Tools</a>
+            <a href="#" class="nav-item" onclick="showSection('examples')">Practical Examples</a>
+            <a href="#" class="nav-item" onclick="showSection('assessment')">Assessment</a>
+            <a href="#" class="nav-item" onclick="showSection('resources')">Additional Resources</a>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Overview Section -->
-            <section id="overview" class="content-section active">
-                <div class="section-header">
-                    <h1 class="section-title">Domain 5: Network Troubleshooting</h1>
-                    <p class="section-subtitle">Essential troubleshooting skills for network professionals</p>
+            <!-- Introduction Section -->
+            <section id="intro" class="section active">
+                <h1>CompTIA Network+ Troubleshooting Methodology</h1>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
+                
+                <h3>Welcome to Network Troubleshooting Mastery!</h3>
+                <p>This interactive lesson will teach you the essential troubleshooting methodology and command-line tools required for the CompTIA Network+ certification. You'll learn systematic approaches to diagnose and resolve network issues like a professional.</p>
 
-                <div class="content-box">
-                    <h2>Domain Overview</h2>
-                    <p>This domain covers the essential troubleshooting skills needed by network professionals. You'll learn systematic approaches to diagnose and resolve network issues across all layers of the OSI model.</p>
-                    
-                    <p><strong>Weight on Exam:</strong> <span class="highlight">24% of total exam</span></p>
-                    
-                    <h3>What You'll Master:</h3>
+                <div class="step-box">
+                    <h3>What You'll Learn:</h3>
                     <ul>
-                        <li>Systematic troubleshooting methodology</li>
-                        <li>Physical layer issue identification and resolution</li>
-                        <li>Network service troubleshooting techniques</li>
-                        <li>Performance problem diagnosis</li>
-                        <li>Appropriate tool selection and usage</li>
+                        <li><strong>6-Step Troubleshooting Methodology</strong> - A systematic approach to problem-solving</li>
+                        <li><strong>Essential Command-Line Tools</strong> - PING, IPCONFIG, TRACERT, NSLOOKUP, NETSTAT</li>
+                        <li><strong>OSI Model Troubleshooting</strong> - Top-down and bottom-up approaches</li>
+                        <li><strong>Real-World Scenarios</strong> - Practical examples and hands-on exercises</li>
+                        <li><strong>Best Practices</strong> - Professional troubleshooting techniques</li>
                     </ul>
                 </div>
 
-                <div class="objective-box">
-                    <h2>OSI Model Reference</h2>
-                    <div class="osi-layer">
-                        <strong>Layer 7 - Application:</strong> User applications, email, web browsers
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 6 - Presentation:</strong> Data encryption, compression, formatting
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 5 - Session:</strong> Session management, connections
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 4 - Transport:</strong> TCP/UDP, ports, flow control
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 3 - Network:</strong> IP addressing, routing, ICMP
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 2 - Data Link:</strong> Switching, VLANs, MAC addresses
-                    </div>
-                    <div class="osi-layer">
-                        <strong>Layer 1 - Physical:</strong> Cables, connectors, electrical signals
-                    </div>
+                <div class="scenario-box">
+                    <h3>🎯 Learning Objectives</h3>
+                    <p>By the end of this lesson, you will be able to:</p>
+                    <ul>
+                        <li>Apply the 6-step troubleshooting methodology to network problems</li>
+                        <li>Use command-line tools effectively for network diagnosis</li>
+                        <li>Troubleshoot common network connectivity issues</li>
+                        <li>Document troubleshooting procedures properly</li>
+                        <li>Apply OSI model concepts to network troubleshooting</li>
+                    </ul>
                 </div>
+
+                <button class="interactive-btn" onclick="showSection('methodology')">Start Learning →</button>
             </section>
 
-            <!-- Learning Objectives -->
-            <section id="objectives" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Domain 5 Learning Objectives</h1>
-                    <p class="section-subtitle">CompTIA Network+ N10-009 Exam Requirements</p>
+            <!-- Methodology Section -->
+            <section id="methodology" class="section">
+                <h2>The 6-Step Troubleshooting Methodology</h2>
+                
+                <p>The CompTIA troubleshooting methodology provides a systematic approach to resolving network issues. This structured process ensures thorough investigation and proper documentation.</p>
+
+                <div class="step-box">
+                    <div class="step-number">1</div>
+                    <h3>Identify the Problem</h3>
+                    <ul>
+                        <li><strong>Gather Information:</strong> Talk to users, examine error messages</li>
+                        <li><strong>Identify Symptoms:</strong> Document what's not working</li>
+                        <li><strong>Determine Scope:</strong> Single user or network-wide?</li>
+                        <li><strong>Question Users:</strong> When did it start? What changed?</li>
+                        <li><strong>Duplicate the Problem:</strong> Can you reproduce it?</li>
+                    </ul>
                 </div>
 
-                <div class="objective-box">
-                    <div class="objective-title">5.1: Explain the troubleshooting methodology</div>
-                    <p>Master the systematic approach to network problem resolution, including identifying problems, establishing theories, testing solutions, and documenting outcomes.</p>
+                <div class="step-box">
+                    <div class="step-number">2</div>
+                    <h3>Establish Theory of Probable Cause</h3>
+                    <ul>
+                        <li><strong>Question the Obvious:</strong> Check simple solutions first</li>
+                        <li><strong>Consider Multiple Approaches:</strong> 
+                            <ul>
+                                <li>Top-Down (OSI Layer 7 → 1)</li>
+                                <li>Bottom-Up (OSI Layer 1 → 7)</li>
+                                <li>Divide and Conquer</li>
+                            </ul>
+                        </li>
+                        <li><strong>Recent Changes:</strong> New hardware, software, or configurations</li>
+                    </ul>
                 </div>
 
-                <div class="objective-box">
-                    <div class="objective-title">5.2: Troubleshoot common cabling and physical interface issues</div>
-                    <p>Diagnose and resolve cable problems, signal degradation, improper terminations, interface errors, and hardware-related network issues.</p>
+                <div class="step-box">
+                    <div class="step-number">3</div>
+                    <h3>Test Theory to Determine Cause</h3>
+                    <ul>
+                        <li><strong>If Theory Confirmed:</strong> Determine next steps to resolve</li>
+                        <li><strong>If Theory Not Confirmed:</strong> Establish new theory or escalate</li>
+                        <li><strong>Use Tools:</strong> Command-line utilities, monitoring software</li>
+                        <li><strong>Document Results:</strong> Keep track of what you've tested</li>
+                    </ul>
                 </div>
 
-                <div class="objective-box">
-                    <div class="objective-title">5.3: Troubleshoot common issues with network services</div>
-                    <p>Address switching problems (STP, VLANs, ACLs), routing issues, address pool exhaustion, and incorrect network configurations.</p>
+                <div class="step-box">
+                    <div class="step-number">4</div>
+                    <h3>Establish Plan of Action & Implement Solution</h3>
+                    <ul>
+                        <li><strong>Plan Before Acting:</strong> Consider potential effects</li>
+                        <li><strong>Identify Resources:</strong> Tools, time, personnel needed</li>
+                        <li><strong>Consider Rollback:</strong> How to undo changes if needed</li>
+                        <li><strong>Implement:</strong> Make the necessary changes</li>
+                    </ul>
                 </div>
 
-                <div class="objective-box">
-                    <div class="objective-title">5.4: Troubleshoot common performance issues</div>
-                    <p>Identify and resolve congestion, latency, packet loss, jitter, and wireless performance problems affecting network efficiency.</p>
+                <div class="step-box">
+                    <div class="step-number">5</div>
+                    <h3>Verify System Functionality</h3>
+                    <ul>
+                        <li><strong>Test the Fix:</strong> Confirm the problem is resolved</li>
+                        <li><strong>Full System Check:</strong> Ensure no new problems were created</li>
+                        <li><strong>User Verification:</strong> Have users confirm functionality</li>
+                        <li><strong>Preventive Measures:</strong> Implement safeguards if applicable</li>
+                    </ul>
                 </div>
 
-                <div class="objective-box">
-                    <div class="objective-title">5.5: Use appropriate tools and protocols to solve networking issues</div>
-                    <p>Select and utilize software tools (protocol analyzers, command line utilities) and hardware tools (cable testers, Wi-Fi analyzers) for effective troubleshooting.</p>
+                <div class="step-box">
+                    <div class="step-number">6</div>
+                    <h3>Document Findings & Actions</h3>
+                    <ul>
+                        <li><strong>Problem Description:</strong> What was the issue?</li>
+                        <li><strong>Solution Applied:</strong> What fixed it?</li>
+                        <li><strong>Lessons Learned:</strong> How to prevent recurrence</li>
+                        <li><strong>Knowledge Base:</strong> Update documentation for future reference</li>
+                    </ul>
                 </div>
+
+                <div class="scenario-box">
+                    <h3>💡 Pro Tip: Start Simple, Work Complex</h3>
+                    <p>Always begin with the most obvious and simple solutions before moving to complex diagnostics. Many network issues have surprisingly simple causes!</p>
+                </div>
+
+                <button class="interactive-btn" onclick="showSection('tools')">Learn the Tools →</button>
             </section>
 
-            <!-- Troubleshooting Methodology -->
-            <section id="methodology" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Troubleshooting Methodology</h1>
-                    <p class="section-subtitle">Systematic approach to network problem solving</p>
-                </div>
+            <!-- Tools Section -->
+            <section id="tools" class="section">
+                <h2>Essential Command-Line Tools</h2>
+                
+                <p>These command-line utilities are fundamental for network troubleshooting and are heavily tested on the CompTIA Network+ exam.</p>
 
-                <div class="content-box">
-                    <h2>7-Step Troubleshooting Process</h2>
+                <div class="tool-demo">
+                    <h3>PING - Test Connectivity</h3>
+                    <p>Uses ICMP to test reachability and measure round-trip time.</p>
                     
-                    <div class="methodology-step">
-                        <span class="step-number">1</span>
-                        <strong>Identify the Problem</strong>
-                        <ul>
-                            <li>Gather information from users and systems</li>
-                            <li>Question users about symptoms and changes</li>
-                            <li>Identify specific symptoms</li>
-                            <li>Determine if anything has changed recently</li>
-                            <li>Duplicate the problem if possible</li>
-                            <li>Approach multiple problems individually</li>
-                        </ul>
-                    </div>
+                    <div class="command">C:\> ping 8.8.8.8</div>
+                    <div class="output">Pinging 8.8.8.8 with 32 bytes of data:
+Reply from 8.8.8.8: bytes=32 time=14ms TTL=117
+Reply from 8.8.8.8: bytes=32 time=13ms TTL=117
+Reply from 8.8.8.8: bytes=32 time=12ms TTL=117
+Reply from 8.8.8.8: bytes=32 time=15ms TTL=117
 
-                    <div class="methodology-step">
-                        <span class="step-number">2</span>
-                        <strong>Establish a Theory of Probable Cause</strong>
-                        <ul>
-                            <li>Question the obvious first</li>
-                            <li>Consider multiple approaches (Top-down, Bottom-up, Divide and conquer)</li>
-                            <li>Use experience and knowledge to form hypotheses</li>
-                        </ul>
-                    </div>
-
-                    <div class="methodology-step">
-                        <span class="step-number">3</span>
-                        <strong>Test the Theory</strong>
-                        <ul>
-                            <li>If theory is confirmed, determine next steps</li>
-                            <li>If theory is not confirmed, establish new theory or escalate</li>
-                        </ul>
-                    </div>
-
-                    <div class="methodology-step">
-                        <span class="step-number">4</span>
-                        <strong>Establish a Plan of Action</strong>
-                        <ul>
-                            <li>Develop solution steps</li>
-                            <li>Identify potential effects of changes</li>
-                            <li>Consider rollback procedures</li>
-                        </ul>
-                    </div>
-
-                    <div class="methodology-step">
-                        <span class="step-number">5</span>
-                        <strong>Implement the Solution</strong>
-                        <ul>
-                            <li>Execute planned changes</li>
-                            <li>Escalate if necessary</li>
-                            <li>Monitor implementation progress</li>
-                        </ul>
-                    </div>
-
-                    <div class="methodology-step">
-                        <span class="step-number">6</span>
-                        <strong>Verify Full System Functionality</strong>
-                        <ul>
-                            <li>Test affected systems thoroughly</li>
-                            <li>Implement preventive measures if applicable</li>
-                            <li>Ensure no new issues were created</li>
-                        </ul>
-                    </div>
-
-                    <div class="methodology-step">
-                        <span class="step-number">7</span>
-                        <strong>Document Findings</strong>
-                        <ul>
-                            <li>Record findings, actions, and outcomes</li>
-                            <li>Document lessons learned</li>
-                            <li>Update knowledge base for future reference</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="content-box">
-                    <h2>Troubleshooting Approaches</h2>
+Ping statistics for 8.8.8.8:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 12ms, Maximum = 15ms, Average = 13ms</div>
                     
-                    <div class="issue-type">
-                        <h3>Top-Down Approach</h3>
-                        <p><strong>Start:</strong> Application Layer (7) → <strong>Direction:</strong> Down to Physical (1)</p>
-                        <p><strong>Best for:</strong> Application-related issues, software problems</p>
-                        <p><strong>Example:</strong> User can't access website → Check browser → Check network settings → Check physical connection</p>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Bottom-Up Approach</h3>
-                        <p><strong>Start:</strong> Physical Layer (1) → <strong>Direction:</strong> Up to Application (7)</p>
-                        <p><strong>Best for:</strong> Hardware issues, widespread outages</p>
-                        <p><strong>Example:</strong> Network down → Check cables → Check switches → Check routing → Check services</p>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Divide and Conquer</h3>
-                        <p><strong>Start:</strong> Network Layer (3) → <strong>Direction:</strong> Up or down based on results</p>
-                        <p><strong>Best for:</strong> Unknown issues, general troubleshooting</p>
-                        <p><strong>Example:</strong> Start with ping test → If successful, go up; if failed, go down</p>
-                    </div>
+                    <p><strong>Key Parameters:</strong></p>
+                    <ul>
+                        <li><code>ping -t [host]</code> - Continuous ping</li>
+                        <li><code>ping -n [count] [host]</code> - Specify number of packets</li>
+                        <li><code>ping -l [size] [host]</code> - Specify packet size</li>
+                    </ul>
                 </div>
+
+                <div class="tool-demo">
+                    <h3>IPCONFIG - IP Configuration</h3>
+                    <p>Displays and manages TCP/IP network configuration.</p>
+                    
+                    <div class="command">C:\> ipconfig /all</div>
+                    <div class="output">Windows IP Configuration
+
+Ethernet adapter Local Area Connection:
+   Connection-specific DNS Suffix  : company.local
+   Description . . . . . . . . . . : Intel Ethernet Adapter
+   Physical Address. . . . . . . . : 00-1B-21-82-45-CE
+   DHCP Enabled. . . . . . . . . . : Yes
+   IP Address. . . . . . . . . . . : 192.168.1.100
+   Subnet Mask . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . : 192.168.1.1
+   DHCP Server . . . . . . . . . . : 192.168.1.1
+   DNS Servers . . . . . . . . . . : 8.8.8.8, 8.8.4.4</div>
+                    
+                    <p><strong>Key Commands:</strong></p>
+                    <ul>
+                        <li><code>ipconfig /release</code> - Release IP address</li>
+                        <li><code>ipconfig /renew</code> - Renew IP address</li>
+                        <li><code>ipconfig /flushdns</code> - Clear DNS cache</li>
+                        <li><code>ipconfig /displaydns</code> - Display DNS cache</li>
+                    </ul>
+                </div>
+
+                <div class="tool-demo">
+                    <h3>TRACERT - Route Tracing</h3>
+                    <p>Shows the path packets take to reach a destination.</p>
+                    
+                    <div class="command">C:\> tracert google.com</div>
+                    <div class="output">Tracing route to google.com [142.250.190.78]
+over a maximum of 30 hops:
+
+  1     1 ms     1 ms     1 ms  192.168.1.1
+  2    12 ms    11 ms    10 ms  10.0.0.1
+  3    15 ms    14 ms    16 ms  isp-gateway.net [203.0.113.1]
+  4    22 ms    21 ms    20 ms  core1.isp.net [203.0.113.10]
+  5    28 ms    27 ms    29 ms  google-peer.net [142.250.190.78]
+
+Trace complete.</div>
+                    
+                    <p><strong>Analysis Points:</strong></p>
+                    <ul>
+                        <li>Each line represents a router hop</li>
+                        <li>Three time measurements show latency</li>
+                        <li>* * * indicates packet loss or filtering</li>
+                        <li>High latency spikes indicate bottlenecks</li>
+                    </ul>
+                </div>
+
+                <div class="tool-demo">
+                    <h3>NSLOOKUP - DNS Troubleshooting</h3>
+                    <p>Query DNS servers for name resolution information.</p>
+                    
+                    <div class="command">C:\> nslookup www.example.com</div>
+                    <div class="output">Server:  dns.company.local
+Address:  192.168.1.1
+
+Non-authoritative answer:
+Name:    www.example.com
+Address:  93.184.216.34</div>
+                    
+                    <p><strong>Advanced Usage:</strong></p>
+                    <ul>
+                        <li><code>nslookup -type=MX domain.com</code> - Mail exchange records</li>
+                        <li><code>nslookup -type=NS domain.com</code> - Name server records</li>
+                        <li><code>nslookup IP-address</code> - Reverse DNS lookup</li>
+                    </ul>
+                </div>
+
+                <div class="tool-demo">
+                    <h3>NETSTAT - Network Statistics</h3>
+                    <p>Display active network connections and listening ports.</p>
+                    
+                    <div class="command">C:\> netstat -an</div>
+                    <div class="output">Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:22             0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:80             0.0.0.0:0              LISTENING
+  TCP    192.168.1.100:443      173.252.74.22:80       ESTABLISHED
+  TCP    192.168.1.100:1234     52.97.128.18:443       ESTABLISHED
+  UDP    0.0.0.0:53             *:*</div>
+                    
+                    <p><strong>Useful Parameters:</strong></p>
+                    <ul>
+                        <li><code>netstat -a</code> - All connections and listening ports</li>
+                        <li><code>netstat -n</code> - Numerical addresses instead of resolving hosts</li>
+                        <li><code>netstat -b</code> - Show executable associated with each connection</li>
+                        <li><code>netstat -r</code> - Display routing table</li>
+                    </ul>
+                </div>
+
+                <button class="interactive-btn" onclick="demonstrateTool()">Try Interactive Demo</button>
+                <button class="interactive-btn" onclick="showSection('examples')">See Examples →</button>
             </section>
 
-            <!-- Layer 1 Issues -->
-            <section id="layer1" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Layer 1 (Physical) Issues</h1>
-                    <p class="section-subtitle">Cabling and physical interface troubleshooting</p>
-                </div>
-
-                <div class="content-box">
-                    <h2>Cable Issues</h2>
+            <!-- Examples Section -->
+            <section id="examples" class="section">
+                <h2>Practical Troubleshooting Examples</h2>
+                
+                <div class="scenario-box">
+                    <h3>🔧 Scenario 1: User Cannot Access Internet</h3>
+                    <p><strong>Problem:</strong> A user reports they cannot browse websites or send emails.</p>
                     
-                    <div class="issue-type">
-                        <h3>Incorrect Cable Types</h3>
+                    <h4>Step-by-Step Resolution:</h4>
+                    <div class="step-box">
+                        <strong>Step 1: Identify the Problem</strong>
                         <ul>
-                            <li><strong>Single mode vs. multimode fiber:</strong> Distance and equipment compatibility</li>
-                            <li><strong>Category cables:</strong> Cat 5/6/7/8 speed and distance limitations</li>
-                            <li><strong>STP vs. UTP:</strong> Electromagnetic interference considerations</li>
+                            <li>Question user: When did it start? What exactly doesn't work?</li>
+                            <li>Determine scope: Just this user or multiple users?</li>
+                            <li>Check error messages: "Page cannot be displayed" etc.</li>
                         </ul>
                     </div>
 
-                    <div class="issue-type">
-                        <h3>Signal Degradation</h3>
+                    <div class="step-box">
+                        <strong>Step 2: Theory of Probable Cause</strong>
                         <ul>
-                            <li><strong>Crosstalk:</strong> Signal interference between cable pairs</li>
-                            <li><strong>Interference:</strong> EMI from external sources</li>
-                            <li><strong>Attenuation:</strong> Signal loss over distance</li>
+                            <li>Physical connectivity issue</li>
+                            <li>IP configuration problem</li>
+                            <li>DNS resolution failure</li>
+                            <li>Gateway/routing issue</li>
                         </ul>
                     </div>
 
-                    <div class="issue-type">
-                        <h3>Termination Problems</h3>
-                        <ul>
-                            <li><strong>Improper termination:</strong> Incorrect wiring standards (T568A/T568B)</li>
-                            <li><strong>TX/RX transposed:</strong> Transmit and receive pairs swapped</li>
-                        </ul>
+                    <div class="step-box">
+                        <strong>Step 3: Test the Theory</strong>
+                        <div class="command">ipconfig /all</div>
+                        <p>Check if IP address is assigned (not 169.254.x.x APIPA)</p>
+                        
+                        <div class="command">ping 127.0.0.1</div>
+                        <p>Test local TCP/IP stack</p>
+                        
+                        <div class="command">ping 192.168.1.1</div>
+                        <p>Test connectivity to default gateway</p>
+                        
+                        <div class="command">ping 8.8.8.8</div>
+                        <p>Test internet connectivity (bypassing DNS)</p>
+                        
+                        <div class="command">nslookup google.com</div>
+                        <p>Test DNS resolution</p>
                     </div>
                 </div>
 
-                <div class="content-box">
-                    <h2>Interface Issues</h2>
+                <div class="scenario-box">
+                    <h3>🔧 Scenario 2: Slow Network Performance</h3>
+                    <p><strong>Problem:</strong> Users complain that network access is very slow.</p>
                     
-                    <div class="issue-type">
-                        <h3>Interface Counters</h3>
-                        <ul>
-                            <li><strong>CRC errors:</strong> Cyclic redundancy check failures</li>
-                            <li><strong>Runts:</strong> Frames smaller than 64 bytes</li>
-                            <li><strong>Giants:</strong> Frames larger than 1518 bytes</li>
-                            <li><strong>Drops:</strong> Frames discarded due to buffer overflow</li>
-                        </ul>
+                    <div class="step-box">
+                        <strong>Diagnostic Commands:</strong>
+                        <div class="command">ping -t google.com</div>
+                        <p>Check for packet loss and latency variations</p>
+                        
+                        <div class="command">tracert www.slowsite.com</div>
+                        <p>Identify where delays occur in the network path</p>
+                        
+                        <div class="command">netstat -e</div>
+                        <p>Check for interface errors and utilization</p>
                     </div>
 
-                    <div class="issue-type">
-                        <h3>Port Status Issues</h3>
+                    <div class="step-box">
+                        <strong>Analysis Points:</strong>
                         <ul>
-                            <li><strong>Error disabled:</strong> Port automatically shut down due to errors</li>
-                            <li><strong>Administratively down:</strong> Port manually disabled</li>
-                            <li><strong>Suspended:</strong> Port temporarily disabled</li>
+                            <li><strong>High Latency (>100ms):</strong> Network congestion or routing issues</li>
+                            <li><strong>Packet Loss:</strong> Hardware problems or network overload</li>
+                            <li><strong>Specific Hop Delays:</strong> Problem with particular router/ISP</li>
+                            <li><strong>Interface Errors:</strong> Physical layer problems</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="content-box">
-                    <h2>Hardware Issues</h2>
+                <div class="scenario-box">
+                    <h3>🔧 Scenario 3: Cannot Access Specific Website</h3>
+                    <p><strong>Problem:</strong> User can browse most sites but cannot access company intranet.</p>
                     
-                    <div class="issue-type">
-                        <h3>Power over Ethernet (PoE)</h3>
-                        <ul>
-                            <li><strong>Power budget exceeded:</strong> Insufficient power supply capacity</li>
-                            <li><strong>Incorrect standard:</strong> PoE/PoE+/PoE++ compatibility issues</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Transceiver Issues</h3>
-                        <ul>
-                            <li><strong>Mismatch:</strong> Incompatible transceiver types or speeds</li>
-                            <li><strong>Signal strength:</strong> Insufficient optical power levels</li>
-                        </ul>
+                    <div class="step-box">
+                        <strong>Troubleshooting Approach:</strong>
+                        <div class="command">nslookup intranet.company.com</div>
+                        <p>Verify DNS can resolve the hostname</p>
+                        
+                        <div class="command">ping intranet.company.com</div>
+                        <p>Test basic connectivity to resolved IP</p>
+                        
+                        <div class="command">telnet intranet.company.com 80</div>
+                        <p>Test specific port connectivity</p>
+                        
+                        <div class="command">tracert intranet.company.com</div>
+                        <p>Check routing path to destination</p>
                     </div>
                 </div>
+
+                <button class="interactive-btn" onclick="showToolSimulator()">Try Tool Simulator</button>
+                <button class="interactive-btn" onclick="showSection('assessment')">Take Assessment →</button>
             </section>
 
-            <!-- Software Tools -->
-            <section id="software-tools" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Software Troubleshooting Tools</h1>
-                    <p class="section-subtitle">Command line and protocol analysis tools</p>
+            <!-- Assessment Section -->
+            <section id="assessment" class="section">
+                <h2>Knowledge Assessment</h2>
+                <p>Test your understanding of CompTIA Network+ troubleshooting methodology and tools.</p>
+                
+                <div id="assessmentContainer">
+                    <!-- Questions will be populated by JavaScript -->
                 </div>
-
-                <div class="content-box">
-                    <h2>Protocol Analyzers</h2>
-                    <div class="tool-category">
-                        <h3>Packet Capture Tools</h3>
-                        <ul>
-                            <li><strong>Wireshark:</strong> Full-featured protocol analyzer with GUI</li>
-                            <li><strong>tcpdump:</strong> Command-line packet analyzer</li>
-                            <li><strong>Network taps:</strong> Hardware devices for packet capture</li>
-                        </ul>
-                    </div>
+                
+                <div id="scoreContainer" class="score-display" style="display: none;">
+                    <h3>Assessment Complete!</h3>
+                    <p id="finalScore"></p>
+                    <button class="interactive-btn" onclick="retakeAssessment()">Retake Assessment</button>
                 </div>
-
-                <div class="content-box">
-                    <h2>Command Line Tools</h2>
-                    
-                    <div class="tool-category">
-                        <h3>Connectivity Testing</h3>
-                        <ul>
-                            <li><strong>ping:</strong> Test reachability using ICMP echo requests</li>
-                            <li><strong>traceroute/tracert:</strong> Display route packets take to destination</li>
-                            <li><strong>pathping:</strong> Windows tool combining ping and tracert</li>
-                        </ul>
-                    </div>
-
-                    <div class="tool-category">
-                        <h3>DNS Resolution</h3>
-                        <ul>
-                            <li><strong>nslookup:</strong> Query DNS servers for name resolution</li>
-                            <li><strong>dig:</strong> Flexible DNS lookup tool (Linux/Unix)</li>
-                        </ul>
-                    </div>
-
-                    <div class="tool-category">
-                        <h3>Network Configuration</h3>
-                        <ul>
-                            <li><strong>ipconfig:</strong> Windows IP configuration utility</li>
-                            <li><strong>ifconfig:</strong> Unix/Linux interface configuration</li>
-                            <li><strong>ip:</strong> Modern Linux networking tool</li>
-                            <li><strong>netstat:</strong> Display network connections and statistics</li>
-                            <li><strong>arp:</strong> Display and modify ARP cache</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="content-box">
-                    <h2>Discovery Tools</h2>
-                    
-                    <div class="tool-category">
-                        <h3>Network Mapping</h3>
-                        <ul>
-                            <li><strong>Nmap:</strong> Network discovery and security scanning</li>
-                            <li><strong>LLDP:</strong> Link Layer Discovery Protocol</li>
-                            <li><strong>CDP:</strong> Cisco Discovery Protocol</li>
-                        </ul>
-                    </div>
-
-                    <div class="tool-category">
-                        <h3>Performance Testing</h3>
-                        <ul>
-                            <li><strong>Speed testers:</strong> Bandwidth measurement tools</li>
-                            <li><strong>iPerf:</strong> Network performance measurement</li>
-                        </ul>
-                    </div>
-                </div>
+                
+                <button class="interactive-btn" onclick="startAssessment()">Start Assessment</button>
+                <button class="interactive-btn" onclick="showSection('resources')">View Resources →</button>
             </section>
 
-            <!-- Wireless Issues -->
-            <section id="wireless-issues" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Wireless Troubleshooting</h1>
-                    <p class="section-subtitle">Common wireless network problems and solutions</p>
+            <!-- Resources Section -->
+            <section id="resources" class="section">
+                <h2>Additional Resources</h2>
+                
+                <div class="step-box">
+                    <h3>📚 Study Resources</h3>
+                    <ul>
+                        <li><strong>CompTIA Network+ Objectives:</strong> Official exam objectives document</li>
+                        <li><strong>Professor Messer:</strong> Free Network+ training videos</li>
+                        <li><strong>CompTIA CertMaster:</strong> Official practice questions</li>
+                        <li><strong>Packet Tracer:</strong> Cisco network simulation software</li>
+                    </ul>
                 </div>
 
-                <div class="content-box">
-                    <h2>Interference Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Channel Overlap</h3>
-                        <ul>
-                            <li>Adjacent channel interference in 2.4GHz band</li>
-                            <li>Use non-overlapping channels (1, 6, 11)</li>
-                            <li>Consider 5GHz for more available channels</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Signal Interference</h3>
-                        <ul>
-                            <li><strong>Physical obstacles:</strong> Walls, metal structures</li>
-                            <li><strong>Electronic devices:</strong> Microwaves, Bluetooth devices</li>
-                            <li><strong>Other wireless networks:</strong> Neighboring access points</li>
-                        </ul>
-                    </div>
+                <div class="step-box">
+                    <h3>🛠️ Practice Labs</h3>
+                    <ul>
+                        <li>Set up a home lab with VirtualBox/VMware</li>
+                        <li>Practice command-line tools daily</li>
+                        <li>Use Wireshark for packet analysis</li>
+                        <li>Configure different network scenarios</li>
+                    </ul>
                 </div>
 
-                <div class="content-box">
-                    <h2>Coverage and Signal Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Signal Degradation or Loss</h3>
-                        <ul>
-                            <li>Distance from access point</li>
-                            <li>Physical obstructions</li>
-                            <li>Antenna positioning and type</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Insufficient Wireless Coverage</h3>
-                        <ul>
-                            <li>Dead zones in coverage area</li>
-                            <li>Need for additional access points</li>
-                            <li>Proper site survey requirements</li>
-                        </ul>
+                <div class="step-box">
+                    <h3>📋 Quick Reference Commands</h3>
+                    <div class="tool-demo">
+                        <strong>Windows:</strong><br>
+                        <code>ping, ipconfig, tracert, nslookup, netstat, arp, route</code><br><br>
+                        <strong>Linux/Mac:</strong><br>
+                        <code>ping, ifconfig, traceroute, dig, netstat, arp, route</code>
                     </div>
                 </div>
 
-                <div class="content-box">
-                    <h2>Client and Roaming Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Client Disassociation</h3>
-                        <ul>
-                            <li>Power management settings</li>
-                            <li>Signal strength thresholds</li>
-                            <li>Authentication timeouts</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Roaming Misconfiguration</h3>
-                        <ul>
-                            <li>Incorrect roaming thresholds</li>
-                            <li>SSID and security mismatches</li>
-                            <li>802.11r fast roaming configuration</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- General Network Issues -->
-            <section id="network-issues" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">General Network Issues</h1>
-                    <p class="section-subtitle">Service and performance troubleshooting</p>
+                <div class="scenario-box">
+                    <h3>🎓 Next Steps</h3>
+                    <p>Continue your CompTIA Network+ preparation by:</p>
+                    <ul>
+                        <li>Practicing with real network hardware</li>
+                        <li>Learning network protocols in depth</li>
+                        <li>Understanding security fundamentals</li>
+                        <li>Exploring cloud networking concepts</li>
+                    </ul>
                 </div>
 
-                <div class="content-box">
-                    <h2>Switching Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Spanning Tree Protocol (STP)</h3>
-                        <ul>
-                            <li><strong>Network loops:</strong> Broadcast storms and network instability</li>
-                            <li><strong>Root bridge selection:</strong> Improper root bridge placement</li>
-                            <li><strong>Port roles:</strong> Designated, root, and blocked port issues</li>
-                            <li><strong>Port states:</strong> Learning, listening, forwarding states</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>VLAN Issues</h3>
-                        <ul>
-                            <li><strong>Incorrect VLAN assignment:</strong> Ports in wrong VLANs</li>
-                            <li><strong>Trunking problems:</strong> Native VLAN mismatches</li>
-                            <li><strong>Inter-VLAN routing:</strong> Layer 3 connectivity issues</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Access Control Lists (ACLs)</h3>
-                        <ul>
-                            <li><strong>Incorrect rule order:</strong> More specific rules after general ones</li>
-                            <li><strong>Implicit deny:</strong> Traffic blocked by default deny rule</li>
-                            <li><strong>Misconfigured permissions:</strong> Allow/deny rule conflicts</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="content-box">
-                    <h2>Routing Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Route Selection Problems</h3>
-                        <ul>
-                            <li><strong>Routing table issues:</strong> Missing or incorrect routes</li>
-                            <li><strong>Default routes:</strong> Missing or incorrect default gateway</li>
-                            <li><strong>Metric problems:</strong> Suboptimal path selection</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Address Configuration</h3>
-                        <ul>
-                            <li><strong>Address pool exhaustion:</strong> DHCP scope full</li>
-                            <li><strong>Incorrect default gateway:</strong> Wrong router address</li>
-                            <li><strong>Duplicate IP addresses:</strong> Address conflicts</li>
-                            <li><strong>Incorrect subnet mask:</strong> Wrong network boundaries</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="content-box">
-                    <h2>Performance Issues</h2>
-                    
-                    <div class="issue-type">
-                        <h3>Bandwidth and Throughput</h3>
-                        <ul>
-                            <li><strong>Congestion/contention:</strong> Too much traffic for available bandwidth</li>
-                            <li><strong>Bottlenecking:</strong> Single point limiting overall performance</li>
-                            <li><strong>Throughput capacity:</strong> Actual vs. theoretical bandwidth</li>
-                        </ul>
-                    </div>
-
-                    <div class="issue-type">
-                        <h3>Quality of Service Issues</h3>
-                        <ul>
-                            <li><strong>Latency:</strong> Delays in packet transmission</li>
-                            <li><strong>Packet loss:</strong> Dropped packets due to congestion</li>
-                            <li><strong>Jitter:</strong> Variation in packet arrival times</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Task Assessments -->
-            <section id="assessments" class="content-section">
-                <div class="section-header">
-                    <h1 class="section-title">Task Assessments</h1>
-                    <p class="section-subtitle">Test your Domain 5 troubleshooting knowledge</p>
-                </div>
-
-                <div class="assessment-container">
-                    <h2>Network+ Domain 5 Assessment Questions</h2>
-                    <p>Complete these 10 questions to test your understanding of network troubleshooting concepts.</p>
-
-                    <!-- Question 1 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 1</div>
-                        <h3>According to the CompTIA troubleshooting methodology, what is the first step when approaching a network problem?</h3>
-                        <div class="option" onclick="selectOption(this, 1, 'A')">A) Establish a theory of probable cause</div>
-                        <div class="option" onclick="selectOption(this, 1, 'B')">B) Identify the problem</div>
-                        <div class="option" onclick="selectOption(this, 1, 'C')">C) Test the theory to determine the cause</div>
-                        <div class="option" onclick="selectOption(this, 1, 'D')">D) Implement the solution</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Identify the problem</strong><br>
-                            The first step in the 7-step troubleshooting methodology is to identify the problem by gathering information, questioning users, and identifying symptoms.
-                        </div>
-                    </div>
-
-                    <!-- Question 2 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 2</div>
-                        <h3>A network technician notices increasing CRC errors on a switch port. What layer of the OSI model is most likely experiencing issues?</h3>
-                        <div class="option" onclick="selectOption(this, 2, 'A')">A) Physical Layer (Layer 1)</div>
-                        <div class="option" onclick="selectOption(this, 2, 'B')">B) Data Link Layer (Layer 2)</div>
-                        <div class="option" onclick="selectOption(this, 2, 'C')">C) Network Layer (Layer 3)</div>
-                        <div class="option" onclick="selectOption(this, 2, 'D')">D) Transport Layer (Layer 4)</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: A) Physical Layer (Layer 1)</strong><br>
-                            CRC (Cyclic Redundancy Check) errors typically indicate physical layer problems such as bad cables, connectors, or signal degradation.
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 3</div>
-                        <h3>Which troubleshooting approach should be used when users report they cannot access a specific web application, but other network services work fine?</h3>
-                        <div class="option" onclick="selectOption(this, 3, 'A')">A) Bottom-up approach</div>
-                        <div class="option" onclick="selectOption(this, 3, 'B')">B) Top-down approach</div>
-                        <div class="option" onclick="selectOption(this, 3, 'C')">C) Divide and conquer</div>
-                        <div class="option" onclick="selectOption(this, 3, 'D')">D) Replace all cables first</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Top-down approach</strong><br>
-                            Since the issue is application-specific and other network services work, start at the Application layer and work down to isolate the problem.
-                        </div>
-                    </div>
-
-                    <!-- Question 4 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 4</div>
-                        <h3>A technician is troubleshooting intermittent wireless connectivity issues. Which tool would be MOST appropriate for identifying channel interference?</h3>
-                        <div class="option" onclick="selectOption(this, 4, 'A')">A) Cable tester</div>
-                        <div class="option" onclick="selectOption(this, 4, 'B')">B) Wi-Fi analyzer</div>
-                        <div class="option" onclick="selectOption(this, 4, 'C')">C) Toner probe</div>
-                        <div class="option" onclick="selectOption(this, 4, 'D')">D) Loopback plug</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Wi-Fi analyzer</strong><br>
-                            A Wi-Fi analyzer can detect channel usage, interference sources, and signal strength issues in wireless networks.
-                        </div>
-                    </div>
-
-                    <!-- Question 5 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 5</div>
-                        <h3>What command would you use to display the path packets take from source to destination and identify where delays occur?</h3>
-                        <div class="option" onclick="selectOption(this, 5, 'A')">A) ping</div>
-                        <div class="option" onclick="selectOption(this, 5, 'B')">B) netstat</div>
-                        <div class="option" onclick="selectOption(this, 5, 'C')">C) traceroute</div>
-                        <div class="option" onclick="selectOption(this, 5, 'D')">D) nslookup</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: C) traceroute</strong><br>
-                            Traceroute (or tracert on Windows) shows the path packets take through the network and can identify where delays or failures occur.
-                        </div>
-                    </div>
-
-                    <!-- Question 6 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 6</div>
-                        <h3>A switch port is showing "error disabled" status. What is the most likely cause?</h3>
-                        <div class="option" onclick="selectOption(this, 6, 'A')">A) Port was manually shut down by administrator</div>
-                        <div class="option" onclick="selectOption(this, 6, 'B')">B) Port automatically shut down due to security violation or errors</div>
-                        <div class="option" onclick="selectOption(this, 6, 'C')">C) Port is in spanning tree learning state</div>
-                        <div class="option" onclick="selectOption(this, 6, 'D')">D) Port speed mismatch with connected device</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Port automatically shut down due to security violation or errors</strong><br>
-                            "Error disabled" means the port was automatically disabled by the switch due to conditions like port security violations, excessive errors, or STP issues.
-                        </div>
-                    </div>
-
-                    <!-- Question 7 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 7</div>
-                        <h3>Users are experiencing slow network performance during peak hours. Which performance issue is most likely occurring?</h3>
-                        <div class="option" onclick="selectOption(this, 7, 'A')">A) Jitter</div>
-                        <div class="option" onclick="selectOption(this, 7, 'B')">B) Congestion</div>
-                        <div class="option" onclick="selectOption(this, 7, 'C')">C) Crosstalk</div>
-                        <div class="option" onclick="selectOption(this, 7, 'D')">D) Attenuation</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Congestion</strong><br>
-                            Congestion occurs when network demand exceeds available bandwidth capacity, typically during peak usage times.
-                        </div>
-                    </div>
-
-                    <!-- Question 8 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 8</div>
-                        <h3>A network has DHCP scope exhaustion. What is the immediate solution to allow new devices to connect?</h3>
-                        <div class="option" onclick="selectOption(this, 8, 'A')">A) Restart the DHCP server</div>
-                        <div class="option" onclick="selectOption(this, 8, 'B')">B) Increase the DHCP lease time</div>
-                        <div class="option" onclick="selectOption(this, 8, 'C')">C) Expand the DHCP scope or add additional scope</div>
-                        <div class="option" onclick="selectOption(this, 8, 'D')">D) Enable DHCP relay</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: C) Expand the DHCP scope or add additional scope</strong><br>
-                            Address pool exhaustion means all available IP addresses in the scope are assigned. Adding more addresses to the scope resolves this immediately.
-                        </div>
-                    </div>
-
-                    <!-- Question 9 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 9</div>
-                        <h3>Which type of cable issue would cause TX/RX transposed problems?</h3>
-                        <div class="option" onclick="selectOption(this, 9, 'A')">A) Signal attenuation</div>
-                        <div class="option" onclick="selectOption(this, 9, 'B')">B) Electromagnetic interference</div>
-                        <div class="option" onclick="selectOption(this, 9, 'C')">C) Improper termination</div>
-                        <div class="option" onclick="selectOption(this, 9, 'D')">D) Cable length exceeded</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: C) Improper termination</strong><br>
-                            TX/RX transposed means transmit and receive pairs are swapped, which is caused by incorrect wiring during cable termination.
-                        </div>
-                    </div>
-
-                    <!-- Question 10 -->
-                    <div class="question-box">
-                        <div class="question-number">Question 10</div>
-                        <h3>A wireless client keeps disconnecting from the access point when moving between conference rooms. What is the most likely cause?</h3>
-                        <div class="option" onclick="selectOption(this, 10, 'A')">A) Channel interference</div>
-                        <div class="option" onclick="selectOption(this, 10, 'B')">B) Roaming misconfiguration</div>
-                        <div class="option" onclick="selectOption(this, 10, 'C')">C) Insufficient wireless coverage</div>
-                        <div class="option" onclick="selectOption(this, 10, 'D')">D) Wrong encryption protocol</div>
-                        <div class="explanation">
-                            <strong>Correct Answer: B) Roaming misconfiguration</strong><br>
-                            When clients disconnect while moving between areas served by different access points, it typically indicates roaming configuration issues.
-                        </div>
-                    </div>
-
-                    <button class="submit-btn" onclick="submitAssessment()">Submit Assessment</button>
-                    
-                    <div id="score-display" class="score-display" style="display: none;">
-                        <h3>Assessment Results</h3>
-                        <p id="score-text"></p>
-                        <p id="feedback-text"></p>
-                    </div>
-                </div>
+                <button class="interactive-btn" onclick="updateProgress(100)">Mark Complete ✅</button>
             </section>
         </main>
     </div>
 
     <script>
-        let answers = {};
-        let correctAnswers = {
-            1: 'B', 2: 'A', 3: 'B', 4: 'B', 5: 'C',
-            6: 'B', 7: 'B', 8: 'C', 9: 'C', 10: 'B'
-        };
+        // Global variables
+        let currentSection = 'intro';
+        let assessmentQuestions = [
+            {
+                question: "What is the first step in the CompTIA troubleshooting methodology?",
+                options: [
+                    "Test the theory to determine cause",
+                    "Identify the problem",
+                    "Establish a theory of probable cause",
+                    "Document findings and actions"
+                ],
+                correct: 1,
+                explanation: "The first step is always to identify the problem by gathering information, questioning users, and understanding the symptoms."
+            },
+            {
+                question: "Which command would you use to test basic connectivity to a remote host?",
+                options: [
+                    "ipconfig",
+                    "netstat",
+                    "ping",
+                    "tracert"
+                ],
+                correct: 2,
+                explanation: "PING uses ICMP to test reachability and measure round-trip time to a remote host."
+            },
+            {
+                question: "You need to see the path packets take to reach a destination. Which tool should you use?",
+                options: [
+                    "ping",
+                    "tracert",
+                    "nslookup",
+                    "ipconfig"
+                ],
+                correct: 1,
+                explanation: "TRACERT (Windows) or traceroute (Linux/Mac) shows the complete path packets take through routers to reach a destination."
+            },
+            {
+                question: "A user cannot access www.example.com but can ping 8.8.8.8. What is the most likely issue?",
+                options: [
+                    "Physical connectivity problem",
+                    "IP configuration issue",
+                    "DNS resolution problem",
+                    "Default gateway failure"
+                ],
+                correct: 2,
+                explanation: "Since the user can ping 8.8.8.8 (internet connectivity works), but cannot access a website by name, this indicates a DNS resolution problem."
+            },
+            {
+                question: "Which step comes immediately after 'Test the theory to determine cause' in the troubleshooting methodology?",
+                options: [
+                    "Verify full system functionality",
+                    "Document findings and actions",
+                    "Establish a plan of action to resolve the problem",
+                    "Identify the problem"
+                ],
+                correct: 2,
+                explanation: "After testing and confirming the theory, the next step is to establish a plan of action to resolve the problem and implement the solution."
+            }
+        ];
+        let userAnswers = [];
+        let assessmentStarted = false;
 
+        // Navigation functions
         function showSection(sectionId) {
             // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
             
-            // Show selected section
+            // Show target section
             document.getElementById(sectionId).classList.add('active');
             
             // Update navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
             event.target.classList.add('active');
+            
+            currentSection = sectionId;
+            updateProgress(getProgressPercent(sectionId));
         }
 
-        function selectOption(element, questionNum, option) {
-            // Remove previous selections for this question
-            const questionBox = element.parentElement;
-            const options = questionBox.querySelectorAll('.option');
-            options.forEach(opt => {
-                opt.classList.remove('selected');
+        function getProgressPercent(section) {
+            const progressMap = {
+                'intro': 10,
+                'methodology': 30,
+                'tools': 50,
+                'examples': 70,
+                'assessment': 90,
+                'resources': 100
+            };
+            return progressMap[section] || 0;
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // Interactive demonstrations
+        function demonstrateTool() {
+            alert("🖥️ Interactive Demo\n\nIn a real environment, you would:\n\n1. Open Command Prompt/Terminal\n2. Try: ping google.com\n3. Try: ipconfig /all\n4. Try: tracert 8.8.8.8\n5. Try: nslookup google.com\n\nPractice these commands in your own environment!");
+        }
+
+        function showToolSimulator() {
+            const commands = ['ping 192.168.1.1', 'ipconfig /all', 'tracert google.com', 'nslookup example.com'];
+            const selectedCommand = commands[Math.floor(Math.random() * commands.length)];
+            
+            alert(`🎯 Tool Simulator\n\nRandomly selected command: ${selectedCommand}\n\nIn a real scenario, this command would help you:\n\n• Diagnose connectivity issues\n• Verify network configuration\n• Trace network paths\n• Resolve DNS problems\n\nTry running this command in your terminal!`);
+        }
+
+        // Assessment functions
+        function startAssessment() {
+            if (assessmentStarted) {
+                alert("Assessment already in progress. Complete current questions or retake assessment.");
+                return;
+            }
+            
+            assessmentStarted = true;
+            userAnswers = [];
+            const container = document.getElementById('assessmentContainer');
+            container.innerHTML = '';
+            
+            assessmentQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <h4>Question ${index + 1}: ${q.question}</h4>
+                    ${q.options.map((option, optIndex) => `
+                        <label class="option">
+                            <input type="radio" name="q${index}" value="${optIndex}">
+                            ${option}
+                        </label>
+                    `).join('')}
+                    <div class="result" id="result${index}"></div>
+                `;
+                container.appendChild(questionDiv);
             });
             
-            // Mark current selection
-            element.classList.add('selected');
-            answers[questionNum] = option;
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'interactive-btn';
+            submitBtn.textContent = 'Submit Assessment';
+            submitBtn.onclick = submitAssessment;
+            container.appendChild(submitBtn);
         }
 
         function submitAssessment() {
             let score = 0;
-            const totalQuestions = 10;
+            userAnswers = [];
             
-            // Check answers and provide feedback
-            for (let i = 1; i <= totalQuestions; i++) {
-                const questionBox = document.querySelectorAll('.question-box')[i-1];
-                const options = questionBox.querySelectorAll('.option');
-                const explanation = questionBox.querySelector('.explanation');
+            assessmentQuestions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const resultDiv = document.getElementById(`result${index}`);
                 
-                options.forEach(option => {
-                    const optionLetter = option.textContent.charAt(0);
-                    if (optionLetter === correctAnswers[i]) {
-                        option.classList.add('correct');
-                        if (answers[i] === correctAnswers[i]) {
-                            score++;
-                        }
-                    } else if (answers[i] === optionLetter) {
-                        option.classList.add('incorrect');
+                if (selected) {
+                    const answer = parseInt(selected.value);
+                    userAnswers.push(answer);
+                    
+                    if (answer === q.correct) {
+                        score++;
+                        resultDiv.className = 'result correct';
+                        resultDiv.textContent = '✅ Correct! ' + q.explanation;
+                    } else {
+                        resultDiv.className = 'result incorrect';
+                        resultDiv.textContent = '❌ Incorrect. ' + q.explanation;
                     }
-                });
-                
-                explanation.style.display = 'block';
-            }
+                    resultDiv.style.display = 'block';
+                } else {
+                    resultDiv.className = 'result incorrect';
+                    resultDiv.textContent = '⚠️ No answer selected.';
+                    resultDiv.style.display = 'block';
+                }
+            });
             
-            // Display score
-            const scorePercentage = Math.round((score / totalQuestions) * 100);
-            const scoreDisplay = document.getElementById('score-display');
-            const scoreText = document.getElementById('score-text');
-            const feedbackText = document.getElementById('feedback-text');
+            const percentage = Math.round((score / assessmentQuestions.length) * 100);
+            document.getElementById('finalScore').textContent = `You scored ${score}/${assessmentQuestions.length} (${percentage}%)`;
+            document.getElementById('scoreContainer').style.display = 'block';
             
-            scoreText.innerHTML = `Your Score: ${score}/${totalQuestions} (${scorePercentage}%)`;
-            
-            let feedback = '';
-            if (scorePercentage >= 90) {
-                feedback = 'Excellent! You have a strong understanding of network troubleshooting concepts.';
-            } else if (scorePercentage >= 80) {
-                feedback = 'Good job! You understand most troubleshooting concepts. Review the explanations for missed questions.';
-            } else if (scorePercentage >= 70) {
-                feedback = 'Fair performance. Focus on studying the troubleshooting methodology and common issues.';
+            if (percentage >= 80) {
+                document.getElementById('finalScore').innerHTML += '<br>🎉 Excellent! You have mastered the troubleshooting methodology!';
+            } else if (percentage >= 60) {
+                document.getElementById('finalScore').innerHTML += '<br>👍 Good job! Review the material and try again for mastery.';
             } else {
-                feedback = 'More study needed. Review all sections thoroughly and practice troubleshooting scenarios.';
+                document.getElementById('finalScore').innerHTML += '<br>📚 Keep studying! Review the methodology and tools sections.';
             }
-            
-            feedbackText.textContent = feedback;
-            scoreDisplay.style.display = 'block';
-            
-            // Scroll to results
-            scoreDisplay.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialize with overview section
-        document.addEventListener('DOMContentLoaded', function() {
-            showSection('overview');
+        function retakeAssessment() {
+            assessmentStarted = false;
+            document.getElementById('scoreContainer').style.display = 'none';
+            document.getElementById('assessmentContainer').innerHTML = '<button class="interactive-btn" onclick="startAssessment()">Start Assessment</button>';
+        }
+
+        // Initialize progress bar
+        updateProgress(10);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                const sections = ['intro', 'methodology', 'tools', 'examples', 'assessment', 'resources'];
+                const currentIndex = sections.indexOf(currentSection);
+                if (currentIndex < sections.length - 1) {
+                    showSection(sections[currentIndex + 1]);
+                }
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                const sections = ['intro', 'methodology', 'tools', 'examples', 'assessment', 'resources'];
+                const currentIndex = sections.indexOf(currentSection);
+                if (currentIndex > 0) {
+                    showSection(sections[currentIndex - 1]);
+                }
+            }
         });
     </script>
 </body>
