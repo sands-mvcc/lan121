@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Router Configuration Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .nav-sidebar {
+            width: 250px;
+            background-color: #2d5a27;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid #4a7c59;
+            margin-bottom: 20px;
+        }
+
+        .nav-header h1 {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background-color: #4a7c59;
+        }
+
+        .nav-item.active {
+            background-color: #1a4016;
+            border-left-color: #7fb069;
+        }
+
+        .nav-item h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .nav-item p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
+
+        .header-bar {
+            background-color: black;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .router-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #7fb069;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2d5a27;
+            font-size: 24px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #7fb069;
+            padding-bottom: 10px;
+        }
+
+        .section-description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #2d5a27;
+            margin-bottom: 8px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #7fb069;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #2d5a27;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a4016;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: #7fb069;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .config-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #7fb069;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .step.completed .step-number {
+            background-color: #7fb069;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background-color: #2d5a27;
+            color: white;
+        }
+
+        .strength-meter {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background-color: #dc3545; width: 25%; }
+        .strength-fair { background-color: #ffc107; width: 50%; }
+        .strength-good { background-color: #28a745; width: 75%; }
+        .strength-strong { background-color: #007bff; width: 100%; }
+
+        .network-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .device-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #2d5a27;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 10px;
+            position: relative;
+        }
+
+        .signal-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ring {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #7fb069;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.6;
+            animation: ripple 2s infinite;
+        }
+
+        .ring:nth-child(2) { animation-delay: 0.5s; }
+        .ring:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes ripple {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-header">
+                <h1>Wi-Fi Configuration</h1>
+                <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Educational Simulator</p>
+            </div>
+            
+            <div class="nav-item active" data-section="overview">
+                <h3>🏠 Overview</h3>
+                <p>System status and quick setup</p>
+            </div>
+            
+            <div class="nav-item" data-section="basic">
+                <h3>📡 Basic Wireless</h3>
+                <p>Network name and password</p>
+            </div>
+            
+            <div class="nav-item" data-section="security">
+                <h3>🔒 Security Settings</h3>
+                <p>Authentication and encryption</p>
+            </div>
+            
+            <div class="nav-item" data-section="advanced">
+                <h3>⚙️ Advanced Settings</h3>
+                <p>Channels and performance</p>
+            </div>
+            
+            <div class="nav-item" data-section="guest">
+                <h3>👥 Guest Network</h3>
+                <p>Separate network for visitors</p>
+            </div>
+            
+            <div class="nav-item" data-section="firewall">
+                <h3>🛡️ Firewall</h3>
+                <p>Network protection settings</p>
+            </div>
+            
+            <div class="nav-item" data-section="summary">
+                <h3>📋 Configuration Summary</h3>
+                <p>Review and apply settings</p>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header-bar">
+                <div>
+                    <h2>Router Configuration Panel</h2>
+                    <p style="font-size: 12px; opacity: 0.8;">Model: EDU-SIM-5000 | Firmware: v2.1.4</p>
+                </div>
+                <div class="router-status">
+                    <div class="status-light"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Overview Section -->
+                <div class="section active" id="overview">
+                    <h2 class="section-title">System Overview</h2>
+                    <p class="section-description">Welcome to the Wi-Fi Configuration Simulator! This tool helps you learn how to configure wireless routers and access points.</p>
+                    
+                    <div class="alert alert-success">
+                        <strong>Learning Objectives:</strong> Understand SSID configuration, security protocols, channel management, and network optimization.
+                    </div>
+
+                    <div class="network-diagram">
+                        <h3 style="margin-bottom: 20px; color: #2d5a27;">Your Network Topology</h3>
+                        <div class="device-icon">
+                            🌐
+                            <div class="signal-rings">
+                                <div class="ring"></div>
+                                <div class="ring"></div>
+                                <div class="ring"></div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px;">Router broadcasting Wi-Fi signal to connected devices</p>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 15%;"></div>
+                    </div>
+                    <p><strong>Configuration Progress:</strong> 1 of 7 sections completed</p>
+                </div>
+
+                <!-- Basic Wireless Section -->
+                <div class="section" id="basic">
+                    <h2 class="section-title">Basic Wireless Settings</h2>
+                    <p class="section-description">Configure the fundamental settings for your wireless network including network name (SSID) and password.</p>
+
+                    <div class="form-group">
+                        <label for="ssid">Network Name (SSID)</label>
+                        <input type="text" id="ssid" class="form-control" placeholder="e.g., MyHomeNetwork" maxlength="32">
+                        <div class="help-text">Choose a unique name for your network (up to 32 characters). Avoid using default names like "Linksys" or "NETGEAR".</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Network Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter a strong password">
+                        <div class="help-text">Use at least 8 characters with a mix of letters, numbers, and symbols.</div>
+                        <div class="strength-meter">
+                            <div class="strength-fill strength-weak" id="passwordStrength"></div>
+                        </div>
+                        <span id="strengthText" style="font-size: 12px; color: #dc3545;">Weak</span>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hideSSID">
+                        <label for="hideSSID">Hide network name (not recommended for home use)</label>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveBasicSettings()">Save Basic Settings</button>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="section" id="security">
+                    <h2 class="section-title">Security Settings</h2>
+                    <p class="section-description">Configure authentication and encryption protocols to protect your network from unauthorized access.</p>
+
+                    <div class="form-group">
+                        <label>Security Protocol</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="wpa3" name="security" value="wpa3" checked>
+                                <label for="wpa3">WPA3 Personal (Recommended)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="wpa2wpa3" name="security" value="wpa2wpa3">
+                                <label for="wpa2wpa3">WPA2/WPA3 Mixed</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="wpa2" name="security" value="wpa2">
+                                <label for="wpa2">WPA2 Personal (Legacy)</label>
+                            </div>
+                        </div>
+                        <div class="help-text">WPA3 provides the strongest security. Use mixed mode only if you have older devices that don't support WPA3.</div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Security Note:</strong> Never use WEP or Open authentication as they provide no real security protection.
+                    </div>
+
+                    <div class="form-group">
+                        <label>Encryption Type</label>
+                        <select class="form-control" id="encryption">
+                            <option value="aes">AES (Advanced Encryption Standard)</option>
+                            <option value="tkip" disabled>TKIP (Deprecated)</option>
+                        </select>
+                        <div class="help-text">AES is the modern standard and provides strong encryption.</div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pmf" checked>
+                        <label for="pmf">Enable Protected Management Frames (PMF)</label>
+                        <div class="help-text">Protects against certain types of wireless attacks.</div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">Save Security Settings</button>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings Section -->
+                <div class="section" id="advanced">
+                    <h2 class="section-title">Advanced Wireless Settings</h2>
+                    <p class="section-description">Fine-tune your wireless performance with channel selection, bandwidth, and transmission power settings.</p>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label>2.4GHz Channel</label>
+                                <select class="form-control" id="channel24">
+                                    <option value="auto">Auto (Recommended)</option>
+                                    <option value="1">Channel 1</option>
+                                    <option value="6">Channel 6</option>
+                                    <option value="11">Channel 11</option>
+                                </select>
+                                <div class="help-text">Channels 1, 6, and 11 don't overlap.</div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label>5GHz Channel</label>
+                                <select class="form-control" id="channel5">
+                                    <option value="auto">Auto (Recommended)</option>
+                                    <option value="36">Channel 36</option>
+                                    <option value="40">Channel 40</option>
+                                    <option value="44">Channel 44</option>
+                                    <option value="149">Channel 149</option>
+                                </select>
+                                <div class="help-text">5GHz has more non-overlapping channels.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label>2.4GHz Bandwidth</label>
+                                <select class="form-control" id="bandwidth24">
+                                    <option value="20">20 MHz (Recommended)</option>
+                                    <option value="40">40 MHz</option>
+                                </select>
+                                <div class="help-text">20MHz reduces interference in crowded areas.</div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label>5GHz Bandwidth</label>
+                                <select class="form-control" id="bandwidth5">
+                                    <option value="80">80 MHz (Recommended)</option>
+                                    <option value="40">40 MHz</option>
+                                    <option value="20">20 MHz</option>
+                                </select>
+                                <div class="help-text">Higher bandwidth = faster speeds but more interference.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transmit Power</label>
+                        <input type="range" id="txPower" min="25" max="100" value="100" class="form-control">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                            <span>25%</span>
+                            <span id="powerValue">100%</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="help-text">Lower power reduces interference and saves energy but decreases range.</div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="beamforming" checked>
+                        <label for="beamforming">Enable Beamforming</label>
+                        <div class="help-text">Focuses signal toward connected devices for better performance.</div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveAdvancedSettings()">Save Advanced Settings</button>
+                    </div>
+                </div>
+
+                <!-- Guest Network Section -->
+                <div class="section" id="guest">
+                    <h2 class="section-title">Guest Network</h2>
+                    <p class="section-description">Set up a separate network for visitors that doesn't provide access to your main network devices.</p>
+
+                    <div class="checkbox-group" style="margin-bottom: 20px;">
+                        <input type="checkbox" id="enableGuest" onchange="toggleGuestSettings()">
+                        <label for="enableGuest"><strong>Enable Guest Network</strong></label>
+                    </div>
+
+                    <div id="guestSettings" style="display: none;">
+                        <div class="form-group">
+                            <label for="guestSSID">Guest Network Name</label>
+                            <input type="text" id="guestSSID" class="form-control" placeholder="e.g., Guest-WiFi">
+                            <div class="help-text">Choose a name that identifies it as a guest network.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guestPassword">Guest Password</label>
+                            <input type="password" id="guestPassword" class="form-control" placeholder="Optional - leave blank for open access">
+                            <div class="help-text">You can leave this blank for open access, but this is less secure.</div>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="guestIsolation" checked>
+                            <label for="guestIsolation">Enable Guest Isolation</label>
+                            <div class="help-text">Prevents guest devices from accessing your main network and each other.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bandwidth Limit for Guests</label>
+                            <select class="form-control" id="guestBandwidth">
+                                <option value="unlimited">Unlimited</option>
+                                <option value="10">10 Mbps</option>
+                                <option value="25">25 Mbps</option>
+                                <option value="50">50 Mbps</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveGuestSettings()">Save Guest Settings</button>
+                    </div>
+                </div>
+
+                <!-- Firewall Section -->
+                <div class="section" id="firewall">
+                    <h2 class="section-title">Firewall & Access Control</h2>
+                    <p class="section-description">Configure network protection and device access controls.</p>
+
+                    <div class="checkbox-group" style="margin-bottom: 20px;">
+                        <input type="checkbox" id="enableFirewall" checked>
+                        <label for="enableFirewall"><strong>Enable Firewall Protection</strong></label>
+                        <div class="help-text">Blocks malicious traffic and unauthorized access attempts.</div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dosProtection" checked>
+                        <label for="dosProtection">Enable DoS Attack Protection</label>
+                        <div class="help-text">Protects against Denial of Service attacks.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MAC Address Filtering</label>
+                        <select class="form-control" id="macFiltering">
+                            <option value="disabled">Disabled (Recommended for home use)</option>
+                            <option value="allow">Allow Listed Devices Only</option>
+                            <option value="deny">Block Listed Devices</option>
+                        </select>
+                        <div class="help-text">Controls which devices can connect based on their MAC addresses.</div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="accessSchedule">
+                        <label for="accessSchedule">Enable Access Scheduling</label>
+                        <div class="help-text">Control when devices can access the internet (useful for parental controls).</div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveFirewallSettings()">Save Firewall Settings</button>
+                    </div>
+                </div>
+
+                <!-- Configuration Summary Section -->
+                <div class="section" id="summary">
+                    <h2 class="section-title">Configuration Summary</h2>
+                    <p class="section-description">Review all your settings before applying the configuration to the router.</p>
+
+                    <div class="step-indicator">
+                        <div class="step completed">
+                            <div class="step-number">1</div>
+                            <span>Basic Settings</span>
+                        </div>
+                        <div class="step completed">
+                            <div class="step-number">2</div>
+                            <span>Security</span>
+                        </div>
+                        <div class="step completed">
+                            <div class="step-number">3</div>
+                            <span>Advanced</span>
+                        </div>
+                        <div class="step completed">
+                            <div class="step-number">4</div>
+                            <span>Complete</span>
+                        </div>
+                    </div>
+
+                    <div class="config-preview">
+                        <h3 style="color: #2d5a27; margin-bottom: 15px;">Current Configuration</h3>
+                        <div id="configSummary">
+                            <div class="config-item">
+                                <strong>Network Name (SSID):</strong>
+                                <span id="summarySSID">Not configured</span>
+                            </div>
+                            <div class="config-item">
+                                <strong>Security Protocol:</strong>
+                                <span id="summarySecurity">WPA3 Personal</span>
+                            </div>
+                            <div class="config-item">
+                                <strong>Password Protected:</strong>
+                                <span id="summaryPassword">No</span>
+                            </div>
+                            <div class="config-item">
+                                <strong>Guest Network:</strong>
+                                <span id="summaryGuest">Disabled</span>
+                            </div>
+                            <div class="config-item">
+                                <strong>Firewall:</strong>
+                                <span id="summaryFirewall">Enabled</span>
+                            </div>
+                            <div class="config-item">
+                                <strong>Channel Selection:</strong>
+                                <span id="summaryChannels">Auto (2.4GHz & 5GHz)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success" style="margin-top: 20px;">
+                        <strong>Ready to Deploy!</strong> Your configuration follows security best practices and should provide excellent performance.
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button class="btn btn-success" onclick="applyConfiguration()" style="margin-right: 10px;">Apply Configuration</button>
+                        <button class="btn btn-secondary" onclick="downloadConfig()">Download Config File</button>
+                        <button class="btn btn-secondary" onclick="resetToDefaults()" style="margin-left: 10px;">Reset to Defaults</button>
+                    </div>
+
+                    <div id="applyResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global configuration object
+        let routerConfig = {
+            ssid: '',
+            password: '',
+            hideSSID: false,
+            security: 'wpa3',
+            encryption: 'aes',
+            pmf: true,
+            channel24: 'auto',
+            channel5: 'auto',
+            bandwidth24: '20',
+            bandwidth5: '80',
+            txPower: 100,
+            beamforming: true,
+            guestEnabled: false,
+            guestSSID: '',
+            guestPassword: '',
+            guestIsolation: true,
+            guestBandwidth: 'unlimited',
+            firewallEnabled: true,
+            dosProtection: true,
+            macFiltering: 'disabled',
+            accessSchedule: false
+        };
+
+        let completedSections = new Set(['overview']);
+
+        // Navigation handling
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const sectionId = this.dataset.section;
+                showSection(sectionId);
+                
+                // Update nav active state
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update progress if viewing summary
+            if (sectionId === 'summary') {
+                updateConfigSummary();
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            updatePasswordStrength(strength);
+        });
+
+        function calculatePasswordStrength(password) {
+            if (password.length < 6) return 1;
+            if (password.length < 8) return 2;
+            
+            let score = 2;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            return Math.min(score, 4);
+        }
+
+        function updatePasswordStrength(strength) {
+            const strengthElement = document.getElementById('passwordStrength');
+            const textElement = document.getElementById('strengthText');
+            
+            const classes = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+            const texts = ['Weak', 'Fair', 'Good', 'Strong'];
+            const colors = ['#dc3545', '#ffc107', '#28a745', '#007bff'];
+            
+            strengthElement.className = 'strength-fill ' + classes[strength - 1];
+            textElement.textContent = texts[strength - 1];
+            textElement.style.color = colors[strength - 1];
+        }
+
+        // Transmission power slider
+        document.getElementById('txPower').addEventListener('input', function() {
+            document.getElementById('powerValue').textContent = this.value + '%';
+            routerConfig.txPower = parseInt(this.value);
+        });
+
+        // Guest network toggle
+        function toggleGuestSettings() {
+            const checkbox = document.getElementById('enableGuest');
+            const settings = document.getElementById('guestSettings');
+            settings.style.display = checkbox.checked ? 'block' : 'none';
+            routerConfig.guestEnabled = checkbox.checked;
+        }
+
+        // Save functions
+        function saveBasicSettings() {
+            const ssid = document.getElementById('ssid').value;
+            const password = document.getElementById('password').value;
+            
+            if (!ssid.trim()) {
+                alert('Please enter a network name (SSID)');
+                return;
+            }
+            
+            if (password.length > 0 && password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            routerConfig.ssid = ssid;
+            routerConfig.password = password;
+            routerConfig.hideSSID = document.getElementById('hideSSID').checked;
+            
+            completedSections.add('basic');
+            showSuccessMessage('Basic wireless settings saved successfully!');
+            updateProgress();
+        }
+
+        function saveSecuritySettings() {
+            routerConfig.security = document.querySelector('input[name="security"]:checked').value;
+            routerConfig.encryption = document.getElementById('encryption').value;
+            routerConfig.pmf = document.getElementById('pmf').checked;
+            
+            completedSections.add('security');
+            showSuccessMessage('Security settings saved successfully!');
+            updateProgress();
+        }
+
+        function saveAdvancedSettings() {
+            routerConfig.channel24 = document.getElementById('channel24').value;
+            routerConfig.channel5 = document.getElementById('channel5').value;
+            routerConfig.bandwidth24 = document.getElementById('bandwidth24').value;
+            routerConfig.bandwidth5 = document.getElementById('bandwidth5').value;
+            routerConfig.beamforming = document.getElementById('beamforming').checked;
+            
+            completedSections.add('advanced');
+            showSuccessMessage('Advanced settings saved successfully!');
+            updateProgress();
+        }
+
+        function saveGuestSettings() {
+            if (routerConfig.guestEnabled) {
+                const guestSSID = document.getElementById('guestSSID').value;
+                if (!guestSSID.trim()) {
+                    alert('Please enter a guest network name');
+                    return;
+                }
+                routerConfig.guestSSID = guestSSID;
+                routerConfig.guestPassword = document.getElementById('guestPassword').value;
+                routerConfig.guestIsolation = document.getElementById('guestIsolation').checked;
+                routerConfig.guestBandwidth = document.getElementById('guestBandwidth').value;
+            }
+            
+            completedSections.add('guest');
+            showSuccessMessage('Guest network settings saved successfully!');
+            updateProgress();
+        }
+
+        function saveFirewallSettings() {
+            routerConfig.firewallEnabled = document.getElementById('enableFirewall').checked;
+            routerConfig.dosProtection = document.getElementById('dosProtection').checked;
+            routerConfig.macFiltering = document.getElementById('macFiltering').value;
+            routerConfig.accessSchedule = document.getElementById('accessSchedule').checked;
+            
+            completedSections.add('firewall');
+            showSuccessMessage('Firewall settings saved successfully!');
+            updateProgress();
+        }
+
+        function showSuccessMessage(message) {
+            // Create temporary success alert
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success';
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '1000';
+            alert.style.minWidth = '300px';
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                document.body.removeChild(alert);
+            }, 3000);
+        }
+
+        function updateProgress() {
+            const totalSections = 7;
+            const completed = completedSections.size;
+            const percentage = (completed / totalSections) * 100;
+            
+            document.querySelector('.progress-fill').style.width = percentage + '%';
+            document.querySelector('.content-area .section:first-child p:last-child').innerHTML = 
+                `<strong>Configuration Progress:</strong> ${completed} of ${totalSections} sections completed`;
+        }
+
+        function updateConfigSummary() {
+            document.getElementById('summarySSID').textContent = routerConfig.ssid || 'Not configured';
+            document.getElementById('summarySecurity').textContent = routerConfig.security.toUpperCase() + ' Personal';
+            document.getElementById('summaryPassword').textContent = routerConfig.password ? 'Yes' : 'No';
+            document.getElementById('summaryGuest').textContent = routerConfig.guestEnabled ? 'Enabled' : 'Disabled';
+            document.getElementById('summaryFirewall').textContent = routerConfig.firewallEnabled ? 'Enabled' : 'Disabled';
+            
+            const channelText = `${routerConfig.channel24} (2.4GHz) & ${routerConfig.channel5} (5GHz)`;
+            document.getElementById('summaryChannels').textContent = channelText;
+        }
+
+        function applyConfiguration() {
+            if (!routerConfig.ssid) {
+                alert('Please configure at least the basic wireless settings before applying.');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('applyResult');
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Configuration Applied Successfully!</strong><br>
+                    Your router has been configured with the new settings. 
+                    Devices may need to reconnect to the network with the new password.
+                    <br><br>
+                    <em>In a real scenario, the router would reboot and apply these changes.</em>
+                </div>
+            `;
+            
+            // Simulate configuration process
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Applying...';
+            
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = 'Apply Configuration';
+            }, 2000);
+        }
+
+        function downloadConfig() {
+            const configText = JSON.stringify(routerConfig, null, 2);
+            const blob = new Blob([configText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'router-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all settings to defaults? This will clear all your configuration.')) {
+                // Reset form fields
+                document.getElementById('ssid').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('hideSSID').checked = false;
+                document.querySelector('input[value="wpa3"]').checked = true;
+                document.getElementById('encryption').value = 'aes';
+                document.getElementById('pmf').checked = true;
+                document.getElementById('channel24').value = 'auto';
+                document.getElementById('channel5').value = 'auto';
+                document.getElementById('bandwidth24').value = '20';
+                document.getElementById('bandwidth5').value = '80';
+                document.getElementById('txPower').value = 100;
+                document.getElementById('powerValue').textContent = '100%';
+                document.getElementById('beamforming').checked = true;
+                document.getElementById('enableGuest').checked = false;
+                document.getElementById('guestSettings').style.display = 'none';
+                document.getElementById('enableFirewall').checked = true;
+                document.getElementById('dosProtection').checked = true;
+                document.getElementById('macFiltering').value = 'disabled';
+                document.getElementById('accessSchedule').checked = false;
+                
+                // Reset password strength indicator
+                updatePasswordStrength(1);
+                
+                // Reset configuration object
+                routerConfig = {
+                    ssid: '',
+                    password: '',
+                    hideSSID: false,
+                    security: 'wpa3',
+                    encryption: 'aes',
+                    pmf: true,
+                    channel24: 'auto',
+                    channel5: 'auto',
+                    bandwidth24: '20',
+                    bandwidth5: '80',
+                    txPower: 100,
+                    beamforming: true,
+                    guestEnabled: false,
+                    guestSSID: '',
+                    guestPassword: '',
+                    guestIsolation: true,
+                    guestBandwidth: 'unlimited',
+                    firewallEnabled: true,
+                    dosProtection: true,
+                    macFiltering: 'disabled',
+                    accessSchedule: false
+                };
+                
+                completedSections = new Set(['overview']);
+                updateProgress();
+                updateConfigSummary();
+                
+                showSuccessMessage('Configuration reset to defaults successfully!');
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            updatePasswordStrength(1);
+        });
+    </script>
+</body>
+</html>
+
+
