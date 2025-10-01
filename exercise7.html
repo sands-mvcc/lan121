@@ -16,6 +16,10 @@
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             color: #333;
             line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
@@ -24,6 +28,7 @@
             padding: 1.5rem 0;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         .header h1 {
@@ -38,7 +43,8 @@
 
         .container {
             display: flex;
-            min-height: calc(100vh - 100px);
+            flex: 1;
+            overflow: hidden;
         }
 
         .sidebar {
@@ -47,6 +53,8 @@
             color: white;
             padding: 2rem 0;
             box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .nav-item {
@@ -72,8 +80,10 @@
 
         .main-content {
             flex: 1;
-            padding: 2rem;
             overflow-y: auto;
+            overflow-x: hidden;
+            padding: 2rem;
+            padding-bottom: 4rem;
         }
 
         .content-section {
@@ -301,6 +311,7 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             animation: fadeIn 0.3s ease;
+            overflow-y: auto;
         }
 
         .modal-content {
@@ -309,7 +320,9 @@
             padding: 2rem;
             border-radius: 12px;
             width: 80%;
-            max-width: 600px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         }
 
@@ -375,13 +388,21 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+
             .container {
                 flex-direction: column;
+                overflow: visible;
             }
             
             .sidebar {
                 width: 100%;
                 padding: 1rem 0;
+                overflow-x: auto;
+                overflow-y: visible;
             }
             
             .nav-item {
@@ -389,9 +410,19 @@
                 padding: 0.5rem 1rem;
                 margin: 0.25rem;
             }
+
+            .main-content {
+                overflow-y: visible;
+                padding-bottom: 2rem;
+            }
             
             .assessment-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2rem auto;
             }
         }
     </style>
@@ -405,19 +436,19 @@
     <div class="container">
         <nav class="sidebar">
             <a href="#overview" class="nav-item active" onclick="showSection('overview')">
-                📊 Organization Overview
+                Organization Overview
             </a>
             <a href="#threats" class="nav-item" onclick="showSection('threats')">
-                ⚠️ Threat Generator
+                Threat Generator
             </a>
             <a href="#assets" class="nav-item" onclick="showSection('assets')">
-                🏭 Asset Analysis
+                Asset Analysis
             </a>
             <a href="#security" class="nav-item" onclick="showSection('security')">
-                🔒 Security Controls
+                Security Controls
             </a>
             <a href="#tasks" class="nav-item" onclick="showSection('tasks')">
-                📝 Assessment Tasks
+                Assessment Tasks
             </a>
         </nav>
 
@@ -444,19 +475,19 @@
                     <h3>Facility Overview</h3>
                     <div class="grid">
                         <div class="threat-card">
-                            <h4>🏢 Headquarters Building</h4>
+                            <h4>Headquarters Building</h4>
                             <p><strong>Location:</strong> 1247 Industrial Parkway, Lima, Ohio</p>
                             <p><strong>Staff:</strong> 22 employees</p>
                             <p><strong>Functions:</strong> Executive offices, R&D labs, quality control, IT operations</p>
                         </div>
                         <div class="threat-card">
-                            <h4>📦 Packaging Facility</h4>
+                            <h4>Packaging Facility</h4>
                             <p><strong>Location:</strong> 1251 Industrial Parkway, Lima, Ohio</p>
                             <p><strong>Staff:</strong> 28 employees</p>
                             <p><strong>Functions:</strong> Automated packaging lines, quality inspection</p>
                         </div>
                         <div class="threat-card">
-                            <h4>🚚 Warehouse & Shipping</h4>
+                            <h4>Warehouse & Shipping</h4>
                             <p><strong>Location:</strong> 1255 Industrial Parkway, Lima, Ohio</p>
                             <p><strong>Staff:</strong> 14 employees</p>
                             <p><strong>Functions:</strong> Inventory management, order fulfillment</p>
@@ -475,7 +506,7 @@
             <!-- Threat Generator Section -->
             <div id="threats" class="content-section">
                 <div class="threat-generator">
-                    <h2>🎯 Interactive Threat Generator</h2>
+                    <h2>Interactive Threat Generator</h2>
                     <p>Generate realistic security threats and risks specific to FreshFlow Systems infrastructure.</p>
                     
                     <div class="controls-panel">
@@ -499,8 +530,8 @@
                                 <option value="warehouse">Warehouse & Shipping</option>
                             </select>
                         </div>
-                        <button class="button" onclick="generateThreat()">🎲 Generate New Threat</button>
-                        <button class="button" onclick="generateMultipleThreats()">⚡ Generate Scenario</button>
+                        <button class="button" onclick="generateThreat()">Generate New Threat</button>
+                        <button class="button" onclick="generateMultipleThreats()">Generate Scenario</button>
                     </div>
 
                     <div id="threatDisplay" class="grid">
@@ -517,7 +548,7 @@
             <!-- Asset Analysis Section -->
             <div id="assets" class="content-section">
                 <div class="card">
-                    <h2>🏭 FreshFlow Systems Asset Inventory</h2>
+                    <h2>FreshFlow Systems Asset Inventory</h2>
                     
                     <h3>Operational Technology (OT) Assets</h3>
                     <table class="asset-table">
@@ -604,12 +635,12 @@
             <!-- Security Controls Section -->
             <div id="security" class="content-section">
                 <div class="card">
-                    <h2>🔒 Network Security Framework Analysis</h2>
+                    <h2>Network Security Framework Analysis</h2>
                     
                     <h3>Current Security Controls (CompTIA Network+ Domain 4.3)</h3>
                     <div class="grid">
                         <div class="threat-card">
-                            <h4>🔐 Identity & Access Management</h4>
+                            <h4>Identity & Access Management</h4>
                             <p><strong>Status:</strong> Partially Implemented</p>
                             <ul>
                                 <li>RADIUS for network authentication</li>
@@ -618,7 +649,7 @@
                             </ul>
                         </div>
                         <div class="threat-card">
-                            <h4>🌐 Network Segmentation</h4>
+                            <h4>Network Segmentation</h4>
                             <p><strong>Status:</strong> Needs Improvement</p>
                             <ul>
                                 <li>OT network segmentation audit required</li>
@@ -627,7 +658,7 @@
                             </ul>
                         </div>
                         <div class="threat-card">
-                            <h4>🛡️ Device Hardening</h4>
+                            <h4>Device Hardening</h4>
                             <p><strong>Status:</strong> In Progress</p>
                             <ul>
                                 <li>Patch management deployment</li>
@@ -662,7 +693,7 @@
             <!-- Assessment Tasks Section -->
             <div id="tasks" class="content-section">
                 <div class="card">
-                    <h2>📝 Network Security Assessment Tasks</h2>
+                    <h2>Network Security Assessment Tasks</h2>
                     <p>Complete these five tasks to demonstrate your understanding of Network+ Domain 4.0 concepts applied to FreshFlow Systems.</p>
                 </div>
 
@@ -684,7 +715,7 @@
                         <li>Assess the need for network segmentation across the three facilities</li>
                     </ol>
                     
-                    <button class="button" onclick="startTask(1)">📋 Start Task 1</button>
+                    <button class="button" onclick="startTask(1)">Start Task 1</button>
                 </div>
 
                 <!-- Task 2 -->
@@ -705,7 +736,7 @@
                         <li>Evaluate social engineering vulnerabilities across all three facilities</li>
                     </ol>
                     
-                    <button class="button" onclick="startTask(2)">🔍 Start Task 2</button>
+                    <button class="button" onclick="startTask(2)">Start Task 2</button>
                 </div>
 
                 <!-- Task 3 -->
@@ -726,7 +757,7 @@
                         <li>Design ACLs and content filtering rules for the industrial network</li>
                     </ol>
                     
-                    <button class="button" onclick="startTask(3)">⚙️ Start Task 3</button>
+                    <button class="button" onclick="startTask(3)">Start Task 3</button>
                 </div>
 
                 <!-- Task 4 -->
@@ -747,7 +778,7 @@
                         <li>Design incident response procedures for security events affecting production</li>
                     </ol>
                     
-                    <button class="button" onclick="startTask(4)">📊 Start Task 4</button>
+                    <button class="button" onclick="startTask(4)">Start Task 4</button>
                 </div>
 
                 <!-- Task 5 -->
@@ -768,7 +799,7 @@
                         <li>Develop security metrics and KPIs for ongoing assessment</li>
                     </ol>
                     
-                    <button class="button" onclick="startTask(5)">🏗️ Start Task 5</button>
+                    <button class="button" onclick="startTask(5)">Start Task 5</button>
                 </div>
 
                 <div class="card">
@@ -1194,17 +1225,17 @@
 
         // Navigation Functions
         function showSection(sectionId) {
-            // Hide all sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
             
-            // Show selected section
             document.getElementById(sectionId).classList.add('active');
             
-            // Update navigation
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             event.target.classList.add('active');
+
+            // Scroll to top of main content
+            document.querySelector('.main-content').scrollTop = 0;
         }
 
         // Threat Generation Functions
@@ -1215,7 +1246,6 @@
             let selectedThreats = [];
             
             if (threatType === 'random') {
-                // Select from all threat categories
                 Object.keys(threatDatabase).forEach(category => {
                     selectedThreats = selectedThreats.concat(threatDatabase[category]);
                 });
@@ -1246,25 +1276,25 @@
                 {
                     title: "Coordinated Cyber Attack",
                     threats: [
-                        threatDatabase.social[0], // Spear phishing
-                        threatDatabase.network[0], // VLAN hopping
-                        threatDatabase.malware[0]  // Industrial malware
+                        threatDatabase.social[0],
+                        threatDatabase.network[0],
+                        threatDatabase.malware[0]
                     ]
                 },
                 {
                     title: "Insider Threat Scenario",
                     threats: [
-                        threatDatabase.physical[1], // USB drop
-                        threatDatabase.social[1],   // Tailgating
-                        threatDatabase.network[1]   // ARP poisoning
+                        threatDatabase.physical[1],
+                        threatDatabase.social[1],
+                        threatDatabase.network[1]
                     ]
                 },
                 {
                     title: "Advanced Persistent Threat",
                     threats: [
-                        threatDatabase.malware[1], // Rogue AP
-                        threatDatabase.malware[2], // Evil twin
-                        threatDatabase.dos[0]      // DDoS on PLCs
+                        threatDatabase.malware[1],
+                        threatDatabase.malware[2],
+                        threatDatabase.dos[0]
                     ]
                 }
             ];
@@ -1293,7 +1323,7 @@
         function displayScenario(scenario) {
             const threatDisplay = document.getElementById('threatDisplay');
             let scenarioHTML = `<div class="scenario-panel">
-                <h3>🎯 ${scenario.title}</h3>
+                <h3>${scenario.title}</h3>
                 <p>A complex multi-stage attack targeting FreshFlow Systems:</p>
             </div>`;
             
@@ -1327,7 +1357,6 @@
             
             historyDiv.insertBefore(historyItem, historyDiv.firstChild);
             
-            // Keep only last 5 items
             while (historyDiv.children.length > 5) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
@@ -1347,7 +1376,6 @@
             
             historyDiv.insertBefore(historyItem, historyDiv.firstChild);
             
-            // Keep only last 3 scenarios
             while (historyDiv.children.length > 3) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
@@ -1377,14 +1405,13 @@
                 <h3>Compliance Requirements</h3>
                 <p><strong>${asset.compliance}</strong></p>
                 
-                <button class="button" onclick="generateAssetThreat('${assetId}')">🎯 Generate Asset-Specific Threats</button>
+                <button class="button" onclick="generateAssetThreat('${assetId}')">Generate Asset-Specific Threats</button>
             `;
             
             modal.style.display = 'block';
         }
 
         function generateAssetThreat(assetId) {
-            // Generate threats specific to the selected asset
             const assetSpecificThreats = {
                 'OT-001': [threatDatabase.malware[0], threatDatabase.network[1], threatDatabase.dos[0]],
                 'OT-002': [threatDatabase.physical[0], threatDatabase.social[1], threatDatabase.network[1]],
@@ -1421,7 +1448,7 @@
                         <p>${step.description}</p>
                         <h5>Key Questions to Address:</h5>
                         <ul>${questionsHTML}</ul>
-                        <button class="button" onclick="completeStep(${taskNumber}, ${index})">✅ Complete Step</button>
+                        <button class="button" onclick="completeStep(${taskNumber}, ${index})">Complete Step</button>
                     </div>
                 `;
             });
@@ -1433,7 +1460,7 @@
                 </div>
                 <p id="taskProgressText${taskNumber}">0 of ${task.steps.length} steps completed</p>
                 ${stepsHTML}
-                <button class="button" onclick="completeTask(${taskNumber})" id="completeTaskBtn${taskNumber}" style="display: none;">🎉 Complete Task ${taskNumber}</button>
+                <button class="button" onclick="completeTask(${taskNumber})" id="completeTaskBtn${taskNumber}" style="display: none;">Complete Task ${taskNumber}</button>
             `;
             
             modal.style.display = 'block';
@@ -1475,7 +1502,7 @@
             progressText.textContent = `${completed} of ${totalTasks} tasks completed`;
             
             if (completed === totalTasks) {
-                showNotification('🎉 All assessment tasks completed! Excellent work!');
+                showNotification('All assessment tasks completed!');
             }
         }
 
@@ -1500,7 +1527,6 @@
             }, 3000);
         }
 
-        // Close modals when clicking outside
         window.onclick = function(event) {
             const assetModal = document.getElementById('assetModal');
             const taskModal = document.getElementById('taskModal');
@@ -1512,11 +1538,9 @@
             }
         }
 
-        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             showNotification('FreshFlow Systems Security Assessment Tool loaded successfully!');
             
-            // Generate an initial threat for demonstration
             setTimeout(() => {
                 generateThreat();
             }, 2000);
