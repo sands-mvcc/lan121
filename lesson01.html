@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA Network+ | Domain 1: Networking Concepts</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --black:       #0a0a0a;
+  --black-soft:  #1a1a1a;
+  --black-mid:   #2a2a2a;
+  --gray-dark:   #3d3d3d;
+  --gray-mid:    #6b6b6b;
+  --gray-light:  #c8c8c8;
+  --gray-pale:   #f0f0f0;
+  --white:       #ffffff;
+  --green:       #00b86b;
+  --green-mid:   #009958;
+  --green-dark:  #006b3c;
+  --green-pale:  #e6f9f0;
+  --green-glow:  rgba(0,184,107,0.15);
+  --accent-warn: #e6a817;
+  --accent-info: #2196f3;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   14px;
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:   0 6px 24px rgba(0,0,0,0.12);
+  --shadow-lg:   0 16px 48px rgba(0,0,0,0.16);
+  --transition:  0.32s cubic-bezier(0.4,0,0.2,1);
+  --font-display: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:    'Consolas', 'Courier New', monospace;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  font-family: var(--font-display);
+  background: var(--white);
+  color: var(--black-soft);
+  line-height: 1.65;
+}
+h1,h2,h3,h4,h5 { line-height:1.25; }
+p { margin-bottom:.85rem; }
+a { color:var(--green-mid); }
+ul,ol { padding-left:1.4rem; }
+li { margin-bottom:.35rem; }
+code {
+  font-family: var(--font-mono);
+  background: var(--gray-pale);
+  padding:.1em .4em;
+  border-radius:3px;
+  font-size:.88em;
+  color: var(--green-dark);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.page-wrap { max-width:1060px; margin:0 auto; padding:0 1.5rem 4rem; }
+
+/* ============================================================
+   TOP NAV BAR
+   ============================================================ */
+.topbar {
+  background: var(--black);
+  border-bottom: 3px solid var(--green);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 56px;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.topbar-logo {
+  width: 32px; height: 32px;
+  background: var(--green);
+  border-radius: 6px;
+  display: flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:.75rem; color:#fff; letter-spacing:-.02em;
+}
+.topbar-name {
+  font-weight:700; font-size:.9rem; color:#fff;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.topbar-tag {
+  font-size:.72rem; color:var(--green);
+  letter-spacing:.1em; text-transform:uppercase;
+}
+.topbar-right {
+  display:flex; gap:1rem; align-items:center;
+}
+.domain-pill {
+  background:var(--green);
+  color:#fff;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:.3rem .75rem;
+  border-radius:20px;
+}
+.progress-wrap {
+  display:flex; align-items:center; gap:.5rem;
+}
+.progress-label { font-size:.7rem; color:var(--gray-light); letter-spacing:.06em; }
+.progress-bar-outer {
+  width:80px; height:6px;
+  background:var(--gray-dark);
+  border-radius:3px; overflow:hidden;
+}
+.progress-bar-inner {
+  height:100%;
+  background: linear-gradient(90deg, var(--green), var(--green-mid));
+  border-radius:3px;
+  width: 0%;
+  transition: width .6s ease;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  background: linear-gradient(135deg, var(--black) 0%, var(--black-soft) 55%, #0d2a1a 100%);
+  padding: 4rem 1.5rem 3.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background: repeating-linear-gradient(
+    60deg,
+    transparent,
+    transparent 38px,
+    rgba(0,184,107,.04) 38px,
+    rgba(0,184,107,.04) 39px
+  );
+  pointer-events:none;
+}
+.hero-eyebrow {
+  font-size:.7rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--green); font-weight:700; margin-bottom:.9rem;
+}
+.hero h1 {
+  font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:900;
+  color:#fff;
+  margin-bottom:.6rem;
+  letter-spacing:-.02em;
+  position:relative;
+}
+.hero h1 span { color:var(--green); }
+.hero-sub {
+  font-size:1.05rem; color:var(--gray-light);
+  max-width:680px; margin:0 auto 2rem;
+  line-height:1.7;
+}
+.hero-stats {
+  display:flex; justify-content:center; flex-wrap:wrap; gap:1.5rem;
+  position:relative;
+}
+.hero-stat {
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius-md);
+  padding:.6rem 1.25rem;
+  text-align:center;
+}
+.hero-stat-val {
+  display:block; font-size:1.3rem; font-weight:900;
+  color:var(--green); letter-spacing:-.02em;
+}
+.hero-stat-lbl {
+  display:block; font-size:.68rem; color:var(--gray-light);
+  text-transform:uppercase; letter-spacing:.1em;
+}
+
+/* ============================================================
+   SECTION WRAPPER & TITLE
+   ============================================================ */
+.section-block { margin-top: 3rem; }
+.section-eyebrow {
+  font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--green); font-weight:700; margin-bottom:.3rem;
+}
+.section-heading {
+  font-size:clamp(1.25rem,2.5vw,1.65rem);
+  font-weight:800; color:var(--black);
+  margin-bottom:1.25rem;
+  padding-bottom:.6rem;
+  border-bottom:2px solid var(--gray-pale);
+  display:flex; align-items:center; gap:.6rem;
+}
+.section-heading .sh-icon {
+  width:30px; height:30px;
+  background:var(--green);
+  border-radius:var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; flex-shrink:0;
+}
+
+/* ============================================================
+   LEARNING OBJECTIVES
+   ============================================================ */
+.obj-card {
+  background: linear-gradient(135deg, var(--black) 0%, #0d2a1a 100%);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.25rem;
+  color:#fff;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.obj-card::after {
+  content:'';
+  position:absolute; right:-20px; top:-20px;
+  width:200px; height:200px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(0,184,107,.18) 0%, transparent 70%);
+  pointer-events:none;
+}
+.obj-card-title {
+  font-size:1rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--green); margin-bottom:1.2rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.obj-list { list-style:none; padding:0; }
+.obj-list li {
+  padding:.55rem 0 .55rem 1.75rem;
+  position:relative;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  font-size:.92rem;
+  color:rgba(255,255,255,.88);
+  line-height:1.55;
+  margin:0;
+}
+.obj-list li:last-child { border-bottom:none; }
+.obj-list li::before {
+  content:'';
+  position:absolute; left:0; top:.85rem;
+  width:8px; height:8px;
+  background:var(--green);
+  border-radius:50%;
+}
+.obj-bloom {
+  display:inline-block;
+  background:rgba(0,184,107,.2);
+  color:var(--green);
+  font-size:.62rem; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:.15rem .4rem;
+  border-radius:3px;
+  margin-right:.35rem;
+  vertical-align:middle;
+}
+
+/* ============================================================
+   ACCORDION SYSTEM
+   ============================================================ */
+.accordion-wrap { display:flex; flex-direction:column; gap:.6rem; }
+
+.acc-item {
+  border:1.5px solid var(--gray-pale);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  background:var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+.acc-item:hover { box-shadow: var(--shadow-md); }
+.acc-item.is-open {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-glow), var(--shadow-sm);
+}
+
+.acc-trigger {
+  width:100%; background:none; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.9rem 1.25rem;
+  text-align:left;
+  gap:.75rem;
+  transition: background var(--transition);
+}
+.acc-trigger:hover { background:var(--gray-pale); }
+.acc-item.is-open .acc-trigger { background:var(--green-pale); }
+
+.acc-trigger-left {
+  display:flex; align-items:center; gap:.75rem;
+}
+.acc-trigger-icon {
+  width:28px; height:28px; flex-shrink:0;
+  background:var(--gray-pale);
+  border-radius:var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.85rem;
+  transition: background var(--transition);
+}
+.acc-item.is-open .acc-trigger-icon {
+  background:var(--green);
+}
+.acc-trigger-label {
+  font-weight:700; font-size:.9rem; color:var(--black-soft);
+}
+.acc-trigger-sub {
+  font-size:.72rem; color:var(--gray-mid);
+  margin-top:.05rem;
+}
+.acc-arrow {
+  width:26px; height:26px; flex-shrink:0;
+  border-radius:50%;
+  background:var(--black);
+  border:2px solid var(--green);
+  display:flex; align-items:center; justify-content:center;
+  transition: transform var(--transition), background var(--transition);
+}
+.acc-arrow svg {
+  width:12px; height:12px;
+  stroke:#fff; stroke-width:2.5;
+  fill:none; stroke-linecap:round; stroke-linejoin:round;
+  transition: stroke var(--transition);
+}
+.acc-item.is-open .acc-arrow {
+  background:var(--green);
+  transform:rotate(180deg);
+}
+
+.acc-body {
+  max-height:0; overflow:hidden;
+  opacity:0;
+  transition: max-height .42s cubic-bezier(0.4,0,0.2,1),
+              opacity .32s ease;
+}
+.acc-body.is-open {
+  opacity:1;
+}
+.acc-body-inner {
+  padding:1.1rem 1.25rem 1.4rem;
+  border-top:1.5px solid var(--gray-pale);
+}
+.acc-item.is-open .acc-body-inner {
+  border-top-color:var(--green);
+}
+
+/* ============================================================
+   KEY TERMS CARDS
+   ============================================================ */
+.term-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+  gap:.75rem;
+}
+.term-card {
+  background:var(--white);
+  border:1.5px solid var(--gray-pale);
+  border-radius:var(--radius-md);
+  padding:1rem 1.1rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  cursor:default;
+}
+.term-card:hover {
+  border-color:var(--green);
+  box-shadow:0 0 0 3px var(--green-glow);
+}
+.term-name {
+  font-weight:800; font-size:.88rem;
+  color:var(--green-dark);
+  margin-bottom:.35rem;
+  display:flex; align-items:center; gap:.4rem;
+}
+.term-badge {
+  font-size:.6rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase;
+  background:var(--green-pale);
+  color:var(--green-dark);
+  padding:.1rem .35rem;
+  border-radius:3px;
+}
+.term-def {
+  font-size:.84rem; color:var(--gray-dark);
+  line-height:1.55; margin:0;
+}
+
+/* ============================================================
+   LESSON CONTENT — TOPIC PANELS
+   ============================================================ */
+.topic-section { margin-bottom:1rem; }
+.topic-header {
+  font-size:1.05rem; font-weight:800;
+  color:var(--black);
+  margin-bottom:.75rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.topic-header::before {
+  content:'';
+  display:inline-block;
+  width:4px; height:1.1em;
+  background:var(--green);
+  border-radius:2px;
+  flex-shrink:0;
+}
+.topic-body { font-size:.92rem; color:var(--black-soft); line-height:1.7; }
+.topic-body h4 {
+  font-size:.88rem; font-weight:800;
+  color:var(--black);
+  margin:.9rem 0 .3rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.topic-body p { margin-bottom:.7rem; }
+.topic-body ul,
+.topic-body ol { margin-bottom:.7rem; }
+
+/* Info table */
+.info-table {
+  width:100%; border-collapse:collapse;
+  font-size:.84rem; margin:1rem 0;
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.info-table th {
+  background:var(--black);
+  color:#fff;
+  padding:.55rem .9rem;
+  text-align:left;
+  font-size:.75rem;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.info-table td {
+  padding:.55rem .9rem;
+  border-bottom:1px solid var(--gray-pale);
+  vertical-align:top;
+  color:var(--black-soft);
+}
+.info-table tr:last-child td { border-bottom:none; }
+.info-table tr:nth-child(even) td { background:var(--gray-pale); }
+
+/* Callout boxes */
+.callout {
+  border-radius:var(--radius-md);
+  padding:.9rem 1.1rem;
+  margin:.9rem 0;
+  border-left:4px solid;
+  font-size:.88rem; line-height:1.6;
+}
+.callout-exam {
+  background:var(--green-pale);
+  border-color:var(--green);
+  color:var(--green-dark);
+}
+.callout-warn {
+  background:#fff8e6;
+  border-color:var(--accent-warn);
+  color:#7a5200;
+}
+.callout-info {
+  background:#e8f4fd;
+  border-color:var(--accent-info);
+  color:#0d47a1;
+}
+.callout strong { display:block; margin-bottom:.2rem; font-size:.78rem; letter-spacing:.07em; text-transform:uppercase; }
+
+/* OSI layer strip */
+.osi-stack {
+  display:flex; flex-direction:column; gap:3px;
+  margin:1rem 0;
+}
+.osi-layer {
+  display:flex; align-items:stretch;
+  border-radius:var(--radius-sm);
+  overflow:hidden;
+  min-height:44px;
+}
+.osi-num {
+  width:36px; flex-shrink:0;
+  background:var(--black);
+  color:#fff;
+  font-weight:900; font-size:.8rem;
+  display:flex; align-items:center; justify-content:center;
+}
+.osi-name {
+  width:130px; flex-shrink:0;
+  font-weight:800; font-size:.82rem;
+  display:flex; align-items:center;
+  padding:0 .8rem;
+  color:#fff;
+}
+.osi-detail {
+  flex:1;
+  font-size:.8rem;
+  display:flex; align-items:center;
+  padding:.4rem .8rem;
+  background:var(--white);
+  border:1px solid;
+  border-left:none;
+  color:var(--black-soft);
+  line-height:1.45;
+}
+.osi-pdu {
+  width:80px; flex-shrink:0;
+  font-size:.72rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 .4rem;
+  text-align:center;
+}
+
+/* layer colors */
+.l7  { --lc:#1565c0; } .l7  .osi-name,.l7  .osi-num { background:var(--lc); }
+.l7  .osi-detail,.l7  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l6  { --lc:#1976d2; } .l6  .osi-name,.l6  .osi-num { background:var(--lc); }
+.l6  .osi-detail,.l6  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l5  { --lc:#7b1fa2; } .l5  .osi-name,.l5  .osi-num { background:var(--lc); }
+.l5  .osi-detail,.l5  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l4  { --lc:#00838f; } .l4  .osi-name,.l4  .osi-num { background:var(--lc); }
+.l4  .osi-detail,.l4  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l3  { --lc:#00695c; } .l3  .osi-name,.l3  .osi-num { background:var(--lc); }
+.l3  .osi-detail,.l3  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l2  { --lc:#2e7d32; } .l2  .osi-name,.l2  .osi-num { background:var(--lc); }
+.l2  .osi-detail,.l2  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+.l1  { --lc:#4e342e; } .l1  .osi-name,.l1  .osi-num { background:var(--lc); }
+.l1  .osi-detail,.l1  .osi-pdu { border-color:var(--lc); color:var(--lc); }
+
+/* Appliance grid */
+.appliance-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:.75rem; margin:1rem 0;
+}
+.appliance-card {
+  background:var(--white);
+  border:1.5px solid var(--gray-pale);
+  border-radius:var(--radius-md);
+  padding:1rem;
+  transition:border-color var(--transition);
+}
+.appliance-card:hover { border-color:var(--green); }
+.app-icon { font-size:1.4rem; margin-bottom:.4rem; }
+.app-name { font-weight:800; font-size:.88rem; color:var(--black); margin-bottom:.3rem; }
+.app-layer {
+  display:inline-block;
+  font-size:.62rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; background:var(--black);
+  color:var(--green); padding:.1rem .4rem; border-radius:3px; margin-bottom:.4rem;
+}
+.app-desc { font-size:.8rem; color:var(--gray-dark); line-height:1.5; margin:0; }
+
+/* Cloud / SDN / concept tag pills */
+.concept-grid {
+  display:flex; flex-wrap:wrap; gap:.5rem; margin:.75rem 0;
+}
+.concept-pill {
+  background:var(--green-pale);
+  border:1.5px solid var(--green);
+  border-radius:20px;
+  padding:.3rem .85rem;
+  font-size:.8rem; font-weight:700;
+  color:var(--green-dark);
+}
+
+/* Illustration placeholder */
+.illus-box {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--gray-pale),
+    var(--gray-pale) 6px,
+    #e0e0e0 6px,
+    #e0e0e0 12px
+  );
+  border:2px dashed var(--gray-light);
+  border-radius:var(--radius-md);
+  padding:2rem 1.5rem;
+  text-align:center;
+  margin:1rem 0;
+  color:var(--gray-mid);
+}
+.illus-box-icon { font-size:2rem; margin-bottom:.5rem; }
+.illus-box-label { font-size:.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+.illus-box-sub { font-size:.75rem; margin-top:.2rem; }
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-wrap { display:flex; flex-direction:column; gap:1.5rem; }
+.q-block {
+  background:var(--white);
+  border:1.5px solid var(--gray-pale);
+  border-radius:var(--radius-md);
+  padding:1.25rem;
+  transition:border-color var(--transition);
+}
+.q-block.answered { border-color:var(--green); }
+.q-num {
+  font-size:.65rem; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--green); margin-bottom:.4rem;
+}
+.q-stem { font-weight:700; font-size:.95rem; color:var(--black); margin-bottom:.85rem; line-height:1.5; }
+.q-options { display:flex; flex-direction:column; gap:.45rem; }
+.q-opt {
+  display:flex; align-items:flex-start; gap:.65rem;
+  padding:.6rem .85rem;
+  border:1.5px solid var(--gray-pale);
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  transition:background var(--transition), border-color var(--transition);
+  font-size:.88rem; color:var(--black-soft);
+  background:var(--white);
+  text-align:left;
+  width:100%; line-height:1.5;
+}
+.q-opt:hover:not(:disabled) {
+  background:var(--green-pale);
+  border-color:var(--green);
+}
+.q-opt:disabled { cursor:default; }
+.q-opt.correct { background:#e6f9f0; border-color:var(--green); color:var(--green-dark); }
+.q-opt.wrong   { background:#fdecea; border-color:#d32f2f; color:#7a1a1a; }
+.q-opt .opt-letter {
+  width:22px; height:22px; flex-shrink:0;
+  border-radius:50%;
+  background:var(--gray-pale);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.72rem; font-weight:800; color:var(--gray-dark);
+  margin-top:.05rem;
+  transition:background var(--transition), color var(--transition);
+}
+.q-opt.correct .opt-letter { background:var(--green); color:#fff; }
+.q-opt.wrong   .opt-letter { background:#d32f2f; color:#fff; }
+
+.q-feedback {
+  display:none; margin-top:.8rem;
+  padding:.75rem 1rem;
+  border-radius:var(--radius-sm);
+  font-size:.85rem; line-height:1.6;
+}
+.q-feedback.show { display:block; }
+.q-feedback.fb-correct { background:var(--green-pale); border-left:4px solid var(--green); color:var(--green-dark); }
+.q-feedback.fb-wrong   { background:#fdecea; border-left:4px solid #d32f2f; color:#7a1a1a; }
+
+.quiz-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:.75rem; margin-top:.5rem;
+}
+.quiz-score-display {
+  font-size:.88rem; font-weight:700; color:var(--black-soft);
+}
+.quiz-score-display .score-num {
+  font-size:1.5rem; font-weight:900; color:var(--green); margin-right:.2rem;
+}
+.btn-primary {
+  background:var(--green);
+  color:#fff; border:none; cursor:pointer;
+  padding:.6rem 1.4rem;
+  border-radius:var(--radius-sm);
+  font-weight:800; font-size:.82rem;
+  letter-spacing:.06em; text-transform:uppercase;
+  transition:background var(--transition), transform .1s;
+}
+.btn-primary:hover { background:var(--green-mid); transform:translateY(-1px); }
+.btn-ghost {
+  background:none;
+  color:var(--black-soft);
+  border:1.5px solid var(--gray-pale);
+  cursor:pointer;
+  padding:.55rem 1.2rem;
+  border-radius:var(--radius-sm);
+  font-weight:700; font-size:.82rem;
+  letter-spacing:.05em; text-transform:uppercase;
+  transition:border-color var(--transition);
+}
+.btn-ghost:hover { border-color:var(--green); color:var(--green-dark); }
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
+.bottom-nav {
+  background:var(--black);
+  padding:1rem 1.5rem;
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:.75rem;
+  margin-top:4rem;
+}
+.bn-link {
+  color:var(--gray-light); font-size:.8rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  text-decoration:none;
+  padding:.5rem .9rem;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--radius-sm);
+  transition:border-color var(--transition), color var(--transition);
+}
+.bn-link:hover { border-color:var(--green); color:var(--green); }
+.bn-center { color:var(--gray-mid); font-size:.75rem; letter-spacing:.07em; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background:var(--black-soft);
+  border-top:2px solid var(--green);
+  padding:1.5rem;
+  text-align:center;
+  font-size:.72rem; color:var(--gray-mid);
+  line-height:1.7;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:680px){
+  .hero h1 { font-size:1.8rem; }
+  .term-grid { grid-template-columns:1fr; }
+  .appliance-grid { grid-template-columns:1fr; }
+  .osi-name { width:90px; }
+  .osi-pdu { width:58px; }
+  .topbar-right .progress-wrap { display:none; }
+}
+@media print {
+  .topbar,.bottom-nav,.btn-primary,.btn-ghost { display:none!important; }
+  .acc-body { max-height:none!important; opacity:1!important; overflow:visible!important; }
+  .acc-trigger { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">N+</div>
+    <div>
+      <div class="topbar-name">Network+</div>
+      <div class="topbar-tag">CompTIA Certification</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="progress-wrap">
+      <span class="progress-label">Progress</span>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar"></div>
+      </div>
+    </div>
+    <span class="domain-pill">Domain 1</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="page-wrap">
+    <p class="hero-eyebrow">CompTIA Network+ &mdash; Domain 1 of 5</p>
+    <h1>Networking <span>Concepts</span></h1>
+    <p class="hero-sub">Master the foundational models, appliances, cloud architectures, and modern networking paradigms that form the backbone of every enterprise environment — and 23% of the N+ exam.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-val">23%</span>
+        <span class="hero-stat-lbl">Exam Weight</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">4</span>
+        <span class="hero-stat-lbl">Topic Clusters</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">~2 hrs</span>
+        <span class="hero-stat-lbl">Study Time</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">3</span>
+        <span class="hero-stat-lbl">Quiz Questions</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+<!-- ============================================================
+     SECTION 1 — LEARNING OBJECTIVES (no accordion)
+     ============================================================ -->
+<div class="section-block">
+  <p class="section-eyebrow">Section 01</p>
+  <h2 class="section-heading">
+    <span class="sh-icon">🎯</span>Learning Objectives
+  </h2>
+  <div class="obj-card">
+    <div class="obj-card-title">🎓 By the End of This Lesson You Will Be Able To:</div>
+    <ul class="obj-list">
+      <li><span class="obj-bloom">Remember</span>Identify and sequence all seven layers of the OSI reference model, their associated PDUs, and the protocols operating at each layer.</li>
+      <li><span class="obj-bloom">Understand</span>Explain the purpose and distinguishing functions of core networking appliances — routers, switches, firewalls, IDS/IPS, load balancers, proxies, NAS/SAN, and wireless controllers.</li>
+      <li><span class="obj-bloom">Apply</span>Map real-world traffic scenarios to the correct OSI layer, appliance type, and appropriate cloud or on-premises deployment model.</li>
+      <li><span class="obj-bloom">Analyze</span>Compare cloud service models (SaaS, IaaS, PaaS), deployment models (public, private, hybrid, community), and cloud networking constructs (VPC, security groups, cloud gateways).</li>
+      <li><span class="obj-bloom">Evaluate</span>Assess modern networking architectures — SDN, SD-WAN, VXLAN, Zero Trust, SASE/SSE, and Infrastructure as Code — and justify their selection for a given enterprise scenario.</li>
+      <li><span class="obj-bloom">Create</span>Construct a layered network design brief that integrates OSI principles, appropriate appliances, cloud connectivity, and a Zero Trust security overlay.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 2 — KEY TERMS (accordion, default collapsed)
+     ============================================================ -->
+<div class="section-block">
+  <p class="section-eyebrow">Section 02</p>
+  <h2 class="section-heading">
+    <span class="sh-icon">📖</span>Key Terms &amp; Concepts
+  </h2>
+  <div class="accordion-wrap" id="terms-accordion">
+
+    <!-- OSI Terms -->
+    <div class="acc-item" data-acc="terms">
+      <button class="acc-trigger" aria-expanded="false" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🔢</div>
+          <div>
+            <div class="acc-trigger-label">OSI Model Vocabulary</div>
+            <div class="acc-trigger-sub">7 layers, PDUs, encapsulation</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <div class="term-grid">
+            <div class="term-card"><div class="term-name">PDU <span class="term-badge">OSI</span></div><p class="term-def"><strong>Protocol Data Unit</strong> — the named unit of data at each OSI layer: Bits (L1), Frames (L2), Packets (L3), Segments/Datagrams (L4), Data (L5–L7).</p></div>
+            <div class="term-card"><div class="term-name">Encapsulation <span class="term-badge">OSI</span></div><p class="term-def">The process of wrapping data with layer-specific headers (and trailers) as it travels <em>down</em> the OSI stack on the sending host.</p></div>
+            <div class="term-card"><div class="term-name">De-encapsulation <span class="term-badge">OSI</span></div><p class="term-def">The reverse process of stripping headers as data travels <em>up</em> the OSI stack on the receiving host.</p></div>
+            <div class="term-card"><div class="term-name">MAC Address <span class="term-badge">Layer 2</span></div><p class="term-def">A 48-bit hardware identifier burned into a NIC; used by switches for frame forwarding within a local segment.</p></div>
+            <div class="term-card"><div class="term-name">IP Address <span class="term-badge">Layer 3</span></div><p class="term-def">A logical, routable address (IPv4 32-bit or IPv6 128-bit) used by routers to forward packets across networks.</p></div>
+            <div class="term-card"><div class="term-name">Port Number <span class="term-badge">Layer 4</span></div><p class="term-def">A 16-bit number (0–65535) that identifies a specific process or service; TCP/UDP use ports to multiplex application traffic.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appliance Terms -->
+    <div class="acc-item" data-acc="terms">
+      <button class="acc-trigger" aria-expanded="false" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🖥️</div>
+          <div>
+            <div class="acc-trigger-label">Networking Appliances</div>
+            <div class="acc-trigger-sub">Routers, switches, firewalls, IDS/IPS, and more</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <div class="term-grid">
+            <div class="term-card"><div class="term-name">Router <span class="term-badge">Layer 3</span></div><p class="term-def">Forwards packets between networks using IP routing tables; makes best-path decisions based on routing protocols (OSPF, BGP, EIGRP).</p></div>
+            <div class="term-card"><div class="term-name">Switch <span class="term-badge">Layer 2</span></div><p class="term-def">Forwards frames within a LAN using a MAC address table; Layer 3 switches also perform inter-VLAN routing.</p></div>
+            <div class="term-card"><div class="term-name">Firewall <span class="term-badge">L3–L7</span></div><p class="term-def">Filters traffic based on rules (ACLs). Stateful firewalls track connection state; NGFW adds application-layer and user-identity inspection.</p></div>
+            <div class="term-card"><div class="term-name">IDS <span class="term-badge">Passive</span></div><p class="term-def"><strong>Intrusion Detection System</strong> — monitors and alerts on suspicious traffic patterns but does not block traffic.</p></div>
+            <div class="term-card"><div class="term-name">IPS <span class="term-badge">Active</span></div><p class="term-def"><strong>Intrusion Prevention System</strong> — sits inline in the traffic path and actively blocks/drops malicious traffic in real time.</p></div>
+            <div class="term-card"><div class="term-name">Load Balancer <span class="term-badge">Layer 4/7</span></div><p class="term-def">Distributes client requests across a pool of servers using algorithms (round-robin, least-connections, IP hash) to maximize availability and throughput.</p></div>
+            <div class="term-card"><div class="term-name">Proxy Server <span class="term-badge">Layer 7</span></div><p class="term-def">Intermediates client requests; a forward proxy hides clients, a reverse proxy hides servers. Used for caching, filtering, and SSL termination.</p></div>
+            <div class="term-card"><div class="term-name">NAS <span class="term-badge">File-level</span></div><p class="term-def"><strong>Network-Attached Storage</strong> — a dedicated file-storage device accessed over IP using SMB, NFS, or AFP protocols.</p></div>
+            <div class="term-card"><div class="term-name">SAN <span class="term-badge">Block-level</span></div><p class="term-def"><strong>Storage Area Network</strong> — a high-speed dedicated network providing block-level storage access via Fibre Channel or iSCSI.</p></div>
+            <div class="term-card"><div class="term-name">Wireless Controller <span class="term-badge">WLAN</span></div><p class="term-def">Centrally manages multiple access points, enforcing consistent SSID policies, security settings, and RF optimization across the WLAN.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cloud Terms -->
+    <div class="acc-item" data-acc="terms">
+      <button class="acc-trigger" aria-expanded="false" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">☁️</div>
+          <div>
+            <div class="acc-trigger-label">Cloud &amp; Virtualization Terms</div>
+            <div class="acc-trigger-sub">NFV, VPC, service models, scalability</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <div class="term-grid">
+            <div class="term-card"><div class="term-name">NFV <span class="term-badge">Cloud</span></div><p class="term-def"><strong>Network Functions Virtualization</strong> — replacing dedicated hardware appliances (firewall, router) with software-based virtual instances running on commodity servers.</p></div>
+            <div class="term-card"><div class="term-name">VPC <span class="term-badge">Cloud</span></div><p class="term-def"><strong>Virtual Private Cloud</strong> — a logically isolated network partition within a public cloud (AWS VPC, Azure VNet) with user-defined subnets, routing, and security controls.</p></div>
+            <div class="term-card"><div class="term-name">Security Group <span class="term-badge">Cloud</span></div><p class="term-def">A virtual firewall for cloud instances that controls inbound/outbound traffic at the instance or subnet level using stateful allow rules.</p></div>
+            <div class="term-card"><div class="term-name">Cloud Gateway <span class="term-badge">Cloud</span></div><p class="term-def">Connects a VPC to the internet (Internet Gateway), other VPCs (Transit Gateway), or on-premises networks (VPN/Direct Connect Gateway).</p></div>
+            <div class="term-card"><div class="term-name">VPN <span class="term-badge">Connectivity</span></div><p class="term-def">Encrypted tunnel over a public network; site-to-site VPN connects branch offices, client VPN connects remote users to corporate resources.</p></div>
+            <div class="term-card"><div class="term-name">Direct Connect <span class="term-badge">Connectivity</span></div><p class="term-def">Dedicated private fiber circuit from an on-premises network to a cloud provider, offering predictable bandwidth and lower latency than internet-based VPN.</p></div>
+            <div class="term-card"><div class="term-name">SaaS <span class="term-badge">Service Model</span></div><p class="term-def"><strong>Software as a Service</strong> — cloud-hosted application delivered to users; provider manages everything. Example: Microsoft 365, Salesforce.</p></div>
+            <div class="term-card"><div class="term-name">IaaS <span class="term-badge">Service Model</span></div><p class="term-def"><strong>Infrastructure as a Service</strong> — provider supplies VMs, storage, and networking; customer manages OS and above. Example: AWS EC2.</p></div>
+            <div class="term-card"><div class="term-name">PaaS <span class="term-badge">Service Model</span></div><p class="term-def"><strong>Platform as a Service</strong> — provider manages infrastructure and runtime; customer deploys applications. Example: Azure App Service, Heroku.</p></div>
+            <div class="term-card"><div class="term-name">Scalability <span class="term-badge">Cloud</span></div><p class="term-def">Ability to increase or decrease resource capacity; <em>vertical scaling</em> (larger instance) vs. <em>horizontal scaling</em> (more instances).</p></div>
+            <div class="term-card"><div class="term-name">Elasticity <span class="term-badge">Cloud</span></div><p class="term-def">The automatic, dynamic provisioning and de-provisioning of resources in real time in response to workload demand — a key differentiator of cloud.</p></div>
+            <div class="term-card"><div class="term-name">Multitenancy <span class="term-badge">Cloud</span></div><p class="term-def">Multiple customers share the same physical infrastructure while remaining logically isolated from each other through virtualization and access controls.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Architecture Terms -->
+    <div class="acc-item" data-acc="terms">
+      <button class="acc-trigger" aria-expanded="false" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🔧</div>
+          <div>
+            <div class="acc-trigger-label">Modern Architecture Terms</div>
+            <div class="acc-trigger-sub">SDN, Zero Trust, SASE, IaC, VXLAN</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <div class="term-grid">
+            <div class="term-card"><div class="term-name">SDN <span class="term-badge">Architecture</span></div><p class="term-def"><strong>Software-Defined Networking</strong> — decouples the control plane (routing decisions) from the data plane (packet forwarding), enabling centralized, programmable network management.</p></div>
+            <div class="term-card"><div class="term-name">SD-WAN <span class="term-badge">Architecture</span></div><p class="term-def"><strong>Software-Defined WAN</strong> — applies SDN principles to WANs, intelligently routing traffic across MPLS, broadband, and LTE links based on application policy.</p></div>
+            <div class="term-card"><div class="term-name">VXLAN <span class="term-badge">Overlay</span></div><p class="term-def"><strong>Virtual Extensible LAN</strong> — encapsulates Layer 2 frames in UDP packets (port 4789) to extend virtual LANs across Layer 3 boundaries; supports 16 million VNIs vs. VLAN's 4,096.</p></div>
+            <div class="term-card"><div class="term-name">Zero Trust <span class="term-badge">Security Model</span></div><p class="term-def">Security framework based on "never trust, always verify" — every access request is authenticated, authorized, and continuously validated regardless of network location.</p></div>
+            <div class="term-card"><div class="term-name">SASE <span class="term-badge">Framework</span></div><p class="term-def"><strong>Secure Access Service Edge</strong> — converges SD-WAN with cloud-native security services (SWG, CASB, ZTNA, FWaaS) delivered from a unified cloud platform.</p></div>
+            <div class="term-card"><div class="term-name">SSE <span class="term-badge">Framework</span></div><p class="term-def"><strong>Security Service Edge</strong> — the security-only component of SASE; includes SWG, CASB, and ZTNA without the SD-WAN networking component.</p></div>
+            <div class="term-card"><div class="term-name">IaC <span class="term-badge">DevOps</span></div><p class="term-def"><strong>Infrastructure as Code</strong> — managing and provisioning network and compute infrastructure through machine-readable configuration files (Terraform, Ansible, CloudFormation) rather than manual processes.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /terms-accordion -->
+</div>
+
+<!-- ============================================================
+     SECTION 3 — LESSON CONTENT (accordion, default EXPANDED)
+     ============================================================ -->
+<div class="section-block">
+  <p class="section-eyebrow">Section 03</p>
+  <h2 class="section-heading">
+    <span class="sh-icon">📡</span>Lesson Content
+  </h2>
+  <div class="accordion-wrap" id="lesson-accordion">
+
+    <!-- 3A: OSI Model -->
+    <div class="acc-item is-open" data-acc="lesson">
+      <button class="acc-trigger" aria-expanded="true" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🔢</div>
+          <div>
+            <div class="acc-trigger-label">Topic 1 — The OSI Reference Model</div>
+            <div class="acc-trigger-sub">Seven layers, PDUs, encapsulation, and protocol mapping</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body is-open" style="max-height:none;">
+        <div class="acc-body-inner">
+          <div class="topic-section">
+            <div class="topic-header">Why the OSI Model Matters</div>
+            <div class="topic-body">
+              <p>The <strong>Open Systems Interconnection (OSI) model</strong> is a conceptual seven-layer framework developed by ISO in 1984 to standardize how diverse networking systems communicate. Every network troubleshooting conversation, vendor datasheet, and certification exam references OSI layers — it is the universal language of networking.</p>
+              <p>The model is divided into two groups: the <strong>upper layers (5–7)</strong> deal with data representation and application interaction, while the <strong>lower layers (1–4)</strong> handle physical transport, logical addressing, and reliable delivery.</p>
+              <div class="callout callout-exam">
+                <strong>🎯 Exam Focus</strong>
+                The mnemonic <em>"Please Do Not Throw Sausage Pizza Away"</em> (Physical → Data Link → Network → Transport → Session → Presentation → Application) or its reverse <em>"All People Seem To Need Data Processing"</em> is essential to memorize. Know the PDU name, key protocols, and device types at each layer.
+              </div>
+            </div>
+
+            <!-- OSI STACK VISUAL -->
+            <div class="osi-stack">
+              <div class="osi-layer l7">
+                <div class="osi-num">7</div>
+                <div class="osi-name">Application</div>
+                <div class="osi-detail">End-user interface to the network. Protocols: <code>HTTP/S</code>, <code>DNS</code>, <code>FTP</code>, <code>SMTP</code>, <code>SNMP</code>, <code>SSH</code>. Provides services directly to user applications.</div>
+                <div class="osi-pdu" style="background:#e3f2fd;color:#1565c0;">Data</div>
+              </div>
+              <div class="osi-layer l6">
+                <div class="osi-num">6</div>
+                <div class="osi-name">Presentation</div>
+                <div class="osi-detail">Data translation, encryption, and compression. Protocols/formats: <code>TLS/SSL</code>, <code>JPEG</code>, <code>MPEG</code>, <code>ASCII</code>. Ensures data is in a usable format.</div>
+                <div class="osi-pdu" style="background:#e3f2fd;color:#1976d2;">Data</div>
+              </div>
+              <div class="osi-layer l5">
+                <div class="osi-num">5</div>
+                <div class="osi-name">Session</div>
+                <div class="osi-detail">Establishes, maintains, and terminates sessions between applications. Protocols: <code>NetBIOS</code>, <code>PPTP</code>, <code>RPC</code>. Handles dialog control and synchronization.</div>
+                <div class="osi-pdu" style="background:#f3e5f5;color:#7b1fa2;">Data</div>
+              </div>
+              <div class="osi-layer l4">
+                <div class="osi-num">4</div>
+                <div class="osi-name">Transport</div>
+                <div class="osi-detail">End-to-end delivery, flow control, error recovery, port addressing. <code>TCP</code> (reliable, connection-oriented) | <code>UDP</code> (best-effort, connectionless). Segments (TCP) or Datagrams (UDP).</div>
+                <div class="osi-pdu" style="background:#e0f7fa;color:#00838f;">Segment</div>
+              </div>
+              <div class="osi-layer l3">
+                <div class="osi-num">3</div>
+                <div class="osi-name">Network</div>
+                <div class="osi-detail">Logical addressing and path selection across networks. Protocols: <code>IP</code>, <code>ICMP</code>, <code>OSPF</code>, <code>BGP</code>. Devices: <strong>Routers</strong>, Layer 3 switches. PDU: Packet.</div>
+                <div class="osi-pdu" style="background:#e8f5e9;color:#00695c;">Packet</div>
+              </div>
+              <div class="osi-layer l2">
+                <div class="osi-num">2</div>
+                <div class="osi-name">Data Link</div>
+                <div class="osi-detail">Physical addressing (MAC), error detection (CRC), framing. Sublayers: LLC &amp; MAC. Protocols: <code>Ethernet</code>, <code>Wi-Fi 802.11</code>, <code>PPP</code>. Devices: <strong>Switches</strong>, bridges.</div>
+                <div class="osi-pdu" style="background:#f1f8e9;color:#2e7d32;">Frame</div>
+              </div>
+              <div class="osi-layer l1">
+                <div class="osi-num">1</div>
+                <div class="osi-name">Physical</div>
+                <div class="osi-detail">Raw bit transmission — electrical signals, light pulses, radio waves. Standards: <code>IEEE 802.3</code>, <code>RS-232</code>. Media: copper, fiber, wireless. Devices: <strong>Hubs</strong>, repeaters, cables.</div>
+                <div class="osi-pdu" style="background:#efebe9;color:#4e342e;">Bit</div>
+              </div>
+            </div>
+
+            <div class="illus-box">
+              <div class="illus-box-icon">🔁</div>
+              <div class="illus-box-label">Simulation Placeholder — Encapsulation Animation</div>
+              <div class="illus-box-sub">Interactive: step through the encapsulation process as a packet travels from an HTTP request (Layer 7) down to bits (Layer 1), showing header addition at each layer.</div>
+            </div>
+
+            <div class="topic-body">
+              <h4>TCP vs. UDP at Layer 4</h4>
+              <table class="info-table">
+                <tr><th>Feature</th><th>TCP</th><th>UDP</th></tr>
+                <tr><td>Connection</td><td>Connection-oriented (3-way handshake)</td><td>Connectionless</td></tr>
+                <tr><td>Reliability</td><td>Guaranteed delivery, retransmission</td><td>Best-effort, no retransmission</td></tr>
+                <tr><td>Speed</td><td>Slower (overhead)</td><td>Faster (low overhead)</td></tr>
+                <tr><td>Use Cases</td><td>HTTP, FTP, SSH, SMTP, database</td><td>DNS, DHCP, VoIP, video streaming, TFTP</td></tr>
+                <tr><td>Header Size</td><td>20–60 bytes</td><td>8 bytes</td></tr>
+              </table>
+              <div class="callout callout-warn">
+                <strong>⚠️ Common Exam Trap</strong>
+                DNS uses <em>UDP port 53</em> for standard queries but switches to <em>TCP port 53</em> for zone transfers and responses &gt;512 bytes. Always check the context of the question.
+              </div>
+            </div>
+          </div><!-- /topic-section -->
+        </div>
+      </div>
+    </div><!-- /OSI accordion -->
+
+    <!-- 3B: Networking Appliances -->
+    <div class="acc-item is-open" data-acc="lesson">
+      <button class="acc-trigger" aria-expanded="true" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🖥️</div>
+          <div>
+            <div class="acc-trigger-label">Topic 2 — Networking Appliances &amp; Functions</div>
+            <div class="acc-trigger-sub">Routers, switches, firewalls, IDS/IPS, load balancers, proxies, NAS/SAN, wireless controllers</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body is-open" style="max-height:none;">
+        <div class="acc-body-inner">
+          <div class="topic-section">
+            <div class="topic-header">Appliance Overview</div>
+            <div class="topic-body">
+              <p>Networking appliances are purpose-built devices (or software equivalents) that perform specific functions in a network. Understanding <em>which OSI layer</em> each operates at and <em>what problem it solves</em> is critical for both design and exam success.</p>
+            </div>
+            <div class="appliance-grid">
+              <div class="appliance-card">
+                <div class="app-icon">🔀</div>
+                <div class="app-name">Router</div>
+                <div><span class="app-layer">Layer 3 — Network</span></div>
+                <p class="app-desc">Connects different networks (LAN-to-WAN, VLAN-to-VLAN). Uses routing protocols (OSPF, BGP, EIGRP) and a routing table to determine best path. Performs NAT for IPv4 address conservation.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">🔌</div>
+                <div class="app-name">Switch</div>
+                <div><span class="app-layer">Layer 2 / Layer 3</span></div>
+                <p class="app-desc">Forwards frames within a LAN using a CAM/MAC table. Managed switches support VLANs, STP, PoE, and port security. Layer 3 switches add inter-VLAN routing, reducing router dependency.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">🛡️</div>
+                <div class="app-name">Firewall</div>
+                <div><span class="app-layer">Layer 3–7</span></div>
+                <p class="app-desc">Packet filter (L3/4), stateful (L4), NGFW (L7). NGFWs add application identification, user-based policy, SSL inspection, and threat intelligence integration. Always deployed at network perimeters and segment boundaries.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">👁️</div>
+                <div class="app-name">IDS</div>
+                <div><span class="app-layer">Passive Monitor</span></div>
+                <p class="app-desc">Intrusion Detection System. Monitors a copy of traffic (via SPAN port or TAP) and generates alerts. Uses signature-based and anomaly-based detection. Does NOT block traffic — alert only.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">🚫</div>
+                <div class="app-name">IPS</div>
+                <div><span class="app-layer">Inline Active</span></div>
+                <p class="app-desc">Intrusion Prevention System. Sits inline — all traffic passes through it. Can drop, block, reset, or quarantine malicious traffic in real time. Higher false-positive risk than IDS must be managed carefully.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">⚖️</div>
+                <div class="app-name">Load Balancer</div>
+                <div><span class="app-layer">Layer 4 / Layer 7</span></div>
+                <p class="app-desc">Distributes traffic across a server pool for high availability and performance. L4 balances by IP/port; L7 (ADC) by URL, cookies, or content. Common algorithms: round-robin, least-connections, weighted, IP hash.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">🔭</div>
+                <div class="app-name">Proxy Server</div>
+                <div><span class="app-layer">Layer 7 — Application</span></div>
+                <p class="app-desc">Forward proxy: hides client identity, caches content, enforces web policy. Reverse proxy: hides server identity, performs SSL termination, WAF functions. Transparent proxies intercept without client configuration.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">💾</div>
+                <div class="app-name">NAS</div>
+                <div><span class="app-layer">File-Level Storage</span></div>
+                <p class="app-desc">Connects to LAN via Ethernet, accessed using file-sharing protocols (SMB for Windows, NFS for Linux). Ideal for shared file storage, home directories, and media servers. Lower cost and simpler than SAN.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">🗄️</div>
+                <div class="app-name">SAN</div>
+                <div><span class="app-layer">Block-Level Storage</span></div>
+                <p class="app-desc">Dedicated high-speed network for block storage, typically using Fibre Channel (FC) or iSCSI over Ethernet. Appears as a local disk to the host. Used for databases, VMs, and mission-critical workloads requiring low latency.</p>
+              </div>
+              <div class="appliance-card">
+                <div class="app-icon">📶</div>
+                <div class="app-name">Wireless Controller</div>
+                <div><span class="app-layer">WLAN Management</span></div>
+                <p class="app-desc">Centralizes configuration, policy, firmware updates, and RF management for a fleet of APs (lightweight/thin APs). Enables seamless roaming, SSID consistency, rogue AP detection, and centralized authentication (802.1X/RADIUS).</p>
+              </div>
+            </div>
+
+            <div class="illus-box">
+              <div class="illus-box-icon">🏢</div>
+              <div class="illus-box-label">Illustration Placeholder — Enterprise Network Topology</div>
+              <div class="illus-box-sub">Diagram showing layered appliance placement: Internet → Firewall → IPS → Router → Core Switch → Distribution/Access Switches → End Devices, with Load Balancer in the DMZ and Wireless Controller managing APs.</div>
+            </div>
+
+            <div class="topic-body">
+              <h4>IDS vs. IPS — Key Distinction</h4>
+              <table class="info-table">
+                <tr><th>Property</th><th>IDS</th><th>IPS</th></tr>
+                <tr><td>Placement</td><td>Out-of-band (SPAN/TAP)</td><td>Inline (in traffic path)</td></tr>
+                <tr><td>Action on threat</td><td>Alert/log only</td><td>Block/drop/reset/quarantine</td></tr>
+                <tr><td>False positive risk</td><td>Low operational impact</td><td>Can disrupt legitimate traffic</td></tr>
+                <tr><td>Performance impact</td><td>Minimal</td><td>Adds latency (must be sized correctly)</td></tr>
+              </table>
+              <div class="callout callout-info">
+                <strong>💡 Design Insight</strong>
+                Modern NGFWs often incorporate IPS functionality inline. Standalone IPS appliances are less common in new deployments, but the conceptual distinction between passive detection and active prevention remains critical for the exam.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /Appliances accordion -->
+
+    <!-- 3C: Cloud Concepts -->
+    <div class="acc-item is-open" data-acc="lesson">
+      <button class="acc-trigger" aria-expanded="true" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">☁️</div>
+          <div>
+            <div class="acc-trigger-label">Topic 3 — Cloud Networking Concepts</div>
+            <div class="acc-trigger-sub">NFV, VPC, security groups, gateways, VPN, service &amp; deployment models, scalability, multitenancy</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body is-open" style="max-height:none;">
+        <div class="acc-body-inner">
+          <div class="topic-section">
+            <div class="topic-header">Cloud Service Models — The Shared Responsibility Stack</div>
+            <div class="topic-body">
+              <p>Cloud computing delivers on-demand computing resources over the internet. The three service models define <em>where the provider's responsibility ends and the customer's begins</em> — a critical security and design consideration.</p>
+              <table class="info-table">
+                <tr><th>Model</th><th>Provider Manages</th><th>Customer Manages</th><th>Examples</th></tr>
+                <tr><td><strong>SaaS</strong></td><td>Everything (infra, OS, app, data)</td><td>User access, configuration</td><td>Microsoft 365, Salesforce, Google Workspace</td></tr>
+                <tr><td><strong>PaaS</strong></td><td>Infra, OS, runtime, middleware</td><td>Application code, data</td><td>Azure App Service, Google App Engine, Heroku</td></tr>
+                <tr><td><strong>IaaS</strong></td><td>Physical infra, hypervisor</td><td>OS, middleware, app, data, networking config</td><td>AWS EC2, Azure VMs, Google Compute Engine</td></tr>
+              </table>
+              <h4>Cloud Deployment Models</h4>
+              <table class="info-table">
+                <tr><th>Model</th><th>Description</th><th>Use Case</th></tr>
+                <tr><td><strong>Public</strong></td><td>Resources shared among tenants on provider infrastructure</td><td>General workloads, startups, dev/test</td></tr>
+                <tr><td><strong>Private</strong></td><td>Dedicated infrastructure, operated on-prem or by provider</td><td>Regulated industries, government, high-security workloads</td></tr>
+                <tr><td><strong>Hybrid</strong></td><td>Integrates public + private; workloads move between environments</td><td>Burst capacity, data sovereignty requirements</td></tr>
+                <tr><td><strong>Community</strong></td><td>Shared by multiple organizations with common requirements</td><td>Healthcare consortia, government agencies</td></tr>
+              </table>
+            </div>
+
+            <div class="topic-header">Virtual Private Cloud (VPC) Architecture</div>
+            <div class="topic-body">
+              <p>A <strong>VPC</strong> is a logically isolated section of a public cloud where you launch resources in a virtual network you define. Within a VPC, you control IP address ranges, subnets, route tables, and security policies.</p>
+              <h4>Key VPC Components</h4>
+              <ul>
+                <li><strong>Subnets</strong> — subdivisions of the VPC's CIDR block; public subnets have a route to an Internet Gateway, private subnets do not.</li>
+                <li><strong>Route Tables</strong> — control where traffic is directed from subnets (local, IGW, NAT Gateway, VPN Gateway, Transit Gateway).</li>
+                <li><strong>Security Groups</strong> — stateful virtual firewalls applied at the instance level; only allow rules, no explicit deny rules. Return traffic is automatically allowed.</li>
+                <li><strong>Network ACLs</strong> — stateless subnet-level firewalls; support both allow and deny rules, evaluated in numbered order.</li>
+                <li><strong>Internet Gateway (IGW)</strong> — allows VPC resources with public IPs to reach the internet and be reached from the internet.</li>
+                <li><strong>NAT Gateway</strong> — allows private-subnet resources to initiate outbound internet connections without being publicly reachable.</li>
+                <li><strong>Transit Gateway</strong> — a hub that interconnects multiple VPCs and on-premises networks through a single gateway.</li>
+              </ul>
+              <div class="callout callout-exam">
+                <strong>🎯 Security Groups vs. NACLs</strong>
+                Security Groups are <em>stateful</em> (return traffic auto-allowed) and instance-level. NACLs are <em>stateless</em> (must explicitly allow return traffic) and subnet-level. For the exam: if the scenario involves blocking specific traffic to a subnet, NACLs are the correct tool.
+              </div>
+            </div>
+
+            <div class="illus-box">
+              <div class="illus-box-icon">🏗️</div>
+              <div class="illus-box-label">Illustration Placeholder — VPC Architecture Diagram</div>
+              <div class="illus-box-sub">Diagram: VPC with public subnet (web tier + IGW), private subnet (app/DB tier + NAT Gateway), VPN Gateway connecting to on-premises, and security group rules annotated at each tier.</div>
+            </div>
+
+            <div class="topic-header">Cloud Connectivity: VPN vs. Direct Connect</div>
+            <div class="topic-body">
+              <table class="info-table">
+                <tr><th>Attribute</th><th>Site-to-Site VPN</th><th>Direct Connect / ExpressRoute</th></tr>
+                <tr><td>Medium</td><td>Encrypted tunnel over public internet</td><td>Dedicated private fiber circuit</td></tr>
+                <tr><td>Setup Time</td><td>Minutes to hours</td><td>Weeks to months</td></tr>
+                <tr><td>Bandwidth</td><td>Up to ~1.25 Gbps (variable)</td><td>1 Gbps – 100 Gbps (guaranteed)</td></tr>
+                <tr><td>Latency</td><td>Variable (internet-dependent)</td><td>Consistent, predictable, low</td></tr>
+                <tr><td>Cost</td><td>Low (internet charges)</td><td>High (port + circuit fees)</td></tr>
+                <tr><td>Best For</td><td>Branch offices, remote access, backup path</td><td>High-throughput, compliance-sensitive workloads</td></tr>
+              </table>
+            </div>
+
+            <div class="topic-header">Scalability, Elasticity, and Multitenancy</div>
+            <div class="topic-body">
+              <p><strong>Scalability</strong> describes a system's ability to handle increased load by adding resources. <em>Vertical scaling</em> (scale up) adds CPU/RAM to an existing instance; <em>horizontal scaling</em> (scale out) adds more instances behind a load balancer. Horizontal scaling is preferred for resilience in cloud architectures.</p>
+              <p><strong>Elasticity</strong> is the <em>automatic</em> scaling — cloud resources provision and de-provision dynamically in response to real-time demand via auto-scaling groups or serverless triggers. This is a defining cloud characteristic enabling pay-per-use economics.</p>
+              <p><strong>Multitenancy</strong> is the architecture where multiple customers share the same underlying physical hardware and software stack, each isolated through virtualization (hypervisor, containers) and access controls. It enables the cost efficiency of cloud but introduces shared-responsibility security considerations.</p>
+              <div class="callout callout-warn">
+                <strong>⚠️ NFV and Its Significance</strong>
+                Network Functions Virtualization (NFV) replaces dedicated hardware appliances (physical firewall, router, WAN optimizer) with software-based virtual network functions (VNFs) running on standard x86 servers. This reduces CAPEX, increases flexibility, and enables rapid deployment — but introduces new management complexity and hypervisor-level attack surfaces.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /Cloud accordion -->
+
+    <!-- 3D: Modern Architectures -->
+    <div class="acc-item is-open" data-acc="lesson">
+      <button class="acc-trigger" aria-expanded="true" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🔧</div>
+          <div>
+            <div class="acc-trigger-label">Topic 4 — Modern Networking Architectures</div>
+            <div class="acc-trigger-sub">SDN, SD-WAN, VXLAN, Zero Trust, SASE/SSE, Infrastructure as Code</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body is-open" style="max-height:none;">
+        <div class="acc-body-inner">
+          <div class="topic-section">
+
+            <div class="topic-header">Software-Defined Networking (SDN)</div>
+            <div class="topic-body">
+              <p>Traditional networks couple the <strong>control plane</strong> (routing/switching decisions) and <strong>data plane</strong> (actual packet forwarding) within each device. SDN <em>decouples</em> these planes, centralizing the control plane in an SDN Controller, which communicates with network devices via southbound APIs (OpenFlow, NETCONF) and exposes northbound APIs for management applications.</p>
+              <h4>SDN Architecture Planes</h4>
+              <table class="info-table">
+                <tr><th>Plane</th><th>Function</th><th>Location in SDN</th></tr>
+                <tr><td><strong>Application Plane</strong></td><td>Business logic, network apps (monitoring, security)</td><td>On controller via northbound API</td></tr>
+                <tr><td><strong>Control Plane</strong></td><td>Routing decisions, topology management</td><td>Centralized SDN Controller</td></tr>
+                <tr><td><strong>Data Plane</strong></td><td>Packet forwarding per controller instructions</td><td>Network devices (switches, routers)</td></tr>
+                <tr><td><strong>Management Plane</strong></td><td>Device configuration, monitoring</td><td>Out-of-band management network</td></tr>
+              </table>
+              <p><strong>Benefits:</strong> Centralized management, programmability, rapid policy deployment, vendor-agnostic control, simplified network automation. <strong>Challenges:</strong> Controller becomes a single point of failure (mitigated by clustering), security of controller communications.</p>
+            </div>
+
+            <div class="topic-header">SD-WAN</div>
+            <div class="topic-body">
+              <p>SD-WAN applies SDN principles to enterprise WANs. Instead of depending on expensive MPLS circuits alone, SD-WAN intelligently routes traffic across multiple transport links — MPLS, broadband internet, 4G/5G LTE — based on application-aware policies defined centrally.</p>
+              <div class="concept-grid">
+                <span class="concept-pill">Application-aware routing</span>
+                <span class="concept-pill">Transport independence</span>
+                <span class="concept-pill">Zero-touch provisioning</span>
+                <span class="concept-pill">Centralized policy</span>
+                <span class="concept-pill">Link bonding &amp; failover</span>
+                <span class="concept-pill">MPLS cost reduction</span>
+              </div>
+              <p>SD-WAN is frequently paired with cloud-native security (forming SASE) to provide secure, optimized connectivity for distributed workforces accessing cloud applications directly from branch locations.</p>
+            </div>
+
+            <div class="topic-header">VXLAN — Virtual Extensible LAN</div>
+            <div class="topic-body">
+              <p>Traditional VLANs (802.1Q) support only 4,096 unique network segments — insufficient for large-scale cloud and data center environments housing thousands of tenants. <strong>VXLAN</strong> solves this by encapsulating Layer 2 Ethernet frames within Layer 3 UDP packets.</p>
+              <table class="info-table">
+                <tr><th>Property</th><th>VLAN (802.1Q)</th><th>VXLAN</th></tr>
+                <tr><td>Identifier size</td><td>12-bit (4,096 IDs)</td><td>24-bit VNI (16.7 million IDs)</td></tr>
+                <tr><td>Scope</td><td>Single L2 domain</td><td>Extends L2 across L3 boundaries</td></tr>
+                <tr><td>Transport</td><td>Tagged Ethernet frames</td><td>UDP encapsulation (port 4789)</td></tr>
+                <tr><td>Endpoint</td><td>Switch port</td><td>VTEP (VXLAN Tunnel Endpoint)</td></tr>
+                <tr><td>Primary use</td><td>LAN segmentation</td><td>Multi-tenant data centers, cloud overlays</td></tr>
+              </table>
+            </div>
+
+            <div class="illus-box">
+              <div class="illus-box-icon">🕸️</div>
+              <div class="illus-box-label">Illustration Placeholder — VXLAN Overlay Diagram</div>
+              <div class="illus-box-sub">Diagram: Two physical racks with VMs on different L3 subnets communicating over a VXLAN tunnel via VTEPs, showing L2 frame encapsulated inside UDP/IP packet across the underlay network.</div>
+            </div>
+
+            <div class="topic-header">Zero Trust Architecture (ZTA)</div>
+            <div class="topic-body">
+              <p>Zero Trust rejects the legacy perimeter model ("castle and moat") where everything inside the network is implicitly trusted. The Zero Trust principle: <strong>"Never trust, always verify."</strong> Every access request — regardless of source network — must be authenticated, authorized, and continuously validated.</p>
+              <h4>Zero Trust Core Principles (NIST SP 800-207)</h4>
+              <ul>
+                <li><strong>All data sources and computing services are resources</strong> — even personal devices and cloud services.</li>
+                <li><strong>All communication is secured regardless of network location</strong> — internal ≠ trusted.</li>
+                <li><strong>Access is granted on a per-session basis</strong> — least privilege, just-in-time access.</li>
+                <li><strong>Access policy is dynamic</strong> — determined by behavioral analytics, device health, and contextual signals.</li>
+                <li><strong>All assets are monitored and measured</strong> — continuous telemetry feeds the policy engine.</li>
+                <li><strong>Authentication and authorization are strictly enforced</strong> — strong MFA, certificate-based identity.</li>
+              </ul>
+              <div class="callout callout-exam">
+                <strong>🎯 Zero Trust vs. Traditional Perimeter</strong>
+                On the exam, "implicit trust based on network location" = legacy perimeter model (wrong answer for modern security). "Continuous verification regardless of location" = Zero Trust (correct for modern scenarios, especially remote work and cloud).
+              </div>
+            </div>
+
+            <div class="topic-header">SASE and SSE</div>
+            <div class="topic-body">
+              <p><strong>SASE (Secure Access Service Edge)</strong>, coined by Gartner, converges SD-WAN network services with a full suite of cloud-native security functions delivered from a globally distributed cloud platform:</p>
+              <div class="concept-grid">
+                <span class="concept-pill">SD-WAN</span>
+                <span class="concept-pill">SWG — Secure Web Gateway</span>
+                <span class="concept-pill">CASB — Cloud Access Security Broker</span>
+                <span class="concept-pill">ZTNA — Zero Trust Network Access</span>
+                <span class="concept-pill">FWaaS — Firewall as a Service</span>
+                <span class="concept-pill">DNS Security</span>
+              </div>
+              <p><strong>SSE (Security Service Edge)</strong> is the security-only subset of SASE — it includes SWG, CASB, and ZTNA but omits the SD-WAN networking component. Organizations that already have a WAN solution may adopt SSE alone.</p>
+              <table class="info-table">
+                <tr><th>Component</th><th>SASE</th><th>SSE</th></tr>
+                <tr><td>SD-WAN</td><td>✅ Included</td><td>❌ Not included</td></tr>
+                <tr><td>SWG</td><td>✅</td><td>✅</td></tr>
+                <tr><td>CASB</td><td>✅</td><td>✅</td></tr>
+                <tr><td>ZTNA</td><td>✅</td><td>✅</td></tr>
+                <tr><td>FWaaS</td><td>✅</td><td>✅</td></tr>
+              </table>
+            </div>
+
+            <div class="topic-header">Infrastructure as Code (IaC)</div>
+            <div class="topic-body">
+              <p><strong>Infrastructure as Code</strong> is the practice of defining and managing network infrastructure through machine-readable configuration files rather than manual, GUI-based processes. IaC enables version-controlled, repeatable, auditable infrastructure deployments.</p>
+              <h4>Key IaC Tools</h4>
+              <table class="info-table">
+                <tr><th>Tool</th><th>Type</th><th>Language</th><th>Primary Use</th></tr>
+                <tr><td><strong>Terraform</strong></td><td>Declarative</td><td>HCL</td><td>Multi-cloud infra provisioning (AWS, Azure, GCP)</td></tr>
+                <tr><td><strong>Ansible</strong></td><td>Declarative/Imperative</td><td>YAML</td><td>Configuration management, network device automation</td></tr>
+                <tr><td><strong>AWS CloudFormation</strong></td><td>Declarative</td><td>JSON/YAML</td><td>AWS-native infra provisioning</td></tr>
+                <tr><td><strong>Puppet / Chef</strong></td><td>Declarative</td><td>Ruby DSL</td><td>Server configuration management</td></tr>
+              </table>
+              <p><strong>IaC Benefits for Networking:</strong> Consistent configurations eliminate drift; rapid deployment of network topologies; rollback capability; integration with CI/CD pipelines for network changes; policy-as-code for security controls.</p>
+              <div class="callout callout-info">
+                <strong>💡 IaC and Zero Trust Integration</strong>
+                IaC pipelines can enforce Zero Trust controls by automatically applying security group rules, network policies, and access controls during infrastructure provisioning — ensuring security is embedded, not bolted on after deployment.
+              </div>
+            </div>
+
+          </div><!-- /topic-section -->
+        </div>
+      </div>
+    </div><!-- /Modern arch accordion -->
+
+  </div><!-- /lesson-accordion -->
+</div>
+
+<!-- ============================================================
+     SECTION 4 — QUIZ (accordion, default EXPANDED)
+     ============================================================ -->
+<div class="section-block">
+  <p class="section-eyebrow">Section 04</p>
+  <h2 class="section-heading">
+    <span class="sh-icon">✅</span>Interactive Knowledge Check
+  </h2>
+  <div class="accordion-wrap" id="quiz-accordion">
+
+    <div class="acc-item is-open" data-acc="quiz">
+      <button class="acc-trigger" aria-expanded="true" onclick="toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="acc-trigger-icon">🧠</div>
+          <div>
+            <div class="acc-trigger-label">Domain 1 Practice Quiz — 3 Questions</div>
+            <div class="acc-trigger-sub">Scenario-based questions drawn from the OSI model, appliances, and modern architectures</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 16 16"><polyline points="3,5 8,11 13,5"/></svg></div>
+      </button>
+      <div class="acc-body is-open" style="max-height:none;">
+        <div class="acc-body-inner">
+
+          <div class="quiz-wrap" id="quizContainer">
+
+            <!-- Question 1 -->
+            <div class="q-block" id="qblock-1">
+              <div class="q-num">Question 1 of 3 &mdash; OSI Model</div>
+              <div class="q-stem">A network engineer captures traffic and observes that data is being segmented, sequence numbers are being assigned, and port 443 is identified as the destination. At which OSI layer is this behavior occurring, and what device primarily operates at this layer?</div>
+              <div class="q-options" id="opts-1">
+                <button class="q-opt" onclick="selectAnswer(1,'A')" id="q1-A">
+                  <span class="opt-letter">A</span>
+                  Layer 3 (Network) — Router
+                </button>
+                <button class="q-opt" onclick="selectAnswer(1,'B')" id="q1-B">
+                  <span class="opt-letter">B</span>
+                  Layer 4 (Transport) — No dedicated hardware device; implemented in the host OS networking stack
+                </button>
+                <button class="q-opt" onclick="selectAnswer(1,'C')" id="q1-C">
+                  <span class="opt-letter">C</span>
+                  Layer 2 (Data Link) — Switch
+                </button>
+                <button class="q-opt" onclick="selectAnswer(1,'D')" id="q1-D">
+                  <span class="opt-letter">D</span>
+                  Layer 7 (Application) — Proxy Server
+                </button>
+              </div>
+              <div class="q-feedback" id="fb-1"></div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="q-block" id="qblock-2">
+              <div class="q-num">Question 2 of 3 &mdash; Cloud Architecture</div>
+              <div class="q-stem">A financial services company requires predictable, sub-millisecond latency and dedicated bandwidth for its hybrid cloud workloads connecting its data center to AWS. The security team also needs all traffic to remain off the public internet. Which connectivity solution best meets these requirements?</div>
+              <div class="q-options" id="opts-2">
+                <button class="q-opt" onclick="selectAnswer(2,'A')" id="q2-A">
+                  <span class="opt-letter">A</span>
+                  Site-to-Site IPSec VPN over the public internet — lowest cost option with AES-256 encryption
+                </button>
+                <button class="q-opt" onclick="selectAnswer(2,'B')" id="q2-B">
+                  <span class="opt-letter">B</span>
+                  AWS Direct Connect — dedicated private fiber circuit providing consistent latency and bandwidth that bypasses the public internet
+                </button>
+                <button class="q-opt" onclick="selectAnswer(2,'C')" id="q2-C">
+                  <span class="opt-letter">C</span>
+                  A Transit Gateway connecting multiple VPCs through the AWS backbone network
+                </button>
+                <button class="q-opt" onclick="selectAnswer(2,'D')" id="q2-D">
+                  <span class="opt-letter">D</span>
+                  A NAT Gateway in the private subnet to route on-premises traffic to AWS services
+                </button>
+              </div>
+              <div class="q-feedback" id="fb-2"></div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="q-block" id="qblock-3">
+              <div class="q-num">Question 3 of 3 &mdash; Modern Architectures</div>
+              <div class="q-stem">An enterprise is redesigning its security model after a breach that exploited implicit trust given to a compromised internal workstation. The CISO mandates that every access request — whether from inside or outside the corporate network — must be continuously authenticated and authorized based on user identity, device health, and behavioral context before access is granted. Which architecture framework directly addresses this requirement?</div>
+              <div class="q-options" id="opts-3">
+                <button class="q-opt" onclick="selectAnswer(3,'A')" id="q3-A">
+                  <span class="opt-letter">A</span>
+                  SD-WAN — to intelligently route traffic across multiple WAN links based on application performance metrics
+                </button>
+                <button class="q-opt" onclick="selectAnswer(3,'B')" id="q3-B">
+                  <span class="opt-letter">B</span>
+                  VXLAN — to extend Layer 2 segments across Layer 3 boundaries and increase the number of supported network segments
+                </button>
+                <button class="q-opt" onclick="selectAnswer(3,'C')" id="q3-C">
+                  <span class="opt-letter">C</span>
+                  Zero Trust Architecture — continuously verifying every access request based on identity, device posture, and context regardless of network location
+                </button>
+                <button class="q-opt" onclick="selectAnswer(3,'D')" id="q3-D">
+                  <span class="opt-letter">D</span>
+                  Infrastructure as Code — automating infrastructure provisioning through version-controlled configuration files
+                </button>
+              </div>
+              <div class="q-feedback" id="fb-3"></div>
+            </div>
+
+          </div><!-- /quiz-wrap -->
+
+          <!-- Quiz Footer -->
+          <div class="quiz-footer" style="margin-top:1.5rem;">
+            <div class="quiz-score-display" id="scoreDisplay" style="display:none;">
+              Score: <span class="score-num" id="scoreNum">0</span>/ 3
+            </div>
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+              <button class="btn-primary" onclick="submitQuiz()" id="submitBtn">Submit Answers</button>
+              <button class="btn-ghost" onclick="resetQuiz()" id="resetBtn" style="display:none;">Try Again</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /quiz inner accordion -->
+
+  </div><!-- /quiz-accordion -->
+</div>
+
+</div><!-- /page-wrap -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="#" class="bn-link">← Domain Overview</a>
+  <span class="bn-center">Domain 1 of 5 &nbsp;|&nbsp; Networking Concepts</span>
+  <a href="#" class="bn-link">Domain 2: Infrastructure →</a>
+</div>
+
+<footer>
+  <p>CompTIA Network+ (N10-009) &nbsp;|&nbsp; Domain 1: Networking Concepts &nbsp;|&nbsp; 23% of Exam</p>
+  <p>This module is an independent educational resource. CompTIA® and Network+® are registered trademarks of CompTIA, Inc.</p>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ── Accordion Engine ──────────────────────────────────────── */
+function toggleAcc(btn) {
+  const item   = btn.closest('.acc-item');
+  const body   = item.querySelector('.acc-body');
+  const isOpen = item.classList.contains('is-open');
+
+  if (isOpen) {
+    // Collapse
+    body.style.maxHeight = body.scrollHeight + 'px';
+    body.getBoundingClientRect(); // force reflow
+    requestAnimationFrame(() => {
+      body.style.maxHeight = '0';
+      body.style.opacity   = '0';
+    });
+    item.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+    body.addEventListener('transitionend', () => {
+      body.classList.remove('is-open');
+    }, { once: true });
+  } else {
+    // Expand
+    body.classList.add('is-open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    body.style.opacity   = '1';
+    item.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    body.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'max-height') {
+        body.style.maxHeight = 'none'; // free height for dynamic content
+      }
+    }, { once: true });
+  }
+  updateProgress();
+}
+
+/* ── Init expanded items ───────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Items that start open get their body visible immediately
+  document.querySelectorAll('.acc-item.is-open').forEach(item => {
+    const body = item.querySelector('.acc-body');
+    body.classList.add('is-open');
+    body.style.maxHeight = 'none';
+    body.style.opacity   = '1';
+  });
+  updateProgress();
+});
+
+/* ── Progress Bar ──────────────────────────────────────────── */
+function updateProgress() {
+  const allItems  = document.querySelectorAll('.acc-item').length;
+  const openItems = document.querySelectorAll('.acc-item.is-open').length;
+  const pct       = allItems > 0 ? Math.round((openItems / allItems) * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+/* ── Quiz Engine ───────────────────────────────────────────── */
+const CORRECT = { 1: 'B', 2: 'B', 3: 'C' };
+const FEEDBACK = {
+  1: {
+    correct: '✅ <strong>Correct!</strong> Layer 4 (Transport) is responsible for segmentation, sequencing (via sequence numbers), and port-based addressing. Port 443 = HTTPS. The Transport layer is implemented in the host operating system\'s networking stack — there is no dedicated discrete hardware device that uniquely "is" Layer 4 the way a switch is Layer 2.',
+    wrong: '❌ <strong>Incorrect.</strong> The clues — segmentation, sequence numbers, and port numbers — all point to <strong>Layer 4 (Transport)</strong>. Port 443 is the HTTPS port, a Transport-layer identifier. Layer 3 uses IP addresses; Layer 2 uses MAC addresses; Layer 7 is the application interface. Layer 4 is implemented in the host OS stack, not a discrete hardware device.'
+  },
+  2: {
+    correct: '✅ <strong>Correct!</strong> AWS Direct Connect (or Azure ExpressRoute) provides a dedicated private fiber circuit from the on-premises data center to the cloud provider. It delivers predictable latency, guaranteed bandwidth, and completely bypasses the public internet — meeting all three requirements: sub-millisecond latency, dedicated bandwidth, and private traffic path.',
+    wrong: '❌ <strong>Incorrect.</strong> The scenario requires <em>dedicated bandwidth</em>, <em>predictable latency</em>, and traffic that <em>bypasses the public internet</em>. A site-to-site VPN travels over the public internet and has variable latency. A Transit Gateway connects VPCs internally within AWS. A NAT Gateway handles outbound internet access for private subnets. <strong>AWS Direct Connect</strong> is the only option that meets all three requirements.'
+  },
+  3: {
+    correct: '✅ <strong>Correct!</strong> The scenario describes the exact problem Zero Trust Architecture solves: eliminating implicit trust based on network location and replacing it with continuous, identity-aware, context-driven verification for every access request. This is NIST SP 800-207\'s core mandate: "never trust, always verify," with access decisions based on user identity, device health, and behavioral signals.',
+    wrong: '❌ <strong>Incorrect.</strong> The scenario describes a need to eliminate implicit trust and enforce continuous, context-aware verification — the defining principle of <strong>Zero Trust Architecture</strong>. SD-WAN optimizes WAN routing. VXLAN extends Layer 2 segments. IaC automates infrastructure provisioning. None of these address the authentication and authorization challenge described in the scenario.'
+  }
+};
+
+let userAnswers = {};
+let submitted = false;
+
+function selectAnswer(qNum, letter) {
+  if (submitted) return;
+  userAnswers[qNum] = letter;
+
+  // Visual feedback: highlight selected option
+  const opts = document.querySelectorAll(`#opts-${qNum} .q-opt`);
+  opts.forEach(o => o.classList.remove('selected-preview'));
+  document.getElementById(`q${qNum}-${letter}`).style.outline = '2px solid var(--green)';
+  document.getElementById(`q${qNum}-${letter}`).style.background = 'var(--green-pale)';
+
+  // Deselect others
+  opts.forEach(o => {
+    const oLetter = o.id.split('-')[1];
+    if (oLetter !== letter) {
+      o.style.outline = '';
+      o.style.background = '';
+    }
+  });
+
+  document.getElementById(`qblock-${qNum}`).classList.add('answered');
+}
+
+function submitQuiz() {
+  if (Object.keys(userAnswers).length < 3) {
+    // Find unanswered and shake
+    for (let i = 1; i <= 3; i++) {
+      if (!userAnswers[i]) {
+        const qb = document.getElementById(`qblock-${i}`);
+        qb.style.borderColor = '#d32f2f';
+        qb.style.boxShadow = '0 0 0 3px rgba(211,47,47,0.15)';
+        setTimeout(() => {
+          qb.style.borderColor = '';
+          qb.style.boxShadow = '';
+        }, 1800);
+      }
+    }
+    return;
+  }
+
+  submitted = true;
+  let score = 0;
+
+  for (let i = 1; i <= 3; i++) {
+    const chosen  = userAnswers[i];
+    const correct = CORRECT[i];
+    const fb      = document.getElementById(`fb-${i}`);
+
+    // Disable all options
+    const opts = document.querySelectorAll(`#opts-${i} .q-opt`);
+    opts.forEach(o => {
+      o.disabled = true;
+      o.style.outline = '';
+      o.style.background = '';
+      o.style.cursor = 'default';
+    });
+
+    // Color options
+    const correctBtn = document.getElementById(`q${i}-${correct}`);
+    correctBtn.classList.add('correct');
+    if (chosen !== correct) {
+      document.getElementById(`q${i}-${chosen}`).classList.add('wrong');
+    } else {
+      score++;
+    }
+
+    // Show feedback
+    const isCorrect = chosen === correct;
+    fb.classList.add('show', isCorrect ? 'fb-correct' : 'fb-wrong');
+    fb.innerHTML = FEEDBACK[i][isCorrect ? 'correct' : 'wrong'];
+  }
+
+  // Show score
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const scoreNum = document.getElementById('scoreNum');
+  scoreNum.textContent = score;
+  scoreDisplay.style.display = 'block';
+
+  // Color score
+  if (score === 3) scoreNum.style.color = 'var(--green)';
+  else if (score === 2) scoreNum.style.color = 'var(--accent-warn)';
+  else scoreNum.style.color = '#d32f2f';
+
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = '';
+
+  updateProgress();
+}
+
+function resetQuiz() {
+  submitted = false;
+  userAnswers = {};
+
+  for (let i = 1; i <= 3; i++) {
+    const opts = document.querySelectorAll(`#opts-${i} .q-opt`);
+    opts.forEach(o => {
+      o.disabled = false;
+      o.classList.remove('correct', 'wrong');
+      o.style.outline = '';
+      o.style.background = '';
+      o.style.cursor = '';
+    });
+    const fb = document.getElementById(`fb-${i}`);
+    fb.classList.remove('show', 'fb-correct', 'fb-wrong');
+    fb.innerHTML = '';
+    document.getElementById(`qblock-${i}`).classList.remove('answered');
+    document.getElementById(`qblock-${i}`).style.borderColor = '';
+    document.getElementById(`qblock-${i}`).style.boxShadow = '';
+  }
+
+  document.getElementById('scoreDisplay').style.display = 'none';
+  document.getElementById('submitBtn').style.display = '';
+  document.getElementById('resetBtn').style.display = 'none';
+}
+</script>
+</body>
+</html>
