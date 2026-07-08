@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 | Network Concepts II — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 2 — Network Concepts II</h1>
+      <div class="sub">Domain 1.0 · Networking Concepts · 23%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 2 OF 8</span>
+      <span class="tag">DOMAIN 1.0 · NETWORKING CONCEPTS · 23%</span>
+      <span class="tag exam">EXAM 1 THIS LESSON</span>
+    </div>
+    <h2>Network Concepts II — Protocols, Media, Topologies &amp; Addressing</h2>
+    <p class="lede">Lesson 1 gave you the map — the OSI model, network appliances, cloud, and the modern network. This lesson fills in the details that make networks actually move data: the ports and protocols every technician must know cold, the four traffic types, TCP versus UDP, the physical media and transceivers that carry the bits, the topologies that organize them, and the addressing systems — IPv4 and IPv6 — that get every packet where it's going. This lesson closes with Exam 1 covering all of Domain 1.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Identify</b> the common networking ports, protocols, and services on the N10-009 blueprint, and match each protocol to its default port number and transport protocol. <span class="bloom">BLOOM: REMEMBER</span></li>
+        <li><b>Differentiate</b> the four network traffic types — unicast, multicast, anycast, and broadcast — and give a real-world example of each. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Compare and contrast</b> TCP and UDP, including the three-way handshake, and select the appropriate transport protocol for a given application. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Compare</b> transmission media and transceivers — single-mode and multimode fiber, copper twisted pair, coax, DAC, SFP/QSFP modules, and 802.11 wireless — for a given distance, bandwidth, and cost requirement. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Classify</b> network topologies and architectures (mesh, hub-and-spoke, spine-and-leaf, three-tier, collapsed core, point-to-point) and recommend one for a given scenario. <span class="bloom">BLOOM: EVALUATE</span></li>
+        <li><b>Calculate</b> IPv4 subnets using CIDR notation and VLSM, and distinguish public, private (RFC 1918), and APIPA address ranges. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Explain</b> IPv6 addressing and the transition mechanisms — SLAAC, EUI-64, dual stack, tunneling, and NAT64. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Well-Known Ports"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚪</span><b>Well-Known Ports</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Port numbers 0–1023, reserved for common services. Examples: 22 (SSH), 53 (DNS), 80 (HTTP), 443 (HTTPS).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Unicast"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">➡️</span><b>Unicast</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">One-to-one traffic: a single sender transmits to a single receiver. The most common traffic type — e.g., loading a web page.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Multicast"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📡</span><b>Multicast</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">One-to-many traffic delivered only to hosts that joined a group (IPv4 class D, 224.0.0.0–239.255.255.255). Used by IPTV, OSPF, video conferencing.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Anycast"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🎯</span><b>Anycast</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">One-to-nearest: many servers share one IP, and routing delivers each request to the closest instance. Used by public DNS like 8.8.8.8 and CDNs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Broadcast"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📢</span><b>Broadcast</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">One-to-all traffic sent to every host on the local segment (e.g., 255.255.255.255, or the subnet broadcast address). IPv6 eliminates broadcast entirely.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: TCP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🤝</span><b>TCP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Transmission Control Protocol — connection-oriented, reliable Layer 4 transport. Uses the three-way handshake (SYN, SYN-ACK, ACK), sequencing, and retransmission.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: UDP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏃</span><b>UDP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">User Datagram Protocol — connectionless, best-effort Layer 4 transport. No handshake, no retransmission. Fast and lightweight: DNS, DHCP, VoIP, streaming.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Single-Mode Fiber"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔦</span><b>Single-Mode Fiber (SMF)</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Fiber with a tiny ~9µm core carrying one light path from a laser. Long distances — kilometers between buildings, campuses, and cities.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Multimode Fiber"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌈</span><b>Multimode Fiber (MMF)</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Fiber with a larger 50/62.5µm core carrying multiple light paths from an LED/VCSEL. Cheaper optics, shorter runs — typically within a building or data center.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: DAC"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔗</span><b>DAC</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Direct Attach Copper — a fixed twinax cable with transceivers permanently attached at both ends. Cheap, low-power, short-reach (rack-to-rack) data center links.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SFP and QSFP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔌</span><b>SFP / QSFP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Hot-swappable transceiver form factors. SFP/SFP+ carry 1/10 Gbps on one lane; QSFP+/QSFP28 bundle four lanes for 40/100 Gbps.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Spine-and-Leaf"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌿</span><b>Spine-and-Leaf</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Modern data center architecture: every leaf switch connects to every spine switch. Any two servers are always exactly two hops apart — predictable east-west performance.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: RFC 1918"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏠</span><b>RFC 1918</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The private IPv4 ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. Not routable on the internet — NAT translates them to public addresses.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: APIPA"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🆘</span><b>APIPA</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Automatic Private IP Addressing: 169.254.0.0/16. A host self-assigns this when DHCP fails. Seeing a 169.254.x.x address is a classic DHCP troubleshooting clue.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: CIDR"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">✂️</span><b>CIDR</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Classless Inter-Domain Routing — the /prefix notation (e.g., /24 = 255.255.255.0) that replaced classful addressing and allows subnets of any size.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: VLSM"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📏</span><b>VLSM</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Variable Length Subnet Masking — using different prefix lengths within one network so each subnet is sized to fit (e.g., /26 for users, /30 for router links).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SLAAC and EUI-64"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪄</span><b>SLAAC / EUI-64</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Stateless Address Autoconfiguration: an IPv6 host builds its own address from the router-advertised prefix. EUI-64 derives the host portion from the MAC address (with FFFE inserted and bit 7 flipped).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: NAT64"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌉</span><b>NAT64</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A transition gateway that translates between IPv6-only hosts and IPv4-only servers, usually paired with DNS64. One of three coexistence strategies alongside dual stack and tunneling.</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. PORTS & PROTOCOLS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🚪</span>
+        <span class="at"><h3>1. Common Ports, Protocols &amp; Services</h3><span class="asub">N10-009 OBJECTIVE 1.4 · MEMORIZATION REQUIRED</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Every network service listens on a <strong>port number</strong> — a 16-bit value (0–65535) that lets one IP address host many services at once. Think of the IP address as a building's street address and the port as the apartment number. Ports 0–1023 are the <strong>well-known ports</strong>, 1024–49151 are <strong>registered ports</strong>, and 49152–65535 are <strong>dynamic/ephemeral ports</strong> that clients use as temporary return addresses.</p>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> The N10-009 exam expects instant recall of the table below — protocol, port number, <em>and</em> transport. Pay special attention to secure/insecure pairs: HTTP 80 → HTTPS 443, FTP 21 → SFTP 22 or FTPS 990, Telnet 23 → SSH 22, LDAP 389 → LDAPS 636, SMTP 25 → SMTPS 587.</span></div>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Protocol</th><th>Port(s)</th><th>Transport</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>FTP (File Transfer Protocol)</td><td class="mono">20 / 21</td><td><span class="pill tcp">TCP</span></td><td>File transfer (20 data, 21 control) — unencrypted</td></tr>
+            <tr><td>SFTP (Secure File Transfer)</td><td class="mono">22</td><td><span class="pill tcp">TCP</span></td><td>File transfer tunneled through SSH</td></tr>
+            <tr><td>SSH (Secure Shell)</td><td class="mono">22</td><td><span class="pill tcp">TCP</span></td><td>Encrypted remote CLI access</td></tr>
+            <tr><td>Telnet</td><td class="mono">23</td><td><span class="pill tcp">TCP</span></td><td>Legacy remote CLI — plaintext, avoid</td></tr>
+            <tr><td>SMTP (Simple Mail Transfer)</td><td class="mono">25</td><td><span class="pill tcp">TCP</span></td><td>Sending email between servers</td></tr>
+            <tr><td>DNS (Domain Name System)</td><td class="mono">53</td><td><span class="pill both">TCP/UDP</span></td><td>Name resolution (UDP queries, TCP zone transfers)</td></tr>
+            <tr><td>DHCP (Dynamic Host Config)</td><td class="mono">67 / 68</td><td><span class="pill udp">UDP</span></td><td>Automatic IP address assignment</td></tr>
+            <tr><td>TFTP (Trivial FTP)</td><td class="mono">69</td><td><span class="pill udp">UDP</span></td><td>Simple file transfer — firmware, configs</td></tr>
+            <tr><td>HTTP (Hypertext Transfer)</td><td class="mono">80</td><td><span class="pill tcp">TCP</span></td><td>Unencrypted web traffic</td></tr>
+            <tr><td>NTP (Network Time Protocol)</td><td class="mono">123</td><td><span class="pill udp">UDP</span></td><td>Clock synchronization</td></tr>
+            <tr><td>SNMP (Simple Network Mgmt)</td><td class="mono">161 / 162</td><td><span class="pill udp">UDP</span></td><td>Device monitoring (161 queries, 162 traps)</td></tr>
+            <tr><td>LDAP (Lightweight Directory)</td><td class="mono">389</td><td><span class="pill both">TCP/UDP</span></td><td>Directory services (e.g., Active Directory)</td></tr>
+            <tr><td>HTTPS (HTTP Secure)</td><td class="mono">443</td><td><span class="pill tcp">TCP</span></td><td>Encrypted web traffic (TLS)</td></tr>
+            <tr><td>SMB (Server Message Block)</td><td class="mono">445</td><td><span class="pill tcp">TCP</span></td><td>Windows file and printer sharing</td></tr>
+            <tr><td>Syslog</td><td class="mono">514</td><td><span class="pill udp">UDP</span></td><td>Centralized event logging</td></tr>
+            <tr><td>SMTPS (SMTP Secure)</td><td class="mono">587</td><td><span class="pill tcp">TCP</span></td><td>Encrypted mail submission (TLS)</td></tr>
+            <tr><td>LDAPS (LDAP Secure)</td><td class="mono">636</td><td><span class="pill tcp">TCP</span></td><td>Encrypted directory services</td></tr>
+            <tr><td>SQL Server</td><td class="mono">1433</td><td><span class="pill tcp">TCP</span></td><td>Microsoft SQL database connections</td></tr>
+            <tr><td>RDP (Remote Desktop)</td><td class="mono">3389</td><td><span class="pill tcp">TCP</span></td><td>Graphical remote access to Windows</td></tr>
+            <tr><td>SIP (Session Initiation)</td><td class="mono">5060 / 5061</td><td><span class="pill both">TCP/UDP</span></td><td>VoIP call setup (5061 = TLS-secured)</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Memory strategy:</strong> Learn ports in story clusters, not as a flat list. The "remote access family" lives low (22, 23, 3389), the "mail family" is 25/587 out and 110/143 in, and the "web pair" is 80/443. Drill five ports a day in the flip cards above and you'll own the table before Exam 1.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. TRAFFIC TYPES -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🚦</span>
+        <span class="at"><h3>2. Traffic Types — Unicast, Multicast, Anycast, Broadcast</h3><span class="asub">N10-009 OBJECTIVE 1.4 · ONE-TO-WHO?</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Every transmission on a network is addressed in one of four patterns. The question that separates them is simple: <strong>one sender talks to how many receivers?</strong></p>
+        <div class="fig-grid">
+          <div class="fig-cell">
+            <svg viewBox="0 0 200 110" role="img" aria-label="Unicast: one sender to one receiver">
+              <circle cx="35" cy="55" r="14" class="sv-node"/>
+              <circle cx="165" cy="55" r="12" class="sv-node2"/>
+              <circle cx="165" cy="20" r="12" fill="var(--line)"/>
+              <circle cx="165" cy="90" r="12" fill="var(--line)"/>
+              <path d="M52 55 L150 55" class="sv-line" stroke="var(--green)" marker-end="url(#arr1)"/>
+              <defs><marker id="arr1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--green)"/></marker></defs>
+              <text x="35" y="88" text-anchor="middle" class="sv-txt">Sender</text>
+            </svg>
+            <div class="fname">➡️ Unicast</div>
+            <div class="fdesc">One-to-one. Web browsing, SSH, email download — most traffic.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 200 110" role="img" aria-label="Multicast: one sender to subscribed group members">
+              <circle cx="35" cy="55" r="14" class="sv-node"/>
+              <circle cx="165" cy="20" r="12" class="sv-node2"/>
+              <circle cx="165" cy="55" r="12" fill="var(--line)"/>
+              <circle cx="165" cy="90" r="12" class="sv-node2"/>
+              <path d="M52 50 L150 24" class="sv-line" stroke="var(--green)"/>
+              <path d="M52 60 L150 86" class="sv-line" stroke="var(--green)"/>
+              <text x="35" y="88" text-anchor="middle" class="sv-txt">Sender</text>
+              <text x="165" y="59" text-anchor="middle" class="sv-mono">opt-out</text>
+            </svg>
+            <div class="fname">📡 Multicast</div>
+            <div class="fdesc">One-to-many, but only to hosts that <em>joined</em> the group. IPTV, OSPF hellos.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 200 110" role="img" aria-label="Anycast: request routed to nearest of several servers sharing one address">
+              <circle cx="35" cy="55" r="14" class="sv-node"/>
+              <circle cx="150" cy="20" r="12" class="sv-node3"/>
+              <circle cx="165" cy="55" r="12" class="sv-node3"/>
+              <circle cx="150" cy="90" r="12" class="sv-node3"/>
+              <path d="M52 55 L150 55" class="sv-line" stroke="var(--amber)"/>
+              <text x="35" y="88" text-anchor="middle" class="sv-txt">Client</text>
+              <text x="158" y="10" class="sv-mono">same IP ↑↓</text>
+              <text x="100" y="48" text-anchor="middle" class="sv-mono">nearest wins</text>
+            </svg>
+            <div class="fname">🎯 Anycast</div>
+            <div class="fdesc">One-to-nearest. Many servers share one IP; routing picks the closest. DNS 8.8.8.8, CDNs.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 200 110" role="img" aria-label="Broadcast: one sender to every host on the segment">
+              <circle cx="35" cy="55" r="14" class="sv-node"/>
+              <circle cx="165" cy="20" r="12" class="sv-node2"/>
+              <circle cx="165" cy="55" r="12" class="sv-node2"/>
+              <circle cx="165" cy="90" r="12" class="sv-node2"/>
+              <path d="M52 50 L150 24" class="sv-line" stroke="var(--green)"/>
+              <path d="M52 55 L150 55" class="sv-line" stroke="var(--green)"/>
+              <path d="M52 60 L150 86" class="sv-line" stroke="var(--green)"/>
+              <text x="35" y="88" text-anchor="middle" class="sv-txt">Sender</text>
+            </svg>
+            <div class="fname">📢 Broadcast</div>
+            <div class="fdesc">One-to-all on the local segment. ARP requests, DHCP Discover. <strong>Gone in IPv6.</strong></div>
+          </div>
+        </div>
+        <ul>
+          <li><strong>Unicast</strong> — a single sender to a single receiver. When you load a web page or SSH into a router, that's unicast.</li>
+          <li><strong>Multicast</strong> — one sender to a <em>subscribed group</em>. IPv4 reserves 224.0.0.0–239.255.255.255 (Class D). Routers use IGMP to track which hosts joined which group, so traffic only flows where it's wanted. Examples: streaming video distribution, OSPF router hellos (224.0.0.5).</li>
+          <li><strong>Anycast</strong> — one address advertised from many locations; the routing system delivers each packet to the topologically <em>nearest</em> instance. This is how 8.8.8.8 answers quickly worldwide.</li>
+          <li><strong>Broadcast</strong> — one sender to <em>every</em> host on the segment (255.255.255.255 or the subnet's broadcast address, e.g., 192.168.1.255 on a /24). Broadcasts stop at routers. <strong>IPv6 has no broadcast</strong> — it uses multicast (like ff02::1, all-nodes) instead.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3. TCP vs UDP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⚖️</span>
+        <span class="at"><h3>3. TCP vs. UDP — The Two Transports</h3><span class="asub">N10-009 OBJECTIVE 1.4 · LAYER 4 · RELIABLE vs FAST</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>At Layer 4, nearly everything rides on one of two protocols. <strong>TCP (Transmission Control Protocol)</strong> is <em>connection-oriented</em>: before any data flows, the two hosts negotiate a session with the famous <strong>three-way handshake</strong>, then number every segment, acknowledge receipt, and retransmit anything lost. <strong>UDP (User Datagram Protocol)</strong> is <em>connectionless</em>: it fires datagrams with no setup, no acknowledgments, and no retransmission — a postcard instead of certified mail.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 560 190" role="img" aria-label="TCP three-way handshake: client sends SYN, server replies SYN-ACK, client sends ACK, then data flows">
+            <line x1="110" y1="30" x2="110" y2="175" class="sv-line" stroke-dasharray="4 4"/>
+            <line x1="450" y1="30" x2="450" y2="175" class="sv-line" stroke-dasharray="4 4"/>
+            <rect x="60" y="8" width="100" height="24" rx="7" class="sv-node"/>
+            <rect x="400" y="8" width="100" height="24" rx="7" class="sv-node2"/>
+            <text x="110" y="25" text-anchor="middle" fill="#fff" font-family="inherit" font-size="12" font-weight="700">CLIENT</text>
+            <text x="450" y="25" text-anchor="middle" fill="#fff" font-family="inherit" font-size="12" font-weight="700">SERVER</text>
+            <defs><marker id="harr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--blue)"/></marker></defs>
+            <path d="M115 55 L440 65" class="sv-line" stroke="var(--blue)" marker-end="url(#harr)"/>
+            <text x="280" y="50" text-anchor="middle" class="sv-mono" font-weight="700">1 — SYN  (“may I connect?”)</text>
+            <path d="M445 90 L120 100" class="sv-line" stroke="var(--blue)" marker-end="url(#harr)"/>
+            <text x="280" y="87" text-anchor="middle" class="sv-mono" font-weight="700">2 — SYN-ACK  (“yes — you too?”)</text>
+            <path d="M115 125 L440 135" class="sv-line" stroke="var(--blue)" marker-end="url(#harr)"/>
+            <text x="280" y="120" text-anchor="middle" class="sv-mono" font-weight="700">3 — ACK  (“confirmed”)</text>
+            <path d="M115 158 L440 158" class="sv-line" stroke="var(--green)" stroke-width="4"/>
+            <text x="280" y="152" text-anchor="middle" class="sv-mono" fill="var(--green)" font-weight="700">✓ SESSION ESTABLISHED — DATA FLOWS</text>
+          </svg>
+          <figcaption>FIG 3.1 — THE TCP THREE-WAY HANDSHAKE: SYN → SYN-ACK → ACK</figcaption>
+        </figure>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Characteristic</th><th>TCP 🤝</th><th>UDP 🏃</th></tr></thead>
+          <tbody>
+            <tr><td>Connection model</td><td>Connection-oriented (handshake first)</td><td>Connectionless (just send)</td></tr>
+            <tr><td>Reliability</td><td>Guaranteed — ACKs + retransmission</td><td>Best-effort — lost is lost</td></tr>
+            <tr><td>Ordering</td><td>Sequence numbers reassemble in order</td><td>No ordering</td></tr>
+            <tr><td>Flow / congestion control</td><td>Yes (windowing)</td><td>No</td></tr>
+            <tr><td>Header size</td><td class="mono">20+ bytes</td><td class="mono">8 bytes</td></tr>
+            <tr><td>Speed / overhead</td><td>Slower, heavier</td><td>Faster, minimal</td></tr>
+            <tr><td>Typical uses</td><td>HTTP/HTTPS, SSH, FTP, SMTP, RDP</td><td>DNS queries, DHCP, TFTP, SNMP, VoIP/RTP, streaming</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>The selection rule:</strong> if the application can't tolerate missing data (a file, an email, a web page), it needs TCP. If it can't tolerate <em>waiting</em> (a live voice call, a game, a DNS lookup), it wants UDP — a retransmitted syllable arriving late is worse than a dropped one.</span></div>
+      </div>
+    </div>
+
+    <!-- 4. MEDIA & TRANSCEIVERS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔌</span>
+        <span class="at"><h3>4. Transmission Media &amp; Transceivers</h3><span class="asub">N10-009 OBJECTIVE 1.5 · FIBER · COPPER · COAX · DAC · WIRELESS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>The physical layer offers a menu of media, and choosing between them always comes down to three trade-offs: <strong>distance, bandwidth, and cost</strong>. Fiber wins on distance and immunity to interference, copper wins on cost and PoE support, and wireless wins on mobility.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 620 130" role="img" aria-label="Cross-sections: single-mode fiber has a tiny core with one straight light path; multimode fiber has a wide core with multiple bouncing light paths">
+            <rect x="20" y="35" width="250" height="50" rx="25" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <rect x="20" y="53" width="250" height="14" rx="7" fill="var(--blue-soft)" stroke="var(--blue)"/>
+            <path d="M30 60 L260 60" stroke="var(--blue)" stroke-width="2.5"/>
+            <text x="145" y="25" text-anchor="middle" class="sv-txt" font-weight="700">SINGLE-MODE (SMF) — ~9µm core</text>
+            <text x="145" y="105" text-anchor="middle" class="sv-mono">laser · one path · km-scale runs</text>
+            <rect x="350" y="35" width="250" height="50" rx="25" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <rect x="350" y="42" width="250" height="36" rx="14" fill="var(--green-soft)" stroke="var(--green)"/>
+            <path d="M360 60 L420 46 L480 74 L540 46 L595 60" fill="none" stroke="var(--green)" stroke-width="2"/>
+            <path d="M360 60 L430 72 L500 48 L595 66" fill="none" stroke="var(--green)" stroke-width="2" opacity=".6"/>
+            <text x="475" y="25" text-anchor="middle" class="sv-txt" font-weight="700">MULTIMODE (MMF) — 50/62.5µm core</text>
+            <text x="475" y="105" text-anchor="middle" class="sv-mono">LED/VCSEL · many paths · in-building runs</text>
+          </svg>
+          <figcaption>FIG 4.1 — FIBER CORE COMPARISON: ONE LIGHT PATH vs MANY</figcaption>
+        </figure>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Medium</th><th>Typical Reach</th><th>Bandwidth</th><th>Best For / Notes</th></tr></thead>
+          <tbody>
+            <tr><td>🔦 Single-mode fiber (SMF)</td><td class="mono">up to 10 km+</td><td class="mono">10–400 Gbps</td><td>Campus backbones, WAN links, ISP circuits; expensive laser optics</td></tr>
+            <tr><td>🌈 Multimode fiber (MMF)</td><td class="mono">300–550 m</td><td class="mono">1–100 Gbps</td><td>Within buildings and data centers; cheaper optics (OM3/OM4 = aqua jackets)</td></tr>
+            <tr><td>🧵 Copper twisted pair (Cat5e–Cat8)</td><td class="mono">100 m</td><td class="mono">1–40 Gbps</td><td>The workhorse of LAN drops; supports PoE; UTP vs shielded STP</td></tr>
+            <tr><td>📺 Coaxial (RG-6) / twinax</td><td class="mono">~500 m</td><td class="mono">up to ~10 Gbps (DOCSIS)</td><td>Cable broadband, CCTV, legacy; twinax used inside DAC cables</td></tr>
+            <tr><td>🔗 DAC (Direct Attach Copper)</td><td class="mono">1–7 m</td><td class="mono">10–100 Gbps</td><td>Rack-to-rack switch/server links; transceivers factory-attached; cheap and low power</td></tr>
+            <tr><td>📶 802.11 wireless (Wi-Fi)</td><td class="mono">~30–50 m indoor</td><td class="mono">up to ~9.6 Gbps (Wi-Fi 6)</td><td>Mobility; 2.4/5/6 GHz bands; shared, half-duplex medium</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Pluggable Transceivers — SFP, SFP+, QSFP+, QSFP28</h4>
+        <p>Modern switches don't hard-wire their uplink media. Instead they provide cages for <strong>hot-swappable transceiver modules</strong>, so the same switch port can drive multimode fiber today and single-mode tomorrow. The form factors scale by lane count:</p>
+        <ul>
+          <li><strong>SFP</strong> (Small Form-factor Pluggable) — 1 Gbps, one lane</li>
+          <li><strong>SFP+</strong> — 10 Gbps, one lane (the everyday data center standard)</li>
+          <li><strong>QSFP+</strong> — <em>Quad</em> SFP: four 10 G lanes = 40 Gbps</li>
+          <li><strong>QSFP28</strong> — four 25 G lanes = 100 Gbps</li>
+        </ul>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Troubleshooting preview (Domain 5):</strong> a <em>transceiver mismatch</em> — SMF optic on one end, MMF on the other, or mismatched wavelengths — is a classic "link light out" exam scenario. Media types must match end to end.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. TOPOLOGIES -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🕸️</span>
+        <span class="at"><h3>5. Topologies &amp; Architectures</h3><span class="asub">N10-009 OBJECTIVE 1.6 · SHAPE OF THE NETWORK</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>A <strong>topology</strong> describes how nodes interconnect. The N10-009 exam tests both classic shapes and the architectures used in real enterprise and data center designs. The recurring trade-off: <strong>more links buy more redundancy, but cost more.</strong></p>
+        <div class="fig-grid">
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Point-to-point: two nodes, one dedicated link">
+              <circle cx="30" cy="55" r="13" class="sv-node"/><circle cx="130" cy="55" r="13" class="sv-node"/>
+              <path d="M43 55 L117 55" class="sv-line" stroke="var(--blue)"/>
+            </svg>
+            <div class="fname">Point-to-Point</div>
+            <div class="fdesc">One dedicated link between two nodes — WAN circuits, wireless bridges. Simple, private, doesn't scale.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Hub and spoke: central hub connected to four spokes">
+              <circle cx="80" cy="55" r="14" class="sv-node3"/>
+              <circle cx="20" cy="20" r="10" class="sv-node"/><circle cx="140" cy="20" r="10" class="sv-node"/>
+              <circle cx="20" cy="92" r="10" class="sv-node"/><circle cx="140" cy="92" r="10" class="sv-node"/>
+              <path d="M80 55 L20 20 M80 55 L140 20 M80 55 L20 92 M80 55 L140 92" class="sv-line"/>
+            </svg>
+            <div class="fname">Hub-and-Spoke (Star)</div>
+            <div class="fdesc">All sites/nodes connect to a central hub. Cheap and easy to manage — but the hub is a single point of failure.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Full mesh: five nodes each connected to every other node">
+              <circle cx="80" cy="15" r="10" class="sv-node"/><circle cx="20" cy="50" r="10" class="sv-node"/>
+              <circle cx="140" cy="50" r="10" class="sv-node"/><circle cx="45" cy="95" r="10" class="sv-node"/><circle cx="115" cy="95" r="10" class="sv-node"/>
+              <path d="M80 15 L20 50 M80 15 L140 50 M80 15 L45 95 M80 15 L115 95 M20 50 L140 50 M20 50 L45 95 M20 50 L115 95 M140 50 L45 95 M140 50 L115 95 M45 95 L115 95" class="sv-line" stroke-width="1.4"/>
+            </svg>
+            <div class="fname">Mesh</div>
+            <div class="fdesc">Every node links to every other (full) or to several (partial). Maximum redundancy, maximum cost — n(n−1)/2 links.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Three-tier architecture: core layer on top, distribution in middle, access at bottom">
+              <rect x="55" y="8" width="50" height="18" rx="5" class="sv-node3"/>
+              <rect x="20" y="46" width="50" height="18" rx="5" class="sv-node"/><rect x="90" y="46" width="50" height="18" rx="5" class="sv-node"/>
+              <rect x="8" y="86" width="40" height="16" rx="5" class="sv-node2"/><rect x="60" y="86" width="40" height="16" rx="5" class="sv-node2"/><rect x="112" y="86" width="40" height="16" rx="5" class="sv-node2"/>
+              <path d="M80 26 L45 46 M80 26 L115 46 M45 64 L28 86 M45 64 L80 86 M115 64 L80 86 M115 64 L132 86" class="sv-line" stroke-width="1.6"/>
+              <text x="80" y="21" text-anchor="middle" fill="#fff" font-size="9" font-family="inherit" font-weight="700">CORE</text>
+            </svg>
+            <div class="fname">Three-Tier</div>
+            <div class="fdesc">Core (fast backbone) → Distribution (policy/routing) → Access (user ports). The classic enterprise campus design.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Collapsed core: combined core and distribution layer above access switches">
+              <rect x="40" y="14" width="80" height="20" rx="5" class="sv-node3"/>
+              <text x="80" y="28" text-anchor="middle" fill="#fff" font-size="8" font-family="inherit" font-weight="700">CORE + DIST</text>
+              <rect x="8" y="80" width="40" height="16" rx="5" class="sv-node2"/><rect x="60" y="80" width="40" height="16" rx="5" class="sv-node2"/><rect x="112" y="80" width="40" height="16" rx="5" class="sv-node2"/>
+              <path d="M80 34 L28 80 M80 34 L80 80 M80 34 L132 80" class="sv-line" stroke-width="1.6"/>
+            </svg>
+            <div class="fname">Collapsed Core</div>
+            <div class="fdesc">Core and distribution merged into one layer — a two-tier design that saves cost in small/medium networks.</div>
+          </div>
+          <div class="fig-cell">
+            <svg viewBox="0 0 160 110" role="img" aria-label="Spine and leaf: every leaf switch connects to every spine switch">
+              <rect x="30" y="12" width="42" height="18" rx="5" class="sv-node3"/><rect x="90" y="12" width="42" height="18" rx="5" class="sv-node3"/>
+              <text x="51" y="25" text-anchor="middle" fill="#fff" font-size="8" font-family="inherit" font-weight="700">SPINE</text>
+              <text x="111" y="25" text-anchor="middle" fill="#fff" font-size="8" font-family="inherit" font-weight="700">SPINE</text>
+              <rect x="8" y="82" width="38" height="16" rx="5" class="sv-node2"/><rect x="61" y="82" width="38" height="16" rx="5" class="sv-node2"/><rect x="114" y="82" width="38" height="16" rx="5" class="sv-node2"/>
+              <path d="M51 30 L27 82 M51 30 L80 82 M51 30 L133 82 M111 30 L27 82 M111 30 L80 82 M111 30 L133 82" class="sv-line" stroke-width="1.4"/>
+              <text x="80" y="106" text-anchor="middle" class="sv-mono" font-size="8">LEAF — LEAF — LEAF</text>
+            </svg>
+            <div class="fname">Spine-and-Leaf</div>
+            <div class="fdesc">Every leaf connects to every spine; any server is exactly 2 hops from any other. Built for data center east-west traffic.</div>
+          </div>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> N10-009 also expects <strong>north-south</strong> (in/out of the data center) vs. <strong>east-west</strong> (server-to-server) traffic direction vocabulary. Spine-and-leaf exists precisely because modern workloads are dominated by east-west flows.</span></div>
+      </div>
+    </div>
+
+    <!-- 6. IPv4 -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔢</span>
+        <span class="at"><h3>6. IPv4 Addressing — RFC 1918, APIPA, CIDR, VLSM &amp; Subnetting</h3><span class="asub">N10-009 OBJECTIVE 1.7 · THE MATH LESSON</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>An IPv4 address is <strong>32 bits</strong> written as four decimal octets — <code>192.168.10.25</code>. The <strong>subnet mask</strong> (or its CIDR shorthand, <code>/24</code>) splits those bits into a <strong>network portion</strong> (which subnet am I on?) and a <strong>host portion</strong> (which device am I?). Everything in subnetting flows from that one split.</p>
+
+        <h4>🏠 Public vs. Private (RFC 1918) vs. APIPA</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Range</th><th>CIDR</th><th>Type</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">10.0.0.0 – 10.255.255.255</td><td class="mono">10.0.0.0/8</td><td>Private (RFC 1918)</td><td>~16.7M addresses; large enterprises</td></tr>
+            <tr><td class="mono">172.16.0.0 – 172.31.255.255</td><td class="mono">172.16.0.0/12</td><td>Private (RFC 1918)</td><td>The one everyone forgets — know the /12 boundary!</td></tr>
+            <tr><td class="mono">192.168.0.0 – 192.168.255.255</td><td class="mono">192.168.0.0/16</td><td>Private (RFC 1918)</td><td>Home and small office networks</td></tr>
+            <tr><td class="mono">169.254.0.0 – 169.254.255.255</td><td class="mono">169.254.0.0/16</td><td>APIPA / link-local</td><td>Self-assigned when <strong>DHCP fails</strong> — a diagnostic red flag</td></tr>
+            <tr><td class="mono">127.0.0.0 – 127.255.255.255</td><td class="mono">127.0.0.0/8</td><td>Loopback</td><td><code>127.0.0.1</code> = "this host"; tests the local TCP/IP stack</td></tr>
+            <tr><td>Everything else (allocated)</td><td class="mono">—</td><td>Public</td><td>Globally routable; assigned via ISPs and regional registries</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Troubleshooting clue:</strong> a workstation showing <code>169.254.x.x</code> in <code>ipconfig</code> didn't reach a DHCP server. That single fact answers several exam questions — and you'll see it live in Lab 2.</span></div>
+
+        <h4>✂️ CIDR — Classless Inter-Domain Routing</h4>
+        <p>CIDR replaced the rigid Class A/B/C system. The prefix (<code>/8</code> through <code>/30</code>) simply counts <strong>network bits</strong>; whatever remains is host bits. Two formulas do all the work:</p>
+        <ul>
+          <li><strong>Subnets gained</strong> when you borrow <em>b</em> bits: <code>2ᵇ</code></li>
+          <li><strong>Usable hosts</strong> with <em>h</em> host bits: <code>2ʰ − 2</code> (subtract the network ID and the broadcast address)</li>
+        </ul>
+        <div class="cidr-widget">
+          <label for="cidrRange">🧮 INTERACTIVE — DRAG THE PREFIX AND WATCH THE MASK &amp; HOST COUNT CHANGE (BASE NETWORK: 192.168.0.0)</label>
+          <input type="range" id="cidrRange" min="16" max="30" value="24" aria-label="CIDR prefix length">
+          <div class="cidr-out">
+            <div class="co"><div class="lbl">Prefix</div><div class="val" id="coPrefix">/24</div></div>
+            <div class="co"><div class="lbl">Subnet Mask</div><div class="val" id="coMask">255.255.255.0</div></div>
+            <div class="co"><div class="lbl">Host Bits</div><div class="val" id="coBits">8</div></div>
+            <div class="co"><div class="lbl">Usable Hosts</div><div class="val" id="coHosts">254</div></div>
+          </div>
+        </div>
+
+        <h4>🧩 Subnetting — A Worked Example</h4>
+        <p><strong>Problem:</strong> You're given <code>192.168.10.0/24</code> and must create at least 4 subnets. How?</p>
+        <ul>
+          <li>Borrow 2 host bits: <code>2² = 4</code> subnets → new prefix <code>/26</code>, mask <code>255.255.255.192</code></li>
+          <li>Host bits remaining: 6 → <code>2⁶ − 2 = 62</code> usable hosts per subnet</li>
+          <li>Block size: 256 − 192 = <strong>64</strong>, so subnets start every 64 addresses</li>
+        </ul>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Subnet</th><th>Network ID</th><th>Usable Range</th><th>Broadcast</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="mono">192.168.10.0/26</td><td class="mono">.1 – .62</td><td class="mono">192.168.10.63</td></tr>
+            <tr><td>2</td><td class="mono">192.168.10.64/26</td><td class="mono">.65 – .126</td><td class="mono">192.168.10.127</td></tr>
+            <tr><td>3</td><td class="mono">192.168.10.128/26</td><td class="mono">.129 – .190</td><td class="mono">192.168.10.191</td></tr>
+            <tr><td>4</td><td class="mono">192.168.10.192/26</td><td class="mono">.193 – .254</td><td class="mono">192.168.10.255</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h4>📏 VLSM — Right-Sizing Every Subnet</h4>
+        <p><strong>Variable Length Subnet Masking</strong> means using <em>different</em> prefixes inside one address block, so each subnet fits its purpose instead of wasting space. From <code>192.168.10.0/24</code> a VLSM design might carve: a <code>/25</code> for 100 users (126 hosts), a <code>/27</code> for 25 servers (30 hosts), and a <code>/30</code> for each router-to-router link (exactly 2 hosts). Always allocate <strong>largest subnet first</strong> to avoid overlap.</p>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Practice pipeline:</strong> the binary and hex skills behind all of this are exactly what <a href="activity02.html">Exercise 3: Computer Math</a> drills. Do the exercise before attempting the subnetting questions in the knowledge check.</span></div>
+      </div>
+    </div>
+
+    <!-- 7. IPv6 -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🚀</span>
+        <span class="at"><h3>7. IPv6 Addressing — SLAAC, EUI-64, Dual Stack, Tunneling &amp; NAT64</h3><span class="asub">N10-009 OBJECTIVE 1.7 · 128 BITS · NO MORE SCARCITY</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>IPv4's 4.3 billion addresses ran out; IPv6 answers with <strong>128-bit</strong> addresses — 340 undecillion of them — written as eight groups of four hex digits: <code>2001:0db8:0000:0000:0000:ff00:0042:8329</code>. Two shortening rules: drop leading zeros in each group, and compress <em>one</em> run of all-zero groups to <code>::</code> — giving <code>2001:db8::ff00:42:8329</code>.</p>
+        <h4>Address Types You Must Recognize</h4>
+        <ul>
+          <li><strong>Global unicast</strong> — <code>2000::/3</code> — the public, internet-routable range</li>
+          <li><strong>Link-local</strong> — <code>fe80::/10</code> — auto-generated on every interface; IPv6's mandatory equivalent of APIPA</li>
+          <li><strong>Unique local</strong> — <code>fc00::/7</code> — the private, RFC-1918-like range</li>
+          <li><strong>Multicast</strong> — <code>ff00::/8</code> — replaces broadcast entirely (e.g., <code>ff02::1</code> = all nodes on link)</li>
+          <li><strong>Loopback</strong> — <code>::1</code> — the IPv6 <code>127.0.0.1</code></li>
+        </ul>
+        <h4>🪄 SLAAC &amp; EUI-64 — Addresses That Configure Themselves</h4>
+        <p>With <strong>SLAAC (Stateless Address Autoconfiguration)</strong>, no DHCP server is required. The router advertises the 64-bit network prefix, and the host generates its own 64-bit interface ID. The classic method is <strong>EUI-64</strong>:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 620 120" role="img" aria-label="EUI-64 process: 48-bit MAC address is split, FFFE is inserted in the middle, and the seventh bit is flipped to form a 64-bit interface ID">
+            <rect x="20" y="20" width="150" height="30" rx="7" class="sv-node"/>
+            <text x="95" y="40" text-anchor="middle" fill="#fff" font-size="11" font-family="ui-monospace,monospace" font-weight="700">AA:BB:CC:DD:EE:FF</text>
+            <text x="95" y="66" text-anchor="middle" class="sv-mono">48-BIT MAC</text>
+            <path d="M175 35 L215 35" class="sv-line" stroke="var(--blue)"/>
+            <rect x="220" y="20" width="90" height="30" rx="7" class="sv-node2"/>
+            <rect x="312" y="20" width="66" height="30" rx="7" class="sv-node3"/>
+            <rect x="380" y="20" width="90" height="30" rx="7" class="sv-node2"/>
+            <text x="265" y="40" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,monospace" font-weight="700">AA:BB:CC</text>
+            <text x="345" y="40" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,monospace" font-weight="700">FF:FE</text>
+            <text x="425" y="40" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,monospace" font-weight="700">DD:EE:FF</text>
+            <text x="345" y="66" text-anchor="middle" class="sv-mono">SPLIT MAC · INSERT FFFE · FLIP 7TH BIT</text>
+            <path d="M475 35 L515 35" class="sv-line" stroke="var(--blue)"/>
+            <rect x="520" y="20" width="85" height="30" rx="7" class="sv-node"/>
+            <text x="562" y="40" text-anchor="middle" fill="#fff" font-size="10" font-family="inherit" font-weight="700">64-BIT ID</text>
+            <text x="562" y="66" text-anchor="middle" class="sv-mono">+ PREFIX = ADDRESS</text>
+            <text x="310" y="100" text-anchor="middle" class="sv-mono">RESULT: A8BB:CCFF:FEDD:EEFF  (bit 7 of first byte inverted: AA → A8)</text>
+          </svg>
+          <figcaption>FIG 7.1 — EUI-64: BUILDING AN INTERFACE ID FROM A MAC ADDRESS</figcaption>
+        </figure>
+        <p>Because EUI-64 embeds the MAC (a privacy concern), modern operating systems usually generate <em>randomized</em> interface IDs instead — but the exam still expects you to perform the EUI-64 conversion.</p>
+        <h4>🌉 Living in Both Worlds — Transition Mechanisms</h4>
+        <ul>
+          <li><strong>Dual stack</strong> — hosts and routers run IPv4 <em>and</em> IPv6 simultaneously. The preferred, cleanest strategy.</li>
+          <li><strong>Tunneling</strong> — encapsulate IPv6 packets inside IPv4 (6to4, 6in4, Teredo, ISATAP) to cross IPv4-only infrastructure — a bridge over old terrain.</li>
+          <li><strong>NAT64</strong> (with DNS64) — a gateway translates so IPv6-only clients can reach IPv4-only servers. Common in mobile carrier networks.</li>
+        </ul>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Know the prefixes on sight — <code>fe80::/10</code> link-local, <code>fc00::/7</code> unique local, <code>ff00::/8</code> multicast, <code>2000::/3</code> global — and remember: <strong>IPv6 has no broadcast and no NAT requirement.</strong></span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity02.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 3: Computer Math (Binary &amp; Hexadecimal)</h3>
+        <p>Master base-2 and base-16 conversion — the number systems behind every subnet mask, MAC address, and IPv6 group in this lesson. Complete before attempting the subnetting problems.</p>
+        <div class="go">Open Exercise 3 →</div>
+      </a>
+      <a class="act-card" href="lab02.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 2: Network Addressing and DHCP</h3>
+        <p>Design a CIDR/VLSM addressing scheme in Packet Tracer, configure DHCP scopes with reservations and exclusions, watch DORA in simulation mode, and diagnose an APIPA failure.</p>
+        <div class="go">Open Lab 2 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">CHAPTER EXAM</span></div>
+        <h3>📝 Exam 1 — Domain 1: Network Concepts</h3>
+        <p>Covers Lessons 1 and 2: the OSI model, appliances, cloud and modern networks, ports and protocols, traffic types, TCP/UDP, media, topologies, and IPv4/IPv6 addressing. Check the LMS for the exam window.</p>
+        <div class="go">Review Domain 1 →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+      <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px">Eight scenario-based questions modeled on the N10-009 style. Select an answer for each, then press <strong>Grade My Answers</strong> for your score and a rationale on every question.</p>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q1.</span>A user reports they cannot reach any network resources. You run <code>ipconfig</code> and see the address 169.254.31.108. What is the MOST likely cause?</div>
+        <label><input type="radio" name="q1" value="a"><span>The workstation has a duplicate IP address</span></label>
+        <label><input type="radio" name="q1" value="b"><span>The workstation failed to reach a DHCP server and self-assigned an APIPA address</span></label>
+        <label><input type="radio" name="q1" value="c"><span>The DNS server is misconfigured</span></label>
+        <label><input type="radio" name="q1" value="d"><span>The default gateway is offline</span></label>
+        <div class="rat"><strong>Rationale:</strong> 169.254.0.0/16 is the APIPA (link-local) range. A host only self-assigns from this range when its DHCP Discover goes unanswered — so the fault is between the client and the DHCP service, not DNS or the gateway.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q2.</span>A company deploys VoIP phones and users complain about choppy audio during retransmission delays. Which transport protocol SHOULD real-time voice traffic use, and why?</div>
+        <label><input type="radio" name="q2" value="a"><span>TCP, because voice packets must arrive reliably</span></label>
+        <label><input type="radio" name="q2" value="b"><span>TCP, because the three-way handshake secures the call</span></label>
+        <label><input type="radio" name="q2" value="c"><span>UDP, because low latency matters more than retransmitting lost packets</span></label>
+        <label><input type="radio" name="q2" value="d"><span>UDP, because it encrypts audio by default</span></label>
+        <div class="rat"><strong>Rationale:</strong> Voice is loss-tolerant but delay-intolerant. A retransmitted voice packet arrives too late to be useful, so VoIP rides UDP (RTP). Note that UDP provides no encryption — that's a separate mechanism (SRTP/TLS).</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q3.</span>Google's public DNS at 8.8.8.8 is served from data centers around the world using a single advertised IP, with each query answered by the nearest location. Which traffic type does this describe?</div>
+        <label><input type="radio" name="q3" value="a"><span>Anycast</span></label>
+        <label><input type="radio" name="q3" value="b"><span>Multicast</span></label>
+        <label><input type="radio" name="q3" value="c"><span>Broadcast</span></label>
+        <label><input type="radio" name="q3" value="d"><span>Unicast</span></label>
+        <div class="rat"><strong>Rationale:</strong> One address, many servers, routed to the nearest instance = anycast. Multicast delivers to subscribed group members; broadcast hits every host on a segment; unicast is strictly one-to-one.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q4.</span>You must connect two switches in adjacent racks with a 100 Gbps link at the lowest cost and power draw. Which option BEST fits?</div>
+        <label><input type="radio" name="q4" value="a"><span>Single-mode fiber with QSFP28 optics</span></label>
+        <label><input type="radio" name="q4" value="b"><span>Cat6a copper patch cable</span></label>
+        <label><input type="radio" name="q4" value="c"><span>Multimode fiber with SFP+ optics</span></label>
+        <label><input type="radio" name="q4" value="d"><span>A QSFP28 DAC (direct attach copper) cable</span></label>
+        <div class="rat"><strong>Rationale:</strong> For short rack-to-rack runs, DAC cables deliver 100 Gbps (QSFP28) with factory-attached transceivers at a fraction of the cost and power of fiber optics. SMF is overkill for 2 meters, Cat6a can't do 100 G, and SFP+ tops out at 10 G per lane.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span>A data center architect needs every server to be exactly two switch hops from every other server to guarantee predictable east-west performance. Which architecture meets this requirement?</div>
+        <label><input type="radio" name="q5" value="a"><span>Hub-and-spoke</span></label>
+        <label><input type="radio" name="q5" value="b"><span>Spine-and-leaf</span></label>
+        <label><input type="radio" name="q5" value="c"><span>Three-tier</span></label>
+        <label><input type="radio" name="q5" value="d"><span>Collapsed core</span></label>
+        <div class="rat"><strong>Rationale:</strong> In spine-and-leaf, every leaf connects to every spine, so any path is leaf → spine → leaf: always two hops. Three-tier and collapsed core are campus designs with variable hop counts; hub-and-spoke concentrates all traffic through one point.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q6.</span>You subnet 192.168.10.0/24 into /26 networks. How many usable host addresses does each subnet provide?</div>
+        <label><input type="radio" name="q6" value="a"><span>64</span></label>
+        <label><input type="radio" name="q6" value="b"><span>30</span></label>
+        <label><input type="radio" name="q6" value="c"><span>62</span></label>
+        <label><input type="radio" name="q6" value="d"><span>126</span></label>
+        <div class="rat"><strong>Rationale:</strong> A /26 leaves 32 − 26 = 6 host bits. 2⁶ = 64 total addresses, minus the network ID and broadcast = <strong>62 usable</strong>. (30 would be a /27; 126 would be a /25.)</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q7.</span>Which IPv4 address is NOT routable on the public internet? <em>(Choose the RFC 1918 address.)</em></div>
+        <label><input type="radio" name="q7" value="a"><span>172.20.4.50</span></label>
+        <label><input type="radio" name="q7" value="b"><span>172.35.4.50</span></label>
+        <label><input type="radio" name="q7" value="c"><span>11.10.4.50</span></label>
+        <label><input type="radio" name="q7" value="d"><span>192.169.4.50</span></label>
+        <div class="rat"><strong>Rationale:</strong> The forgotten middle range is 172.16.0.0/12, which spans 172.16.0.0–172.31.255.255. So 172.20.x.x is private, while 172.35.x.x falls outside the /12. Likewise 11.x is outside 10/8 and 192.169.x is outside 192.168/16 — both public.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q8.</span>A mobile carrier runs an IPv6-only network, but customers still need to reach IPv4-only websites. Which transition mechanism enables this?</div>
+        <label><input type="radio" name="q8" value="a"><span>Dual stack</span></label>
+        <label><input type="radio" name="q8" value="b"><span>EUI-64</span></label>
+        <label><input type="radio" name="q8" value="c"><span>SLAAC</span></label>
+        <label><input type="radio" name="q8" value="d"><span>NAT64 with DNS64</span></label>
+        <div class="rat"><strong>Rationale:</strong> NAT64 translates between IPv6 clients and IPv4 servers, with DNS64 synthesizing the AAAA records that point at the translator. Dual stack would require IPv4 on the client (contradicting "IPv6-only"); SLAAC and EUI-64 are address-assignment mechanisms, not translation.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson01.html">← Lesson 1: Network Concepts I</a>
+    <a href="lesson03.html">Lesson 3: Network Implementation I →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 2 of 8 · Domain 1.0 Networking Concepts (23%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---------- CIDR slider widget ---------- */
+  var range = document.getElementById('cidrRange');
+  if (range) {
+    var upd = function(){
+      var p = parseInt(range.value, 10);
+      var hostBits = 32 - p;
+      var maskNum = p === 0 ? 0 : (0xFFFFFFFF << hostBits) >>> 0;
+      var mask = [(maskNum>>>24)&255,(maskNum>>>16)&255,(maskNum>>>8)&255,maskNum&255].join('.');
+      var hosts = Math.pow(2, hostBits) - 2;
+      document.getElementById('coPrefix').textContent = '/' + p;
+      document.getElementById('coMask').textContent = mask;
+      document.getElementById('coBits').textContent = hostBits;
+      document.getElementById('coHosts').textContent = hosts.toLocaleString();
+    };
+    range.addEventListener('input', upd); upd();
+  }
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreEl = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreEl.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
