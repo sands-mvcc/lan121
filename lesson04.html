@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4 | Network Implementation II — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Router CLI simulator ---------- */
+  .sim{background:#0E1822;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+  [data-theme="dark"] .sim{background:#0A1118}
+  .sim-bar{display:flex;align-items:center;gap:8px;background:#1B2836;padding:9px 14px}
+  .sim-bar .dot{width:11px;height:11px;border-radius:50%}
+  .sim-bar .d1{background:#E0655C}.sim-bar .d2{background:#E0A458}.sim-bar .d3{background:#4FC08D}
+  .sim-bar .stitle{margin-left:6px;color:#9FB2C3;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em}
+  .sim-out{height:250px;overflow-y:auto;padding:13px 16px;font-family:var(--mono);font-size:.8rem;line-height:1.55;color:#D7E4EE;white-space:pre-wrap;word-break:break-word}
+  .sim-out .ok{color:#4FC08D}.sim-out .err{color:#E0827B}.sim-out .dim{color:#7E93A6}.sim-out .cmd{color:#8FC7F2}
+  .sim-in{display:flex;align-items:center;gap:8px;border-top:1px solid #223447;padding:9px 14px}
+  .sim-in .pr{font-family:var(--mono);font-size:.8rem;color:#4FC08D;white-space:nowrap}
+  .sim-in input{flex:1;background:none;border:none;outline:none;color:#EAF2F8;font-family:var(--mono);font-size:.84rem}
+  .sim-in input::placeholder{color:#5E7386}
+  .sim-help{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 15px;font-size:.8rem;margin-top:10px}
+  .sim-help code{display:inline-block;margin:2px 3px}
+  .task-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
+  .task{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:13px 16px}
+  .task h5{font-size:.83rem;color:var(--blue);margin-bottom:8px;font-family:var(--mono);letter-spacing:.04em}
+  .task ul{list-style:none;padding:0;margin:0}
+  .task li{font-size:.8rem;padding:5px 0 5px 26px;position:relative;font-family:var(--mono)}
+  .task li::before{content:'○';position:absolute;left:2px;color:var(--muted)}
+  .task li.done{color:var(--green);text-decoration:none}
+  .task li.done::before{content:'✔';color:var(--green);font-weight:800}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 4 — Network Implementation II</h1>
+      <div class="sub">Domain 2.0 · Network Implementations · 20%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 4 OF 8</span>
+      <span class="tag">DOMAIN 2.0 · NETWORK IMPLEMENTATIONS · 20%</span>
+      <span class="tag exam">EXAM 2 THIS LESSON</span>
+    </div>
+    <h2>Network Implementation II — Routing &amp; Address Translation</h2>
+    <p class="lede">Lesson 3 built the Layer 2 world — switches, VLANs, wireless, and the racks they live in. This lesson moves up to Layer 3, where routers decide how packets cross network boundaries. You'll configure static routes and the RIP routing protocol in a live command simulator, separate interior from exterior gateway protocols, contrast distance vector with link state, and meet the big three — OSPF, EIGRP, and BGP. Then you'll learn how a router chooses among competing routes using administrative distance, prefix length, and metric; how NAT and PAT let private networks share public addresses; how FHRP/VRRP virtual IPs keep the default gateway alive; and how one router arm can route between all your VLANs with subinterfaces. Exam 2 closes out Domain 2.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Differentiate</b> static and dynamic routing, and identify when each is the appropriate choice. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Configure</b> static routes, a default route, and basic RIPv2 using router CLI commands, and verify the routing table with <code>show ip route</code>. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Classify</b> routing protocols as interior (IGP) or exterior (EGP), and as distance vector or link state. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Compare</b> OSPF, EIGRP, and BGP — their algorithms, metrics, and where each is deployed. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Predict</b> which route a router installs and uses, applying longest prefix match, administrative distance, and metric in the correct order. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Explain</b> how NAT and PAT translate private RFC 1918 addresses to public addresses, and read a PAT translation table. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Describe</b> first-hop redundancy (FHRP/VRRP) with virtual IPs, and explain router-on-a-stick inter-VLAN routing with 802.1Q subinterfaces. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Static Route"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📌</span><b>Static Route</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A route entered manually by an administrator (ip route …). Predictable, zero overhead — but it never adapts when the topology changes.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Default Route"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚪</span><b>Default Route</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">0.0.0.0/0 — the route of last resort, matching any destination not found elsewhere in the table. Usually points toward the internet.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: RIP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🐢</span><b>RIP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Routing Information Protocol — a simple distance vector IGP using hop count as its metric (max 15). Easy to configure, slow to converge; ideal for learning.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: IGP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏠</span><b>IGP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Interior Gateway Protocol — routes WITHIN one autonomous system (one organization). RIP, OSPF, EIGRP, and IS-IS are IGPs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: EGP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌍</span><b>EGP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Exterior Gateway Protocol — routes BETWEEN autonomous systems. In practice there is exactly one: BGP, the protocol that glues the internet together.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Distance Vector"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🗣️</span><b>Distance Vector</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">"Routing by rumor" — each router shares its routing table with neighbors and trusts what it hears. Knows distance and direction, not the map. RIP, EIGRP.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Link State"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🗺️</span><b>Link State</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Every router floods link advertisements until all share an identical map of the whole area, then each computes shortest paths itself (Dijkstra/SPF). OSPF, IS-IS.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: OSPF"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">⚡</span><b>OSPF</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Open Shortest Path First — the open-standard link state IGP. Metric = cost (based on bandwidth); scales with areas; fast convergence. AD 110.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: EIGRP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚀</span><b>EIGRP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Enhanced Interior Gateway Routing Protocol — Cisco's advanced distance vector IGP. Composite metric (bandwidth + delay), very fast convergence. AD 90.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: BGP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌐</span><b>BGP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Border Gateway Protocol — the exterior path vector protocol of the internet. Routes between autonomous systems using AS-path and policy, not speed. AD 20 (eBGP).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Administrative Distance"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏅</span><b>Administrative Distance</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Trustworthiness ranking of a route's SOURCE — lower wins. Connected 0, Static 1, eBGP 20, EIGRP 90, OSPF 110, RIP 120.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Metric"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📐</span><b>Metric</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A protocol's own cost for a path — hop count (RIP), cost/bandwidth (OSPF), composite (EIGRP). Breaks ties between routes from the SAME protocol; lower wins.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: NAT"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🎭</span><b>NAT</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Network Address Translation — rewrites private RFC 1918 source addresses to public addresses at the network edge. Static NAT: one-to-one. Dynamic NAT: pool-based.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: PAT"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚦</span><b>PAT</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Port Address Translation (NAT overload) — many private hosts share ONE public IP, distinguished by unique source port numbers. How your whole house shares one address.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: FHRP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🛟</span><b>FHRP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">First-Hop Redundancy Protocol — a family (VRRP, HSRP, GLBP) that lets two or more routers stand behind one virtual gateway so the first hop never dies.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: VRRP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">👥</span><b>VRRP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Virtual Router Redundancy Protocol — the open-standard FHRP. A master router answers for the virtual IP; a backup takes over in seconds if the master fails.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Virtual IP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪞</span><b>Virtual IP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">An IP address (with a virtual MAC) not tied to one physical box — hosts use it as their default gateway, and whichever router is active answers for it.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Subinterface"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪓</span><b>Subinterface</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A logical division of one physical router interface (e.g., G0/0.10), each tagged to a VLAN with 802.1Q and given its own IP — the heart of router-on-a-stick.</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT (expanded) ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. STATIC vs DYNAMIC + SIMULATOR -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧭</span>
+        <span class="at"><h3>1. Static vs. Dynamic Routing — With a Live CLI Simulator</h3><span class="asub">N10-009 OBJECTIVE 2.1 · TYPE THE COMMANDS · STATIC ROUTES &amp; RIPv2</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>A router forwards packets by consulting its <strong>routing table</strong>. Routes get into that table three ways: <strong>directly connected</strong> networks appear automatically when an interface comes up; <strong>static routes</strong> are typed in by an administrator; and <strong>dynamic routes</strong> are learned automatically from neighboring routers running a routing protocol.</p>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th></th><th>Static Routing</th><th>Dynamic Routing</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Configured by</strong></td><td>A human, one route at a time</td><td>A routing protocol (RIP, OSPF, EIGRP, BGP)</td></tr>
+            <tr><td><strong>Adapts to failures</strong></td><td>❌ Never — a dead next hop is a black hole</td><td>✅ Reconverges around failures automatically</td></tr>
+            <tr><td><strong>Overhead</strong></td><td>Zero CPU/bandwidth</td><td>Protocol traffic, CPU, memory</td></tr>
+            <tr><td><strong>Scales to</strong></td><td>A handful of networks</td><td>Hundreds to hundreds of thousands of routes</td></tr>
+            <tr><td><strong>Best for</strong></td><td>Stub networks, default routes, labs, absolute control</td><td>Anything with redundancy or more than a few routers</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>🖥️ Router CLI Simulator — configure it yourself</h4>
+        <p>This simulated Cisco-style router understands the Network+ routing commands. Complete both task cards — the checkboxes tick themselves as your commands land. Type <code>?</code> at any time for help.</p>
+        <div class="task-grid">
+          <div class="task" id="taskA">
+            <h5>TASK A — STATIC ROUTING</h5>
+            <ul>
+              <li id="tA1">enable → configure terminal</li>
+              <li id="tA2">ip route 10.2.0.0 255.255.0.0 192.168.1.2</li>
+              <li id="tA3">ip route 0.0.0.0 0.0.0.0 203.0.113.1</li>
+              <li id="tA4">show ip route (see your S and S* entries)</li>
+            </ul>
+          </div>
+          <div class="task" id="taskB">
+            <h5>TASK B — RIP v2 ROUTING</h5>
+            <ul>
+              <li id="tB1">router rip</li>
+              <li id="tB2">version 2</li>
+              <li id="tB3">network 192.168.1.0</li>
+              <li id="tB4">no auto-summary</li>
+            </ul>
+          </div>
+        </div>
+        <div class="sim">
+          <div class="sim-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="stitle">R1 — LAN 121 ROUTING SIMULATOR · type ? for help</span></div>
+          <div class="sim-out" id="simOut" aria-live="polite"></div>
+          <div class="sim-in">
+            <span class="pr" id="simPrompt">R1&gt;</span>
+            <input id="simIn" type="text" autocomplete="off" spellcheck="false" placeholder="type a command and press Enter…" aria-label="Router command input">
+          </div>
+        </div>
+        <div class="sim-help">
+          <strong>Command reference:</strong>
+          <code>enable</code> <code>configure terminal</code> <code>ip route &lt;net&gt; &lt;mask&gt; &lt;next-hop&gt;</code> <code>router rip</code> <code>version 2</code> <code>network &lt;net&gt;</code> <code>no auto-summary</code> <code>show ip route</code> <code>show run</code> <code>exit</code> <code>reset</code>
+        </div>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Reading the table:</strong> in <code>show ip route</code>, the letter code tells you the route's source — <code>C</code> connected, <code>S</code> static, <code>S*</code> static default, <code>R</code> RIP, <code>O</code> OSPF, <code>D</code> EIGRP, <code>B</code> BGP. The bracketed pair is <code>[administrative distance/metric]</code> — Section 5 explains both.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. IGP vs EGP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🌍</span>
+        <span class="at"><h3>2. Internal vs. External Routing Protocols — IGP &amp; EGP</h3><span class="asub">N10-009 OBJECTIVE 2.1 · AUTONOMOUS SYSTEMS · WHO ROUTES WHERE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>The internet is not one network — it's roughly a hundred thousand <strong>autonomous systems (AS)</strong>: networks under a single administrative control, each with an AS number. Moraine Valley is inside one AS; Comcast is another; Google another. That boundary defines the two protocol families:</p>
+        <ul>
+          <li><strong>IGP — Interior Gateway Protocol:</strong> routes <em>within</em> one AS, optimizing for speed and fast convergence. RIP, OSPF, EIGRP, and IS-IS are IGPs.</li>
+          <li><strong>EGP — Exterior Gateway Protocol:</strong> routes <em>between</em> autonomous systems, optimizing for <em>policy and reachability</em>, not speed. Today there is exactly one: <strong>BGP</strong>.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 660 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two autonomous systems running IGPs internally, connected by BGP">
+            <ellipse cx="165" cy="115" rx="145" ry="95" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2"/>
+            <text x="165" y="40" text-anchor="middle" class="sv-mono" font-weight="700">AS 65001 · CAMPUS</text>
+            <circle cx="110" cy="100" r="15" class="sv-node"/><circle cx="215" cy="90" r="15" class="sv-node"/><circle cx="165" cy="160" r="15" class="sv-node"/>
+            <path class="sv-line" d="M124 96 L200 92 M120 111 L153 150 M204 102 L176 149"/>
+            <text x="165" y="205" text-anchor="middle" class="sv-txt" font-weight="700">IGP inside: OSPF / EIGRP / RIP</text>
+            <ellipse cx="495" cy="115" rx="145" ry="95" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>
+            <text x="495" y="40" text-anchor="middle" class="sv-mono" font-weight="700">AS 65002 · ISP</text>
+            <circle cx="440" cy="100" r="15" class="sv-node2"/><circle cx="545" cy="90" r="15" class="sv-node2"/><circle cx="495" cy="160" r="15" class="sv-node2"/>
+            <path class="sv-line" d="M454 96 L530 92 M450 111 L483 150 M534 102 L506 149"/>
+            <text x="495" y="205" text-anchor="middle" class="sv-txt" font-weight="700">IGP inside: OSPF / IS-IS</text>
+            <line x1="310" y1="115" x2="350" y2="115" stroke="var(--amber)" stroke-width="5"/>
+            <text x="330" y="100" text-anchor="middle" class="sv-mono" fill="var(--amber)" font-weight="800">BGP</text>
+            <text x="330" y="138" text-anchor="middle" class="sv-mono" fill="var(--amber)">between AS</text>
+          </svg>
+          <figcaption>FIG 4.1 — IGPs ROUTE INSIDE AN AUTONOMOUS SYSTEM; BGP ROUTES BETWEEN THEM</figcaption>
+        </figure>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> "Which protocol routes between autonomous systems?" — BGP, every time. Everything else on the blueprint (RIP, OSPF, EIGRP) is interior.</span></div>
+      </div>
+    </div>
+
+    <!-- 3. DISTANCE VECTOR vs LINK STATE -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗺️</span>
+        <span class="at"><h3>3. Distance Vector vs. Link State</h3><span class="asub">N10-009 OBJECTIVE 2.1 · ROUTING BY RUMOR vs ROUTING BY MAP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Interior protocols split into two philosophies, and the difference is <em>what each router actually knows</em>.</p>
+        <h4>Distance vector — routing by rumor</h4>
+        <p>Each router periodically hands its whole routing table to its direct neighbors: <em>"I can reach 10.2.0.0 in 2 hops."</em> Neighbors add one hop and pass the rumor on. No router ever sees the map — only <strong>distances</strong> (how far) and <strong>vectors</strong> (which way). Simple and light, but rumors travel slowly (slow convergence) and can loop, which is why RIP caps paths at <strong>15 hops</strong> and uses guardrails like split horizon and hold-down timers. <strong>RIP</strong> is the classic; <strong>EIGRP</strong> is the advanced, fast-converging evolution.</p>
+        <h4>Link state — routing by map</h4>
+        <p>Each router floods tiny <strong>link-state advertisements</strong> — <em>"I am R3, and my links and their costs are…"</em> — until every router in the area holds an <em>identical database of the entire topology</em>. Then each router independently runs <strong>Dijkstra's shortest-path-first (SPF) algorithm</strong> against that map. More CPU and memory, but fast convergence and no rumor loops. <strong>OSPF</strong> and <strong>IS-IS</strong> are link state.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Distance vector routers passing rumors versus link state routers sharing a full map">
+            <rect x="15" y="12" width="315" height="236" rx="12" fill="var(--blue-soft)" opacity=".45"/>
+            <text x="172" y="38" text-anchor="middle" class="sv-txt" font-weight="800">DISTANCE VECTOR · "rumor"</text>
+            <circle cx="70" cy="110" r="18" class="sv-node"/><text x="70" y="145" text-anchor="middle" class="sv-txt">R1</text>
+            <circle cx="172" cy="110" r="18" class="sv-node"/><text x="172" y="145" text-anchor="middle" class="sv-txt">R2</text>
+            <circle cx="274" cy="110" r="18" class="sv-node"/><text x="274" y="145" text-anchor="middle" class="sv-txt">R3</text>
+            <path class="sv-line" d="M88 110 H154 M190 110 H256"/>
+            <path d="M95 90 Q133 68 148 86" fill="none" stroke="var(--amber)" stroke-width="2" marker-end="none"/>
+            <path d="M197 90 Q235 68 250 86" fill="none" stroke="var(--amber)" stroke-width="2"/>
+            <text x="120" y="66" text-anchor="middle" class="sv-mono" fill="var(--amber)">"10.0.0.0 = 1 hop"</text>
+            <text x="224" y="66" text-anchor="middle" class="sv-mono" fill="var(--amber)">"…= 2 hops"</text>
+            <text x="172" y="190" text-anchor="middle" class="sv-mono">knows distance + direction only</text>
+            <text x="172" y="212" text-anchor="middle" class="sv-mono">RIP · EIGRP</text>
+            <rect x="350" y="12" width="315" height="236" rx="12" fill="var(--green-soft)" opacity=".55"/>
+            <text x="507" y="38" text-anchor="middle" class="sv-txt" font-weight="800">LINK STATE · "map"</text>
+            <circle cx="435" cy="95" r="16" class="sv-node2"/><circle cx="580" cy="95" r="16" class="sv-node2"/><circle cx="507" cy="165" r="16" class="sv-node2"/>
+            <path class="sv-line" d="M451 95 H564 M444 108 L497 152 M571 108 L518 152"/>
+            <rect x="470" y="60" width="76" height="0" fill="none"/>
+            <text x="507" y="88" text-anchor="middle" class="sv-mono" fill="var(--green)">identical topology DB</text>
+            <text x="507" y="212" text-anchor="middle" class="sv-mono">every router runs SPF on the full map</text>
+            <text x="507" y="232" text-anchor="middle" class="sv-mono">OSPF · IS-IS</text>
+          </svg>
+          <figcaption>FIG 4.2 — WHAT EACH ROUTER KNOWS: A RUMOR TRAIL vs. THE WHOLE MAP</figcaption>
+        </figure>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th></th><th>Distance Vector</th><th>Link State</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Router knows</strong></td><td>Distances + next hops (from neighbors)</td><td>The entire area topology</td></tr>
+            <tr><td><strong>Shares</strong></td><td>Its routing table, with neighbors</td><td>Link-state advertisements, flooded to all</td></tr>
+            <tr><td><strong>Algorithm</strong></td><td>Bellman-Ford</td><td>Dijkstra SPF</td></tr>
+            <tr><td><strong>Convergence</strong></td><td>Slower (RIP) to fast (EIGRP)</td><td>Fast</td></tr>
+            <tr><td><strong>Resources</strong></td><td>Light</td><td>More CPU / memory</td></tr>
+            <tr><td><strong>Examples</strong></td><td>RIP, EIGRP*</td><td>OSPF, IS-IS</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="mono" style="font-size:.75rem;color:var(--muted)">* EIGRP is formally an "advanced distance vector" protocol — it borrows link state ideas but still routes on neighbor-supplied information.</p>
+      </div>
+    </div>
+
+    <!-- 4. OSPF, EIGRP, BGP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⚡</span>
+        <span class="at"><h3>4. The Big Three — OSPF, EIGRP &amp; BGP</h3><span class="asub">N10-009 OBJECTIVE 2.1 · WHO RUNS WHAT, AND WHY</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>OSPF — the enterprise standard</h4>
+        <p><strong>Open Shortest Path First</strong> is the open-standard link state IGP most enterprises run. Its metric is <strong>cost</strong>, derived from interface bandwidth — faster links cost less. Large networks divide into <strong>areas</strong> hung off a backbone (Area 0) to keep the topology database and SPF calculations manageable. Vendor-neutral, fast, scalable — the default answer for "which IGP should a mixed-vendor enterprise use?"</p>
+        <h4>EIGRP — Cisco's speedster</h4>
+        <p><strong>Enhanced Interior Gateway Routing Protocol</strong> is Cisco's advanced distance vector IGP. Its composite metric blends <strong>bandwidth and delay</strong>, and its DUAL algorithm pre-computes backup paths (feasible successors), so failover is nearly instant. Historically Cisco-proprietary — the reason it loses to OSPF in multi-vendor shops.</p>
+        <h4>BGP — the internet's protocol</h4>
+        <p><strong>Border Gateway Protocol</strong> is the exterior <em>path vector</em> protocol connecting all autonomous systems. It doesn't ask "which path is fastest?" but <strong>"which path is allowed, and through whose networks?"</strong> — selecting routes by AS-path length and administrative <em>policy</em>. It carries the full internet table (900k+ prefixes) and converges deliberately, not instantly. Your campus touches BGP exactly where it meets its ISPs.</p>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Protocol</th><th>Type</th><th>Scope</th><th>Metric</th><th>AD</th><th>Deployed</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">RIP</td><td>Distance vector</td><td>IGP</td><td>Hop count (max 15)</td><td class="mono">120</td><td>Small/lab networks</td></tr>
+            <tr><td class="mono">OSPF</td><td>Link state</td><td>IGP</td><td>Cost (bandwidth)</td><td class="mono">110</td><td>Enterprises (open standard)</td></tr>
+            <tr><td class="mono">EIGRP</td><td>Adv. distance vector</td><td>IGP</td><td>Bandwidth + delay</td><td class="mono">90</td><td>Cisco shops</td></tr>
+            <tr><td class="mono">BGP</td><td>Path vector</td><td>EGP</td><td>AS-path + policy</td><td class="mono">20 (eBGP)</td><td>Between AS / the internet</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Match protocol → metric: RIP = hops, OSPF = cost/bandwidth, EIGRP = composite (bandwidth + delay), BGP = AS-path/policy. And OSPF = link state + open standard; EIGRP = Cisco.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. ROUTE SELECTION -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🏆</span>
+        <span class="at"><h3>5. Route Selection — Prefix Length, Administrative Distance &amp; Metric</h3><span class="asub">N10-009 OBJECTIVE 2.1 · HOW A ROUTER PICKS THE WINNER</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>A router often knows several ways to reach the same destination. It decides in a strict order — and getting this order right is worth easy exam points:</p>
+        <ul>
+          <li><strong>① Longest prefix match wins the forwarding decision.</strong> For a packet to 10.1.1.55, a route to <code>10.1.1.0/24</code> beats <code>10.0.0.0/8</code> — more matching bits = more specific = wins. Always evaluated first, regardless of protocol.</li>
+          <li><strong>② Administrative distance decides between protocols.</strong> If two <em>different sources</em> offer the exact same prefix, the router installs the one with the lower AD — a trust ranking of the source, not a measure of the path.</li>
+          <li><strong>③ Metric breaks ties within one protocol.</strong> Two OSPF routes to the same prefix? Lower cost wins. Two RIP routes? Fewer hops wins.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Administrative distance ladder from connected 0 to RIP 120">
+            <line x1="60" y1="150" x2="620" y2="150" stroke="var(--muted)" stroke-width="2"/>
+            <text x="60" y="182" class="sv-mono" font-weight="700">MOST TRUSTED (low AD)</text>
+            <text x="620" y="182" text-anchor="end" class="sv-mono" font-weight="700">LEAST TRUSTED (high AD)</text>
+            <g><rect x="70"  y="70" width="88" height="52" rx="9" fill="var(--green)"/><text x="114" y="92"  text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Connected</text><text x="114" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">0</text></g>
+            <g><rect x="168" y="70" width="88" height="52" rx="9" fill="var(--green)" opacity=".85"/><text x="212" y="92" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Static</text><text x="212" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">1</text></g>
+            <g><rect x="266" y="70" width="88" height="52" rx="9" fill="var(--blue)"/><text x="310" y="92" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">eBGP</text><text x="310" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">20</text></g>
+            <g><rect x="364" y="70" width="88" height="52" rx="9" fill="var(--blue)" opacity=".85"/><text x="408" y="92" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">EIGRP</text><text x="408" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">90</text></g>
+            <g><rect x="462" y="70" width="88" height="52" rx="9" fill="var(--amber)"/><text x="506" y="92" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">OSPF</text><text x="506" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">110</text></g>
+            <g><rect x="560" y="70" width="60" height="52" rx="9" fill="var(--red)"/><text x="590" y="92" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">RIP</text><text x="590" y="110" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">120</text></g>
+            <text x="340" y="40" text-anchor="middle" class="sv-txt" font-weight="800">ADMINISTRATIVE DISTANCE — LOWER WINS</text>
+          </svg>
+          <figcaption>FIG 4.3 — THE AD TRUST LADDER: CONNECTED 0 · STATIC 1 · eBGP 20 · EIGRP 90 · OSPF 110 · RIP 120</figcaption>
+        </figure>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Common trap:</strong> AD does <em>not</em> mean the path is better — a 15-hop static route (AD 1) beats a 1-hop OSPF route (AD 110) to the same prefix. AD ranks the <em>source's trustworthiness</em>, and longest prefix match outranks them all.</span></div>
+      </div>
+    </div>
+
+    <!-- 6. NAT & PAT -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🎭</span>
+        <span class="at"><h3>6. NAT &amp; PAT — Address Translation at the Edge</h3><span class="asub">N10-009 OBJECTIVE 2.1 · RFC 1918 MEETS THE PUBLIC INTERNET</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Private RFC 1918 addresses (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) are not routable on the internet. <strong>Network Address Translation</strong> rewrites packet addresses at the border router so private hosts can reach public destinations:</p>
+        <ul>
+          <li><strong>Static NAT</strong> — one private ↔ one public, permanently. Used to publish an internal server to the world.</li>
+          <li><strong>Dynamic NAT</strong> — private hosts borrow public addresses from a pool, first come, first served. Pool empty = no translation.</li>
+          <li><strong>PAT (Port Address Translation / NAT overload)</strong> — the one everyone actually uses: <em>many</em> private hosts share <em>one</em> public IP, kept separate by rewriting each flow's <strong>source port</strong>. Thousands of devices, one address.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PAT translating two private hosts to one public IP with different ports">
+            <circle cx="70" cy="70" r="18" class="sv-node"/><text x="70" y="105" text-anchor="middle" class="sv-txt">PC-A</text>
+            <text x="70" y="122" text-anchor="middle" class="sv-mono">192.168.1.10</text>
+            <circle cx="70" cy="170" r="18" class="sv-node"/><text x="70" y="205" text-anchor="middle" class="sv-txt">PC-B</text>
+            <text x="70" y="222" text-anchor="middle" class="sv-mono">192.168.1.11</text>
+            <rect x="255" y="85" width="150" height="66" rx="11" fill="var(--amber)"/>
+            <text x="330" y="112" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">PAT ROUTER</text>
+            <text x="330" y="132" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,Consolas,monospace">outside: 203.0.113.5</text>
+            <path class="sv-line" d="M88 75 Q170 85 255 105 M88 165 Q170 155 255 131"/>
+            <circle cx="610" cy="118" r="26" class="sv-node2"/><text x="610" y="160" text-anchor="middle" class="sv-txt">Internet</text>
+            <path class="sv-line" d="M405 118 H584"/>
+            <text x="165" y="60" text-anchor="middle" class="sv-mono" fill="var(--blue)">:49152 →</text>
+            <text x="165" y="192" text-anchor="middle" class="sv-mono" fill="var(--blue)">:49201 →</text>
+            <text x="495" y="100" text-anchor="middle" class="sv-mono" fill="var(--green)">203.0.113.5:30001</text>
+            <text x="495" y="140" text-anchor="middle" class="sv-mono" fill="var(--green)">203.0.113.5:30002</text>
+            <text x="340" y="220" text-anchor="middle" class="sv-mono">two inside hosts · ONE public IP · unique ports keep the flows apart</text>
+          </svg>
+          <figcaption>FIG 4.4 — PAT: THE TRANSLATION TABLE MAPS INSIDE IP:PORT PAIRS TO ONE OUTSIDE ADDRESS</figcaption>
+        </figure>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Lab 3 connection:</strong> you configured all three flavors in <em>Lab 3: Using NAT/PAT</em> — revisit your translation table output (<code>show ip nat translations</code>) with this diagram in hand and each line will read like a sentence.</span></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> "Hundreds of hosts, one public IP" = PAT/overload. "Internal web server must be reachable from outside at a fixed address" = static NAT.</span></div>
+      </div>
+    </div>
+
+    <!-- 7. FHRP & ROUTER ON A STICK -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🛟</span>
+        <span class="at"><h3>7. FHRP/VRRP Virtual IPs &amp; Router-on-a-Stick Subinterfaces</h3><span class="asub">N10-009 OBJECTIVES 2.1 &amp; 2.2 · A GATEWAY THAT CAN'T DIE · ONE ARM, MANY VLANS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>First-hop redundancy — protecting the default gateway</h4>
+        <p>Every host on a subnet points at one default gateway address. If that router dies, everyone is stranded — DHCP won't hand out a new gateway until leases renew. <strong>First-Hop Redundancy Protocols (FHRP)</strong> fix this: two or more routers share a <strong>virtual IP</strong> (and virtual MAC). Hosts use the virtual IP as their gateway; the <strong>master/active</strong> router answers for it, and if it fails, the <strong>backup/standby</strong> takes over in seconds. Hosts never notice.</p>
+        <ul>
+          <li><strong>VRRP</strong> — the open standard (master/backup). The exam's favorite.</li>
+          <li><strong>HSRP</strong> — Cisco's original (active/standby).</li>
+          <li><strong>GLBP</strong> — Cisco's load-balancing variant (several routers forward simultaneously).</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two routers sharing one VRRP virtual IP used by hosts as gateway">
+            <rect x="150" y="20" width="130" height="48" rx="9" fill="var(--green)"/><text x="215" y="41" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">R1 · MASTER</text><text x="215" y="58" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">.2</text>
+            <rect x="380" y="20" width="130" height="48" rx="9" fill="var(--blue)"/><text x="445" y="41" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">R2 · BACKUP</text><text x="445" y="58" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">.3</text>
+            <rect x="255" y="88" width="150" height="40" rx="20" fill="none" stroke="var(--amber)" stroke-width="3" stroke-dasharray="7 5"/>
+            <text x="330" y="106" text-anchor="middle" class="sv-txt" font-weight="800">VIRTUAL IP</text>
+            <text x="330" y="121" text-anchor="middle" class="sv-mono" fill="var(--amber)">192.168.1.1</text>
+            <path class="sv-line" d="M215 68 Q240 85 262 96 M445 68 Q420 85 398 96"/>
+            <circle cx="180" cy="180" r="14" class="sv-node"/><circle cx="330" cy="180" r="14" class="sv-node"/><circle cx="480" cy="180" r="14" class="sv-node"/>
+            <path class="sv-line" d="M300 128 Q240 150 190 168 M330 128 V166 M360 128 Q420 150 470 168"/>
+            <text x="330" y="207" text-anchor="middle" class="sv-mono">every host's gateway = the virtual IP · failover in seconds</text>
+          </svg>
+          <figcaption>FIG 4.5 — VRRP: HOSTS POINT AT AN ADDRESS NO SINGLE ROUTER OWNS</figcaption>
+        </figure>
+        <h4>Router-on-a-stick — inter-VLAN routing with subinterfaces</h4>
+        <p>Lesson 3 gave you one way to route between VLANs: SVIs on a Layer 3 switch. The classic alternative needs only a Layer 2 switch and a router with <em>one</em> interface. Run an <strong>802.1Q trunk</strong> up to the router, then split the physical interface into logical <strong>subinterfaces</strong> — one per VLAN, each tagged with <code>encapsulation dot1Q &lt;vlan&gt;</code> and holding that VLAN's gateway IP:</p>
+        <p><code>interface g0/0.10</code> · <code>encapsulation dot1Q 10</code> · <code>ip address 192.168.10.1 255.255.255.0</code></p>
+        <figure class="fig">
+          <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Router-on-a-stick with a trunk to a switch carrying VLAN 10 and 20">
+            <rect x="250" y="15" width="150" height="52" rx="10" fill="var(--amber)"/>
+            <text x="325" y="37" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">ROUTER</text>
+            <text x="325" y="55" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">g0/0.10 = .10.1 · g0/0.20 = .20.1</text>
+            <line x1="325" y1="67" x2="325" y2="120" stroke="var(--muted)" stroke-width="5"/>
+            <text x="415" y="97" text-anchor="middle" class="sv-mono" fill="var(--amber)">802.1Q trunk — "the stick"</text>
+            <rect x="235" y="120" width="180" height="46" rx="9" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+            <text x="325" y="147" text-anchor="middle" class="sv-txt" font-weight="700">Layer 2 Switch</text>
+            <circle cx="145" cy="205" r="15" class="sv-node"/><text x="145" y="232" text-anchor="middle" class="sv-mono">VLAN 10</text>
+            <circle cx="505" cy="205" r="15" class="sv-node2"/><text x="505" y="232" text-anchor="middle" class="sv-mono">VLAN 20</text>
+            <path class="sv-line" d="M247 166 Q190 185 158 197 M403 166 Q460 185 492 197"/>
+          </svg>
+          <figcaption>FIG 4.6 — ROUTER-ON-A-STICK: ONE PHYSICAL LINK, ONE SUBINTERFACE (AND GATEWAY) PER VLAN</figcaption>
+        </figure>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> FHRP scenario cue: "hosts must keep working if the default gateway router fails" → VRRP virtual IP. Subinterface cue: "route between VLANs using a router with a single interface" → router-on-a-stick with 802.1Q subinterfaces.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity04.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 5: Network Operations Challenge</h3>
+        <p>Scenario-driven challenges that put this lesson's routing decisions to work — pick the protocol, predict the winning route, and troubleshoot translation and gateway failures.</p>
+        <div class="go">Open Exercise 5 →</div>
+      </a>
+      <a class="act-card" href="lab04.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 4: Network Segmentation with VLANs and Trunking</h3>
+        <p>Build VLANs, configure access and 802.1Q trunk ports, and route between segments — cementing Lesson 3's switching alongside this lesson's inter-VLAN routing.</p>
+        <div class="go">Open Lab 4 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">CHAPTER EXAM</span></div>
+        <h3>📝 Exam 2 — Domain 2: Network Implementation</h3>
+        <p>Covers Lessons 3 and 4: VLANs, trunking, STP, wireless, physical installations, routing protocols, route selection, NAT/PAT, FHRP, and subinterfaces. Check the LMS for the exam window.</p>
+        <div class="go">Review Domain 2 →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q1.</span> Which command installs a default route pointing to 203.0.113.1?</div>
+        <label><input type="radio" name="q1" value="a"> <code>ip route 255.255.255.255 0.0.0.0 203.0.113.1</code></label>
+        <label><input type="radio" name="q1" value="b"> <code>ip route 0.0.0.0 0.0.0.0 203.0.113.1</code></label>
+        <label><input type="radio" name="q1" value="c"> <code>router rip 203.0.113.1</code></label>
+        <label><input type="radio" name="q1" value="d"> <code>network 203.0.113.1</code></label>
+        <div class="rat"><strong>Rationale:</strong> 0.0.0.0 0.0.0.0 (network and mask of all zeros) matches every destination — the route of last resort, shown as S* in the routing table.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q2.</span> Which protocol routes BETWEEN autonomous systems?</div>
+        <label><input type="radio" name="q2" value="a"> OSPF</label>
+        <label><input type="radio" name="q2" value="b"> EIGRP</label>
+        <label><input type="radio" name="q2" value="c"> BGP</label>
+        <label><input type="radio" name="q2" value="d"> RIP</label>
+        <div class="rat"><strong>Rationale:</strong> BGP is the only exterior gateway protocol in use — it connects autonomous systems using AS-path and policy. RIP, OSPF, and EIGRP are all interior protocols.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q3.</span> What best describes how a LINK STATE protocol like OSPF works?</div>
+        <label><input type="radio" name="q3" value="a"> Every router floods link advertisements until all share the same topology map, then each runs SPF</label>
+        <label><input type="radio" name="q3" value="b"> Each router periodically sends its whole routing table to neighbors and trusts what it hears</label>
+        <label><input type="radio" name="q3" value="c"> A central controller computes all routes and pushes them down</label>
+        <label><input type="radio" name="q3" value="d"> Routers exchange AS-path lists and apply policy</label>
+        <div class="rat"><strong>Rationale:</strong> Link state = routing by map: identical topology databases plus Dijkstra SPF on every router. Option B is distance vector ("routing by rumor"); option D is BGP.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q4.</span> A router learns 172.16.5.0/24 from OSPF (metric 40) and the same 172.16.5.0/24 from RIP (metric 2 hops). Which route is installed, and why?</div>
+        <label><input type="radio" name="q4" value="a"> RIP — 2 hops is a better metric than 40</label>
+        <label><input type="radio" name="q4" value="b"> Both — the router load-balances</label>
+        <label><input type="radio" name="q4" value="c"> RIP — it was learned first</label>
+        <label><input type="radio" name="q4" value="d"> OSPF — its administrative distance (110) beats RIP's (120); metrics from different protocols are never compared</label>
+        <div class="rat"><strong>Rationale:</strong> Same prefix from different protocols → AD decides. OSPF 110 &lt; RIP 120. Metrics only break ties WITHIN one protocol — a hop count and an OSPF cost aren't even the same units.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span> A packet is destined for 10.1.1.55. The routing table holds 10.0.0.0/8 via R2 and 10.1.1.0/24 via R3. Where does the packet go?</div>
+        <label><input type="radio" name="q5" value="a"> R2 — /8 was probably entered first</label>
+        <label><input type="radio" name="q5" value="b"> R3 — longest prefix match: /24 is more specific than /8</label>
+        <label><input type="radio" name="q5" value="c"> It's dropped as ambiguous</label>
+        <label><input type="radio" name="q5" value="d"> Both, round-robin</label>
+        <div class="rat"><strong>Rationale:</strong> Longest prefix match is evaluated before anything else — the /24 matches more bits of the destination, so it wins regardless of AD or metric.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q6.</span> Three hundred campus laptops browse the internet through one public IP address. Which technology makes this work?</div>
+        <label><input type="radio" name="q6" value="a"> Static NAT</label>
+        <label><input type="radio" name="q6" value="b"> Dynamic NAT with a 300-address pool</label>
+        <label><input type="radio" name="q6" value="c"> PAT (NAT overload) — unique source ports keep the flows separate</label>
+        <label><input type="radio" name="q6" value="d"> VRRP</label>
+        <div class="rat"><strong>Rationale:</strong> Many-to-one sharing of a single public address is PAT: the router rewrites each flow's source port and tracks the mappings in its translation table.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q7.</span> Management requires that hosts keep their default gateway even if the primary router fails. What should you deploy?</div>
+        <label><input type="radio" name="q7" value="a"> VRRP — two routers sharing a virtual IP that hosts use as their gateway</label>
+        <label><input type="radio" name="q7" value="b"> A second DHCP scope</label>
+        <label><input type="radio" name="q7" value="c"> PAT on both routers</label>
+        <label><input type="radio" name="q7" value="d"> Spanning Tree Protocol</label>
+        <div class="rat"><strong>Rationale:</strong> That's the FHRP scenario: VRRP presents a virtual IP/MAC owned by no single box. The backup router assumes it within seconds of a master failure — hosts never reconfigure.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q8.</span> In a router-on-a-stick design, what is configured on the router side of the trunk?</div>
+        <label><input type="radio" name="q8" value="a"> One SVI per VLAN</label>
+        <label><input type="radio" name="q8" value="b"> A separate physical interface per VLAN</label>
+        <label><input type="radio" name="q8" value="c"> A VRRP group per VLAN</label>
+        <label><input type="radio" name="q8" value="d"> One 802.1Q subinterface per VLAN, each with that VLAN's gateway IP</label>
+        <div class="rat"><strong>Rationale:</strong> Subinterfaces (g0/0.10, g0/0.20…) with <code>encapsulation dot1Q</code> split a single physical interface into one logical gateway per VLAN. SVIs are the Layer 3 switch alternative from Lesson 3.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson03.html">← Lesson 3: Network Implementation I</a>
+    <a href="lesson05.html">Lesson 5: Network Operations I →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 4 of 8 · Domain 2.0 Network Implementations (20%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ================= ROUTER CLI SIMULATOR ================= */
+  var out = document.getElementById('simOut');
+  var inp = document.getElementById('simIn');
+  var promptEl = document.getElementById('simPrompt');
+  if (out && inp) {
+    var state;
+    function freshState(){
+      return {
+        mode: 'user', // user | priv | config | rip
+        statics: [],   // {net, mask, prefix, hop, def}
+        rip: { enabled:false, v2:false, noAuto:false, networks: [] }
+      };
+    }
+    function promptText(){
+      switch (state.mode) {
+        case 'user':   return 'R1>';
+        case 'priv':   return 'R1#';
+        case 'config': return 'R1(config)#';
+        case 'rip':    return 'R1(config-router)#';
+      }
+    }
+    function print(txt, cls){
+      var s = document.createElement('span');
+      if (cls) s.className = cls;
+      s.textContent = txt + '\n';
+      out.appendChild(s);
+      out.scrollTop = out.scrollHeight;
+    }
+    function check(id){ var el = document.getElementById(id); if (el) el.classList.add('done'); }
+    function maskToPrefix(mask){
+      var parts = mask.split('.').map(Number);
+      if (parts.length !== 4 || parts.some(function(n){ return isNaN(n) || n < 0 || n > 255; })) return -1;
+      var bits = parts.map(function(n){ return ('00000000' + n.toString(2)).slice(-8); }).join('');
+      if (bits.indexOf('01') !== -1) return -1; // non-contiguous
+      return (bits.match(/1/g) || []).length;
+    }
+    function validIp(ip){
+      var p = ip.split('.');
+      return p.length === 4 && p.every(function(n){ return /^\d+$/.test(n) && +n >= 0 && +n <= 255; });
+    }
+    function banner(){
+      print('LAN 121 Routing Simulator — router R1', 'dim');
+      print('Interfaces up: g0/0 192.168.1.1/24 · g0/1 10.1.0.1/16', 'dim');
+      print('Try: enable → configure terminal → ip route … · type ? for help', 'dim');
+      print('');
+    }
+    function showRoutes(){
+      print('Codes: C - connected, S - static, R - RIP, O - OSPF, B - BGP', 'dim');
+      print('       * - candidate default', 'dim');
+      print('');
+      var any = false;
+      state.statics.forEach(function(r){
+        any = true;
+        if (r.def) print('S*   0.0.0.0/0 [1/0] via ' + r.hop, 'ok');
+        else print('S    ' + r.net + '/' + r.prefix + ' [1/0] via ' + r.hop, 'ok');
+      });
+      if (state.rip.enabled) {
+        state.rip.networks.forEach(function(n){
+          any = true;
+          print('R    ' + n + ' [120/1] via 192.168.1.2, 00:00:12, GigabitEthernet0/0', 'ok');
+        });
+      }
+      print('C    192.168.1.0/24 is directly connected, GigabitEthernet0/0', 'ok');
+      print('C    10.1.0.0/16 is directly connected, GigabitEthernet0/1', 'ok');
+      if (!any) print('(no static or RIP routes configured yet — add some!)', 'dim');
+    }
+    function showRun(){
+      print('!', 'dim'); print('hostname R1', 'dim');
+      state.statics.forEach(function(r){
+        print('ip route ' + (r.def ? '0.0.0.0 0.0.0.0' : r.net + ' ' + r.mask) + ' ' + r.hop);
+      });
+      if (state.rip.enabled) {
+        print('router rip');
+        if (state.rip.v2) print(' version 2');
+        state.rip.networks.forEach(function(n){ print(' network ' + n); });
+        if (state.rip.noAuto) print(' no auto-summary');
+      }
+      print('!', 'dim');
+    }
+    function help(){
+      print('— Modes —', 'dim');
+      print('  enable                      user → privileged (R1#)');
+      print('  configure terminal          privileged → global config (R1(config)#)');
+      print('  exit                        back out one mode');
+      print('— Static routing (config mode) —', 'dim');
+      print('  ip route <net> <mask> <next-hop>');
+      print('  ip route 0.0.0.0 0.0.0.0 <next-hop>     default route');
+      print('  no ip route <net> <mask> <next-hop>     remove a route');
+      print('— RIP (config mode) —', 'dim');
+      print('  router rip / version 2 / network <net> / no auto-summary');
+      print('— Verify (any mode) —', 'dim');
+      print('  show ip route · show run · reset');
+    }
+    function handle(raw){
+      var line = raw.trim().replace(/\s+/g, ' ');
+      if (!line) return;
+      print(promptText() + ' ' + line, 'cmd');
+      var l = line.toLowerCase();
+
+      if (l === '?' || l === 'help') return help();
+      if (l === 'reset' || l === 'reload') { state = freshState(); out.textContent = ''; banner(); document.querySelectorAll('.task li').forEach(function(li){ li.classList.remove('done'); }); return; }
+      if (l === 'show ip route' || l === 'sh ip route') { showRoutes(); if (state.statics.length) check('tA4'); return; }
+      if (l === 'show run' || l === 'show running-config' || l === 'sh run') return showRun();
+      if (l === 'exit' || l === 'end') {
+        if (state.mode === 'rip') state.mode = 'config';
+        else if (state.mode === 'config') state.mode = 'priv';
+        else if (state.mode === 'priv') state.mode = 'user';
+        return;
+      }
+      if (l === 'enable' || l === 'en') {
+        if (state.mode === 'user') { state.mode = 'priv'; return; }
+        return print('% Already privileged', 'dim');
+      }
+      if (l === 'configure terminal' || l === 'conf t' || l === 'config t' || l === 'configure t') {
+        if (state.mode === 'user') return print('% Type "enable" first', 'err');
+        state.mode = 'config'; check('tA1');
+        return print('Enter configuration commands, one per line.', 'dim');
+      }
+
+      /* ---- ip route ---- */
+      var m = l.match(/^(no )?ip route (\S+) (\S+) (\S+)$/);
+      if (m) {
+        if (state.mode !== 'config' && state.mode !== 'rip') return print('% Enter global configuration mode first (enable → configure terminal)', 'err');
+        var neg = !!m[1], net = m[2], mask = m[3], hop = m[4];
+        if (!validIp(net) || !validIp(mask) || !validIp(hop)) return print('% Invalid address or mask', 'err');
+        var prefix = maskToPrefix(mask);
+        if (prefix === -1) return print('% Invalid subnet mask: ' + mask, 'err');
+        var isDef = (net === '0.0.0.0' && mask === '0.0.0.0');
+        if (neg) {
+          var before = state.statics.length;
+          state.statics = state.statics.filter(function(r){ return !(r.net === net && r.mask === mask && r.hop === hop); });
+          return print(before === state.statics.length ? '% Route not found' : 'Route removed.', before === state.statics.length ? 'err' : 'ok');
+        }
+        state.statics.push({ net: net, mask: mask, prefix: prefix, hop: hop, def: isDef });
+        if (isDef) { check('tA3'); print('✔ Default route (gateway of last resort) installed via ' + hop, 'ok'); }
+        else {
+          print('✔ Static route to ' + net + '/' + prefix + ' via ' + hop + ' installed', 'ok');
+          if (net === '10.2.0.0' && mask === '255.255.0.0' && hop === '192.168.1.2') check('tA2');
+        }
+        return;
+      }
+
+      /* ---- RIP ---- */
+      if (l === 'router rip') {
+        if (state.mode === 'user' || state.mode === 'priv') return print('% Enter global configuration mode first', 'err');
+        state.mode = 'rip'; state.rip.enabled = true; check('tB1');
+        return print('RIP routing process started.', 'ok');
+      }
+      if (state.mode === 'rip') {
+        if (l === 'version 2') { state.rip.v2 = true; check('tB2'); return print('✔ RIPv2 enabled (classless, multicast updates to 224.0.0.9)', 'ok'); }
+        if (l === 'no auto-summary') { state.rip.noAuto = true; check('tB4'); return print('✔ Auto-summarization disabled — subnet masks advertised as configured', 'ok'); }
+        var n = l.match(/^network (\S+)$/);
+        if (n) {
+          if (!validIp(n[1])) return print('% Invalid network address', 'err');
+          if (state.rip.networks.indexOf(n[1]) === -1) state.rip.networks.push(n[1]);
+          print('✔ RIP now advertising (and listening on) ' + n[1], 'ok');
+          if (n[1] === '192.168.1.0') check('tB3');
+          return;
+        }
+      }
+      if (l === 'version 2' || l === 'no auto-summary' || /^network /.test(l)) {
+        return print('% RIP subcommand — enter "router rip" first', 'err');
+      }
+
+      print('% Unrecognized command: "' + line + '" — type ? for help', 'err');
+    }
+    state = freshState();
+    banner();
+    inp.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { handle(inp.value); inp.value = ''; promptEl.textContent = promptText(); }
+    });
+  }
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreEl = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreEl.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
