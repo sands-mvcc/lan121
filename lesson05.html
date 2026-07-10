@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5 | Network Operations I — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Interactive tool cards ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 5 — Network Operations I</h1>
+      <div class="sub">Domain 3.0 · Network Operations · 19%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 5 OF 8</span>
+      <span class="tag">DOMAIN 3.0 · NETWORK OPERATIONS · 19%</span>
+      <span class="tag">NO EXAM THIS LESSON</span>
+      <span class="tag exam">7 INTERACTIVE TOOLS</span>
+    </div>
+    <h2>Network Operations I — Core Network Services</h2>
+    <p class="lede">Domains 1 and 2 built the roads; Domain 3 runs the traffic. This lesson covers the invisible services every network depends on: ARP, which turns IP addresses into MAC addresses; DNS in depth — the resolution hierarchy, record types, zones, and the modern security additions DNSSEC, DoH, and DoT; DHCP scopes, reservations, exclusions, leases, relay, and IPv6's SLAAC; the time services NTP, PTP, and NTS that keep logs, certificates, and authentication honest; ICMP, the network's diagnostic voice behind ping and traceroute; and IPAM plus the web and mail services users actually see. Seven interactive simulators are woven into the sections — work each one as you reach it.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Explain</b> how ARP resolves an IP address to a MAC address on the local segment, and interpret an ARP cache. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Trace</b> a full recursive DNS resolution from stub resolver through root, TLD, and authoritative servers, distinguishing recursive from authoritative roles. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Match</b> DNS record types (A, AAAA, CNAME, MX, PTR, NS, SOA, TXT) and zone types to their functions. <span class="bloom">BLOOM: REMEMBER</span></li>
+        <li><b>Compare</b> DNSSEC, DNS over HTTPS (DoH), and DNS over TLS (DoT) — what each protects and on which port. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Describe</b> the DHCP DORA exchange and configure scopes, reservations, exclusions, lease times, and relay/helper addresses; contrast DHCP with IPv6 SLAAC. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Explain</b> network time services — NTP stratum hierarchy, PTP for precision timing, and NTS for authenticated time — and why accurate time matters. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Use</b> ICMP-based tools (ping, traceroute) to diagnose reachability, and describe the role of IPAM and core web/mail services. <span class="bloom">BLOOM: APPLY</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: ARP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔎</span><b>ARP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Address Resolution Protocol — broadcasts "who has this IP?" and caches the MAC address that answers. The bridge between Layer 3 addressing and Layer 2 delivery.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: ICMP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🩺</span><b>ICMP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Internet Control Message Protocol — the network's error and diagnostic messenger: echo request/reply (ping), TTL exceeded (traceroute), destination unreachable.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: A and AAAA Records"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📇</span><b>A / AAAA Records</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The address records: A maps a hostname to an IPv4 address; AAAA ("quad-A") maps it to an IPv6 address. The workhorses of DNS.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: CNAME Record"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏷️</span><b>CNAME Record</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Canonical Name — an alias pointing one hostname at another (www → webserver01.mvcc.edu). The alias inherits wherever the target points.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: MX Record"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📮</span><b>MX Record</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Mail Exchange — names the server(s) that accept email for a domain, each with a preference number (lowest = tried first).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Recursive Resolver"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🕵️</span><b>Recursive Resolver</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The DNS server that does the legwork for clients — querying root, TLD, and authoritative servers, then caching the answer. Usually your ISP's or 8.8.8.8/1.1.1.1.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Authoritative Server"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">⚖️</span><b>Authoritative Server</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The DNS server that OWNS the zone's records and gives the final, official answer for its domain — no guessing, no forwarding.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: DNSSEC"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">✍️</span><b>DNSSEC</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">DNS Security Extensions — digitally signs DNS records so resolvers can verify they're authentic and untampered. Protects integrity, not privacy.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: DoH and DoT"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔐</span><b>DoH / DoT</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">DNS over HTTPS (port 443, hides inside web traffic) and DNS over TLS (dedicated port 853) — both encrypt queries between client and resolver. Privacy, not authenticity.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: DHCP Scope"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🎯</span><b>DHCP Scope</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The pool of addresses a DHCP server may lease on one subnet, plus its options: default gateway, DNS servers, lease time.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Reservation"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪑</span><b>Reservation</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A scope entry that always hands a specific MAC address the same IP — DHCP's convenience with static predictability. Perfect for printers and cameras.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Lease"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">⏳</span><b>Lease</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The time a client may keep its DHCP address. Clients try to renew at 50% of the lease (T1) with the original server, and rebind at 87.5% (T2) with any server.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: DHCP Relay"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📨</span><b>DHCP Relay</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A router function (IP helper address) that converts a client's local DHCP broadcast into a unicast aimed at a central DHCP server on another subnet.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SLAAC"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪄</span><b>SLAAC</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Stateless Address Autoconfiguration — an IPv6 host builds its own address from the router-advertised prefix plus a self-generated interface ID. No server, no lease.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: NTP Stratum"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🗼</span><b>NTP Stratum</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Distance from the reference clock: stratum 0 = the atomic/GPS clock itself, stratum 1 = servers attached to it, stratum 2 syncs from stratum 1, and so on.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: PTP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">⚡</span><b>PTP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Precision Time Protocol (IEEE 1588) — hardware-timestamped sync to sub-microsecond accuracy for trading floors, broadcast, and industrial control. NTP's precise sibling.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: NTS"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🛡️</span><b>NTS</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Network Time Security — adds TLS-based authentication to NTP so a spoofed server can't shift your clocks (and silently break certificates and logs).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: IPAM"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🗃️</span><b>IPAM</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">IP Address Management — software that tracks every subnet, scope, lease, and DNS record in one place, replacing the infamous spreadsheet.</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT (expanded) ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. ARP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔎</span>
+        <span class="at"><h3>1. ARP — Turning IP Addresses into MAC Addresses</h3><span class="asub">THE GLUE BETWEEN LAYER 3 AND LAYER 2 · INTERACTIVE SIMULATOR</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>An IP address gets a packet to the right <em>network</em>; a MAC address gets the frame to the right <em>machine</em>. When a host knows a destination IP on its own subnet but not the MAC, it uses the <strong>Address Resolution Protocol</strong>: it <strong>broadcasts</strong> an ARP request — <em>"Who has 192.168.1.20? Tell 192.168.1.10"</em> — to <code>FF:FF:FF:FF:FF:FF</code>. Every host hears it; only the owner answers with a <strong>unicast</strong> reply carrying its MAC. The asker stores the pair in its <strong>ARP cache</strong> for a few minutes so the question isn't repeated for every frame.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ARP broadcast request and unicast reply">
+            <circle cx="80" cy="100" r="20" class="sv-node"/><text x="80" y="140" text-anchor="middle" class="sv-txt">Host A</text>
+            <text x="80" y="157" text-anchor="middle" class="sv-mono">192.168.1.10</text>
+            <circle cx="330" cy="55" r="16" class="sv-node3"/><text x="330" y="30" text-anchor="middle" class="sv-txt">Host B</text>
+            <circle cx="330" cy="155" r="16" class="sv-node3"/><text x="330" y="192" text-anchor="middle" class="sv-txt">Host C</text>
+            <circle cx="580" cy="100" r="20" class="sv-node2"/><text x="580" y="140" text-anchor="middle" class="sv-txt">Host D</text>
+            <text x="580" y="157" text-anchor="middle" class="sv-mono">192.168.1.20</text>
+            <path d="M104 92 Q210 60 314 58" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 5"/>
+            <path d="M104 108 Q210 140 314 152" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 5"/>
+            <path d="M104 100 H556" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 5"/>
+            <text x="330" y="90" text-anchor="middle" class="sv-mono" fill="var(--amber)">① BROADCAST: "Who has 192.168.1.20?"</text>
+            <path d="M560 115 Q330 190 106 116" fill="none" stroke="var(--green)" stroke-width="3"/>
+            <text x="330" y="178" text-anchor="middle" class="sv-mono" fill="var(--green)">② UNICAST REPLY: "1.20 is at AA:BB:CC:DD:EE:20"</text>
+          </svg>
+          <figcaption>FIG 5.1 — ARP: EVERYONE HEARS THE QUESTION; ONLY THE OWNER ANSWERS</figcaption>
+        </figure>
+        <ul>
+          <li><strong>View the cache:</strong> <code>arp -a</code> on Windows/macOS/Linux shows learned IP↔MAC pairs and whether each was dynamic or static.</li>
+          <li><strong>Off-subnet destinations:</strong> the host ARPs for its <em>default gateway's</em> MAC instead — Layer 2 only ever delivers to the next hop.</li>
+          <li><strong>Gratuitous ARP:</strong> an unsolicited announcement of your own IP→MAC — used when interfaces come up and by FHRP failovers (Lesson 4) to update everyone's cache instantly.</li>
+          <li><strong>IPv6:</strong> ARP doesn't exist there — Neighbor Discovery (NDP over ICMPv6) does the same job with multicast instead of broadcast.</li>
+        </ul>
+        <div class="tool-row">
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/arpsim.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 ARP Header Simulator</div>
+            <div class="td">Build ARP requests and replies field by field — watch the opcode, sender, and target fields change as the exchange completes.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> ARP request = broadcast, ARP reply = unicast. "Host can ping the gateway but arp -a shows nothing for a local server" → ARP/Layer 2 problem, not routing.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. DNS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🌐</span>
+        <span class="at"><h3>2. DNS — Architecture, Records, Zones &amp; Modern Security</h3><span class="asub">N10-009 OBJECTIVE 3.4 · RECURSION · RECORD TYPES · DNSSEC / DoH / DoT</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>The Domain Name System is a <strong>distributed, hierarchical database</strong> that turns names into addresses. No single server knows everything; instead, each layer knows who to ask next.</p>
+        <h4>Recursive vs. authoritative — who does the work</h4>
+        <p>Your laptop's <strong>stub resolver</strong> asks one question of a <strong>recursive resolver</strong> (campus DNS, 8.8.8.8, 1.1.1.1) and waits. The recursive resolver does the walking: it asks a <strong>root server</strong> (which delegates to <code>.edu</code>), the <strong>TLD server</strong> (which delegates to <code>mvcc.edu</code>'s name servers), and finally the <strong>authoritative server</strong> that owns the zone and gives the official answer. The resolver caches the result for the record's <strong>TTL</strong> so the next student's lookup is instant.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Recursive DNS resolution through root, TLD, and authoritative servers">
+            <circle cx="60" cy="120" r="20" class="sv-node"/><text x="60" y="160" text-anchor="middle" class="sv-txt">Client</text>
+            <rect x="160" y="92" width="130" height="56" rx="10" fill="var(--blue)"/><text x="225" y="115" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">RECURSIVE</text><text x="225" y="132" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,Consolas,monospace">resolver + cache</text>
+            <rect x="390" y="14" width="120" height="44" rx="9" fill="var(--amber)"/><text x="450" y="41" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">ROOT  ( . )</text>
+            <rect x="390" y="98" width="120" height="44" rx="9" fill="var(--amber)" opacity=".85"/><text x="450" y="125" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">TLD  ( .edu )</text>
+            <rect x="390" y="182" width="180" height="44" rx="9" fill="var(--green)"/><text x="480" y="203" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">AUTHORITATIVE</text><text x="480" y="219" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,Consolas,monospace">mvcc.edu zone</text>
+            <path class="sv-line" d="M80 114 H160"/><text x="120" y="106" text-anchor="middle" class="sv-mono">① query</text>
+            <path class="sv-line" d="M290 100 Q340 60 390 40"/><text x="330" y="55" text-anchor="middle" class="sv-mono">②</text>
+            <path class="sv-line" d="M290 120 H390"/><text x="340" y="112" text-anchor="middle" class="sv-mono">③</text>
+            <path class="sv-line" d="M290 140 Q340 180 390 200"/><text x="330" y="185" text-anchor="middle" class="sv-mono">④</text>
+            <path d="M160 148 Q110 150 84 134" fill="none" stroke="var(--green)" stroke-width="3"/>
+            <text x="112" y="168" text-anchor="middle" class="sv-mono" fill="var(--green)">⑤ answer (cached for TTL)</text>
+          </svg>
+          <figcaption>FIG 5.2 — ONE QUESTION FROM THE CLIENT; THE RECURSIVE RESOLVER WALKS THE TREE</figcaption>
+        </figure>
+        <h4>Record types you must know</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Record</th><th>Maps</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">A</td><td>Name → IPv4</td><td>The classic address record</td></tr>
+            <tr><td class="mono">AAAA</td><td>Name → IPv6</td><td>"Quad-A"</td></tr>
+            <tr><td class="mono">CNAME</td><td>Alias → canonical name</td><td>www → webserver01; can't coexist with other records for the same name</td></tr>
+            <tr><td class="mono">MX</td><td>Domain → mail server</td><td>Preference number: lowest tried first</td></tr>
+            <tr><td class="mono">PTR</td><td>IP → name (reverse)</td><td>Lives in reverse lookup zones; used by mail filters and logs</td></tr>
+            <tr><td class="mono">NS</td><td>Zone → its name servers</td><td>Delegation glue of the hierarchy</td></tr>
+            <tr><td class="mono">SOA</td><td>Zone → its authority data</td><td>Serial number, refresh/retry timers for zone transfers</td></tr>
+            <tr><td class="mono">TXT</td><td>Name → arbitrary text</td><td>SPF/DKIM/DMARC email authentication lives here</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Zone types</h4>
+        <p>A <strong>zone</strong> is the slice of the namespace a server is authoritative for. <strong>Forward zones</strong> answer name→address; <strong>reverse zones</strong> answer address→name (PTR). A <strong>primary</strong> zone holds the writable copy; <strong>secondary</strong> zones pull read-only copies via zone transfer, triggered when the SOA serial number increments.</p>
+        <h4>Securing DNS — three different jobs</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Technology</th><th>Protects</th><th>How</th><th>Port</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">DNSSEC</td><td><strong>Integrity</strong> — is this answer authentic?</td><td>Digital signatures on records; resolvers validate the chain of trust</td><td class="mono">53</td></tr>
+            <tr><td class="mono">DoT</td><td><strong>Privacy</strong> — who can read my queries?</td><td>DNS inside TLS on a dedicated port (easy for admins to see/control)</td><td class="mono">853</td></tr>
+            <tr><td class="mono">DoH</td><td><strong>Privacy</strong> — same, but camouflaged</td><td>DNS inside HTTPS — indistinguishable from web traffic</td><td class="mono">443</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="tool-row">
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dns.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 DNS Interactive Learning Tool</div>
+            <div class="td">Explore the DNS hierarchy and record types hands-on — build queries and inspect the answers.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dnslookup.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 DNS Lookup Simulation</div>
+            <div class="td">Step through a full recursive resolution — root → TLD → authoritative — one packet at a time, matching FIG 5.2.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Match the record to the job (mail = MX, alias = CNAME, reverse = PTR, IPv6 = AAAA) and the security tech to the goal: authenticity = DNSSEC; encrypted queries = DoT (853) or DoH (443).</span></div>
+      </div>
+    </div>
+
+    <!-- 3. DHCP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📬</span>
+        <span class="at"><h3>3. DHCP &amp; SLAAC — Handing Out Addresses</h3><span class="asub">N10-009 OBJECTIVE 3.4 · DORA · SCOPES · RELAY · IPv6 AUTOCONFIG</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Nobody types IP addresses into 500 laptops. The <strong>Dynamic Host Configuration Protocol</strong> leases addresses automatically through the four-step <strong>DORA</strong> exchange (UDP 67 server / 68 client):</p>
+        <figure class="fig">
+          <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DHCP DORA four-message exchange">
+            <rect x="40" y="20" width="110" height="44" rx="9" fill="var(--blue)"/><text x="95" y="47" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">CLIENT</text>
+            <rect x="490" y="20" width="110" height="44" rx="9" fill="var(--green)"/><text x="545" y="47" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SERVER</text>
+            <line x1="95" y1="64" x2="95" y2="215" stroke="var(--line)" stroke-width="2"/>
+            <line x1="545" y1="64" x2="545" y2="215" stroke="var(--line)" stroke-width="2"/>
+            <path d="M95 90 H538" stroke="var(--amber)" stroke-width="2.5" stroke-dasharray="7 5"/><text x="320" y="82" text-anchor="middle" class="sv-mono" fill="var(--amber)">① DISCOVER — broadcast: "any DHCP servers out there?"</text>
+            <path d="M545 122 H102" stroke="var(--green)" stroke-width="2.5"/><text x="320" y="114" text-anchor="middle" class="sv-mono" fill="var(--green)">② OFFER — "how about 192.168.1.57?"</text>
+            <path d="M95 154 H538" stroke="var(--amber)" stroke-width="2.5" stroke-dasharray="7 5"/><text x="320" y="146" text-anchor="middle" class="sv-mono" fill="var(--amber)">③ REQUEST — broadcast: "I accept 192.168.1.57"</text>
+            <path d="M545 186 H102" stroke="var(--green)" stroke-width="2.5"/><text x="320" y="178" text-anchor="middle" class="sv-mono" fill="var(--green)">④ ACK — lease granted + gateway, DNS, lease time</text>
+            <text x="320" y="212" text-anchor="middle" class="sv-mono">D-O-R-A · Discover, Offer, Request, Acknowledge</text>
+          </svg>
+          <figcaption>FIG 5.3 — THE DORA EXCHANGE: TWO BROADCASTS FROM THE CLIENT, TWO ANSWERS FROM THE SERVER</figcaption>
+        </figure>
+        <h4>The vocabulary of a scope</h4>
+        <ul>
+          <li><strong>Scope</strong> — the address pool for one subnet, plus options: default gateway (option 3), DNS servers (option 6), domain name, lease time.</li>
+          <li><strong>Exclusion</strong> — addresses inside the range the server must never lease (your statically addressed router, servers, printers).</li>
+          <li><strong>Reservation</strong> — a MAC address that always receives the same IP. Central control with static predictability.</li>
+          <li><strong>Lease time</strong> — how long the address is good. Clients renew at <strong>50%</strong> of the lease (T1, unicast to their server) and rebind at <strong>87.5%</strong> (T2, broadcast to any server). Short leases suit guest Wi-Fi; long leases suit stable offices.</li>
+        </ul>
+        <h4>DHCP relay — one server, many subnets</h4>
+        <p>DISCOVER is a broadcast, and <strong>routers don't forward broadcasts</strong>. Rather than one DHCP server per subnet, configure the router interface as a <strong>DHCP relay</strong> with a <strong>helper address</strong> (<code>ip helper-address 10.1.1.5</code>): it repackages the client's broadcast as a <em>unicast</em> to the central server, stamping in the subnet it came from so the server picks the right scope.</p>
+        <h4>SLAAC — how IPv6 does it without a server</h4>
+        <p>An IPv6 host listens for the router's <strong>Router Advertisement</strong>, takes the advertised /64 prefix, appends a self-generated interface ID, checks for duplicates, and starts talking — <strong>Stateless Address Autoconfiguration</strong>. No server, no lease, no table of who has what (that statelessness is why enterprises often still layer DHCPv6 on top for logging and options).</p>
+        <div class="tool-row">
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dhcp.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 Interactive DHCP Protocol Tool</div>
+            <div class="td">Watch DORA fire message by message and inspect what each packet carries.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dhcppools.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 DHCP Server Configuration Simulator</div>
+            <div class="td">Build scopes with ranges, exclusions, reservations, and lease times — then watch clients pull addresses from your pool.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+        </div>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Troubleshooting anchor:</strong> a client sitting on <strong>169.254.x.x</strong> (APIPA, from Lesson 2) reached step ① and heard silence — no server, no relay, or a dead scope. That address is the symptom; DHCP is the diagnosis.</span></div>
+      </div>
+    </div>
+
+    <!-- 4. TIME -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⏱️</span>
+        <span class="at"><h3>4. Time Services — NTP, PTP &amp; NTS</h3><span class="asub">N10-009 OBJECTIVE 3.4 · STRATUM · PRECISION · AUTHENTICATED TIME</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Wrong clocks break things quietly: log timestamps stop lining up across devices (good luck correlating an incident), Kerberos authentication rejects tickets, and TLS certificates appear expired or not-yet-valid. Time is infrastructure.</p>
+        <h4>NTP and the stratum hierarchy</h4>
+        <p><strong>Network Time Protocol</strong> (UDP 123) syncs clocks across a hierarchy measured in <strong>stratum</strong> levels — distance from the reference clock, not quality of hardware:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NTP stratum pyramid from stratum 0 reference clocks down to clients">
+            <rect x="245" y="16" width="150" height="40" rx="8" fill="var(--amber)"/><text x="320" y="36" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">STRATUM 0</text><text x="320" y="50" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">GPS · atomic clocks</text>
+            <rect x="185" y="76" width="270" height="38" rx="8" fill="var(--blue)"/><text x="320" y="94" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">STRATUM 1 — servers wired to the clock</text><text x="320" y="108" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">time.nist.gov</text>
+            <rect x="125" y="134" width="390" height="36" rx="8" fill="var(--blue)" opacity=".75"/><text x="320" y="156" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">STRATUM 2 — your campus NTP servers</text>
+            <rect x="65" y="192" width="510" height="32" rx="8" fill="var(--green)"/><text x="320" y="212" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">STRATUM 3+ — switches, servers, cameras, workstations</text>
+            <path class="sv-line" d="M320 56 V76 M320 114 V134 M320 170 V192"/>
+          </svg>
+          <figcaption>FIG 5.4 — STRATUM = HOPS FROM THE REFERENCE CLOCK; EACH LAYER SYNCS FROM THE ONE ABOVE</figcaption>
+        </figure>
+        <ul>
+          <li><strong>PTP (Precision Time Protocol, IEEE 1588)</strong> — when milliseconds aren't good enough. Hardware timestamping in the NICs and switches delivers <em>sub-microsecond</em> sync for financial trading, broadcast studios, and industrial control.</li>
+          <li><strong>NTS (Network Time Security)</strong> — plain NTP is unauthenticated; an attacker who can spoof it can roll your clocks and break certificate validation and log integrity. NTS adds TLS-based key exchange so clients verify the time source.</li>
+        </ul>
+        <div class="tool-row">
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/ntp.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NTP Protocol Explorer</div>
+            <div class="td">Interactive walk through NTP synchronization and the stratum hierarchy — see how offset and delay are measured.</div>
+            <div class="tg">LAUNCH TOOL ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> NTP = UDP 123, stratum = distance from the reference. Precision (trading floor, broadcast) → PTP. Authenticated/secure time → NTS.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. ICMP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🩺</span>
+        <span class="at"><h3>5. ICMP — The Network's Diagnostic Voice</h3><span class="asub">PING · TRACEROUTE · ERROR MESSAGES THAT TELL YOU WHERE IT HURTS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>The <strong>Internet Control Message Protocol</strong> carries no user data — it carries <em>news about</em> the network. Two message pairs matter most:</p>
+        <ul>
+          <li><strong>Echo Request / Echo Reply</strong> — the heartbeat behind <code>ping</code>. Reply received = the destination is reachable, and round-trip time tells you how far/slow.</li>
+          <li><strong>Time Exceeded</strong> — a router discarding a packet whose TTL hit zero reports back. <code>traceroute</code> weaponizes this: it sends probes with TTL=1, 2, 3… and each hop's "time exceeded" message reveals that router's address, mapping the path one hop at a time.</li>
+          <li><strong>Destination Unreachable</strong> — the network's precise complaint, with a code that matters: <em>network unreachable</em> (no route), <em>host unreachable</em> (route ok, host doesn't answer ARP), <em>port unreachable</em> (host up, service down).</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Traceroute using increasing TTL values to reveal each hop">
+            <circle cx="60" cy="70" r="18" class="sv-node"/><text x="60" y="108" text-anchor="middle" class="sv-txt">You</text>
+            <rect x="170" y="50" width="90" height="40" rx="8" fill="var(--amber)"/><text x="215" y="74" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">R1</text>
+            <rect x="330" y="50" width="90" height="40" rx="8" fill="var(--amber)"/><text x="375" y="74" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">R2</text>
+            <rect x="490" y="50" width="110" height="40" rx="8" fill="var(--green)"/><text x="545" y="74" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Server</text>
+            <path class="sv-line" d="M78 70 H170 M260 70 H330 M420 70 H490"/>
+            <text x="215" y="125" text-anchor="middle" class="sv-mono" fill="var(--red)">TTL=1 dies here → "time exceeded" ①</text>
+            <text x="375" y="150" text-anchor="middle" class="sv-mono" fill="var(--red)">TTL=2 dies here → ②</text>
+            <text x="545" y="175" text-anchor="middle" class="sv-mono" fill="var(--green)">TTL=3 arrives → echo reply ③</text>
+          </svg>
+          <figcaption>FIG 5.5 — TRACEROUTE: EACH EXPIRING TTL FORCES ONE MORE HOP TO IDENTIFY ITSELF</figcaption>
+        </figure>
+        <p>IPv6 promotes ICMP from helpful to essential: <strong>ICMPv6</strong> carries Neighbor Discovery (ARP's replacement), Router Advertisements (SLAAC, Section 3), and path MTU discovery — block it entirely and IPv6 breaks.</p>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Field habit:</strong> ping the loopback (127.0.0.1) → your stack works; ping your gateway → the LAN works; ping 8.8.8.8 → routing works; ping google.com → DNS works. Four pings, and you've isolated the failing layer.</span></div>
+      </div>
+    </div>
+
+    <!-- 6. IPAM, WEB & MAIL -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗃️</span>
+        <span class="at"><h3>6. IPAM, Web &amp; Mail Services</h3><span class="asub">N10-009 OBJECTIVE 3.4 · MANAGING THE ADDRESS ESTATE · THE SERVICES USERS SEE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>IPAM — retiring the spreadsheet</h4>
+        <p>Every organization eventually asks: <em>who has 10.4.7.22, and is 10.8.0.0/16 free?</em> <strong>IP Address Management</strong> software answers authoritatively by integrating three views — the subnet plan, live <strong>DHCP</strong> scopes and leases, and <strong>DNS</strong> records (the trio is often sold together as <em>DDI</em>: DNS-DHCP-IPAM). Good IPAM tracks utilization, flags conflicts and overlapping subnets, and gives auditors the "who had this address when" answer that a stale spreadsheet never can.</p>
+        <h4>Web services — HTTP &amp; HTTPS</h4>
+        <p><strong>HTTP</strong> (TCP 80) is the web's request/response protocol; <strong>HTTPS</strong> (TCP 443) wraps it in <strong>TLS</strong>, providing encryption, integrity, and server authentication via certificates — which is why accurate time (Section 4) and honest DNS (Section 2) both feed directly into whether that padlock appears. Modern sites are HTTPS-only; port 80's remaining job is redirecting to 443.</p>
+        <h4>Mail services — one send protocol, two read protocols</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Protocol</th><th>Job</th><th>Port</th><th>Secure Port</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">SMTP</td><td>Sending / server-to-server relay</td><td class="mono">25</td><td class="mono">587 (submission, STARTTLS)</td></tr>
+            <tr><td class="mono">IMAP</td><td>Reading — mail stays on the server, syncs across devices</td><td class="mono">143</td><td class="mono">993</td></tr>
+            <tr><td class="mono">POP3</td><td>Reading — downloads to one device, typically then deletes</td><td class="mono">110</td><td class="mono">995</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>The full journey ties this lesson together: your outgoing message leaves via <strong>SMTP</strong>, the receiving domain is located by its <strong>MX record</strong> (Section 2), the sender is validated against <strong>TXT records</strong> (SPF/DKIM/DMARC), and the recipient reads it over <strong>IMAP</strong> — every hop logged with <strong>NTP</strong>-synced timestamps.</p>
+        <div class="tool-row">
+          <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/nat.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NAT/PAT Interactive Lesson</div>
+            <div class="td">Domain 2 refresher before Exam 3 season: revisit address translation with the interactive walkthrough — pairs perfectly with your Lab 3 results.</div>
+            <div class="tg">REVIEW TOOL ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> IPAM = centralized tracking of subnets, scopes, and leases (often integrated with DNS/DHCP). Mail: SMTP sends (25/587), IMAP syncs (143/993), POP3 downloads (110/995) — those port pairs came home to roost from Lesson 2.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity05.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 6: Analyzing Domain Name Services (DNS)</h3>
+        <p>Dissect real DNS lookups: identify record types, follow the resolution chain, and interpret dig/nslookup output using the concepts from Section 2.</p>
+        <div class="go">Open Exercise 6 →</div>
+      </a>
+      <a class="act-card" href="lab05.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 5: Configuring Network Services (DNS, Email, HTTP/HTTPS, NTP)</h3>
+        <p>Stand up the services themselves — DNS zones and records, a mail flow, a secured web server, and NTP synchronization — then verify each from a client.</p>
+        <div class="go">Open Lab 5 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">LOOKING AHEAD</span></div>
+        <h3>📝 No Exam This Lesson — Exam 3 Follows Lesson 6</h3>
+        <p>Exam 3 covers all of Domain 3 (Lessons 5 and 6): the services in this lesson plus documentation, monitoring, disaster recovery, and remote access. Your Section 1–6 notes are the first half of that exam.</p>
+        <div class="go">Review the Course Plan →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q1.</span> How does a host learn the MAC address for an IP on its own subnet?</div>
+        <label><input type="radio" name="q1" value="a"> It queries DNS for a PTR record</label>
+        <label><input type="radio" name="q1" value="b"> It broadcasts an ARP request; the owner replies unicast with its MAC</label>
+        <label><input type="radio" name="q1" value="c"> It sends an ICMP echo request</label>
+        <label><input type="radio" name="q1" value="d"> The DHCP server supplies all MAC addresses at lease time</label>
+        <div class="rat"><strong>Rationale:</strong> ARP: the request goes to FF:FF:FF:FF:FF:FF so everyone hears it; only the IP's owner answers, unicast, and the mapping is cached.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q2.</span> Which DNS server ultimately provides the official answer for records in the mvcc.edu zone?</div>
+        <label><input type="radio" name="q2" value="a"> The root server</label>
+        <label><input type="radio" name="q2" value="b"> The client's recursive resolver</label>
+        <label><input type="radio" name="q2" value="c"> The zone's authoritative name server</label>
+        <label><input type="radio" name="q2" value="d"> The .edu TLD server</label>
+        <div class="rat"><strong>Rationale:</strong> Root and TLD servers only delegate ("ask them next"); the recursive resolver just does the walking and caching. Authority lives with the server that owns the zone.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q3.</span> Mail for @mvcc.edu must be delivered to a new server. Which record do you update?</div>
+        <label><input type="radio" name="q3" value="a"> MX</label>
+        <label><input type="radio" name="q3" value="b"> CNAME</label>
+        <label><input type="radio" name="q3" value="c"> PTR</label>
+        <label><input type="radio" name="q3" value="d"> SOA</label>
+        <div class="rat"><strong>Rationale:</strong> MX records name a domain's mail servers (with preference numbers — lowest wins). CNAME aliases, PTR reverses, SOA holds zone metadata.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q4.</span> A company wants DNS queries encrypted on a dedicated, easily identifiable port. Which technology and port?</div>
+        <label><input type="radio" name="q4" value="a"> DNSSEC on port 53</label>
+        <label><input type="radio" name="q4" value="b"> DoH on port 443</label>
+        <label><input type="radio" name="q4" value="c"> DNSSEC on port 853</label>
+        <label><input type="radio" name="q4" value="d"> DoT on port 853</label>
+        <div class="rat"><strong>Rationale:</strong> DNS over TLS uses dedicated port 853 — visible and manageable. DoH (443) hides inside web traffic; DNSSEC signs records for authenticity but encrypts nothing.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span> Clients on VLAN 30 can't get addresses; the only DHCP server sits on VLAN 10. The fix?</div>
+        <label><input type="radio" name="q5" value="a"> Increase the lease time on the VLAN 10 scope</label>
+        <label><input type="radio" name="q5" value="b"> Configure a DHCP relay / IP helper address on VLAN 30's router interface</label>
+        <label><input type="radio" name="q5" value="c"> Enable jumbo frames between the VLANs</label>
+        <label><input type="radio" name="q5" value="d"> Add a CNAME for the DHCP server</label>
+        <div class="rat"><strong>Rationale:</strong> DISCOVER is a broadcast and routers don't forward broadcasts. A relay (ip helper-address) converts it to unicast aimed at the central server, tagging the source subnet so the right scope answers.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q6.</span> By default, when does a DHCP client first attempt to renew its lease?</div>
+        <label><input type="radio" name="q6" value="a"> At 50% of the lease time (T1), unicast to its original server</label>
+        <label><input type="radio" name="q6" value="b"> At 87.5% (T2), broadcast to any server</label>
+        <label><input type="radio" name="q6" value="c"> Only after the lease fully expires</label>
+        <label><input type="radio" name="q6" value="d"> Every 10 minutes regardless of lease length</label>
+        <div class="rat"><strong>Rationale:</strong> T1 renewal fires at 50%, quietly, to the server that granted the lease. Only if that fails does the client rebind at 87.5% (T2) via broadcast — and fall back to APIPA if everything fails.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q7.</span> A trading firm needs clocks synchronized to sub-microsecond accuracy across its network. Which protocol fits?</div>
+        <label><input type="radio" name="q7" value="a"> NTP</label>
+        <label><input type="radio" name="q7" value="b"> NTS</label>
+        <label><input type="radio" name="q7" value="c"> PTP</label>
+        <label><input type="radio" name="q7" value="d"> SNMP</label>
+        <div class="rat"><strong>Rationale:</strong> Precision Time Protocol (IEEE 1588) uses hardware timestamping for sub-microsecond sync. NTP is millisecond-class; NTS secures NTP but doesn't sharpen it.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q8.</span> How does an IPv6 host using SLAAC obtain its address?</div>
+        <label><input type="radio" name="q8" value="a"> A DORA exchange with a DHCPv6 server</label>
+        <label><input type="radio" name="q8" value="b"> The administrator assigns it manually</label>
+        <label><input type="radio" name="q8" value="c"> It copies the router's address and changes the last bit</label>
+        <label><input type="radio" name="q8" value="d"> It combines the prefix from the router's advertisement with a self-generated interface ID</label>
+        <div class="rat"><strong>Rationale:</strong> SLAAC is stateless: Router Advertisement supplies the /64 prefix, the host generates its own interface ID, verifies uniqueness, and is done — no server, no lease table.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson04.html">← Lesson 4: Network Implementation II</a>
+    <a href="lesson06.html">Lesson 6: Network Operations II →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 5 of 8 · Domain 3.0 Network Operations (19%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreEl = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreEl.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
