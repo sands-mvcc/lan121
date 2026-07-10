@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7 | Network Security — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Interactive activity cards ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 7 — Network Security</h1>
+      <div class="sub">Domain 4.0 · Network Security · 14%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 7 OF 8</span>
+      <span class="tag">DOMAIN 4.0 · NETWORK SECURITY · 14%</span>
+      <span class="tag exam">EXAM 4 THIS LESSON</span>
+      <span class="tag exam">11 INTERACTIVE ACTIVITIES</span>
+    </div>
+    <h2>Network Security — Threats, Vulnerabilities &amp; Countermeasures</h2>
+    <p class="lede">Everything you've built in six lessons is a target. This lesson organizes defense the way professionals do: foundations first — the CIA triad, encryption in transit and at rest, PKI and certificates; then identity and access management — authentication, MFA, SSO, Kerberos, RADIUS, TACACS+, LDAP, and SAML, governed by least privilege and role-based access; then the attacks themselves — DoS/DDoS, VLAN hopping, MAC flooding, ARP and DNS poisoning, rogue devices and evil twins, on-path attacks, social engineering, and malware; and finally the countermeasures — device hardening, NAC with 802.1X and port security, firewalls, IDS/IPS, ACLs, security zones, deception technologies, and segmentation for IoT, SCADA/OT, guest, and BYOD networks, wrapped in audits and regulatory compliance. Eleven NCyTE interactive activities are embedded where they teach best. Exam 4 covers this domain.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Explain</b> the CIA triad and map encryption in transit, encryption at rest, and PKI certificates to the properties they protect. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Differentiate</b> the IAM protocols — Kerberos, RADIUS, TACACS+, LDAP, and SAML — and the roles of MFA, SSO, least privilege, and role-based access control. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Identify</b> attack types from their symptoms: DoS/DDoS, VLAN hopping, MAC flooding, ARP poisoning, DNS poisoning, rogue devices, evil twins, on-path attacks, social engineering, and malware. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Describe</b> how 802.1X network access control authenticates a device before granting port access, and configure port security behaviors. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Compare</b> firewalls, IDS vs. IPS placement, ACLs, content filtering, and security zones including the screened subnet. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Justify</b> segmentation strategies for IoT/IIoT, SCADA/ICS/OT, guest, and BYOD networks. <span class="bloom">BLOOM: EVALUATE</span></li>
+        <li><b>Explain</b> physical security controls, deception technologies (honeypots/honeynets), geofencing, and compliance drivers including data locality, PCI DSS, and GDPR. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: CIA Triad"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🛡️</span><b>CIA Triad</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The three goals of security: Confidentiality (only authorized eyes), Integrity (unaltered data), Availability (there when needed). Every control serves at least one.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: PKI"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📜</span><b>PKI</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Public Key Infrastructure — the system of Certificate Authorities, digital certificates, and key pairs that lets strangers verify identity and exchange keys. The trust behind HTTPS.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: MFA"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔢</span><b>MFA</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Multi-Factor Authentication — proof from at least two categories: something you KNOW (password), HAVE (token/phone), or ARE (biometric). Two passwords ≠ MFA.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SSO"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🎫</span><b>SSO</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Single Sign-On — authenticate once, access many systems. Delivered by protocols like Kerberos inside the LAN and SAML across web applications.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Kerberos"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🐕</span><b>Kerberos</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Ticket-based authentication protocol (the three heads: client, service, KDC). Passwords never cross the wire — time-stamped encrypted tickets do. Active Directory's engine.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: RADIUS"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📻</span><b>RADIUS</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The AAA protocol (authentication, authorization, accounting) for network access — Wi-Fi, VPN, 802.1X. UDP 1812/1813; encrypts only the password field.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: TACACS+"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🖥️</span><b>TACACS+</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Cisco's AAA protocol for DEVICE administration — TCP 49, encrypts the whole payload, and separates authentication from authorization for per-command control.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: 802.1X"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚦</span><b>802.1X</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Port-based network access control: the supplicant (device) proves itself through the authenticator (switch/AP) to the authentication server (RADIUS) before the port passes traffic.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: NAC"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🛂</span><b>NAC</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Network Access Control — admits devices based on identity AND posture (patched? antivirus?), then assigns the right VLAN. 802.1X is its enforcement backbone.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Port Security"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔌</span><b>Port Security</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Switch feature limiting which/how many MAC addresses a port accepts; violations can shut the port down. Kills MAC flooding and casual rogue devices.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Evil Twin"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">👯</span><b>Evil Twin</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A rogue access point broadcasting a legitimate network's SSID so victims connect through the attacker — on-path position achieved by imitation.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: ARP Poisoning"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">☠️</span><b>ARP Poisoning</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Forged ARP replies convince hosts the attacker's MAC belongs to the gateway's IP — traffic detours through the attacker. ARP has no authentication; it believes anyone.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: On-Path Attack"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🕳️</span><b>On-Path Attack</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Formerly "man-in-the-middle" — the attacker relays (and can read or alter) traffic between two parties who believe they're talking directly. ARP poisoning and evil twins are the entry moves.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: VLAN Hopping"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🦘</span><b>VLAN Hopping</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Escaping your VLAN via switch-spoofing (negotiating a trunk with DTP) or double-tagging (nested 802.1Q tags). Defense: disable DTP, hard-code access ports, move the native VLAN.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Honeypot"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🍯</span><b>Honeypot</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A decoy system built to be attacked — no legitimate user touches it, so every interaction is an alarm and an intelligence feed. A honeynet is a whole decoy network.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Screened Subnet"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏰</span><b>Screened Subnet</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The zone (formerly DMZ) between two firewall layers where public-facing servers live — the internet can reach them, but a compromise there still can't reach the internal LAN directly.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: ACL"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📃</span><b>ACL</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Access Control List — ordered permit/deny rules evaluated top-down, first match wins, with an implicit "deny all" at the end. Traffic law on routers and switches.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SCADA"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏭</span><b>SCADA</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Supervisory Control and Data Acquisition — the industrial control systems running utilities and factories. Often unpatchable and safety-critical: isolate OT from IT ruthlessly.</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT (expanded) ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. CIA, ENCRYPTION, PKI -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🛡️</span>
+        <span class="at"><h3>1. Foundations — The CIA Triad, Encryption &amp; PKI</h3><span class="asub">N10-009 OBJECTIVE 4.1 · WHAT SECURITY IS ACTUALLY PROTECTING</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Every security control in this lesson exists to defend one or more of three properties:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CIA triad triangle: confidentiality, integrity, availability">
+            <path d="M320 25 L560 210 L80 210 Z" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2.5"/>
+            <circle cx="320" cy="25" r="30" fill="var(--blue)"/><text x="320" y="31" text-anchor="middle" fill="#fff" font-size="15" font-weight="800">C</text>
+            <circle cx="80" cy="210" r="30" fill="var(--green)"/><text x="80" y="216" text-anchor="middle" fill="#fff" font-size="15" font-weight="800">I</text>
+            <circle cx="560" cy="210" r="30" fill="var(--amber)"/><text x="560" y="216" text-anchor="middle" fill="#fff" font-size="15" font-weight="800">A</text>
+            <text x="320" y="72" text-anchor="middle" class="sv-txt" font-weight="800">CONFIDENTIALITY</text>
+            <text x="320" y="88" text-anchor="middle" class="sv-mono">only authorized eyes · encryption, access control</text>
+            <text x="140" y="245" text-anchor="middle" class="sv-txt" font-weight="800">INTEGRITY</text>
+            <text x="140" y="261" text-anchor="middle" class="sv-mono" font-size="9">unaltered · hashing, signatures</text>
+            <text x="505" y="245" text-anchor="middle" class="sv-txt" font-weight="800">AVAILABILITY</text>
+            <text x="505" y="261" text-anchor="middle" class="sv-mono" font-size="9">there when needed · redundancy, DR</text>
+            <text x="320" y="165" text-anchor="middle" class="sv-txt" font-weight="700">every control serves</text>
+            <text x="320" y="183" text-anchor="middle" class="sv-txt" font-weight="700">at least one corner</text>
+          </svg>
+          <figcaption>FIG 7.1 — THE CIA TRIAD: THE THREE PROMISES EVERY DEFENSE EXISTS TO KEEP</figcaption>
+        </figure>
+        <h4>Encryption — in transit and at rest</h4>
+        <ul>
+          <li><strong>In transit</strong> — data moving across the network: TLS for web and mail, IPsec/TLS VPN tunnels (Lesson 6), WPA3 on wireless, SSH instead of Telnet. Defeats eavesdropping and on-path reading.</li>
+          <li><strong>At rest</strong> — data sitting on storage: full-disk encryption (BitLocker/LUKS), encrypted databases and backups, self-encrypting drives. Defeats theft of the physical media — a stolen encrypted laptop is a hardware loss, not a breach.</li>
+        </ul>
+        <h4>PKI and certificates — trust between strangers</h4>
+        <p>Symmetric encryption is fast but both sides need the same key — how do you share it with a server you've never met? <strong>Public Key Infrastructure</strong>: every subject holds a <strong>key pair</strong> (public + private), and a trusted <strong>Certificate Authority (CA)</strong> signs a <strong>digital certificate</strong> binding the public key to an identity. Your browser trusts the CA, the CA vouches for the server, and the two sides use the public key to agree on a fast symmetric session key. <strong>Key management</strong> is the discipline around it — generating, distributing, rotating, storing, and revoking keys; the strongest algorithm is worthless if the private key leaks or an expired certificate goes unnoticed (recall from Lesson 5 why accurate time matters here).</p>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/vpn/vpn.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: VPNs</div>
+            <div class="td">Encryption in transit, applied — reinforce Lesson 6's simulator with this guided walkthrough of tunneling and encapsulation.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Classify the scenario by corner — encryption = confidentiality, hashing/signatures = integrity, redundancy/DDoS protection = availability. Certificate signed by a CA = PKI.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. IAM -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🪪</span>
+        <span class="at"><h3>2. Identity &amp; Access Management — Who Are You, What May You Do</h3><span class="asub">N10-009 OBJECTIVE 4.1 · MFA · SSO · KERBEROS · RADIUS vs TACACS+ · LDAP · SAML</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p><strong>Authentication</strong> proves identity; <strong>authorization</strong> grants rights; <strong>accounting</strong> records what happened — AAA. <strong>MFA</strong> strengthens the first A by requiring factors from different categories: something you <em>know</em>, <em>have</em>, or <em>are</em> (plus somewhere you are — <strong>geofencing</strong> restricts access by physical location). <strong>SSO</strong> means one authentication unlocks many systems.</p>
+        <h4>The protocol lineup</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Protocol</th><th>Job</th><th>Distinguishers</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">Kerberos</td><td>LAN authentication &amp; SSO (Active Directory)</td><td>Time-stamped encrypted tickets from a KDC; passwords never cross the wire</td></tr>
+            <tr><td class="mono">RADIUS</td><td>AAA for <em>network access</em> — Wi-Fi, VPN, 802.1X</td><td>UDP 1812/1813; encrypts only the password field</td></tr>
+            <tr><td class="mono">TACACS+</td><td>AAA for <em>device administration</em></td><td>TCP 49; encrypts the full payload; per-command authorization</td></tr>
+            <tr><td class="mono">LDAP</td><td>Querying the directory (users, groups)</td><td>TCP 389; LDAPS 636 for TLS — the phone book, not the bouncer</td></tr>
+            <tr><td class="mono">SAML</td><td>Web SSO across organizations</td><td>Identity provider asserts to service provider — log into cloud apps with campus credentials</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Governing principles</h4>
+        <ul>
+          <li><strong>Least privilege</strong> — every account gets the minimum rights the job requires, nothing more. The blast radius of any compromise shrinks to match.</li>
+          <li><strong>Role-based access control (RBAC)</strong> — rights attach to roles (Instructor, Help Desk, Student), and people inherit from role membership. Onboarding and offboarding become one group change instead of fifty permission edits.</li>
+        </ul>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/access_control/access_control.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Access Control</div>
+            <div class="td">Work through authentication, authorization, and access-control models interactively.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/kerberos/kerberos.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Kerberos</div>
+            <div class="td">Follow Bob's ticket through the KDC's three heads — Authentication Server, Ticket Granting Server, and the service — step by step.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> The classic discriminator pair — RADIUS = network access, UDP, password-only encryption; TACACS+ = device administration, TCP 49, full encryption. Tickets = Kerberos; web SSO assertions = SAML; directory lookups = LDAP.</span></div>
+      </div>
+    </div>
+
+    <!-- 3. ATTACKS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⚔️</span>
+        <span class="at"><h3>3. Know Your Enemy — Threat Actors &amp; Attack Types</h3><span class="asub">N10-009 OBJECTIVE 4.2 · FROM BOTNETS TO SHOULDER SURFING · 4 ACTIVITIES</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Attackers range from script kiddies to organized crime to nation-states — different resources, same playbook categories. Start with the actors, then learn the moves:</p>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/ThreatActors/ThreatActors.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Threat Actors</div>
+            <div class="td">Who attacks networks and why — motivations, resources, and sophistication levels.</div>
+            <div class="tg">START HERE ↗</div>
+          </a>
+        </div>
+        <h4>Network &amp; Layer 2 attacks</h4>
+        <ul>
+          <li><strong>DoS / DDoS</strong> — exhaust a service's capacity (bandwidth, connections, CPU) so legitimate users can't get in; DDoS does it from thousands of botnet machines at once. Pure availability attack.</li>
+          <li><strong>MAC flooding</strong> — blast a switch with fake source MACs until its MAC table overflows and it fails open, flooding all traffic like a hub the attacker can sniff.</li>
+          <li><strong>VLAN hopping</strong> — escape segmentation by <em>switch spoofing</em> (negotiating a trunk via DTP) or <em>double tagging</em> (nested 802.1Q tags that survive the first strip). Lesson 3's trunking knowledge, weaponized.</li>
+          <li><strong>ARP poisoning/spoofing</strong> — ARP (Lesson 5) has zero authentication, so forged replies rewrite victims' caches: "the gateway's IP is at MY MAC." Traffic now detours through the attacker — the classic on-path setup:</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ARP poisoning placing an attacker on-path between victim and gateway">
+            <circle cx="80" cy="80" r="20" class="sv-node"/><text x="80" y="120" text-anchor="middle" class="sv-txt">Victim</text>
+            <rect x="520" y="55" width="120" height="50" rx="10" fill="var(--green)"/><text x="580" y="76" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">GATEWAY</text><text x="580" y="93" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">192.168.1.1</text>
+            <circle cx="330" cy="185" r="22" fill="var(--red)"/><text x="330" y="191" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">😈</text>
+            <text x="330" y="228" text-anchor="middle" class="sv-mono" fill="var(--red)">attacker · AA:AA:AA</text>
+            <path d="M100 80 H512" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 6" opacity=".5"/>
+            <text x="300" y="68" text-anchor="middle" class="sv-mono" opacity=".6">intended path (dead)</text>
+            <path d="M96 96 Q190 160 308 180" stroke="var(--red)" stroke-width="3" fill="none"/>
+            <path d="M352 180 Q470 160 564 105" stroke="var(--red)" stroke-width="3" fill="none"/>
+            <text x="170" y="155" text-anchor="middle" class="sv-mono" fill="var(--red)">"1.1 is at AA:AA:AA"</text>
+            <text x="490" y="155" text-anchor="middle" class="sv-mono" fill="var(--red)">relayed (read · altered)</text>
+          </svg>
+          <figcaption>FIG 7.2 — ARP POISONING: FORGED REPLIES BEND THE PATH THROUGH THE ATTACKER</figcaption>
+        </figure>
+        <ul>
+          <li><strong>DNS poisoning</strong> — corrupt a resolver's cache so a good name returns the attacker's address; whole populations get redirected (the integrity problem DNSSEC from Lesson 5 exists to solve).</li>
+          <li><strong>Rogue devices &amp; evil twins</strong> — unauthorized hardware on your network: a rogue DHCP server handing out attacker gateways, a rogue AP in a cubicle, or an <strong>evil twin</strong> broadcasting your SSID so victims connect through it.</li>
+          <li><strong>On-path attack</strong> — the destination position of ARP poisoning and evil twins: the attacker silently relays between two parties, reading or altering everything unencrypted.</li>
+        </ul>
+        <h4>The human layer</h4>
+        <ul>
+          <li><strong>Phishing</strong> (and spear phishing/vishing/smishing) — fraudulent messages harvesting credentials or delivering malware. Still the #1 initial access vector.</li>
+          <li><strong>Tailgating</strong> — following an authorized person through a secured door; <strong>shoulder surfing</strong> — reading credentials over someone's shoulder. Physical controls exist because these work.</li>
+          <li><strong>Malware</strong> — viruses, worms, trojans, and the headline act, <strong>ransomware</strong>: encrypt the victim's data, sell back the key — which is why Lesson 6's offline, tested backups are a security control, not just an ops chore.</li>
+        </ul>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/attacks/attacks.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Network Attacks</div>
+            <div class="td">Interactive walkthrough of the attack types above — see each mechanism in motion.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/social_engineering/social_engineering.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Social Engineering</div>
+            <div class="td">Phishing, pretexting, tailgating — recognize the manipulation patterns before they work on you.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/ransomware/RansomwareAttack.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Ransomware Attack</div>
+            <div class="td">Follow a ransomware incident end to end — infection, encryption, extortion, and recovery decisions.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Symptom → attack: switch flooding all traffic = MAC flooding; wrong site from a correct URL = DNS poisoning; duplicate SSID capturing logins = evil twin; forged gateway MAC = ARP poisoning; nested 802.1Q tags = VLAN hopping (double tagging).</span></div>
+      </div>
+    </div>
+
+    <!-- 4. HARDENING, NAC, WIRELESS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔧</span>
+        <span class="at"><h3>4. Hardening, NAC with 802.1X &amp; Wireless Security</h3><span class="asub">N10-009 OBJECTIVE 4.3 · CLOSE THE DOORS THE ATTACKS WALK THROUGH</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Device hardening — shrinking the attack surface</h4>
+        <p>Every device ships friendly and dies hard: change default credentials, disable unused services and ports, replace insecure protocols (Telnet→SSH, HTTP→HTTPS, SNMPv2c→SNMPv3), keep firmware patched (Lesson 6's lifecycle management), and protect the management plane — ACL-restricted access, ideally out-of-band. Then <em>verify against the configuration baseline</em> so hardening survives the next change.</p>
+        <h4>NAC and 802.1X — authenticate the device before the port works</h4>
+        <p>Port security (below) trusts MAC addresses; <strong>802.1X</strong> trusts <em>credentials</em>. Until authentication succeeds, the switch port passes nothing but the authentication conversation itself:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="802.1X three-party exchange: supplicant, authenticator, RADIUS server">
+            <rect x="25" y="70" width="150" height="60" rx="11" fill="var(--blue)"/><text x="100" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">SUPPLICANT</text><text x="100" y="113" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">laptop · 802.1X client</text>
+            <rect x="262" y="70" width="160" height="60" rx="11" fill="var(--amber)"/><text x="342" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">AUTHENTICATOR</text><text x="342" y="113" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">switch / AP · port closed</text>
+            <rect x="505" y="70" width="150" height="60" rx="11" fill="var(--green)"/><text x="580" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">AUTH SERVER</text><text x="580" y="113" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">RADIUS</text>
+            <path class="sv-line" d="M175 90 H262"/><text x="218" y="82" text-anchor="middle" class="sv-mono">EAPOL</text>
+            <path class="sv-line" d="M422 90 H505"/><text x="463" y="82" text-anchor="middle" class="sv-mono">RADIUS</text>
+            <path d="M505 118 Q342 165 180 120" stroke="var(--green)" stroke-width="3" fill="none"/>
+            <text x="342" y="168" text-anchor="middle" class="sv-mono" fill="var(--green)">ACCEPT → port opens onto the assigned VLAN</text>
+            <text x="342" y="30" text-anchor="middle" class="sv-txt" font-weight="700">until then, the port forwards NOTHING but authentication traffic</text>
+          </svg>
+          <figcaption>FIG 7.3 — 802.1X: SUPPLICANT PROVES ITSELF THROUGH THE SWITCH TO RADIUS BEFORE THE PORT OPENS</figcaption>
+        </figure>
+        <p>Full <strong>NAC</strong> adds <em>posture</em>: is the device patched, encrypted, running AV? Pass → production VLAN; fail → quarantine VLAN for remediation. This is how BYOD gets admitted without being trusted.</p>
+        <h4>Port security — the Layer 2 seatbelt</h4>
+        <p>Where 802.1X isn't practical (printers, cameras), <strong>port security</strong> limits a port to specific or a maximum number of MAC addresses (sticky-learned), with a violation action — typically <em>shutdown (err-disabled)</em>. It blunts MAC flooding and casual rogue devices; pair with <strong>DHCP snooping</strong> and <strong>dynamic ARP inspection</strong> to counter rogue DHCP servers and ARP poisoning at the switch itself.</p>
+        <h4>Wireless security</h4>
+        <p>Use <strong>WPA3</strong> (or WPA2 minimum) — never WEP/open; <strong>WPA3-Enterprise</strong> puts 802.1X/RADIUS behind every association, so there's no shared passphrase to leak. Combine with a segmented <strong>guest SSID</strong>, and rogue-AP detection on the WLC (Lesson 3) to hunt evil twins.</p>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/WirelessSec/WirelessSecurity.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Wireless Security</div>
+            <div class="td">Wireless encryption and authentication from WEP's failures to WPA3 — the perfect warm-up for Lab 7.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Name the three 802.1X roles: supplicant (client), authenticator (switch/AP), authentication server (RADIUS). "Port went err-disabled after an unknown device" = port security violation.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. FIREWALLS, IDS/IPS, ZONES -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧱</span>
+        <span class="at"><h3>5. Firewalls, IDS/IPS, ACLs &amp; Security Zones</h3><span class="asub">N10-009 OBJECTIVE 4.3 · WHERE THE TRAFFIC LAW GETS ENFORCED</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Firewalls &amp; ACLs</h4>
+        <p>A <strong>firewall</strong> enforces policy between zones of different trust. Modern <em>stateful</em> firewalls track connections (a reply is only allowed if a matching outbound request exists); next-generation firewalls add application awareness and <strong>content filtering</strong> (block categories, scan payloads). The underlying grammar everywhere is the <strong>ACL</strong>: ordered permit/deny rules, evaluated <strong>top-down, first match wins</strong>, ending in an implicit <em>deny all</em> — so rule order is itself a security control.</p>
+        <h4>IDS vs. IPS — the alarm vs. the gate</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th></th><th>IDS</th><th>IPS</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Placement</strong></td><td>Out-of-band — watches a <em>copy</em> of traffic (port mirroring, Lesson 6)</td><td>Inline — traffic flows <em>through</em> it</td></tr>
+            <tr><td><strong>On detection</strong></td><td>Alerts</td><td>Blocks in real time</td></tr>
+            <tr><td><strong>Risk profile</strong></td><td>Can't stop anything; can't break anything</td><td>Stops attacks; a false positive blocks legitimate traffic</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Security zones &amp; the screened subnet</h4>
+        <figure class="fig">
+          <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Security zones: internet, screened subnet with public servers, internal LAN">
+            <rect x="20" y="60" width="150" height="90" rx="12" fill="var(--red-soft)" stroke="var(--red)" stroke-width="2"/>
+            <text x="95" y="100" text-anchor="middle" class="sv-txt" font-weight="800">INTERNET</text>
+            <text x="95" y="118" text-anchor="middle" class="sv-mono">untrusted</text>
+            <rect x="255" y="35" width="190" height="140" rx="12" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="2"/>
+            <text x="350" y="62" text-anchor="middle" class="sv-txt" font-weight="800">SCREENED SUBNET</text>
+            <text x="350" y="80" text-anchor="middle" class="sv-mono">(DMZ) · semi-trusted</text>
+            <rect x="278" y="95" width="144" height="28" rx="6" fill="var(--card)" stroke="var(--line)"/><text x="350" y="113" text-anchor="middle" class="sv-mono">web · mail · VPN GW</text>
+            <text x="350" y="152" text-anchor="middle" class="sv-mono">reachable from outside</text>
+            <rect x="530" y="60" width="130" height="90" rx="12" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>
+            <text x="595" y="100" text-anchor="middle" class="sv-txt" font-weight="800">INTERNAL LAN</text>
+            <text x="595" y="118" text-anchor="middle" class="sv-mono">trusted</text>
+            <rect x="184" y="86" width="56" height="38" rx="7" fill="var(--blue)"/><text x="212" y="110" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">FW</text>
+            <rect x="459" y="86" width="56" height="38" rx="7" fill="var(--blue)"/><text x="487" y="110" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">FW</text>
+            <path class="sv-line" d="M170 105 H184 M240 105 H255 M445 105 H459 M515 105 H530"/>
+            <text x="340" y="200" text-anchor="middle" class="sv-mono">a compromised public server still faces a second firewall before the LAN</text>
+          </svg>
+          <figcaption>FIG 7.4 — THE SCREENED SUBNET: PUBLIC-FACING SERVERS LIVE BETWEEN TWO ENFORCEMENT POINTS</figcaption>
+        </figure>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/Firewalls/Firewalls.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: Firewalls</div>
+            <div class="td">Firewall types, rule processing, and placement — build intuition for how policy becomes enforcement.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/IDS_IPS/IDS_IPS.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: IDS / IPS</div>
+            <div class="td">Detection vs. prevention, signatures vs. anomalies, and where each sensor belongs.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> "Detects and alerts but cannot block" = IDS (out-of-band); "sits inline and blocks" = IPS. Public web server that must be reachable from the internet belongs in the screened subnet — never the internal LAN.</span></div>
+      </div>
+    </div>
+
+    <!-- 6. SEGMENTATION -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🕸️</span>
+        <span class="at"><h3>6. Segmentation Enforcement — IoT, SCADA/OT, Guest &amp; BYOD</h3><span class="asub">N10-009 OBJECTIVE 4.3 · WHAT CAN'T BE HARDENED MUST BE ISOLATED</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Some devices can't run agents, can't be patched, and can't be trusted — so the network itself becomes the control. Segmentation (VLANs from Lesson 3, zones and ACLs from Section 5, NAC from Section 4) puts each risk class in its own compartment:</p>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Segment</th><th>Why it's isolated</th><th>Policy sketch</th></tr></thead>
+          <tbody>
+            <tr><td><strong>IoT / IIoT</strong></td><td>Cameras, sensors, badge readers — weak firmware, rarely patched, chatty</td><td>Own VLAN; may reach their cloud controller; may NOT reach user or server VLANs</td></tr>
+            <tr><td><strong>SCADA / ICS / OT</strong></td><td>Industrial control — safety-critical, often unpatchable, decades-old protocols</td><td>Strictest isolation from IT; access only through a hardened jump box (Lesson 6); monitor, never scan casually</td></tr>
+            <tr><td><strong>Guest</strong></td><td>Unknown devices, unknown hygiene</td><td>Internet-only via captive portal (Lesson 3); zero routes to internal networks</td></tr>
+            <tr><td><strong>BYOD</strong></td><td>Personal devices with corporate access needs</td><td>NAC posture check → limited-access VLAN; corporate data via managed apps/VPN only</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="tool-row">
+          <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/vlan/vlan.html" target="_blank" rel="noopener">
+            <div class="tt">🧪 NCyTE Activity: VLANs</div>
+            <div class="td">VLAN segmentation from the security angle — the enforcement layer under every row of this table.</div>
+            <div class="tg">LAUNCH ACTIVITY ↗</div>
+          </a>
+        </div>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Why this matters:</strong> the infamous casino-fish-tank breach and the Target HVAC breach were both segmentation failures — a low-trust device with a path to high-value networks. The device wasn't the prize; the route was.</span></div>
+      </div>
+    </div>
+
+    <!-- 7. PHYSICAL, DECEPTION, COMPLIANCE -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🏰</span>
+        <span class="at"><h3>7. Physical Security, Deception &amp; Compliance</h3><span class="asub">N10-009 OBJECTIVE 4.1 · LOCKS · HONEYPOTS · PCI DSS · GDPR</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Physical security</h4>
+        <p>Every logical control assumes the attacker can't touch the hardware. <strong>Badge readers and locks</strong> (with anti-tailgating vestibules where it matters), <strong>cameras</strong> for deterrence and evidence, <strong>locked racks</strong> (Lesson 3), and clean media disposal (Lesson 6's decommissioning). Tailgating and shoulder surfing from Section 3 are precisely the attacks this layer answers.</p>
+        <h4>Deception technologies</h4>
+        <p>A <strong>honeypot</strong> is a deliberately attractive decoy — a fake server with tempting weaknesses. No legitimate user ever touches it, so <em>every</em> interaction is a high-confidence alarm, and the attacker's techniques become free threat intelligence while they waste time in the sandbox. A <strong>honeynet</strong> scales the idea to an entire decoy network.</p>
+        <h4>Audits &amp; regulatory compliance</h4>
+        <ul>
+          <li><strong>Audits</strong> — independent verification that controls exist and work: configs vs. baselines, access reviews against least privilege, log evidence (Lessons 5–6 built the audit trail).</li>
+          <li><strong>PCI DSS</strong> — contractual rules for anyone handling payment cards: segment the cardholder-data environment, encrypt, restrict, log.</li>
+          <li><strong>GDPR</strong> — EU law protecting personal data, with real fines and breach-notification clocks.</li>
+          <li><strong>Data locality</strong> — laws dictating <em>where</em> data may physically reside; your cloud region choice is a compliance decision, not just a latency one.</li>
+        </ul>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> "Decoy system whose only purpose is to be attacked and studied" = honeypot. Payment cards = PCI DSS; EU personal data = GDPR; "data must remain in-country" = data locality.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity06.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 7: Network Security Challenge</h3>
+        <p>Scenario gauntlet: identify the attack from its symptoms, pick the countermeasure, and justify the segmentation call — Sections 3 through 6 under exam conditions.</p>
+        <div class="go">Open Exercise 7 →</div>
+      </a>
+      <a class="act-card" href="lab07.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 7: Wireless Networking</h3>
+        <p>Build and secure a wireless network — SSIDs, WPA3, guest segmentation, and rogue-AP awareness. The Wireless Security activity in Section 4 is your pre-lab.</p>
+        <div class="go">Open Lab 7 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">CHAPTER EXAM</span></div>
+        <h3>📝 Exam 4 — Domain 4: Network Security</h3>
+        <p>Covers this lesson: security concepts, IAM, attack types, hardening, NAC, defense infrastructure, segmentation, and compliance. Check the LMS for the exam window.</p>
+        <div class="go">Review Domain 4 →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q1.</span> A DDoS attack that takes a web service offline primarily violates which element of the CIA triad?</div>
+        <label><input type="radio" name="q1" value="a"> Confidentiality</label>
+        <label><input type="radio" name="q1" value="b"> Integrity</label>
+        <label><input type="radio" name="q1" value="c"> Availability</label>
+        <label><input type="radio" name="q1" value="d"> Authentication</label>
+        <div class="rat"><strong>Rationale:</strong> Nothing was read (confidentiality) or altered (integrity) — the service simply isn't there when legitimate users need it. DoS/DDoS is the textbook availability attack.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q2.</span> Which protocol should manage administrator logins TO the routers and switches themselves, with full-payload encryption and per-command authorization?</div>
+        <label><input type="radio" name="q2" value="a"> RADIUS</label>
+        <label><input type="radio" name="q2" value="b"> TACACS+</label>
+        <label><input type="radio" name="q2" value="c"> LDAP</label>
+        <label><input type="radio" name="q2" value="d"> SAML</label>
+        <div class="rat"><strong>Rationale:</strong> TACACS+ (TCP 49) is built for device administration: full encryption and separated authorization for per-command control. RADIUS is for network access (Wi-Fi/VPN/802.1X) and encrypts only the password.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q3.</span> Users report reaching a convincing fake of a banking site even though they typed the correct URL. DNS on the resolver checks out as compromised. What happened?</div>
+        <label><input type="radio" name="q3" value="a"> DNS poisoning — the resolver's cache returns the attacker's address for a legitimate name</label>
+        <label><input type="radio" name="q3" value="b"> MAC flooding</label>
+        <label><input type="radio" name="q3" value="c"> VLAN hopping</label>
+        <label><input type="radio" name="q3" value="d"> Tailgating</label>
+        <div class="rat"><strong>Rationale:</strong> Correct name → wrong address is the DNS poisoning signature; every client of that resolver is redirected. DNSSEC's signed records (Lesson 5) exist to make exactly this forgery detectable.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q4.</span> In 802.1X, what role does the switch play?</div>
+        <label><input type="radio" name="q4" value="a"> Supplicant</label>
+        <label><input type="radio" name="q4" value="b"> Authentication server</label>
+        <label><input type="radio" name="q4" value="c"> Certificate authority</label>
+        <label><input type="radio" name="q4" value="d"> Authenticator — it relays the supplicant's credentials to the RADIUS server and opens the port on acceptance</label>
+        <div class="rat"><strong>Rationale:</strong> Three roles: supplicant (client device), authenticator (switch/AP — the gatekeeper in the middle), authentication server (RADIUS — the decision maker). Until ACCEPT, the port passes only authentication traffic.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span> Security wants malicious traffic BLOCKED in real time, accepting the risk that a false positive could interrupt legitimate traffic. Deploy…</div>
+        <label><input type="radio" name="q5" value="a"> An IDS fed by port mirroring</label>
+        <label><input type="radio" name="q5" value="b"> An inline IPS</label>
+        <label><input type="radio" name="q5" value="c"> A honeypot</label>
+        <label><input type="radio" name="q5" value="d"> A syslog collector</label>
+        <div class="rat"><strong>Rationale:</strong> Blocking requires being inline — that's the IPS. An IDS watches a copy of traffic and can only alert; the stated false-positive trade-off is exactly the IPS trade-off.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q6.</span> A new public-facing web server must be reachable from the internet. Per security zone design, where does it belong?</div>
+        <label><input type="radio" name="q6" value="a"> In the screened subnet, between the external and internal enforcement points</label>
+        <label><input type="radio" name="q6" value="b"> On the internal LAN with the file servers</label>
+        <label><input type="radio" name="q6" value="c"> On the SCADA network</label>
+        <label><input type="radio" name="q6" value="d"> Outside the firewall entirely</label>
+        <div class="rat"><strong>Rationale:</strong> The screened subnet (DMZ) exists for exactly this: the internet can reach the server, but if it's compromised, a second firewall still stands between the attacker and the internal LAN.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q7.</span> Hundreds of factory PLCs run an OS the vendor stopped patching years ago, and they control physical machinery. Best available control?</div>
+        <label><input type="radio" name="q7" value="a"> Install endpoint antivirus on each PLC</label>
+        <label><input type="radio" name="q7" value="b"> Move them to the guest VLAN</label>
+        <label><input type="radio" name="q7" value="c"> Require MFA on each PLC</label>
+        <label><input type="radio" name="q7" value="d"> Strictly segment the OT network from IT, with access only through a hardened, monitored jump box</label>
+        <div class="rat"><strong>Rationale:</strong> SCADA/OT gear often can't be patched or run agents — so the network becomes the control: ruthless segmentation plus one audited doorway (Lesson 6's jump box). What can't be hardened must be isolated.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q8.</span> The SOC notices logins on a server that hosts no real services and that no employee should ever touch. What is this system, and what does the activity mean?</div>
+        <label><input type="radio" name="q8" value="a"> A jump box — routine administration</label>
+        <label><input type="radio" name="q8" value="b"> A rogue device — remove it immediately</label>
+        <label><input type="radio" name="q8" value="c"> A honeypot — any interaction is a high-confidence indicator of an intruder</label>
+        <label><input type="radio" name="q8" value="d"> A RADIUS server — normal AAA traffic</label>
+        <div class="rat"><strong>Rationale:</strong> A honeypot's value is that it has zero legitimate purpose: no false-positive debate, every touch is signal. Meanwhile the attacker wastes time and reveals techniques in a controlled sandbox.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson06.html">← Lesson 6: Network Operations II</a>
+    <a href="lesson08.html">Lesson 8: Network Troubleshooting →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 7 of 8 · Domain 4.0 Network Security (14%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreEl = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreEl.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
