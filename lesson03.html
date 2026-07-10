@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3 | Network Implementation I — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 3 — Network Implementation I</h1>
+      <div class="sub">Domain 2.0 · Network Implementations · 20%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 3 OF 8</span>
+      <span class="tag">DOMAIN 2.0 · NETWORK IMPLEMENTATIONS · 20%</span>
+      <span class="tag">NO EXAM THIS LESSON</span>
+    </div>
+    <h2>Network Implementation I — Switching, Wireless &amp; Physical Installations</h2>
+    <p class="lede">Domain 1 taught you how networks are designed on paper. Domain 2 is where you build them. This lesson covers the physical and data link layer technologies a technician touches every day: Layer 2 switching with VLANs, SVIs, and 802.1Q trunks; interface configuration including speed, duplex, link aggregation, MTU, and jumbo frames; Spanning Tree Protocol and the loops it prevents; wireless networking from 802.11 standards and frequency bands to band steering, BSSIDs, mesh, access point architectures, captive portals, and antennas; and the physical installation itself — racks, PDUs, UPSs, environmental controls, and patch and fiber distribution panels.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Explain</b> how VLANs segment a switch into separate broadcast domains, and describe the role of a Switch Virtual Interface (SVI) in inter-VLAN routing. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Configure</b> switch interfaces — access ports, 802.1Q trunk ports, native and voice VLANs, speed, duplex, and LACP link aggregation — and troubleshoot common mismatches. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Explain</b> MTU and jumbo frames, and identify where jumbo frames help and where mismatched MTUs cause problems. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Describe</b> how Spanning Tree Protocol prevents Layer 2 loops, including root bridge election, port roles, and port states. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Compare</b> the 802.11 wireless standards and the 2.4 GHz, 5 GHz, and 6 GHz frequency bands, and select appropriate channels and channel widths for a given environment. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Differentiate</b> SSID, BSSID, and ESSID; mesh networks; autonomous versus lightweight access points; captive portals; and omnidirectional versus directional antennas. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Plan</b> a physical installation — rack layout, PDU and UPS power, environmental controls (temperature, humidity, fire suppression), and patch/fiber distribution panels — for a small equipment room. <span class="bloom">BLOOM: EVALUATE</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: VLAN"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🧱</span><b>VLAN</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Virtual LAN — a logical broadcast domain created on a switch. Hosts in different VLANs cannot talk without a router or Layer 3 switch, even on the same hardware.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: SVI"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔀</span><b>SVI</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Switch Virtual Interface — a virtual Layer 3 interface assigned to a VLAN (e.g., interface vlan 10). Gives the VLAN an IP address and enables inter-VLAN routing on a Layer 3 switch.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: 802.1Q"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🏷️</span><b>802.1Q</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The IEEE trunking standard. Inserts a 4-byte tag into the Ethernet frame carrying a 12-bit VLAN ID (1–4094) so one link can carry many VLANs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Native VLAN"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🪪</span><b>Native VLAN</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The one VLAN that crosses an 802.1Q trunk untagged (default VLAN 1). Must match on both ends of the trunk — mismatches leak traffic between VLANs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Link Aggregation LACP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔗</span><b>LACP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Link Aggregation Control Protocol (802.3ad/802.1AX) — bundles multiple physical links into one logical link for more bandwidth and redundancy.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: MTU"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📏</span><b>MTU</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Maximum Transmission Unit — the largest payload a frame can carry. Standard Ethernet MTU is 1500 bytes. Mismatched MTUs cause fragmentation or silent drops.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Jumbo Frames"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🐘</span><b>Jumbo Frames</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Ethernet frames with an MTU larger than 1500 bytes — commonly 9000. Reduce per-frame overhead on storage and backup networks, but every device in the path must support them.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: STP"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌉</span><b>STP</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Spanning Tree Protocol (802.1D) — blocks redundant Layer 2 paths to prevent switching loops and broadcast storms, then unblocks them if the active path fails.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Root Bridge"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">👑</span><b>Root Bridge</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The switch elected as the reference point of the spanning tree — the one with the lowest bridge ID (priority + MAC address). All path decisions are measured from it.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: BPDU"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">✉️</span><b>BPDU</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Bridge Protocol Data Unit — the message switches exchange to elect the root bridge and calculate the loop-free topology.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Band Steering"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🧲</span><b>Band Steering</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">An AP feature that nudges dual-band capable clients off crowded 2.4 GHz and onto the faster, cleaner 5/6 GHz bands.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Channel Width"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📶</span><b>Channel Width</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">How much spectrum a Wi-Fi channel occupies — 20, 40, 80, or 160 MHz. Wider = faster, but consumes more spectrum and increases interference risk.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: BSSID"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔖</span><b>BSSID</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Basic Service Set Identifier — the MAC address of an individual access point radio. One SSID broadcast from three APs = three BSSIDs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: ESSID"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🌐</span><b>ESSID</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Extended Service Set Identifier — the same SSID shared across multiple APs so clients can roam seamlessly through a building.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Mesh Network"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🕸️</span><b>Mesh Network</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Wireless topology where APs relay traffic to each other over the air — only one node needs a wired uplink. Great where cabling is impractical.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Captive Portal"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚧</span><b>Captive Portal</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A web page that intercepts new wireless clients and requires login, payment, or acceptance of terms before granting network access. Standard on guest Wi-Fi.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: PDU"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔌</span><b>PDU</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Power Distribution Unit — a rack-mounted power strip that distributes power to equipment. Metered and switched PDUs add load monitoring and remote outlet control.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: UPS"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔋</span><b>UPS</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Uninterruptible Power Supply — battery backup that bridges outages and conditions power. Sized in VA/watts; runtime covers graceful shutdown or generator start.</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT (expanded) ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. VLANS & SVIs -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧱</span>
+        <span class="at"><h3>1. VLANs &amp; Switch Virtual Interfaces (SVIs)</h3><span class="asub">N10-009 OBJECTIVE 2.2 · SEGMENTING AT LAYER 2</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>By default, every port on a switch belongs to one big <strong>broadcast domain</strong> — a broadcast from any host reaches every other host. A <strong>VLAN (Virtual LAN)</strong> carves that switch into multiple logical switches. Ports assigned to VLAN 10 can only talk to other VLAN 10 ports; VLAN 20 is a completely separate broadcast domain, even though both live on the same physical hardware.</p>
+        <p>VLANs deliver three big wins:</p>
+        <ul>
+          <li><strong>Security</strong> — Accounting traffic never touches Guest traffic. Crossing VLANs requires a router, where you can apply ACLs and firewall rules.</li>
+          <li><strong>Performance</strong> — smaller broadcast domains mean less broadcast noise per host.</li>
+          <li><strong>Flexibility</strong> — membership follows configuration, not cabling. Move a user to a new department without re-pulling cable.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="One switch segmented into VLAN 10 and VLAN 20">
+            <rect x="220" y="95" width="200" height="52" rx="10" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+            <text x="320" y="117" text-anchor="middle" class="sv-txt" font-weight="700">Layer 2 Switch</text>
+            <text x="320" y="134" text-anchor="middle" class="sv-mono">one chassis · two broadcast domains</text>
+            <rect x="20" y="20" width="180" height="200" rx="12" fill="var(--blue-soft)" opacity=".55"/>
+            <text x="110" y="42" text-anchor="middle" class="sv-mono" font-weight="700">VLAN 10 · SALES</text>
+            <circle cx="70" cy="90" r="16" class="sv-node"/><text x="70" y="122" text-anchor="middle" class="sv-txt">PC-A</text>
+            <circle cx="150" cy="90" r="16" class="sv-node"/><text x="150" y="122" text-anchor="middle" class="sv-txt">PC-B</text>
+            <circle cx="110" cy="170" r="16" class="sv-node"/><text x="110" y="202" text-anchor="middle" class="sv-txt">Printer</text>
+            <rect x="440" y="20" width="180" height="200" rx="12" fill="var(--green-soft)" opacity=".65"/>
+            <text x="530" y="42" text-anchor="middle" class="sv-mono" font-weight="700">VLAN 20 · GUEST</text>
+            <circle cx="490" cy="90" r="16" class="sv-node2"/><text x="490" y="122" text-anchor="middle" class="sv-txt">Laptop</text>
+            <circle cx="570" cy="90" r="16" class="sv-node2"/><text x="570" y="122" text-anchor="middle" class="sv-txt">Phone</text>
+            <circle cx="530" cy="170" r="16" class="sv-node2"/><text x="530" y="202" text-anchor="middle" class="sv-txt">Tablet</text>
+            <path class="sv-line" d="M86 90 H220 M200 170 Q225 150 240 147"/>
+            <path class="sv-line" d="M474 90 H420 M446 170 Q420 150 402 147"/>
+            <line x1="320" y1="60" x2="320" y2="95" stroke="var(--red)" stroke-width="3" stroke-dasharray="6 5"/>
+            <text x="320" y="50" text-anchor="middle" class="sv-mono" fill="var(--red)">no path between VLANs without a router</text>
+          </svg>
+          <figcaption>FIG 3.1 — ONE SWITCH, TWO VLANS, TWO SEPARATE BROADCAST DOMAINS</figcaption>
+        </figure>
+        <h4>Access ports</h4>
+        <p>A port that connects an end device (PC, printer, camera) is an <strong>access port</strong> — it belongs to exactly one data VLAN, and frames on it are untagged. The host has no idea a VLAN exists:</p>
+        <p><code>switchport mode access</code> · <code>switchport access vlan 10</code></p>
+        <h4>SVIs — giving a VLAN an IP address</h4>
+        <p>VLANs isolate traffic; eventually those networks still need to reach each other. On a <strong>Layer 3 switch</strong>, you create a <strong>Switch Virtual Interface (SVI)</strong> — a virtual routed interface for the VLAN. Assign it an IP address, and it becomes the default gateway for every host in that VLAN. The switch then routes between SVIs in hardware — no external router needed.</p>
+        <p><code>interface vlan 10</code> · <code>ip address 192.168.10.1 255.255.255.0</code></p>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Know the vocabulary cold: a VLAN is a <em>broadcast domain</em>, an access port carries <em>one untagged VLAN</em>, and an SVI is the <em>virtual Layer 3 interface</em> that lets a multilayer switch route between VLANs. Lesson 4 adds the alternative: router-on-a-stick with subinterfaces.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. TRUNKING & INTERFACE CONFIG -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🏷️</span>
+        <span class="at"><h3>2. 802.1Q Trunking, Interface Configuration, MTU &amp; Jumbo Frames</h3><span class="asub">N10-009 OBJECTIVE 2.2 · TAGGED FRAMES · SPEED &amp; DUPLEX · LACP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Trunk ports and the 802.1Q tag</h4>
+        <p>If VLAN 10 and VLAN 20 both need to travel between two switches, you could burn one cable per VLAN — or use a single <strong>trunk port</strong>. The <strong>IEEE 802.1Q</strong> standard inserts a <strong>4-byte tag</strong> into each Ethernet frame right after the source MAC address. Inside that tag, a <strong>12-bit VLAN ID</strong> (values 1–4094) tells the receiving switch which VLAN the frame belongs to.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 660 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="802.1Q tag inserted into an Ethernet frame">
+            <rect x="10"  y="35" width="105" height="44" rx="6" fill="var(--blue-soft)" stroke="var(--line)"/><text x="62" y="61" text-anchor="middle" class="sv-txt">Dest MAC</text>
+            <rect x="120" y="35" width="105" height="44" rx="6" fill="var(--blue-soft)" stroke="var(--line)"/><text x="172" y="61" text-anchor="middle" class="sv-txt">Source MAC</text>
+            <rect x="230" y="30" width="120" height="54" rx="6" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="2"/>
+            <text x="290" y="52" text-anchor="middle" class="sv-txt" font-weight="700">802.1Q TAG</text>
+            <text x="290" y="70" text-anchor="middle" class="sv-mono">4 bytes · VLAN ID 1–4094</text>
+            <rect x="355" y="35" width="80" height="44" rx="6" fill="var(--blue-soft)" stroke="var(--line)"/><text x="395" y="61" text-anchor="middle" class="sv-txt">Type</text>
+            <rect x="440" y="35" width="130" height="44" rx="6" fill="var(--green-soft)" stroke="var(--line)"/><text x="505" y="61" text-anchor="middle" class="sv-txt">Payload</text>
+            <rect x="575" y="35" width="70" height="44" rx="6" fill="var(--blue-soft)" stroke="var(--line)"/><text x="610" y="61" text-anchor="middle" class="sv-txt">FCS</text>
+            <path d="M290 15 L290 28" stroke="var(--amber)" stroke-width="2" marker-end="none"/>
+            <text x="290" y="12" text-anchor="middle" class="sv-mono" fill="var(--amber)">inserted after source MAC</text>
+            <text x="330" y="112" text-anchor="middle" class="sv-mono">untagged frames on a trunk belong to the NATIVE VLAN</text>
+          </svg>
+          <figcaption>FIG 3.2 — WHERE THE 802.1Q TAG LIVES IN THE ETHERNET FRAME</figcaption>
+        </figure>
+        <ul>
+          <li><strong>Native VLAN</strong> — the one VLAN a trunk carries <em>untagged</em> (default: VLAN 1). Both ends of the trunk must agree; a native VLAN mismatch silently leaks frames between VLANs. Best practice: move it off VLAN 1 to an unused VLAN.</li>
+          <li><strong>Voice VLAN</strong> — a special second VLAN on an access port so an IP phone and the PC plugged into it ride separate VLANs on one cable, letting QoS prioritize voice.</li>
+        </ul>
+        <h4>Interface configuration: speed &amp; duplex</h4>
+        <p>Modern interfaces autonegotiate <strong>speed</strong> (100 Mbps / 1 / 2.5 / 10 Gbps) and <strong>duplex</strong>. Full duplex sends and receives simultaneously; half duplex takes turns. The classic failure: one side hard-coded to full, the other left on auto — the auto side falls back to half duplex. The link works, but crawls, logging <em>late collisions and CRC errors</em>. Configure both ends identically: both auto, or both hard-coded.</p>
+        <h4>Link aggregation (LACP)</h4>
+        <p><strong>LACP</strong> (802.3ad/802.1AX) bundles 2–8 physical links into one logical link — an EtherChannel or port channel. You get combined bandwidth, automatic failover if a member link dies, and STP treats the whole bundle as a single interface (so no blocked ports inside it). All member links must match: same speed, same duplex, same VLAN configuration.</p>
+        <h4>MTU &amp; jumbo frames</h4>
+        <p>The <strong>MTU (Maximum Transmission Unit)</strong> is the largest payload one frame can carry — <strong>1500 bytes</strong> for standard Ethernet. <strong>Jumbo frames</strong> raise that to roughly <strong>9000 bytes</strong>, so one frame does the work of six. Fewer frames means less header overhead and less CPU interrupt load — a real win on storage (iSCSI), backup, and virtualization networks.</p>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>The jumbo frame rule:</strong> every device in the path — both NICs and every switch between them — must support the same jumbo MTU. One standard-MTU device in the middle causes fragmentation at best and silently dropped frames at worst. Enable jumbo frames on purpose-built segments, not casually across the whole LAN.</span></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Scenario questions love the duplex mismatch ("link is up but throughput is terrible, errors incrementing") and the 802.1Q facts: 4-byte tag, 12-bit VLAN ID, native VLAN untagged.</span></div>
+      </div>
+    </div>
+
+    <!-- 3. STP -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🌉</span>
+        <span class="at"><h3>3. Spanning Tree Protocol — Loops &amp; How STP Stops Them</h3><span class="asub">N10-009 OBJECTIVE 2.2 · 802.1D · ROOT BRIDGE · BLOCKED PORTS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Redundant links between switches are good design — until you remember that Ethernet frames have <strong>no TTL</strong>. Connect three switches in a triangle with nothing to stop it, and a single broadcast circulates forever, multiplying each lap: a <strong>broadcast storm</strong>. MAC address tables flap, CPUs peg at 100%, and the network melts in seconds.</p>
+        <p><strong>Spanning Tree Protocol (STP, IEEE 802.1D)</strong> solves this by logically <strong>blocking</strong> redundant paths while keeping them on standby. Switches exchange <strong>BPDUs (Bridge Protocol Data Units)</strong> to build one loop-free tree:</p>
+        <ul>
+          <li><strong>1. Elect the root bridge</strong> — the switch with the lowest <strong>bridge ID</strong> (priority + MAC address) wins. Lower priority wins; on a tie, lowest MAC wins. Set priority deliberately so your core switch is the root — don't let an old closet switch win by accident.</li>
+          <li><strong>2. Pick port roles</strong> — every non-root switch selects one <strong>root port</strong> (best path toward the root); each segment gets one <strong>designated port</strong>; everything left over is <strong>blocked</strong>.</li>
+          <li><strong>3. Fail over</strong> — if the active path dies, a blocked port transitions to forwarding and traffic keeps flowing.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three switches in a triangle with one STP-blocked port">
+            <rect x="240" y="18" width="140" height="46" rx="9" fill="var(--blue)"/><text x="310" y="40" text-anchor="middle" fill="#fff" font-family="inherit" font-size="12" font-weight="700">SW1 · ROOT 👑</text><text x="310" y="55" text-anchor="middle" fill="#fff" font-size="10" font-family="ui-monospace,Consolas,monospace">priority 4096</text>
+            <rect x="60" y="170" width="130" height="46" rx="9" fill="var(--green)"/><text x="125" y="197" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW2</text>
+            <rect x="430" y="170" width="130" height="46" rx="9" fill="var(--green)"/><text x="495" y="197" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW3</text>
+            <line x1="255" y1="64" x2="145" y2="170" class="sv-line" stroke="var(--green)" stroke-width="3"/>
+            <line x1="365" y1="64" x2="475" y2="170" class="sv-line" stroke="var(--green)" stroke-width="3"/>
+            <line x1="190" y1="193" x2="430" y2="193" stroke="var(--red)" stroke-width="3" stroke-dasharray="8 6"/>
+            <circle cx="410" cy="193" r="11" fill="var(--red)"/><text x="410" y="197" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">✕</text>
+            <text x="310" y="182" text-anchor="middle" class="sv-mono" fill="var(--red)">BLOCKED — standby path</text>
+            <text x="165" y="110" text-anchor="middle" class="sv-mono" fill="var(--green)">forwarding</text>
+            <text x="460" y="110" text-anchor="middle" class="sv-mono" fill="var(--green)">forwarding</text>
+            <text x="310" y="240" text-anchor="middle" class="sv-mono">loop broken · redundancy preserved</text>
+          </svg>
+          <figcaption>FIG 3.3 — STP BLOCKS ONE PORT TO BREAK THE TRIANGLE LOOP</figcaption>
+        </figure>
+        <h4>Port states</h4>
+        <p>Classic 802.1D ports walk through <strong>Blocking → Listening → Learning → Forwarding</strong> (plus Disabled), taking 30–50 seconds to converge. <strong>Rapid Spanning Tree (RSTP, 802.1w)</strong> collapses the states to <em>Discarding / Learning / Forwarding</em> and converges in seconds — it's the default on modern gear.</p>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Field tip:</strong> Enable <em>PortFast</em> (edge port) on access ports facing PCs so users don't wait through STP convergence at boot — and pair it with <em>BPDU Guard</em>, which shuts the port down if a switch ever appears where a PC should be.</span></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Root bridge = lowest bridge ID (priority first, MAC as tiebreaker). STP's job in one sentence: <em>prevent Layer 2 loops while preserving redundant paths</em>. Symptoms of a loop: broadcast storm, MAC table instability, total slowdown.</span></div>
+      </div>
+    </div>
+
+    <!-- 4. WIRELESS STANDARDS, BANDS & CHANNELS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📶</span>
+        <span class="at"><h3>4. Wireless — 802.11 Standards, Frequency Bands &amp; Channels</h3><span class="asub">N10-009 OBJECTIVE 2.3 · 2.4 / 5 / 6 GHz · CHANNEL WIDTH · BAND STEERING</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>The 802.11 family</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Standard</th><th>Wi-Fi Name</th><th>Band(s)</th><th>Max Theoretical Rate</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">802.11b</td><td>—</td><td>2.4 GHz</td><td class="mono">11 Mbps</td><td>Legacy; DSSS</td></tr>
+            <tr><td class="mono">802.11a</td><td>—</td><td>5 GHz</td><td class="mono">54 Mbps</td><td>Legacy; OFDM</td></tr>
+            <tr><td class="mono">802.11g</td><td>—</td><td>2.4 GHz</td><td class="mono">54 Mbps</td><td>b-compatible</td></tr>
+            <tr><td class="mono">802.11n</td><td>Wi-Fi 4</td><td>2.4 &amp; 5 GHz</td><td class="mono">~600 Mbps</td><td>MIMO; 40 MHz channels</td></tr>
+            <tr><td class="mono">802.11ac</td><td>Wi-Fi 5</td><td>5 GHz</td><td class="mono">~6.9 Gbps</td><td>MU-MIMO; 80/160 MHz</td></tr>
+            <tr><td class="mono">802.11ax</td><td>Wi-Fi 6 / 6E</td><td>2.4, 5, +6 GHz (6E)</td><td class="mono">~9.6 Gbps</td><td>OFDMA; high-density efficiency</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Frequency bands — the range vs. speed trade</h4>
+        <ul>
+          <li><strong>2.4 GHz</strong> — best range and wall penetration, but only <strong>3 non-overlapping channels (1, 6, 11)</strong> and it's crowded: microwaves, Bluetooth, baby monitors, and every neighbor's router.</li>
+          <li><strong>5 GHz</strong> — many more non-overlapping channels and higher speeds; shorter range; some channels require <strong>DFS</strong> (radar avoidance).</li>
+          <li><strong>6 GHz (Wi-Fi 6E)</strong> — a huge swath of clean spectrum, exclusively for modern clients; shortest range of the three.</li>
+        </ul>
+        <h4>Channels &amp; channel width</h4>
+        <p>Each band is sliced into <strong>channels</strong>. In 2.4 GHz, channels are 5 MHz apart but a signal is ~20 MHz wide — so adjacent channels overlap and interfere. That's why proper 2.4 GHz design uses only <strong>1, 6, and 11</strong>, tiling them like a honeycomb so neighboring APs never share a channel. <strong>Channel width</strong> (20/40/80/160 MHz) is the throughput dial: wider channels bond more spectrum for speed, but in 2.4 GHz a 40 MHz channel swallows the whole band. Rule of thumb: <strong>20 MHz in 2.4 GHz, 40–80 MHz in 5 GHz</strong>, wider only where spectrum is clean.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 660 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2.4 GHz channel overlap showing non-overlapping channels 1, 6, and 11">
+            <line x1="30" y1="130" x2="630" y2="130" stroke="var(--muted)" stroke-width="2"/>
+            <path d="M40 130 Q90 20 140 130"  fill="var(--blue)"  opacity=".75"/>
+            <path d="M245 130 Q295 20 345 130" fill="var(--green)" opacity=".75"/>
+            <path d="M450 130 Q500 20 550 130" fill="var(--amber)" opacity=".8"/>
+            <path d="M122 130 Q172 55 222 130" fill="var(--muted)" opacity=".28"/>
+            <path d="M163 130 Q213 55 263 130" fill="var(--muted)" opacity=".28"/>
+            <text x="90"  y="55" text-anchor="middle" class="sv-txt" font-weight="800">CH 1</text>
+            <text x="295" y="55" text-anchor="middle" class="sv-txt" font-weight="800">CH 6</text>
+            <text x="500" y="55" text-anchor="middle" class="sv-txt" font-weight="800">CH 11</text>
+            <text x="193" y="95" text-anchor="middle" class="sv-mono">CH 3, 4… overlap ⚡</text>
+            <text x="90"  y="150" text-anchor="middle" class="sv-mono">2412 MHz</text>
+            <text x="295" y="150" text-anchor="middle" class="sv-mono">2437 MHz</text>
+            <text x="500" y="150" text-anchor="middle" class="sv-mono">2462 MHz</text>
+            <text x="330" y="167" text-anchor="middle" class="sv-mono">only 1 · 6 · 11 fit without overlapping in 2.4 GHz</text>
+          </svg>
+          <figcaption>FIG 3.4 — 2.4 GHz: CHANNELS 1, 6, 11 ARE THE ONLY NON-OVERLAPPING SET</figcaption>
+        </figure>
+        <div class="cidr-widget">
+          <label for="chRange">DRAG TO EXPLORE 2.4 GHz CHANNELS (1–11, NORTH AMERICA)</label>
+          <input type="range" id="chRange" min="1" max="11" value="6" step="1" aria-label="2.4 GHz channel selector">
+          <div class="cidr-out">
+            <div class="co"><div class="lbl">Channel</div><div class="val" id="chNum">6</div></div>
+            <div class="co"><div class="lbl">Center Frequency</div><div class="val" id="chFreq">2437 MHz</div></div>
+            <div class="co"><div class="lbl">Overlaps With</div><div class="val" id="chOverlap">4–8</div></div>
+            <div class="co"><div class="lbl">Design Verdict</div><div class="val" id="chVerdict">✅ Non-overlapping set</div></div>
+          </div>
+        </div>
+        <h4>Band steering</h4>
+        <p>Many clients stubbornly cling to 2.4 GHz because its signal reads "stronger." <strong>Band steering</strong> is an AP feature that detects dual-band-capable clients and nudges them onto 5/6 GHz — typically by delaying or ignoring their 2.4 GHz probe requests — reserving 2.4 GHz for legacy and IoT devices that have no choice.</p>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Memorize the pairs — 2.4 GHz = range + congestion + channels 1/6/11; 5 GHz = speed + more channels + DFS; 6 GHz = Wi-Fi 6E only. "Which channels should three neighboring APs use in 2.4 GHz?" is a gift question: 1, 6, 11.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. WIRELESS INFRASTRUCTURE -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📡</span>
+        <span class="at"><h3>5. Wireless Infrastructure — SSIDs, Mesh, AP Architectures, Portals &amp; Antennas</h3><span class="asub">N10-009 OBJECTIVE 2.3 · BSSID vs ESSID · AUTONOMOUS vs LIGHTWEIGHT · ANTENNA TYPES</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>SSID, BSSID, ESSID — three IDs, one network</h4>
+        <ul>
+          <li><strong>SSID</strong> — the human-readable network name you tap on ("MVCC-WiFi").</li>
+          <li><strong>BSSID</strong> — the <em>MAC address of an individual AP radio</em>. Three APs broadcasting the same SSID = three different BSSIDs. Your laptop associates with a BSSID, not a name.</li>
+          <li><strong>ESSID</strong> — the same SSID extended across multiple APs so clients roam between them seamlessly. Enterprise Wi-Fi is one big ESS.</li>
+        </ul>
+        <h4>Mesh networks</h4>
+        <p>In a <strong>mesh</strong>, APs backhaul traffic to each other <em>over the air</em> — only one node needs a wired connection. Perfect for warehouses, outdoor spaces, historic buildings, and homes where pulling cable is impractical. The trade-off: each wireless hop consumes airtime and cuts throughput, so wire what you can.</p>
+        <h4>Autonomous vs. lightweight access points</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Model</th><th>Where the brains live</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Autonomous (fat) AP</strong></td><td>In the AP itself — each one configured individually</td><td>Homes, small offices, a handful of APs</td></tr>
+            <tr><td><strong>Lightweight (thin) AP</strong></td><td>In a central <strong>Wireless LAN Controller (WLC)</strong> — the AP tunnels traffic to it (CAPWAP); the controller pushes config, channels, power, and roaming policy to every AP</td><td>Campuses and enterprises with dozens to thousands of APs (controller may be an appliance or cloud-managed)</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Captive portals</h4>
+        <p>A <strong>captive portal</strong> intercepts a newly connected client's first web request and redirects it to a gateway page — accept the terms, enter a voucher, watch an ad, or log in — before granting access. It's the standard front door for <strong>guest networks</strong> in hotels, airports, coffee shops, and campuses, and it keeps guests segmented (usually on their own VLAN — see Section 1) from internal resources.</p>
+        <h4>Antenna types</h4>
+        <figure class="fig">
+          <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Omnidirectional versus directional antenna radiation patterns">
+            <circle cx="160" cy="90" r="62" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2.5"/>
+            <circle cx="160" cy="90" r="7" fill="var(--blue)"/>
+            <line x1="160" y1="62" x2="160" y2="118" stroke="var(--blue)" stroke-width="3"/>
+            <text x="160" y="172" text-anchor="middle" class="sv-txt" font-weight="700">OMNIDIRECTIONAL</text>
+            <text x="160" y="186" text-anchor="middle" class="sv-mono">360° doughnut · ceiling APs</text>
+            <path d="M420 90 L560 40 Q590 90 560 140 Z" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2.5"/>
+            <circle cx="420" cy="90" r="7" fill="var(--green)"/>
+            <rect x="404" y="70" width="12" height="40" rx="3" fill="var(--green)"/>
+            <text x="490" y="172" text-anchor="middle" class="sv-txt" font-weight="700">DIRECTIONAL</text>
+            <text x="490" y="186" text-anchor="middle" class="sv-mono">focused beam · Yagi · patch · dish</text>
+          </svg>
+          <figcaption>FIG 3.5 — RADIATION PATTERNS: COVERAGE IN ALL DIRECTIONS vs. FOCUSED GAIN</figcaption>
+        </figure>
+        <ul>
+          <li><strong>Omnidirectional</strong> — radiates 360° in the horizontal plane (a doughnut shape). The default for ceiling-mounted APs covering open areas.</li>
+          <li><strong>Directional</strong> — focuses energy in one direction for greater range/gain: <strong>patch/panel</strong> antennas mount on a wall and cover a hallway or room; <strong>Yagi</strong> antennas reach further down a line; <strong>parabolic dishes</strong> handle long point-to-point building-to-building links.</li>
+        </ul>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Design tip:</strong> Antenna choice is placement, not preference: omni in the middle of the space, directional at the edge pointing in. Never cover a parking lot by cranking power on an indoor omni — you'll create interference and a security footprint outside your walls.</span></div>
+      </div>
+    </div>
+
+    <!-- 6. PHYSICAL INSTALLATIONS -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗄️</span>
+        <span class="at"><h3>6. Physical Installations — Racks, Power &amp; Environment</h3><span class="asub">N10-009 OBJECTIVE 2.4 · MDF/IDF · PDU &amp; UPS · HVAC · PATCH &amp; FIBER PANELS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Installation locations &amp; rack layout</h4>
+        <p>Structured cabling terminates in the <strong>MDF</strong> (Main Distribution Frame — the building's primary equipment room) and <strong>IDFs</strong> (Intermediate Distribution Frames — closets serving each floor or area, uplinked to the MDF). Inside, equipment mounts in <strong>19-inch racks</strong> measured in <strong>rack units (1U = 1.75")</strong>; a full-height rack is typically 42U.</p>
+        <ul>
+          <li><strong>Heavy gear low</strong> — UPS and batteries at the bottom for stability.</li>
+          <li><strong>Patch panels adjacent to switches</strong> — short, tidy patch cords beat a cable waterfall.</li>
+          <li><strong>Respect airflow</strong> — most gear breathes front-to-back; match <strong>port-side intake/exhaust</strong> to your hot-aisle/cold-aisle layout so one device's exhaust isn't another's intake.</li>
+          <li><strong>Label and lock</strong> — label every cable and use lockable racks/doors; physical access is the first security control.</li>
+        </ul>
+        <figure class="fig">
+          <svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rack elevation diagram with patch panel, switch, servers, PDU and UPS">
+            <rect x="200" y="12" width="220" height="226" rx="8" fill="none" stroke="var(--muted)" stroke-width="2.5"/>
+            <rect x="212" y="24"  width="196" height="24" rx="4" fill="var(--blue-soft)"  stroke="var(--blue)"/><text x="310" y="40"  text-anchor="middle" class="sv-txt">Fiber distribution panel</text>
+            <rect x="212" y="52"  width="196" height="24" rx="4" fill="var(--blue-soft)"  stroke="var(--blue)"/><text x="310" y="68"  text-anchor="middle" class="sv-txt">Copper patch panel · 48 port</text>
+            <rect x="212" y="80"  width="196" height="24" rx="4" fill="var(--blue)"/><text x="310" y="96"  text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Access switch (1U)</text>
+            <rect x="212" y="108" width="196" height="14" rx="3" fill="var(--paper)" stroke="var(--line)"/><text x="310" y="119" text-anchor="middle" class="sv-mono" font-size="8">cable management</text>
+            <rect x="212" y="126" width="196" height="34" rx="4" fill="var(--green-soft)" stroke="var(--green)"/><text x="310" y="147" text-anchor="middle" class="sv-txt">Server (2U)</text>
+            <rect x="212" y="164" width="196" height="30" rx="4" fill="var(--amber-soft)" stroke="var(--amber)"/><text x="310" y="183" text-anchor="middle" class="sv-txt">Metered PDU</text>
+            <rect x="212" y="198" width="196" height="32" rx="4" fill="var(--red-soft)" stroke="var(--red)"/><text x="310" y="218" text-anchor="middle" class="sv-txt">UPS — heaviest, at the bottom</text>
+            <text x="130" y="40" text-anchor="end" class="sv-mono">cross-connects up top</text>
+            <text x="130" y="95" text-anchor="end" class="sv-mono">short patch cords</text>
+            <text x="130" y="215" text-anchor="end" class="sv-mono">weight + runtime</text>
+            <text x="490" y="60" class="sv-mono">❄️ cold aisle → intake</text>
+            <text x="490" y="80" class="sv-mono">🔥 exhaust → hot aisle</text>
+            <text x="490" y="120" class="sv-mono">42U · 19-inch</text>
+            <text x="490" y="140" class="sv-mono">1U = 1.75 in</text>
+          </svg>
+          <figcaption>FIG 3.6 — A CLEAN RACK ELEVATION: CONNECTIVITY UP TOP, POWER DOWN LOW</figcaption>
+        </figure>
+        <h4>Power: PDU, UPS &amp; load</h4>
+        <ul>
+          <li><strong>PDU (Power Distribution Unit)</strong> — the rack's power strip. <em>Metered</em> PDUs report load; <em>switched</em> PDUs let you power-cycle an outlet remotely at 2 a.m. instead of driving in.</li>
+          <li><strong>UPS (Uninterruptible Power Supply)</strong> — battery backup that also conditions power (surges, sags, brownouts). An <em>online/double-conversion</em> UPS powers the load from the battery path continuously — zero transfer time.</li>
+          <li><strong>Power load &amp; voltage</strong> — add up equipment draw (watts/VA) and keep the UPS below ~80% of capacity, with runtime for a graceful shutdown or generator start. Verify circuit <strong>voltage</strong> (120 V vs 208/240 V) and plug types <em>before</em> installation day.</li>
+        </ul>
+        <h4>Environmental factors</h4>
+        <ul>
+          <li><strong>Temperature</strong> — keep intake air roughly <strong>64–80 °F (18–27 °C)</strong>; heat is the number-one hardware killer.</li>
+          <li><strong>Humidity</strong> — target ~<strong>40–60% RH</strong>: too dry invites static discharge, too damp invites condensation and corrosion.</li>
+          <li><strong>Fire suppression</strong> — water sprinklers destroy electronics; equipment rooms use <strong>clean-agent gas systems</strong> (FM-200, Novec 1230, inert gas) that suppress fire without residue.</li>
+        </ul>
+        <h4>Patch panels &amp; fiber distribution panels</h4>
+        <p>Horizontal cable runs from wall jacks <strong>punch down once</strong> into a <strong>patch panel</strong>; short patch cords then connect panel ports to switch ports. Moves and changes happen at the patch cord — the permanent cabling is never disturbed. <strong>Fiber distribution panels</strong> do the same job for fiber, protecting splice trays and connectors, managing bend radius, and safely parking unused strands.</p>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Know PDU vs UPS (distribution vs backup), why humidity has both a floor (ESD) and a ceiling (condensation), why clean-agent suppression replaces water, and the purpose of patch/fiber panels: a permanent termination point so all changes happen at the patch cord.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity03.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 4: Network Appliances and Devices</h3>
+        <p>Identify and place switches, access points, controllers, and supporting appliances in realistic network scenarios — reinforcing the Layer 2 and wireless roles covered in this lesson.</p>
+        <div class="go">Open Exercise 4 →</div>
+      </a>
+      <a class="act-card" href="lab03.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 3: Using NAT/PAT</h3>
+        <p>Configure static NAT, dynamic NAT, and PAT (overload) on a border router. Verify the translation table and watch private RFC 1918 hosts share one public address — a preview of Lesson 4's routing topics.</p>
+        <div class="go">Open Lab 3 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">LOOKING AHEAD</span></div>
+        <h3>📝 No Exam This Lesson — Exam 2 Follows Lesson 4</h3>
+        <p>Exam 2 covers all of Domain 2 (Lessons 3 and 4): switching, STP, wireless, physical installations, routing, and NAT. Keep your Section 1–6 notes handy — they're half the exam.</p>
+        <div class="go">Review the Course Plan →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q1.</span> Hosts in VLAN 10 cannot communicate with hosts in VLAN 20 on the same Layer 2 switch. Why?</div>
+        <label><input type="radio" name="q1" value="a"> The switch's MAC table is full</label>
+        <label><input type="radio" name="q1" value="b"> 802.1Q tagging is disabled</label>
+        <label><input type="radio" name="q1" value="c"> Each VLAN is a separate broadcast domain — crossing them requires a Layer 3 device</label>
+        <label><input type="radio" name="q1" value="d"> STP is blocking the ports</label>
+        <div class="rat"><strong>Rationale:</strong> VLANs are separate broadcast domains by design. Traffic between them must be routed — by a router or by SVIs on a Layer 3 switch. That isolation is the whole point.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q2.</span> What does the 802.1Q standard add to an Ethernet frame on a trunk link?</div>
+        <label><input type="radio" name="q2" value="a"> A new 8-byte preamble identifying the trunk</label>
+        <label><input type="radio" name="q2" value="b"> A 4-byte tag containing a 12-bit VLAN ID, inserted after the source MAC</label>
+        <label><input type="radio" name="q2" value="c"> An encrypted header protecting the payload</label>
+        <label><input type="radio" name="q2" value="d"> A TTL field so frames expire</label>
+        <div class="rat"><strong>Rationale:</strong> 802.1Q inserts a 4-byte tag after the source MAC address; 12 of those bits carry the VLAN ID (1–4094). Ethernet frames never gain a TTL — which is exactly why STP exists.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q3.</span> A link shows "up/up" but throughput is terrible and the interface counters show late collisions and CRC errors. Most likely cause?</div>
+        <label><input type="radio" name="q3" value="a"> Native VLAN mismatch</label>
+        <label><input type="radio" name="q3" value="b"> Jumbo frames enabled on both ends</label>
+        <label><input type="radio" name="q3" value="c"> The root bridge failed</label>
+        <label><input type="radio" name="q3" value="d"> A duplex mismatch — one side full, the other half</label>
+        <div class="rat"><strong>Rationale:</strong> The classic duplex mismatch signature: link is up, performance is awful, late collisions and CRC errors increment. Configure both ends to autonegotiate, or hard-code both identically.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q4.</span> In STP, which switch becomes the root bridge?</div>
+        <label><input type="radio" name="q4" value="a"> The one with the lowest bridge ID (lowest priority, MAC address as tiebreaker)</label>
+        <label><input type="radio" name="q4" value="b"> The one with the most connected ports</label>
+        <label><input type="radio" name="q4" value="c"> The newest switch with the fastest CPU</label>
+        <label><input type="radio" name="q4" value="d"> The switch with the highest IP address</label>
+        <div class="rat"><strong>Rationale:</strong> Lowest bridge ID wins: priority is compared first, and the lowest MAC address breaks ties. Set the core switch's priority low on purpose so an old closet switch never wins by having an ancient (low) MAC.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span> Your storage team wants jumbo frames on the iSCSI network. Which condition is required?</div>
+        <label><input type="radio" name="q5" value="a"> All traffic must use UDP</label>
+        <label><input type="radio" name="q5" value="b"> Every device in the path — NICs and switches — must support the same larger MTU (~9000)</label>
+        <label><input type="radio" name="q5" value="c"> STP must be disabled</label>
+        <label><input type="radio" name="q5" value="d"> The network must run at 2.4 GHz</label>
+        <div class="rat"><strong>Rationale:</strong> Jumbo frames only work end-to-end. One device stuck at MTU 1500 in the path causes fragmentation or silent drops. Enable them deliberately on isolated storage/backup segments.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q6.</span> You're deploying three access points in adjacent classrooms on 2.4 GHz. Which channel plan avoids co-channel interference?</div>
+        <label><input type="radio" name="q6" value="a"> Channels 1, 2, 3</label>
+        <label><input type="radio" name="q6" value="b"> Channels 5, 6, 7</label>
+        <label><input type="radio" name="q6" value="c"> Channels 1, 6, 11</label>
+        <label><input type="radio" name="q6" value="d"> All three on channel 6 for consistency</label>
+        <div class="rat"><strong>Rationale:</strong> In 2.4 GHz, a ~20 MHz signal on channels spaced 5 MHz apart means only 1, 6, and 11 don't overlap. Adjacent-channel overlap (1,2,3) is actually worse than sharing one channel.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q7.</span> A campus has 200 access points all broadcasting "MVCC-WiFi." What term describes the unique MAC-address identifier of each individual AP radio?</div>
+        <label><input type="radio" name="q7" value="a"> ESSID</label>
+        <label><input type="radio" name="q7" value="b"> BSSID</label>
+        <label><input type="radio" name="q7" value="c"> SSID</label>
+        <label><input type="radio" name="q7" value="d"> Captive portal</label>
+        <div class="rat"><strong>Rationale:</strong> The BSSID is the MAC address of a single AP radio. The SSID is the shared name; the ESSID describes that name extended across all 200 APs so clients roam seamlessly.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q8.</span> Which fire suppression approach is appropriate for a server room, and why?</div>
+        <label><input type="radio" name="q8" value="a"> Standard water sprinklers — they're the cheapest option</label>
+        <label><input type="radio" name="q8" value="b"> No suppression — smoke detectors are enough</label>
+        <label><input type="radio" name="q8" value="c"> Foam suppression from ceiling nozzles</label>
+        <label><input type="radio" name="q8" value="d"> A clean-agent gas system — it suppresses fire without damaging electronics</label>
+        <div class="rat"><strong>Rationale:</strong> Clean-agent systems (FM-200, Novec 1230, inert gas) extinguish fires without water or residue. A sprinkler discharge often destroys more equipment than the fire it stops.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson02.html">← Lesson 2: Network Concepts II</a>
+    <a href="lesson04.html">Lesson 4: Network Implementation II →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 3 of 8 · Domain 2.0 Network Implementations (20%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---------- 2.4 GHz channel explorer widget ---------- */
+  var chRange = document.getElementById('chRange');
+  if (chRange) {
+    var upd = function(){
+      var ch = parseInt(chRange.value, 10);
+      var freq = 2407 + ch * 5;
+      var lo = Math.max(1, ch - 2), hi = Math.min(11, ch + 2);
+      var overlaps = [];
+      for (var i = lo; i <= hi; i++) { if (i !== ch) overlaps.push(i); }
+      var nonOverlap = (ch === 1 || ch === 6 || ch === 11);
+      document.getElementById('chNum').textContent = ch;
+      document.getElementById('chFreq').textContent = freq + ' MHz';
+      document.getElementById('chOverlap').textContent = overlaps[0] + '\u2013' + overlaps[overlaps.length - 1];
+      document.getElementById('chVerdict').textContent = nonOverlap ? '\u2705 Non-overlapping set' : '\u26A0\uFE0F Avoid \u2014 use 1, 6, or 11';
+    };
+    chRange.addEventListener('input', upd); upd();
+  }
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreEl = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreEl.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
