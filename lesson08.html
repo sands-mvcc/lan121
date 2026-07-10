@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8 | Network Troubleshooting — LAN 121 Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Tool selector drill ---------- */
+  .drill{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .drill .scen{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:13px 16px;font-size:.9rem;min-height:64px}
+  .drill .scen .sn{font-family:var(--mono);font-size:.66rem;color:var(--muted);letter-spacing:.08em;display:block;margin-bottom:5px}
+  .drill-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:13px 0 4px}
+  .drill-opts button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:11px 10px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:var(--mono);transition:transform .12s}
+  .drill-opts button:hover{transform:translateY(-2px);border-color:var(--blue)}
+  .drill-opts button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .drill-opts button.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .drill-opts button.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+  .drill-opts button:disabled{cursor:default;opacity:.85}
+  .drill .fb{font-size:.82rem;margin-top:9px;min-height:38px}
+  .drill .fb.good{color:var(--green)} .drill .fb.bad{color:var(--red)}
+  .drill-bar{display:flex;align-items:center;gap:14px;margin-top:12px;flex-wrap:wrap}
+  .drill-score{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Lesson 8 — Network Troubleshooting</h1>
+      <div class="sub">Domain 5.0 · Network Troubleshooting · 24%</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">LESSON 8 OF 8</span>
+      <span class="tag">DOMAIN 5.0 · NETWORK TROUBLESHOOTING · 24%</span>
+      <span class="tag exam">FINAL EXAM</span>
+    </div>
+    <h2>Network Troubleshooting — Methodology, Tools &amp; Performance</h2>
+    <p class="lede">This is the domain the whole course was building toward — and at 24%, the biggest slice of the N10-009 exam. Troubleshooting is where knowledge becomes skill: the CompTIA seven-step methodology that replaces guesswork with process; Layer 1 diagnosis — cable faults, interface error counters, port states, PoE budgets, and transceivers; service failures in DNS, DHCP, NTP, authentication, VPN, and NAT that call back everything from Lessons 4 through 7; performance problems — latency, jitter, packet loss, congestion, and the wireless gremlins of RSSI, channel overlap, and hidden nodes; and the toolbag itself, from ping and dig to TDRs and Wi-Fi analyzers, with an interactive drill to sharpen your tool selection. Then: the Final Exam and the capstone lab.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Apply</b> the CompTIA seven-step troubleshooting methodology to a reported problem, in order, from identification through documentation. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Select</b> a hypothesis strategy — top-down, bottom-up, or divide and conquer — appropriate to the symptoms. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Diagnose</b> cabling and physical interface problems from symptoms and error counters: attenuation, crosstalk, EMI/RFI, CRC errors, runts/giants, duplex mismatch, port states, PoE budget, and transceiver faults. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Trace</b> service failures — DNS, DHCP, NTP, authentication, VPN, and NAT — to their root cause using the behavior each failure produces. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Differentiate</b> the performance metrics — throughput, latency, jitter, and packet loss — and identify causes of congestion and wireless degradation (RSSI, SNR, channel overlap, hidden node, roaming). <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Choose</b> the correct software or hardware tool for a diagnostic question and interpret its output. <span class="bloom">BLOOM: EVALUATE</span></li>
+        <li><b>Document</b> a completed incident — problem, root cause, actions, resolution, and lessons learned — so the next technician starts ahead. <span class="bloom">BLOOM: CREATE</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= KEY TERMS (collapsed) ================= -->
+  <section id="keyterms">
+    <div class="sec-head"><span class="ic">🗂️</span><h2>Key Terms &amp; Concepts</h2></div>
+    <div class="acc" id="ktAcc">
+      <button class="acc-btn" aria-expanded="false">
+        <span class="aic">🃏</span>
+        <span class="at"><h3>Flip Card Glossary — 18 Terms</h3><span class="asub">CLICK TO EXPAND · TAP EACH CARD TO FLIP</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="kt-grid">
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Root Cause Analysis"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🎯</span><b>Root Cause Analysis</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Digging past the symptom to the underlying cause — restarting a service clears the symptom; finding why it crashed prevents the repeat at 3 a.m.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Escalation"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📈</span><b>Escalation</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Handing the problem to someone with more authority, access, or expertise — a defined step in the methodology, not an admission of failure.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Rollback Plan"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">↩️</span><b>Rollback Plan</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The tested path back to the pre-change state, prepared BEFORE implementing a fix — Lesson 6's change management rule, applied under pressure.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Top-Down / Bottom-Up"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">↕️</span><b>Top-Down / Bottom-Up</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Walking the OSI model from Layer 7 downward (start at the app) or Layer 1 upward (start at the cable) until you find the broken layer.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Divide and Conquer"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">✂️</span><b>Divide &amp; Conquer</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Start at a middle layer (can you ping?) and let the result cut the problem space in half — success means look up the stack, failure means look down.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Attenuation"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📉</span><b>Attenuation</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Signal weakening over distance — the reason copper runs stop at 100 m. Symptoms: intermittent or failed links on long runs.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Crosstalk"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🗣️</span><b>Crosstalk</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Signal bleeding between adjacent wire pairs — often from sloppy termination that untwisted too much pair. Better cable categories and STP fight it.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: EMI RFI"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">⚡</span><b>EMI / RFI</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Electromagnetic / radio-frequency interference from motors, fluorescent lights, and transmitters corrupting signals — why data cable avoids power runs, and why shielded (STP) exists.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: CRC Error"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🧮</span><b>CRC Error</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A frame arrived but its checksum didn't match — it was damaged in transit. Rising CRC counters point at bad cable, interference, or duplex mismatch.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Runt Giant"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🐜</span><b>Runt / Giant</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Frames below 64 bytes (runts — often collision fragments) or above the MTU (giants — often an MTU/jumbo mismatch from Lesson 3).</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Duplex Mismatch"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🤝</span><b>Duplex Mismatch</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">One side full duplex, the other half — the link works but crawls, logging late collisions and CRC errors. The classic "up but terrible" diagnosis.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: PoE Budget"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔋</span><b>PoE Budget</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">The total watts a switch can deliver across all ports (802.3af 15.4W · at 30W · bt 60–90W per port). Exceed it and new devices simply don't power on.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: APIPA"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🚩</span><b>APIPA</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">169.254.x.x — the address a client self-assigns when DHCP never answered. Not the problem; the symptom that says "investigate DHCP."</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Latency"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🐢</span><b>Latency</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Time for a packet to make the trip — from distance, congested queues, firewall inspection, VPN encryption. Measured by ping's round-trip time.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Jitter"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📳</span><b>Jitter</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">VARIATION in latency — packets arriving at uneven intervals. The metric that ruins VoIP and video; QoS exists largely to control it.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: RSSI SNR"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📶</span><b>RSSI / SNR</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Received signal strength (closer to 0 dBm is stronger; −67 good, −85 unusable) and signal-to-noise ratio — a strong signal in a noisy room can still be an unusable one.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: TDR OTDR"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">📡</span><b>TDR / OTDR</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">Reflectometers that send a pulse down copper (TDR) or fiber (OTDR) and time the echo — reporting the DISTANCE to the break, short, or bad splice.</div>
+          </div></div>
+          <div class="flip" tabindex="0" role="button" aria-label="Flip card: Loopback Adapter"><div class="flip-inner">
+            <div class="flip-face flip-front"><span class="fic">🔁</span><b>Loopback Adapter</b><span class="hint">TAP TO FLIP</span></div>
+            <div class="flip-face flip-back">A plug that wires TX straight to RX so a port tests itself — isolating "is the interface bad?" from "is the cable or far end bad?"</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LESSON CONTENT (expanded) ================= -->
+  <section id="content">
+    <div class="sec-head"><span class="ic">📖</span><h2>Lesson Content</h2></div>
+
+    <!-- 1. METHODOLOGY -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧭</span>
+        <span class="at"><h3>1. The Seven-Step Troubleshooting Methodology</h3><span class="asub">N10-009 OBJECTIVE 5.1 · PROCESS BEATS GUESSWORK · MEMORIZE THE ORDER</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Every technician has watched someone "fix" a network by rebooting things until the symptom disappeared — leaving the cause alive and the next outage scheduled. The CompTIA methodology exists so that never has to be you. <strong>The exam tests the steps in order</strong>:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 680 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Seven step troubleshooting methodology flow">
+            <g font-size="11">
+              <rect x="20"  y="20"  width="305" height="56" rx="10" fill="var(--blue)"/><text x="36" y="43" fill="#fff" font-weight="800">① IDENTIFY THE PROBLEM</text><text x="36" y="61" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">gather info · question users · recent changes? · duplicate it</text>
+              <rect x="355" y="20"  width="305" height="56" rx="10" fill="var(--blue)"/><text x="371" y="43" fill="#fff" font-weight="800">② ESTABLISH A THEORY</text><text x="371" y="61" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">question the obvious · top-down / bottom-up / divide &amp; conquer</text>
+              <rect x="355" y="100" width="305" height="56" rx="10" fill="var(--amber)"/><text x="371" y="123" fill="#fff" font-weight="800">③ TEST THE THEORY</text><text x="371" y="141" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">confirmed → plan · busted → new theory or ESCALATE</text>
+              <rect x="20"  y="100" width="305" height="56" rx="10" fill="var(--amber)"/><text x="36" y="123" fill="#fff" font-weight="800">④ PLAN OF ACTION</text><text x="36" y="141" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">safest fix · impact &amp; downtime · ROLLBACK ready</text>
+              <rect x="20"  y="180" width="305" height="56" rx="10" fill="var(--green)"/><text x="36" y="203" fill="#fff" font-weight="800">⑤ IMPLEMENT</text><text x="36" y="221" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">make the change · or escalate to who can</text>
+              <rect x="355" y="180" width="305" height="56" rx="10" fill="var(--green)"/><text x="371" y="203" fill="#fff" font-weight="800">⑥ VERIFY FULL FUNCTIONALITY</text><text x="371" y="221" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">original issue gone · nothing new broken · prevent recurrence</text>
+              <rect x="187" y="260" width="305" height="56" rx="10" fill="var(--ink)"/><text x="203" y="283" fill="var(--card)" font-weight="800">⑦ DOCUMENT EVERYTHING</text><text x="203" y="301" fill="var(--card)" font-size="9" font-family="ui-monospace,Consolas,monospace">problem · root cause · actions · resolution · lessons learned</text>
+            </g>
+            <path class="sv-line" d="M325 48 H355 M508 76 V100 M355 128 H325 M172 156 V180 M325 208 H355 M508 236 V260 H492"/>
+            <path d="M430 100 Q430 60 440 76" stroke="var(--red)" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+            <text x="415" y="92" text-anchor="end" class="sv-mono" fill="var(--red)" font-size="8">theory busted ↺</text>
+          </svg>
+          <figcaption>FIG 8.1 — THE SEVEN STEPS: IDENTIFY → THEORIZE → TEST → PLAN → IMPLEMENT → VERIFY → DOCUMENT</figcaption>
+        </figure>
+        <h4>Three ways to hunt a theory (step ②)</h4>
+        <ul>
+          <li><strong>Top-down</strong> — start at Layer 7 and descend: app config, then DNS, then IP, then link. Natural when "one application is broken but the network seems fine."</li>
+          <li><strong>Bottom-up</strong> — start at Layer 1 and climb: link lights, cable, interface counters, IP, service. Natural when "nothing works at all."</li>
+          <li><strong>Divide and conquer</strong> — jump to the middle and let one test halve the search: <code>ping 8.8.8.8</code> works? The problem is above Layer 3 — probably DNS or the app. Fails? Look down at addressing, gateway, link.</li>
+        </ul>
+        <div class="callout warn"><span class="cic">⚠️</span><span><strong>Two rules the exam loves:</strong> if you must <strong>escalate</strong>, it happens when a theory can't be confirmed (step ③) or the fix exceeds your authority (step ⑤). And the job is not done at "it works" — it's done at step ⑦, when the <strong>documentation</strong> is written. Skip it and the next tech starts from zero.</span></div>
+      </div>
+    </div>
+
+    <!-- 2. CABLING & PHYSICAL -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔌</span>
+        <span class="at"><h3>2. Cabling &amp; Physical Interface Issues</h3><span class="asub">N10-009 OBJECTIVE 5.2 · LAYER 1 · ERROR COUNTERS · PoE · TRANSCEIVERS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Copper problems</h4>
+        <ul>
+          <li><strong>Attenuation</strong> — signal fades with distance; twisted-pair runs cap at <strong>100 m</strong>. Symptom: the far cubicle's link flaps or trains down to a lower speed.</li>
+          <li><strong>Crosstalk</strong> — pairs interfering with each other, usually from terminations that untwisted too much wire, or under-spec cable (Cat5e pushed to 10G).</li>
+          <li><strong>EMI/RFI</strong> — motors, fluorescent ballasts, and elevators inducing noise. Fix: reroute away from power, or use shielded (STP) cable.</li>
+          <li><strong>Termination &amp; damage</strong> — opens, shorts, split pairs, and the wrong cable for the job (flat patch cable in a 90 m horizontal run).</li>
+        </ul>
+        <h4>Fiber problems</h4>
+        <p><strong>Dirty connectors</strong> (the #1 fiber issue — clean before you condemn), <strong>bend radius</strong> violations leaking light, <strong>TX/RX reversed</strong> (dead link, fixed by flipping the pair), and <strong>mismatches</strong>: single-mode gear on multimode fiber, or transceivers on different <strong>wavelengths</strong>.</p>
+        <h4>Reading the interface counters</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Counter climbing</th><th>It means</th><th>Prime suspects</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">CRC errors</td><td>Frames arriving damaged</td><td>Bad cable, EMI, duplex mismatch</td></tr>
+            <tr><td class="mono">Runts (&lt;64 B)</td><td>Fragment frames</td><td>Collisions → duplex mismatch</td></tr>
+            <tr><td class="mono">Giants (&gt;MTU)</td><td>Oversized frames</td><td>MTU/jumbo mismatch (Lesson 3)</td></tr>
+            <tr><td class="mono">Late collisions</td><td>Collisions after the 64-byte window</td><td>Duplex mismatch, cable too long</td></tr>
+            <tr><td class="mono">Drops</td><td>Buffer overflow discards</td><td>Congestion / oversubscription (Section 4)</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p><strong>Port states</strong> tell the rest of the story: <em>up/up</em> (healthy), <em>down/down</em> (physical problem — cable, far end, transceiver), <em>administratively down</em> (someone typed <code>shutdown</code> — configuration, not hardware), <em>error-disabled</em> (the switch punished a violation — port security from Lesson 7, BPDU Guard from Lesson 3), <em>suspended</em> (usually an LACP/EtherChannel misconfig, Lesson 3).</p>
+        <h4>PoE — when the device won't even power on</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Standard</th><th>Name</th><th>Per-port power</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">802.3af</td><td>PoE</td><td class="mono">15.4 W</td></tr>
+            <tr><td class="mono">802.3at</td><td>PoE+</td><td class="mono">30 W</td></tr>
+            <tr><td class="mono">802.3bt</td><td>PoE++ (Type 3/4)</td><td class="mono">60 / 90–100 W</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Two classic failures: the device needs more than the port's <strong>standard</strong> supplies (a PTZ camera on an 802.3af port), or the switch's total <strong>power budget</strong> is exhausted — the first twenty phones power up and number twenty-one stays dark even though the port is fine.</p>
+        <p><strong>Transceivers:</strong> SFP (1G), SFP+ (10G), QSFP (40G+) — a mismatch in speed, wavelength, or fiber type between the two ends means no light, no link. Verify with the datasheet, or swap in a known-good pair.</p>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Late collisions + CRC on a link that's "up" = duplex mismatch. Port shows err-disabled = a protection feature fired, check port security/BPDU Guard. New PoE device won't power = check the standard AND the remaining budget.</span></div>
+      </div>
+    </div>
+
+    <!-- 3. SERVICE ISSUES -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🛠️</span>
+        <span class="at"><h3>3. Troubleshooting Network Services</h3><span class="asub">N10-009 OBJECTIVE 5.3 · DNS · DHCP · NTP · AUTH · VPN · NAT — LESSONS 4–7, IN REVERSE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>You built every one of these services earlier in the course; troubleshooting them is recognizing each one's <em>signature failure</em>:</p>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Service</th><th>Symptom signature</th><th>Likely causes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>DNS</strong></td><td>Ping by IP works, ping by name fails</td><td>Wrong DNS server configured, missing/stale record, cache poisoning, propagation delay after a change</td></tr>
+            <tr><td><strong>DHCP</strong></td><td>Client sits on <span class="mono">169.254.x.x</span> (APIPA)</td><td>Scope exhausted, server down, missing relay (Lesson 5); wrong gateway/mask in scope options = "I have an address but nothing works"; rogue DHCP server = wrong gateway on purpose</td></tr>
+            <tr><td><strong>NTP</strong></td><td>Kerberos logins fail, certificates "invalid," logs won't correlate</td><td>Time drift, unreachable time source, wrong stratum design (Lesson 5)</td></tr>
+            <tr><td><strong>Authentication</strong></td><td>Some users/devices rejected, others fine</td><td>LDAP/AD outage, Kerberos clock skew (&gt;5 min), RADIUS/TACACS+ shared-secret or reachability problems (Lesson 7)</td></tr>
+            <tr><td><strong>VPN</strong></td><td>Tunnel won't establish, or connects then passes nothing</td><td>Authentication failure, encryption/proposal mismatch between peers, expired certificate, blocked ports (Lesson 6)</td></tr>
+            <tr><td><strong>NAT</strong></td><td>Inside hosts fine internally, dead to the internet — or a published server unreachable from outside</td><td>Pool exhausted (dynamic NAT), missing/incorrect static mapping, PAT table issues (Lesson 4)</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>The four-ping ladder from Lesson 5 still rules:</strong> loopback → gateway → 8.8.8.8 → google.com. Where the ladder breaks names the layer: last rung only = DNS; third rung = routing/NAT; second = LAN; first = the host itself.</span></div>
+      </div>
+    </div>
+
+    <!-- 4. PERFORMANCE -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🐢</span>
+        <span class="at"><h3>4. Performance Issues — Slow Is a Symptom Too</h3><span class="asub">N10-009 OBJECTIVE 5.4 · LATENCY · JITTER · LOSS · CONGESTION · WIRELESS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>Outages are easy — something is <em>down</em>. Performance problems are subtler: everything is up, and everyone is miserable. Four metrics separate the complaints:</p>
+        <figure class="fig">
+          <svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Healthy packet timing versus latency, jitter, and packet loss">
+            <text x="20" y="30" class="sv-txt" font-weight="800">HEALTHY — even spacing, all arrive</text>
+            <line x1="20" y1="52" x2="660" y2="52" stroke="var(--line)" stroke-width="2"/>
+            <g fill="var(--green)"><rect x="60" y="42" width="16" height="20" rx="3"/><rect x="160" y="42" width="16" height="20" rx="3"/><rect x="260" y="42" width="16" height="20" rx="3"/><rect x="360" y="42" width="16" height="20" rx="3"/><rect x="460" y="42" width="16" height="20" rx="3"/><rect x="560" y="42" width="16" height="20" rx="3"/></g>
+            <text x="20" y="100" class="sv-txt" font-weight="800">LATENCY — even spacing, everything shifted late</text>
+            <line x1="20" y1="122" x2="660" y2="122" stroke="var(--line)" stroke-width="2"/>
+            <g fill="var(--amber)"><rect x="160" y="112" width="16" height="20" rx="3"/><rect x="260" y="112" width="16" height="20" rx="3"/><rect x="360" y="112" width="16" height="20" rx="3"/><rect x="460" y="112" width="16" height="20" rx="3"/><rect x="560" y="112" width="16" height="20" rx="3"/><rect x="660" y="112" width="16" height="20" rx="3"/></g>
+            <path d="M60 132 H150" stroke="var(--amber)" stroke-width="2"/><text x="105" y="146" text-anchor="middle" class="sv-mono" fill="var(--amber)">delay</text>
+            <text x="20" y="180" class="sv-txt" font-weight="800">JITTER + LOSS — uneven arrival, gaps where packets died (VoIP's nightmare)</text>
+            <line x1="20" y1="202" x2="660" y2="202" stroke="var(--line)" stroke-width="2"/>
+            <g fill="var(--red)"><rect x="60" y="192" width="16" height="20" rx="3"/><rect x="98" y="192" width="16" height="20" rx="3"/><rect x="238" y="192" width="16" height="20" rx="3"/><rect x="270" y="192" width="16" height="20" rx="3"/><rect x="470" y="192" width="16" height="20" rx="3"/></g>
+            <text x="370" y="207" text-anchor="middle" class="sv-mono" fill="var(--red)">✕ lost</text>
+            <text x="580" y="207" text-anchor="middle" class="sv-mono" fill="var(--red)">✕ lost</text>
+          </svg>
+          <figcaption>FIG 8.2 — THE SAME STREAM, THREE WAYS: DELAY SHIFTS IT, JITTER SCRAMBLES IT, LOSS PUNCHES HOLES</figcaption>
+        </figure>
+        <ul>
+          <li><strong>Throughput</strong> — how much data actually moves. Killed by <strong>saturation and oversubscription</strong> (forty 1G users funneled through one 1G uplink), misapplied traffic shaping, or a rogue <strong>broadcast storm</strong> (Lesson 3's STP failure) consuming the segment.</li>
+          <li><strong>Latency</strong> — delay from distance, congested router queues, deep firewall inspection, VPN encryption overhead. Batch transfers shrug; interactive apps suffer.</li>
+          <li><strong>Jitter</strong> — <em>variable</em> latency. Buffers can hide a little; VoIP and video die by it — the reason <strong>QoS</strong> gives real-time traffic the express lane.</li>
+          <li><strong>Packet loss</strong> — from interface errors (Section 2), congestion drops, or wireless interference. TCP retransmits (slowly); real-time UDP just glitches.</li>
+          <li><strong>Device resources</strong> — high CPU/memory or buffer exhaustion on a switch/router makes a healthy link perform like a sick one. Check the box, not just the wire — against the <strong>baseline</strong> from Lesson 6.</li>
+        </ul>
+        <h4>Wireless performance gremlins</h4>
+        <ul>
+          <li><strong>Low RSSI / poor SNR</strong> — weak signal or strong noise; −67 dBm is a common design floor for voice/video.</li>
+          <li><strong>Channel overlap / co-channel interference</strong> — neighbors off the 1/6/11 plan (Lesson 3's channel widget pays off here).</li>
+          <li><strong>Hidden node</strong> — two clients both hear the AP but not each other, so they collide at it. RTS/CTS mitigates.</li>
+          <li><strong>Roaming problems</strong> — sticky clients clinging to a distant AP; fix with power tuning, minimum data rates, and band steering (Lesson 3).</li>
+        </ul>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Choppy VoIP with everything else fine = jitter → QoS. Slow every afternoon at the same hour = congestion/oversubscription — check utilization against the baseline. Wireless fine near the AP, awful by the window = RSSI/coverage, bring the Wi-Fi analyzer.</span></div>
+      </div>
+    </div>
+
+    <!-- 5. TOOLS + DRILL -->
+    <div class="acc open">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧰</span>
+        <span class="at"><h3>5. The Troubleshooting Toolbag — With a Tool-Selector Drill</h3><span class="asub">N10-009 OBJECTIVE 5.5 · KNOW WHAT EACH TOOL ANSWERS · THEN PROVE IT</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <h4>Command-line tools — each answers one question</h4>
+        <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Command</th><th>The question it answers</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">ping</td><td>Is it reachable, and how long is the round trip?</td></tr>
+            <tr><td class="mono">traceroute / tracert</td><td>What path does traffic take, and at which hop does it die or slow?</td></tr>
+            <tr><td class="mono">ipconfig / ifconfig / ip</td><td>What are MY address, mask, gateway, and DNS right now?</td></tr>
+            <tr><td class="mono">arp -a</td><td>What IP↔MAC mappings do I believe? (Poisoning check, Lesson 7)</td></tr>
+            <tr><td class="mono">nslookup / dig</td><td>What does DNS actually return for this name — and from which server?</td></tr>
+            <tr><td class="mono">netstat</td><td>What connections and listening ports does this host have?</td></tr>
+            <tr><td class="mono">route</td><td>What does this host's routing table say?</td></tr>
+            <tr><td class="mono">tcpdump</td><td>Show me the raw packets on this interface (CLI capture)</td></tr>
+            <tr><td class="mono">nmap</td><td>What hosts/ports/services are alive on this network?</td></tr>
+            <tr><td class="mono">LLDP / CDP</td><td>What device and port is on the other end of this link?</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Hardware tools</h4>
+        <p><strong>Cable tester</strong> — wiremap: opens, shorts, split/crossed pairs. <strong>Tone generator &amp; probe</strong> — find WHICH cable in the bundle this jack is. <strong>Loopback plug</strong> — make a port test itself. <strong>TDR/OTDR</strong> — distance to the fault on copper/fiber. <strong>Punch-down tool &amp; crimper</strong> — terminate panels and ends. <strong>Multimeter</strong> — voltage/continuity (PoE checks). <strong>Wi-Fi analyzer</strong> — RSSI, SNR, channel occupancy; the wireless survey instrument from Lesson 6's documentation.</p>
+        <h4>Monitoring &amp; packet analysis</h4>
+        <p>The Lesson 6 stack is also a troubleshooting stack: <strong>syslog</strong> for what devices said, <strong>SNMP</strong> for counters and traps, <strong>NetFlow</strong> for who's talking, and <strong>packet capture</strong> (Wireshark + port mirroring) for ground truth. In captures, know what healthy looks like — the <strong>TCP three-way handshake</strong> (SYN → SYN/ACK → ACK), <strong>DORA</strong>, DNS query/answer pairs, ARP request/reply, 802.1Q tags — so the broken version jumps out (a lonely SYN retransmitting = something's dropping or filtering; an immediate <strong>RST</strong> = the port is closed or refused).</p>
+
+        <h4>🕹️ Tool-Selector Drill — six scenarios, pick your instrument</h4>
+        <div class="drill">
+          <div class="scen"><span class="sn" id="drillNum">SCENARIO 1 OF 6</span><span id="drillText"></span></div>
+          <div class="drill-opts" id="drillOpts"></div>
+          <div class="fb" id="drillFb" aria-live="polite"></div>
+          <div class="drill-bar">
+            <button class="btn primary" id="drillNext" disabled>Next Scenario ▶</button>
+            <button class="btn ghost" id="drillReset">Restart Drill</button>
+            <span class="drill-score" id="drillScore">SCORE: 0/0</span>
+          </div>
+        </div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> These pairings are free points — trace the PATH = traceroute; verify what DNS RETURNS = nslookup/dig; find WHICH cable = toner; DISTANCE to a fiber break = OTDR; port tests ITSELF = loopback plug; see the actual PACKETS = capture via port mirroring.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITIES ================= -->
+  <section id="activities">
+    <div class="sec-head"><span class="ic">🧭</span><h2>This Lesson's Activities</h2></div>
+    <div class="act-grid">
+      <a class="act-card" href="activity07.html">
+        <div class="tagrow"><span class="tag">GRADED EXERCISE</span></div>
+        <h3>✏️ Exercise 8: Troubleshooting Methods and Techniques</h3>
+        <p>Apply the seven steps to written scenarios: order the process, choose the strategy, pick the tool, and name the root cause.</p>
+        <div class="go">Open Exercise 8 →</div>
+      </a>
+      <a class="act-card" href="lab08.html">
+        <div class="tagrow"><span class="tag">HANDS-ON LAB</span></div>
+        <h3>🔬 Lab 8: Network Troubleshooting Capstone (Final Review)</h3>
+        <p>A deliberately broken network spanning all five domains — find every fault, fix it, and document it. Everything from Lessons 1–8 is in play.</p>
+        <div class="go">Open Lab 8 →</div>
+      </a>
+      <a class="act-card examcard" href="index.html#lessons">
+        <div class="tagrow"><span class="tag exam">FINAL EXAM</span></div>
+        <h3>📝 Final Exam — All Domains</h3>
+        <p>Comprehensive: Domains 1–5, weighted like the real N10-009 (troubleshooting is the largest slice at 24%). Check the LMS for the exam window — and good luck. You've built every piece of this.</p>
+        <div class="go">Review the Full Course →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= KNOWLEDGE CHECK ================= -->
+  <section id="quiz">
+    <div class="sec-head"><span class="ic">✅</span><h2>Knowledge Check</h2></div>
+    <div class="panel">
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q1.</span> A user reports "the internet is down." Per the methodology, what comes FIRST?</div>
+        <label><input type="radio" name="q1" value="a"> Reboot the user's PC</label>
+        <label><input type="radio" name="q1" value="b"> Identify the problem — question the user, establish symptoms, and ask what changed recently</label>
+        <label><input type="radio" name="q1" value="c"> Replace the patch cable</label>
+        <label><input type="radio" name="q1" value="d"> Escalate to the ISP</label>
+        <div class="rat"><strong>Rationale:</strong> Step ① is always identification: gather information, interview, determine recent changes, duplicate if possible. Acting before understanding is exactly the guesswork the methodology exists to prevent.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q2.</span> A tech runs <code>ping 8.8.8.8</code> as their very first test, planning to look up the stack if it succeeds and down if it fails. Which strategy is this?</div>
+        <label><input type="radio" name="q2" value="a"> Top-down</label>
+        <label><input type="radio" name="q2" value="b"> Bottom-up</label>
+        <label><input type="radio" name="q2" value="c"> Trial and error</label>
+        <label><input type="radio" name="q2" value="d"> Divide and conquer</label>
+        <div class="rat"><strong>Rationale:</strong> Starting at a middle layer and letting one result halve the search space is divide and conquer. Top-down starts at the application; bottom-up starts at the cable.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q3.</span> An interface shows climbing CRC errors and late collisions, and users say the connection is "up but painfully slow." Most likely cause?</div>
+        <label><input type="radio" name="q3" value="a"> Duplex mismatch between the two ends</label>
+        <label><input type="radio" name="q3" value="b"> DNS cache poisoning</label>
+        <label><input type="radio" name="q3" value="c"> DHCP scope exhaustion</label>
+        <label><input type="radio" name="q3" value="d"> A honeypot on the segment</label>
+        <div class="rat"><strong>Rationale:</strong> Late collisions + CRC + terrible throughput on an "up" link is the duplex mismatch signature you first met in Lesson 3 — one side full, one side half. Set both ends identically.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q4.</span> Twenty IP phones power up fine; the twenty-first, on a known-good port, gets link but no power. Best explanation?</div>
+        <label><input type="radio" name="q4" value="a"> The phone needs a crossover cable</label>
+        <label><input type="radio" name="q4" value="b"> APIPA addressing</label>
+        <label><input type="radio" name="q4" value="c"> The switch's total PoE power budget is exhausted</label>
+        <label><input type="radio" name="q4" value="d"> Spanning tree is blocking the port</label>
+        <div class="rat"><strong>Rationale:</strong> Per-port capability isn't the whole story — the switch has a total wattage budget across all ports. When it's spent, additional powered devices stay dark even on healthy ports.</div>
+      </div>
+
+      <div class="q" data-answer="b">
+        <div class="qt"><span class="qnum">Q5.</span> A workstation can ping 8.8.8.8 but cannot reach any website by name. Which tool most directly investigates the failing layer?</div>
+        <label><input type="radio" name="q5" value="a"> A cable tester</label>
+        <label><input type="radio" name="q5" value="b"> nslookup or dig against the configured DNS server</label>
+        <label><input type="radio" name="q5" value="c"> A tone generator</label>
+        <label><input type="radio" name="q5" value="d"> traceroute to 8.8.8.8</label>
+        <div class="rat"><strong>Rationale:</strong> IP connectivity works; name resolution doesn't — that's DNS. nslookup/dig shows exactly what the resolver returns (or doesn't). The four-ping ladder broke on its last rung.</div>
+      </div>
+
+      <div class="q" data-answer="d">
+        <div class="qt"><span class="qnum">Q6.</span> Users on video calls report robotic, garbled audio, though file downloads are fast. Which metric is the culprit, and which control addresses it?</div>
+        <label><input type="radio" name="q6" value="a"> Throughput — add bandwidth</label>
+        <label><input type="radio" name="q6" value="b"> Attenuation — shorten the cable</label>
+        <label><input type="radio" name="q6" value="c"> RSSI — add access points</label>
+        <label><input type="radio" name="q6" value="d"> Jitter — prioritize real-time traffic with QoS</label>
+        <div class="rat"><strong>Rationale:</strong> Fast downloads rule out raw bandwidth; uneven packet arrival (jitter) is what shreds real-time audio/video. QoS gives voice/video queues priority so their timing stays smooth.</div>
+      </div>
+
+      <div class="q" data-answer="a">
+        <div class="qt"><span class="qnum">Q7.</span> A fiber uplink between buildings is dead. Which tool reports the distance to the break?</div>
+        <label><input type="radio" name="q7" value="a"> OTDR</label>
+        <label><input type="radio" name="q7" value="b"> Multimeter</label>
+        <label><input type="radio" name="q7" value="c"> Loopback plug</label>
+        <label><input type="radio" name="q7" value="d"> Punch-down tool</label>
+        <div class="rat"><strong>Rationale:</strong> The Optical Time Domain Reflectometer pulses light down the fiber and times the reflection — reporting how far away the break or bad splice is, so you dig in the right spot. TDR is its copper sibling.</div>
+      </div>
+
+      <div class="q" data-answer="c">
+        <div class="qt"><span class="qnum">Q8.</span> The fix worked and the user confirms everything runs. Per the methodology, what remains before the ticket closes?</div>
+        <label><input type="radio" name="q8" value="a"> Nothing — verified means done</label>
+        <label><input type="radio" name="q8" value="b"> Reboot the switch as a precaution</label>
+        <label><input type="radio" name="q8" value="c"> Document the problem, root cause, actions, resolution, and lessons learned</label>
+        <label><input type="radio" name="q8" value="d"> Escalate for review</label>
+        <div class="rat"><strong>Rationale:</strong> Step ⑦. Documentation converts one technician's afternoon into the organization's knowledge — and it's the step the exam checks that you won't skip.</div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn primary" id="gradeBtn">Grade My Answers</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <span id="quizScore" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="navrow">
+    <a href="lesson07.html">← Lesson 7: Network Security</a>
+    <a href="index.html">Course Home: You Made It! 🎓 →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Lesson 8 of 8 · Domain 5.0 Network Troubleshooting (24%)</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- Flip cards (click + keyboard) ---------- */
+  document.querySelectorAll('.flip').forEach(function(f){
+    function toggle(){ f.classList.toggle('flipped'); }
+    f.addEventListener('click', toggle);
+    f.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ================= TOOL-SELECTOR DRILL ================= */
+  var drillText = document.getElementById('drillText');
+  if (drillText) {
+    var scenarios = [
+      { s: 'A user\u2019s wall jack is live, but nobody knows which of the 200 unlabeled cables in the wiring closet serves it.',
+        opts: ['Tone generator & probe','ping','OTDR','nmap'], a: 0,
+        why: 'Toner on the jack, probe through the bundle until it sings \u2014 that\u2019s exactly what the tone generator exists for. (And then label it \u2014 Lesson 6!)' },
+      { s: 'Web pages load by IP address but not by name. You suspect the resolver is returning something wrong.',
+        opts: ['Cable tester','nslookup / dig','Crimper','Loopback plug'], a: 1,
+        why: 'nslookup/dig queries DNS directly and shows the exact answer (and server). IP-works-name-fails is the DNS signature.' },
+      { s: 'A buried fiber run between buildings went dark. The contractor needs to know WHERE to dig.',
+        opts: ['Wi-Fi analyzer','netstat','Multimeter','OTDR'], a: 3,
+        why: 'The OTDR times the light reflection from the break and reports its distance \u2014 dig once, in the right place.' },
+      { s: 'Remote staff report the app is \u201Cslow from Chicago only.\u201D You want to see the path and find the hop where delay piles up.',
+        opts: ['traceroute','arp -a','Punch-down tool','ipconfig'], a: 0,
+        why: 'traceroute reveals every hop and its round-trip times \u2014 the hop where latency jumps is your suspect.' },
+      { s: 'A switch port might be bad. You want the interface to transmit to itself to rule the port in or out.',
+        opts: ['Tone generator','SNMP trap','Loopback plug','dig'], a: 2,
+        why: 'A loopback plug wires TX to RX so the port tests itself \u2014 cleanly separating \u201Cbad interface\u201D from \u201Cbad cable/far end.\u201D' },
+      { s: 'An app intermittently fails to connect. You need ground truth: watch the actual TCP handshake attempts to that server.',
+        opts: ['Cable tester','Packet capture via port mirroring','Multimeter','Toner probe'], a: 1,
+        why: 'Only a capture shows the packets \u2014 SYN with no SYN/ACK means drops or filtering; an instant RST means the port is refusing. Port mirroring (Lesson 6) feeds the analyzer.' }
+    ];
+    var idx = 0, score = 0, attempted = 0, locked = false;
+    var optsEl = document.getElementById('drillOpts');
+    var fbEl = document.getElementById('drillFb');
+    var numEl = document.getElementById('drillNum');
+    var nextBtn = document.getElementById('drillNext');
+    var scoreEl = document.getElementById('drillScore');
+
+    function load(i){
+      var sc = scenarios[i];
+      locked = false;
+      numEl.textContent = 'SCENARIO ' + (i+1) + ' OF ' + scenarios.length;
+      drillText.textContent = sc.s;
+      fbEl.textContent = ''; fbEl.className = 'fb';
+      nextBtn.disabled = true;
+      optsEl.innerHTML = '';
+      sc.opts.forEach(function(label, oi){
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = label;
+        b.addEventListener('click', function(){
+          if (locked) return;
+          locked = true; attempted++;
+          var right = oi === sc.a;
+          if (right) { score++; b.classList.add('right'); fbEl.textContent = '✔ Correct — ' + sc.why; fbEl.className = 'fb good'; }
+          else {
+            b.classList.add('wrong');
+            optsEl.children[sc.a].classList.add('right');
+            fbEl.textContent = '✘ Not quite. ' + sc.why; fbEl.className = 'fb bad';
+          }
+          Array.prototype.forEach.call(optsEl.children, function(x){ x.disabled = true; });
+          scoreEl.textContent = 'SCORE: ' + score + '/' + attempted;
+          nextBtn.disabled = idx >= scenarios.length - 1;
+          if (idx >= scenarios.length - 1) {
+            fbEl.textContent += ' — Drill complete: ' + score + '/' + scenarios.length + (score === scenarios.length ? ' 🏆 Perfect!' : '. Restart to try again.');
+          }
+        });
+        optsEl.appendChild(b);
+      });
+    }
+    nextBtn.addEventListener('click', function(){ if (idx < scenarios.length - 1) { idx++; load(idx); } });
+    document.getElementById('drillReset').addEventListener('click', function(){
+      idx = 0; score = 0; attempted = 0;
+      scoreEl.textContent = 'SCORE: 0/0'; load(0);
+    });
+    load(0);
+  }
+
+  /* ---------- Quiz grading with rationale ---------- */
+  var gradeBtn = document.getElementById('gradeBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var scoreQ = document.getElementById('quizScore');
+  gradeBtn.addEventListener('click', function(){
+    var qs = document.querySelectorAll('#quiz .q');
+    var right = 0, answered = 0;
+    qs.forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked) {
+        answered++;
+        if (picked.value === key) { right++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); picked.closest('label').classList.add('picked'); }
+      } else {
+        q.classList.add('wrong');
+      }
+    });
+    var pct = Math.round((right / qs.length) * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    scoreQ.textContent = emoji + ' Score: ' + right + '/' + qs.length + ' (' + pct + '%)' + (answered < qs.length ? ' — ' + (qs.length - answered) + ' unanswered' : '');
+  });
+  resetBtn.addEventListener('click', function(){
+    document.querySelectorAll('#quiz .q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      q.querySelectorAll('input').forEach(function(i){ i.checked = false; });
+    });
+    scoreQ.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
