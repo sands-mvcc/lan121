@@ -1,230 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CompTIA Network+ Prep</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            background-color: #F0F0F0; /* Light gray to complement the white */
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #222; /* Black */
-            color: #fff;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-        }
-        .sidebar h2 {
-            color: #4CAF50; /* Green */
-            text-align: center;
-        }
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            color: #fff;
-            display: block;
-            border-left: 5px solid transparent;
-            transition: 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #333;
-            border-left: 5px solid #4CAF50; /* Green highlight */
-        }
-        .content {
-            margin-left: 250px;
-            padding: 40px;
-            flex-grow: 1;
-            background-color: #fff;
-        }
-        .task-container {
-            display: none;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .task-container.active {
-            display: block;
-        }
-        h1, h3 {
-            color: #333;
-        }
-        .quiz-container {
-            background-color: #e9e9e9;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .quiz-question {
-            margin-bottom: 15px;
-        }
-        .quiz-question p {
-            font-weight: bold;
-            color: #333;
-        }
-        .quiz-question input[type="text"] {
-            width: 90%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .quiz-question button {
-            background-color: #4CAF50; /* Green */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .quiz-question button:hover {
-            background-color: #45a049;
-        }
-        #quiz-results {
-            margin-top: 20px;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 1 | Exploring the CompTIA Network+ Exam — LAN 121</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Exercise additions ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+  .match-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .match-row .mr-l{font-weight:700;font-size:.88rem}
+  .match-row .mr-l .dnum{font-family:var(--mono);font-size:.68rem;color:var(--muted);display:block;letter-spacing:.06em}
+  select.exsel{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.82rem;cursor:pointer}
+  select.exsel:focus-visible{outline:3px solid var(--blue)}
+  .match-row.right{border-color:var(--green);background:var(--green-soft)}
+  .match-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 15px;flex-wrap:wrap}
+  .alloc-row input{width:80px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:.9rem;text-align:center}
+  .alloc-row.right{border-color:var(--green);background:var(--green-soft)}
+  .alloc-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-total{font-family:var(--mono);font-size:.8rem;margin-top:8px}
+  .task-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .pts{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:4px 11px;font-weight:800}
+  .task-status{font-family:var(--mono);font-size:.75rem;margin-left:auto}
+  .task-status.good{color:var(--green)} .task-status.part{color:var(--amber)} .task-status.none{color:var(--muted)}
+  .score-panel{background:linear-gradient(135deg,var(--blue),#1F4E79);color:#fff;border-radius:16px;padding:26px 28px;margin:26px 0}
+  [data-theme="dark"] .score-panel{background:linear-gradient(135deg,#123A5C,#0E2C46)}
+  .score-panel h2{font-size:1.15rem;margin-bottom:6px}
+  .score-panel .big{font-size:2.3rem;font-weight:800;font-family:var(--mono)}
+  .score-panel .brk{font-family:var(--mono);font-size:.78rem;opacity:.92;margin-top:10px;line-height:1.9}
+  .score-panel .btn{margin-top:14px}
+</style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>CompTIA Network+</h2>
-        <a href="#" onclick="showTask('details')">Exam Details</a>
-        <a href="#" onclick="showTask('activity')">Prep Activity</a>
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Exercise 1 — Exploring the CompTIA Network+ Exam</h1>
+      <div class="sub">Graded Exercise · Accompanies Lesson 1 · N10-009</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">GRADED EXERCISE 1</span>
+      <span class="tag">ACCOMPANIES LESSON 1</span>
+      <span class="tag exam">6 GRADED TASKS · 30 POINTS</span>
+    </div>
+    <h2>Deep Analysis: Know the Exam Before You Study for It</h2>
+    <p class="lede">Professionals don't study blind — they profile the exam first. In this exercise you'll dissect the CompTIA Network+ N10-009: its structure, domains and weights, question formats, scoring, and where it sits in the certification pathway. You'll use the official resources below to hunt down facts, classify real objective topics into their domains, take apart the anatomy of an exam question, and build a study plan whose hours actually match the exam's weighting. Every task is auto-graded; grade tasks individually as you go, then grade the whole exercise at the bottom and record your score in the LMS.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Identify</b> the structure of the N10-009 exam: question count, time limit, scoring scale, and question formats. <span class="bloom">BLOOM: REMEMBER</span></li>
+        <li><b>Match</b> the five exam domains to their official weightings and rank them by exam impact. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Classify</b> objective-level topics into their correct domains. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Deconstruct</b> an exam-style question — its qualifiers, distractors, and tested objective. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Design</b> a study-hour plan proportioned to the official domain weights. <span class="bloom">BLOOM: CREATE</span></li>
+        <li><b>Locate</b> Network+ within the CompTIA certification pathway and state its renewal requirements. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= RESOURCES ================= -->
+  <section id="resources">
+    <div class="sec-head"><span class="ic">📚</span><h2>Exam Resources — Use These to Complete the Tasks</h2></div>
+    <div class="panel">
+      <p>Several tasks below are scavenger hunts: the answers live in these official sources. Open them in new tabs and investigate like a professional.</p>
+      <div class="tool-row">
+        <a class="tool-card" href="https://www.comptia.org/certifications/network" target="_blank" rel="noopener">
+          <div class="tt">🏛️ Official CompTIA Network+ Page</div>
+          <div class="td">The authoritative source: exam code, question count, length, passing score, price, and recommended experience.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://www.comptia.org/resources/exam-objectives" target="_blank" rel="noopener">
+          <div class="tt">📄 N10-009 Exam Objectives (PDF)</div>
+          <div class="td">Download the full objectives document — the exam's complete blueprint. Tasks 1 and 3 come straight from it.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://www.professormesser.com/network-plus/n10-009/n10-009-video/n10-009-training-course/" target="_blank" rel="noopener">
+          <div class="tt">🎬 Professor Messer — Free N10-009 Course</div>
+          <div class="td">The classic free video series, organized by the same objectives. Bookmark it now; you'll use it all semester.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="lesson01.html">
+          <div class="tt">🏠 LAN 121 Lesson 1</div>
+          <div class="td">Your lesson companion — the course's own tour of the exam and the semester roadmap.</div>
+          <div class="tg">OPEN LESSON →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TASKS ================= -->
+  <section id="tasks">
+    <div class="sec-head"><span class="ic">📝</span><h2>Graded Tasks</h2></div>
+
+    <!-- TASK 1 -->
+    <div class="acc open" id="task1">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⚖️</span>
+        <span class="at"><h3>Task 1 — Match Each Domain to Its Exam Weight</h3><span class="asub">5 POINTS · SOURCE: THE EXAM OBJECTIVES PDF</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st1">NOT GRADED</span></div>
+        <p>Open the N10-009 objectives and assign each domain its official percentage. Each weight is used exactly once — and notice which domain is the heavyweight.</p>
+        <div class="match-row" data-key="23"><span class="mr-l"><span class="dnum">DOMAIN 1.0</span>Networking Concepts</span><select class="exsel t1"><option value="">— select —</option><option>14</option><option>19</option><option>20</option><option>23</option><option>24</option></select></div>
+        <div class="match-row" data-key="20"><span class="mr-l"><span class="dnum">DOMAIN 2.0</span>Network Implementations</span><select class="exsel t1"><option value="">— select —</option><option>14</option><option>19</option><option>20</option><option>23</option><option>24</option></select></div>
+        <div class="match-row" data-key="19"><span class="mr-l"><span class="dnum">DOMAIN 3.0</span>Network Operations</span><select class="exsel t1"><option value="">— select —</option><option>14</option><option>19</option><option>20</option><option>23</option><option>24</option></select></div>
+        <div class="match-row" data-key="14"><span class="mr-l"><span class="dnum">DOMAIN 4.0</span>Network Security</span><select class="exsel t1"><option value="">— select —</option><option>14</option><option>19</option><option>20</option><option>23</option><option>24</option></select></div>
+        <div class="match-row" data-key="24"><span class="mr-l"><span class="dnum">DOMAIN 5.0</span>Network Troubleshooting</span><select class="exsel t1"><option value="">— select —</option><option>14</option><option>19</option><option>20</option><option>23</option><option>24</option></select></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="1">Grade Task 1</button></div>
+      </div>
     </div>
 
-    <div class="content">
-        <div id="details" class="task-container active">
-            <h1>CompTIA Network+ Certification Exam</h1>
-            <p>Welcome to the CompTIA Network+ preparation page. Use this site to learn about the exam and test your knowledge!</p>
-            <h3>Exam Overview</h3>
-            <p>The CompTIA Network+ certification is designed for IT professionals who want to demonstrate their skills in managing, maintaining, troubleshooting, and configuring basic network infrastructure. This vendor-neutral certification is a stepping stone to more advanced certifications and a solid foundation for a career in networking.</p>
-            <h3>Exam Objectives</h3>
-            <ul>
-                <li>Networking Concepts</li>
-                <li>Network Infrastructure</li>
-                <li>Network Operations</li>
-                <li>Network Security</li>
-                <li>Network Troubleshooting and Tools</li>
-            </ul>
+    <!-- TASK 2 -->
+    <div class="acc open" id="task2">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔎</span>
+        <span class="at"><h3>Task 2 — Exam Facts Scavenger Hunt</h3><span class="asub">5 POINTS · SOURCE: THE OFFICIAL CERTIFICATION PAGE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st2">NOT GRADED</span></div>
+        <p>Hunt these facts down on CompTIA's official Network+ page. No guessing — verify.</p>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">2.1</span> What is the current Network+ exam code?</div>
+          <label><input type="radio" name="t2q1" value="a"> N10-008</label>
+          <label><input type="radio" name="t2q1" value="b"> N10-009</label>
+          <label><input type="radio" name="t2q1" value="c"> SY0-701</label>
+          <label><input type="radio" name="t2q1" value="d"> 220-1101</label>
+          <div class="rat"><strong>Answer:</strong> N10-009 (launched June 2024). N10-008 is its retired predecessor; SY0-701 is Security+, 220-1101 is A+.</div>
         </div>
-
-        <div id="activity" class="task-container">
-            <h1>Prep Activity</h1>
-            <p>Answer the following 10 questions to test your knowledge of the CompTIA Network+ exam details. Type your answer in the box provided and click "Submit" to see your results.</p>
-            
-            <div class="quiz-container">
-                <div class="quiz-question">
-                    <p>1. What is the current exam code for the CompTIA Network+ certification?</p>
-                    <input type="text" id="q1">
-                </div>
-                <div class="quiz-question">
-                    <p>2. How many questions are on the CompTIA Network+ exam?</p>
-                    <input type="text" id="q2">
-                </div>
-                <div class="quiz-question">
-                    <p>3. What is the maximum time in minutes you have to complete the exam?</p>
-                    <input type="text" id="q3">
-                </div>
-                <div class="quiz-question">
-                    <p>4. What is the approximate cost of the exam in USD?</p>
-                    <input type="text" id="q4">
-                </div>
-                <div class="quiz-question">
-                    <p>5. What is the passing score for the exam on a scale of 100-900?</p>
-                    <input type="text" id="q5">
-                </div>
-                <div class="quiz-question">
-                    <p>6. What is one of the two question types on the exam?</p>
-                    <input type="text" id="q6">
-                </div>
-                <div class="quiz-question">
-                    <p>7. What is the recommended prior certification before taking Network+?</p>
-                    <input type="text" id="q7">
-                </div>
-                <div class="quiz-question">
-                    <p>8. What is one of the five domains covered by the exam objectives?</p>
-                    <input type="text" id="q8">
-                </div>
-                <div class="quiz-question">
-                    <p>9. What is the name for the hands-on question type on the exam?</p>
-                    <input type="text" id="q9">
-                </div>
-                <div class="quiz-question">
-                    <p>10. How many months of hands-on experience does CompTIA recommend?</p>
-                    <input type="text" id="q10">
-                </div>
-
-                <button onclick="checkAnswers()">Submit</button>
-            </div>
-
-            <div id="quiz-results"></div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">2.2</span> What is the MAXIMUM number of questions on the exam?</div>
+          <label><input type="radio" name="t2q2" value="a"> 60</label>
+          <label><input type="radio" name="t2q2" value="b"> 75</label>
+          <label><input type="radio" name="t2q2" value="c"> 90</label>
+          <label><input type="radio" name="t2q2" value="d"> 165</label>
+          <div class="rat"><strong>Answer:</strong> Up to 90 questions — and note "maximum": your exam may present fewer.</div>
         </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">2.3</span> How much time do you get?</div>
+          <label><input type="radio" name="t2q3" value="a"> 60 minutes</label>
+          <label><input type="radio" name="t2q3" value="b"> 75 minutes</label>
+          <label><input type="radio" name="t2q3" value="c"> 90 minutes</label>
+          <label><input type="radio" name="t2q3" value="d"> 120 minutes</label>
+          <div class="rat"><strong>Answer:</strong> 90 minutes — with up to 90 questions, budget roughly a minute each, banking time early for the PBQs.</div>
+        </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">2.4</span> What is the passing score?</div>
+          <label><input type="radio" name="t2q4" value="a"> 720 on a scale of 100–900</label>
+          <label><input type="radio" name="t2q4" value="b"> 70 percent</label>
+          <label><input type="radio" name="t2q4" value="c"> 900 on a scale of 100–900</label>
+          <label><input type="radio" name="t2q4" value="d"> 675 on a scale of 100–900</label>
+          <div class="rat"><strong>Answer:</strong> 720 on CompTIA's 100–900 scale — a scaled score, not a straight percentage. (675 is Security+'s bar.)</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">2.5</span> Which question formats should you expect?</div>
+          <label><input type="radio" name="t2q5" value="a"> Multiple-choice only</label>
+          <label><input type="radio" name="t2q5" value="b"> Essay and short answer</label>
+          <label><input type="radio" name="t2q5" value="c"> Hands-on live equipment only</label>
+          <label><input type="radio" name="t2q5" value="d"> Multiple-choice (single and multiple response) plus performance-based questions (PBQs)</label>
+          <div class="rat"><strong>Answer:</strong> MCQs plus PBQs — interactive simulations like dragging cables, configuring a switch, or ordering troubleshooting steps. Task 4 dissects the MCQ side.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="2">Grade Task 2</button></div>
+      </div>
     </div>
 
-    <script>
-        function showTask(taskId) {
-            // Hide all task containers
-            document.querySelectorAll('.task-container').forEach(container => {
-                container.classList.remove('active');
-            });
-            // Show the selected task container
-            document.getElementById(taskId).classList.add('active');
-        }
+    <!-- TASK 3 -->
+    <div class="acc open" id="task3">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗂️</span>
+        <span class="at"><h3>Task 3 — Classify Topics into Their Domains</h3><span class="asub">8 POINTS · SOURCE: THE OBJECTIVES PDF — SKIM EACH DOMAIN'S TOPIC LIST</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">8 PTS</span><span class="task-status none" id="st3">NOT GRADED</span></div>
+        <p>These eight topics are lifted from the objectives. File each under its domain — this is also a preview of your whole semester.</p>
+        <div class="match-row" data-key="1"><span class="mr-l">Compare the OSI reference model layers</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="2"><span class="mr-l">Configure 802.1Q VLAN trunking</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="1"><span class="mr-l">Subnet an IPv4 network using VLSM</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="3"><span class="mr-l">Interpret NetFlow data and SNMP traps</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="4"><span class="mr-l">Implement 802.1X network access control</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="5"><span class="mr-l">Diagnose climbing CRC errors on an interface</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="2"><span class="mr-l">Configure OSPF dynamic routing</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="match-row" data-key="3"><span class="mr-l">Select a cold, warm, or hot disaster recovery site</span><select class="exsel t3"><option value="">— domain —</option><option value="1">1.0 Concepts</option><option value="2">2.0 Implementations</option><option value="3">3.0 Operations</option><option value="4">4.0 Security</option><option value="5">5.0 Troubleshooting</option></select></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="3">Grade Task 3</button></div>
+      </div>
+    </div>
 
-        function checkAnswers() {
-            const answers = {
-                'q1': 'N10-009',
-                'q2': '90',
-                'q3': '90',
-                'q4': '369',
-                'q5': '720',
-                'q6': ['Multiple-choice', 'Performance-based', 'PBQs'],
-                'q7': 'CompTIA A+',
-                'q8': ['Networking Concepts', 'Network Infrastructure', 'Network Operations', 'Network Security', 'Network Troubleshooting and Tools'],
-                'q9': ['Performance-based', 'PBQ', 'PBQs'],
-                'q10': ['9 to 12', '9-12', '9-12 months', '9 to 12 months']
-            };
+    <!-- TASK 4 -->
+    <div class="acc open" id="task4">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔬</span>
+        <span class="at"><h3>Task 4 — Anatomy of an Exam Question</h3><span class="asub">3 POINTS · DISSECT A REALISTIC N10-009 ITEM</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">3 PTS</span><span class="task-status none" id="st4">NOT GRADED</span></div>
+        <p>Read this exam-style item like a test designer, then answer the three analysis questions.</p>
+        <div class="callout tip"><span class="cic">🧪</span><span><strong>SAMPLE ITEM:</strong> "A technician replaces a switch. Afterward, a server's link shows up/up, but users report the connection is extremely slow, and the interface counters show increasing late collisions and CRC errors. Which of the following is the <em>MOST likely</em> cause? &nbsp;(A) DNS misconfiguration &nbsp;(B) Duplex mismatch &nbsp;(C) DHCP scope exhaustion &nbsp;(D) Invalid SSL certificate"</span></div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">4.1</span> What is the correct answer to the sample item?</div>
+          <label><input type="radio" name="t4q1" value="a"> A — DNS misconfiguration</label>
+          <label><input type="radio" name="t4q1" value="b"> B — Duplex mismatch</label>
+          <label><input type="radio" name="t4q1" value="c"> C — DHCP scope exhaustion</label>
+          <label><input type="radio" name="t4q1" value="d"> D — Invalid SSL certificate</label>
+          <div class="rat"><strong>Answer:</strong> Up/up + slow + late collisions + CRC is the duplex mismatch signature. DNS/DHCP/SSL failures don't produce Layer 1/2 error counters.</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">4.2</span> Which domain is this item testing?</div>
+          <label><input type="radio" name="t4q2" value="a"> 1.0 Networking Concepts</label>
+          <label><input type="radio" name="t4q2" value="b"> 2.0 Network Implementations</label>
+          <label><input type="radio" name="t4q2" value="c"> 4.0 Network Security</label>
+          <label><input type="radio" name="t4q2" value="d"> 5.0 Network Troubleshooting</label>
+          <div class="rat"><strong>Answer:</strong> A symptom set plus "MOST likely cause" is Domain 5's signature move — and Domain 5 is the exam's biggest slice at 24%.</div>
+        </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">4.3</span> The distractors (A, C, D) share a design pattern. What is it?</div>
+          <label><input type="radio" name="t4q3" value="a"> They are made-up technologies that don't exist</label>
+          <label><input type="radio" name="t4q3" value="b"> They are all Layer 1 problems, like the answer</label>
+          <label><input type="radio" name="t4q3" value="c"> They are real technologies whose failures don't match the stated symptoms — plausible words, wrong layer</label>
+          <label><input type="radio" name="t4q3" value="d"> They are all deprecated protocols</label>
+          <div class="rat"><strong>Answer:</strong> Good distractors are real and familiar — DNS, DHCP, SSL — but their failure modes (name resolution, addressing, certificates) can't produce these Layer 1/2 counters. Match SYMPTOMS to failure modes, not vocabulary to vocabulary. Also notice the qualifier "MOST likely": several answers may be possible; one best fits the evidence.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="4">Grade Task 4</button></div>
+      </div>
+    </div>
 
-            let score = 0;
-            let resultsHtml = '<h3>Your Results:</h3>';
-            
-            for (let i = 1; i <= 10; i++) {
-                const questionId = `q${i}`;
-                const userAnswer = document.getElementById(questionId).value.trim();
-                const correctAnswer = answers[questionId];
-                
-                let isCorrect = false;
+    <!-- TASK 5 -->
+    <div class="acc open" id="task5">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📐</span>
+        <span class="at"><h3>Task 5 — Build a Weight-Proportional Study Plan</h3><span class="asub">5 POINTS · ALLOCATE EXACTLY 24 HOURS ACROSS THE FIVE DOMAINS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st5">NOT GRADED</span></div>
+        <p>You have <strong>24 study hours</strong> before a practice exam. Distribute them (whole or half hours) in proportion to each domain's official weight — within ±1.5 hours of the mathematically proportional value. Your Task 1 answers are the input: <em>weight% × 24 hours</em>.</p>
+        <div class="alloc-row" data-w="23"><span class="mr-l"><span class="dnum">DOMAIN 1.0 · 23%</span>Networking Concepts</span><span><input type="number" class="t5" min="0" max="24" step="0.5" value="0"> hrs</span></div>
+        <div class="alloc-row" data-w="20"><span class="mr-l"><span class="dnum">DOMAIN 2.0 · 20%</span>Network Implementations</span><span><input type="number" class="t5" min="0" max="24" step="0.5" value="0"> hrs</span></div>
+        <div class="alloc-row" data-w="19"><span class="mr-l"><span class="dnum">DOMAIN 3.0 · 19%</span>Network Operations</span><span><input type="number" class="t5" min="0" max="24" step="0.5" value="0"> hrs</span></div>
+        <div class="alloc-row" data-w="14"><span class="mr-l"><span class="dnum">DOMAIN 4.0 · 14%</span>Network Security</span><span><input type="number" class="t5" min="0" max="24" step="0.5" value="0"> hrs</span></div>
+        <div class="alloc-row" data-w="24"><span class="mr-l"><span class="dnum">DOMAIN 5.0 · 24%</span>Network Troubleshooting</span><span><input type="number" class="t5" min="0" max="24" step="0.5" value="0"> hrs</span></div>
+        <div class="alloc-total" id="allocTotal">TOTAL: 0 / 24 hours</div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="5">Grade Task 5</button></div>
+        <div class="rat" id="t5rat" style="display:none"><strong>Proportional targets:</strong> D1 ≈ 5.5 h · D2 ≈ 4.8 h · D3 ≈ 4.6 h · D4 ≈ 3.4 h · D5 ≈ 5.8 h. The lesson inside the math: troubleshooting deserves your single biggest block, and security — critical as it is — is the exam's smallest slice.</div>
+      </div>
+    </div>
 
-                if (Array.isArray(correctAnswer)) {
-                    isCorrect = correctAnswer.some(ans => userAnswer.toLowerCase().includes(ans.toLowerCase()));
-                } else {
-                    isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
-                }
+    <!-- TASK 6 -->
+    <div class="acc open" id="task6">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗺️</span>
+        <span class="at"><h3>Task 6 — The Certification Pathway &amp; Staying Certified</h3><span class="asub">4 POINTS · WHERE NETWORK+ FITS, AND HOW LONG IT LASTS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st6">NOT GRADED</span></div>
+        <p>Order CompTIA's classic "core" certification sequence, then answer the renewal questions.</p>
+        <div class="match-row" data-key="A+"><span class="mr-l"><span class="dnum">STEP 1 — hardware &amp; support foundation</span>Which certification?</span><select class="exsel t6"><option value="">— select —</option><option>A+</option><option>Network+</option><option>Security+</option></select></div>
+        <div class="match-row" data-key="Network+"><span class="mr-l"><span class="dnum">STEP 2 — networking (this course!)</span>Which certification?</span><select class="exsel t6"><option value="">— select —</option><option>A+</option><option>Network+</option><option>Security+</option></select></div>
+        <div class="match-row" data-key="Security+"><span class="mr-l"><span class="dnum">STEP 3 — security baseline</span>Which certification?</span><select class="exsel t6"><option value="">— select —</option><option>A+</option><option>Network+</option><option>Security+</option></select></div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">6.1</span> How long is Network+ valid, and how is it kept current?</div>
+          <label><input type="radio" name="t6q1" value="a"> Valid forever once earned</label>
+          <label><input type="radio" name="t6q1" value="b"> Three years — renewed through Continuing Education Units (CEUs) or by passing a newer/higher exam</label>
+          <label><input type="radio" name="t6q1" value="c"> One year — must retake the exam annually</label>
+          <label><input type="radio" name="t6q1" value="d"> Five years, no renewal option</label>
+          <div class="rat"><strong>Answer:</strong> Three years under CompTIA's Continuing Education program — earn CEUs (training, teaching, higher certs) or renew automatically by passing a higher-level exam like Security+.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="6">Grade Task 6</button></div>
+      </div>
+    </div>
+  </section>
 
-                if (isCorrect) {
-                    score++;
-                    resultsHtml += `<p style="color: green;">Question ${i}: Correct!</p>`;
-                } else {
-                    resultsHtml += `<p style="color: red;">Question ${i}: Incorrect. The correct answer is: ${Array.isArray(correctAnswer) ? correctAnswer[0] : correctAnswer}</p>`;
-                }
-            }
+  <!-- ================= MASTER SCORE ================= -->
+  <div class="score-panel" id="scorePanel">
+    <h2>📊 Exercise Score</h2>
+    <div class="big" id="masterScore">— / 30</div>
+    <div class="brk" id="masterBreakdown">Grade each task above, then press the button to compute your final score. Record it in the LMS.</div>
+    <button class="btn primary" id="masterGrade" style="background:#fff;color:var(--blue)">Grade Entire Exercise</button>
+  </div>
 
-            resultsHtml += `<h4>Your final score is: ${score} out of 10</h4>`;
-            document.getElementById('quiz-results').innerHTML = resultsHtml;
-        }
-    </script>
+  <div class="navrow">
+    <a href="lesson01.html">← Back to Lesson 1</a>
+    <a href="index.html">Course Home →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Exercise 1 · Exploring the CompTIA Network+ Exam</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ================= TASK GRADING ================= */
+  var TOTAL = { 1:5, 2:5, 3:8, 4:3, 5:5, 6:4 };
+  var earned = { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null };
+
+  function setStatus(n, pts){
+    var el = document.getElementById('st' + n);
+    el.textContent = pts + '/' + TOTAL[n] + ' PTS';
+    el.className = 'task-status ' + (pts === TOTAL[n] ? 'good' : pts > 0 ? 'part' : 'none');
+    if (pts === 0) el.textContent += ' — TRY AGAIN';
+  }
+
+  /* Match-row graders (tasks 1, 6-selects, and 3) */
+  function gradeMatches(taskEl, selClass){
+    var pts = 0;
+    taskEl.querySelectorAll('.match-row').forEach(function(row){
+      var sel = row.querySelector('select');
+      if (!sel) return;
+      row.classList.remove('right','wrong');
+      var ok = sel.value === row.getAttribute('data-key');
+      row.classList.add(ok ? 'right' : 'wrong');
+      if (ok) pts++;
+    });
+    return pts;
+  }
+
+  /* Radio-question grader — reveals rationale + correct answer like the lesson quizzes */
+  function gradeRadios(taskEl){
+    var pts = 0;
+    taskEl.querySelectorAll('.q').forEach(function(q){
+      q.classList.remove('correct','wrong');
+      q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+      var key = q.getAttribute('data-answer');
+      var picked = q.querySelector('input:checked');
+      q.querySelectorAll('label').forEach(function(l){
+        if (l.querySelector('input').value === key) l.classList.add('ans');
+      });
+      if (picked && picked.value === key) { pts++; q.classList.add('correct'); }
+      else { q.classList.add('wrong'); if (picked) picked.closest('label').classList.add('picked'); }
+    });
+    return pts;
+  }
+
+  /* Task 5 — study plan allocation */
+  var t5inputs = document.querySelectorAll('#task5 input.t5');
+  var totalEl = document.getElementById('allocTotal');
+  function allocTotal(){
+    var t = 0;
+    t5inputs.forEach(function(i){ t += parseFloat(i.value) || 0; });
+    return Math.round(t * 2) / 2;
+  }
+  t5inputs.forEach(function(i){ i.addEventListener('input', function(){
+    totalEl.textContent = 'TOTAL: ' + allocTotal() + ' / 24 hours';
+  }); });
+
+  function gradeTask5(){
+    var pts = 0;
+    var total = allocTotal();
+    var totalOk = Math.abs(total - 24) <= 0.5;
+    document.querySelectorAll('#task5 .alloc-row').forEach(function(row){
+      row.classList.remove('right','wrong');
+      var w = parseFloat(row.getAttribute('data-w'));
+      var target = w / 100 * 24;
+      var val = parseFloat(row.querySelector('input').value) || 0;
+      var ok = totalOk && Math.abs(val - target) <= 1.5;
+      row.classList.add(ok ? 'right' : 'wrong');
+      if (ok) pts++;
+    });
+    totalEl.textContent = 'TOTAL: ' + total + ' / 24 hours' + (totalOk ? '' : '  ⚠ must total 24 (±0.5)');
+    document.getElementById('t5rat').style.display = 'block';
+    return pts;
+  }
+
+  function gradeTask(n){
+    var taskEl = document.getElementById('task' + n);
+    var pts = 0;
+    if (n === 1 || n === 6) {
+      pts = gradeMatches(taskEl);
+      if (n === 6) pts += gradeRadios(taskEl);
+    } else if (n === 3) {
+      pts = gradeMatches(taskEl);
+    } else if (n === 5) {
+      pts = gradeTask5();
+    } else {
+      pts = gradeRadios(taskEl);
+    }
+    earned[n] = pts;
+    setStatus(n, pts);
+    return pts;
+  }
+
+  document.querySelectorAll('[data-grade]').forEach(function(b){
+    b.addEventListener('click', function(){ gradeTask(parseInt(b.getAttribute('data-grade'), 10)); });
+  });
+
+  /* ---------- Master grade ---------- */
+  document.getElementById('masterGrade').addEventListener('click', function(){
+    var sum = 0, max = 0, lines = [];
+    for (var n = 1; n <= 6; n++) {
+      gradeTask(n);
+      sum += earned[n]; max += TOTAL[n];
+      lines.push('Task ' + n + ': ' + earned[n] + '/' + TOTAL[n]);
+    }
+    var pct = Math.round(sum / max * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    document.getElementById('masterScore').textContent = sum + ' / ' + max + '  (' + pct + '%) ' + emoji;
+    document.getElementById('masterBreakdown').innerHTML = lines.join(' &nbsp;·&nbsp; ') +
+      '<br>' + (pct === 100 ? 'Perfect — you know this exam better than most people who\u2019ve taken it. Record your score in the LMS.' :
+      'Review the highlighted items, adjust your answers, and regrade — mastery beats first attempts. Record your final score in the LMS.');
+  });
+})();
+</script>
 
 </body>
 </html>
