@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 3 | Number Systems Workout — LAN 121</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Exercise additions ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+  .match-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .match-row .mr-l{font-weight:700;font-size:.88rem}
+  .match-row .mr-l .dnum{font-family:var(--mono);font-size:.68rem;color:var(--muted);display:block;letter-spacing:.06em}
+  select.exsel{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.82rem;cursor:pointer}
+  select.exsel:focus-visible{outline:3px solid var(--blue)}
+  .match-row.right{border-color:var(--green);background:var(--green-soft)}
+  .match-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 15px;flex-wrap:wrap}
+  .alloc-row input{width:80px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:.9rem;text-align:center}
+  .alloc-row.right{border-color:var(--green);background:var(--green-soft)}
+  .alloc-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-total{font-family:var(--mono);font-size:.8rem;margin-top:8px}
+  .task-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .pts{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:4px 11px;font-weight:800}
+  .task-status{font-family:var(--mono);font-size:.75rem;margin-left:auto}
+  .task-status.good{color:var(--green)} .task-status.part{color:var(--amber)} .task-status.none{color:var(--muted)}
+  .score-panel{background:linear-gradient(135deg,var(--blue),#1F4E79);color:#fff;border-radius:16px;padding:26px 28px;margin:26px 0}
+  [data-theme="dark"] .score-panel{background:linear-gradient(135deg,#123A5C,#0E2C46)}
+  .score-panel h2{font-size:1.15rem;margin-bottom:6px}
+  .score-panel .big{font-size:2.3rem;font-weight:800;font-family:var(--mono)}
+  .score-panel .brk{font-family:var(--mono);font-size:.78rem;opacity:.92;margin-top:10px;line-height:1.9}
+  .score-panel .btn{margin-top:14px}
+  .ans-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .ans-row .mr-l{font-weight:700;font-size:.92rem;font-family:var(--mono)}
+  .ans-row .mr-l .dnum{font-family:var(--mono);font-size:.66rem;color:var(--muted);display:block;letter-spacing:.06em;font-weight:400}
+  .ans-row input{width:min(220px,45vw);background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:.92rem;letter-spacing:.06em}
+  .ans-row input:focus-visible{outline:3px solid var(--blue)}
+  .ans-row.right{border-color:var(--green);background:var(--green-soft)}
+  .ans-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .ans-row .exp{font-family:var(--mono);font-size:.72rem;color:var(--red);width:100%;display:none}
+  .ans-row.wrong .exp{display:block}
+  .hex-chart{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px;margin:12px 0}
+  .hex-chart div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 4px;text-align:center;font-family:var(--mono);font-size:.72rem}
+  .hex-chart b{display:block;font-size:.95rem;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Exercise 3 — Number Systems Workout</h1>
+      <div class="sub">Graded Exercise · Binary · Decimal · Hexadecimal · Two's Complement · Binary Math</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">GRADED EXERCISE 3</span>
+      <span class="tag">THE MATH UNDER EVERY ADDRESS</span>
+      <span class="tag exam">6 GRADED TASKS · 25 POINTS</span>
+    </div>
+    <h2>Binary, Hex &amp; Two's Complement — Type Your Answers, Get Graded</h2>
+    <p class="lede">Every IPv4 subnet mask, every MAC address, every IPv6 shorthand is number-base arithmetic wearing a network costume. This exercise is a hands-on workout: convert binary to decimal and back, translate binary to hexadecimal and back using the nibble trick, encode negative numbers in 8-bit two's complement, and perform binary addition and subtraction the way the hardware does. Answers are typed, not multiple choice — leading zeros and letter case won't hurt you, but the math has to be right. Grade each task as you go, then grade the whole exercise and download your PDF summary for the LMS. Master this now and Lesson 2's subnetting becomes mental math.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Convert</b> binary numbers to decimal using positional weights (128-64-32-16-8-4-2-1). <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Convert</b> decimal numbers to binary via repeated division or weight subtraction. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Translate</b> between binary and hexadecimal by grouping bits into 4-bit nibbles. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Encode and decode</b> negative values using 8-bit two's complement (invert and add one). <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Perform</b> binary addition with carries and subtraction with borrows or two's complement addition. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Connect</b> each skill to its networking payoff — subnet masks, MAC addresses, and IPv6 notation. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= RESOURCES ================= -->
+  <section id="resources">
+    <div class="sec-head"><span class="ic">📚</span><h2>Resources — Learn the Technique, Then Verify by Hand</h2></div>
+    <div class="panel">
+      <p>Work every problem on paper first. Calculators are for <em>checking</em>, not solving — the exam gives you neither.</p>
+      <div class="tool-row">
+        <a class="tool-card" href="lesson02.html">
+          <div class="tt">🏠 LAN 121 Lesson 2</div>
+          <div class="td">Where these skills go to work — IPv4 addressing, subnet masks, and CIDR all speak binary.</div>
+          <div class="tg">OPEN LESSON →</div>
+        </a>
+        <a class="tool-card" href="https://learningnetwork.cisco.com/s/binary-game" target="_blank" rel="noopener">
+          <div class="tt">🎮 The Cisco Binary Game</div>
+          <div class="td">The legendary speed-drill for binary↔decimal conversion. Ten minutes a day builds real fluency.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://www.professormesser.com/network-plus/n10-009/n10-009-video/n10-009-training-course/" target="_blank" rel="noopener">
+          <div class="tt">🎬 Professor Messer — N10-009 Course</div>
+          <div class="td">The IPv4 addressing videos walk binary math in a networking context.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+      </div>
+      <h4 style="margin-top:14px">Nibble Reference Chart — every hex digit is exactly four bits</h4>
+      <div class="hex-chart">
+        <div><b>0</b>0000</div><div><b>1</b>0001</div><div><b>2</b>0010</div><div><b>3</b>0011</div>
+        <div><b>4</b>0100</div><div><b>5</b>0101</div><div><b>6</b>0110</div><div><b>7</b>0111</div>
+        <div><b>8</b>1000</div><div><b>9</b>1001</div><div><b>A</b>1010</div><div><b>B</b>1011</div>
+        <div><b>C</b>1100</div><div><b>D</b>1101</div><div><b>E</b>1110</div><div><b>F</b>1111</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TASKS ================= -->
+  <section id="tasks">
+    <div class="sec-head"><span class="ic">📝</span><h2>Graded Tasks</h2></div>
+
+    <!-- TASK 1 -->
+    <div class="acc open" id="task1">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔢</span>
+        <span class="at"><h3>Task 1 — Binary → Decimal</h3><span class="asub">4 POINTS · ADD THE WEIGHTS OF THE 1-BITS: 128·64·32·16·8·4·2·1</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st1">NOT GRADED</span></div>
+        <p>Write each binary value as a decimal number.</p>
+        <div class="ans-row" data-mode="dec" data-key="11"><span class="mr-l"><span class="dnum">1.1</span>1011₂ =</span><input type="text" inputmode="numeric" placeholder="decimal" aria-label="1011 in decimal"><span class="exp">Correct answer: 11 &nbsp;(8+2+1)</span></div>
+        <div class="ans-row" data-mode="dec" data-key="202"><span class="mr-l"><span class="dnum">1.2</span>11001010₂ =</span><input type="text" inputmode="numeric" placeholder="decimal" aria-label="11001010 in decimal"><span class="exp">Correct answer: 202 &nbsp;(128+64+8+2)</span></div>
+        <div class="ans-row" data-mode="dec" data-key="127"><span class="mr-l"><span class="dnum">1.3</span>01111111₂ =</span><input type="text" inputmode="numeric" placeholder="decimal" aria-label="01111111 in decimal"><span class="exp">Correct answer: 127 &nbsp;(64+32+16+8+4+2+1)</span></div>
+        <div class="ans-row" data-mode="dec" data-key="170"><span class="mr-l"><span class="dnum">1.4</span>10101010₂ =</span><input type="text" inputmode="numeric" placeholder="decimal" aria-label="10101010 in decimal"><span class="exp">Correct answer: 170 &nbsp;(128+32+8+2 — the classic alternating pattern)</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="1">Grade Task 1</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 2 -->
+    <div class="acc open" id="task2">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">↩️</span>
+        <span class="at"><h3>Task 2 — Decimal → Binary</h3><span class="asub">4 POINTS · SUBTRACT THE BIGGEST WEIGHT THAT FITS, REPEAT</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st2">NOT GRADED</span></div>
+        <p>Write each decimal value in binary. Leading zeros are fine (1101 and 00001101 both count).</p>
+        <div class="ans-row" data-mode="bin" data-key="13"><span class="mr-l"><span class="dnum">2.1</span>13₁₀ =</span><input type="text" placeholder="binary" aria-label="13 in binary"><span class="exp">Correct answer: 1101 &nbsp;(8+4+1)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="89"><span class="mr-l"><span class="dnum">2.2</span>89₁₀ =</span><input type="text" placeholder="binary" aria-label="89 in binary"><span class="exp">Correct answer: 1011001 &nbsp;(64+16+8+1)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="200"><span class="mr-l"><span class="dnum">2.3</span>200₁₀ =</span><input type="text" placeholder="binary" aria-label="200 in binary"><span class="exp">Correct answer: 11001000 &nbsp;(128+64+8)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="255"><span class="mr-l"><span class="dnum">2.4</span>255₁₀ =</span><input type="text" placeholder="binary" aria-label="255 in binary"><span class="exp">Correct answer: 11111111 — memorize this one; it's every full octet in a subnet mask</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="2">Grade Task 2</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 3 -->
+    <div class="acc open" id="task3">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔡</span>
+        <span class="at"><h3>Task 3 — Binary → Hexadecimal</h3><span class="asub">4 POINTS · GROUP INTO NIBBLES FROM THE RIGHT, READ THE CHART</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st3">NOT GRADED</span></div>
+        <p>Convert to hex (case doesn't matter; "0x" prefix optional). This is how MAC addresses and IPv6 compress binary.</p>
+        <div class="ans-row" data-mode="hex" data-key="188"><span class="mr-l"><span class="dnum">3.1</span>10111100₂ =</span><input type="text" placeholder="hex" aria-label="10111100 in hex"><span class="exp">Correct answer: BC &nbsp;(1011=B, 1100=C)</span></div>
+        <div class="ans-row" data-mode="hex" data-key="240"><span class="mr-l"><span class="dnum">3.2</span>11110000₂ =</span><input type="text" placeholder="hex" aria-label="11110000 in hex"><span class="exp">Correct answer: F0 &nbsp;(1111=F, 0000=0)</span></div>
+        <div class="ans-row" data-mode="hex" data-key="109"><span class="mr-l"><span class="dnum">3.3</span>01101101₂ =</span><input type="text" placeholder="hex" aria-label="01101101 in hex"><span class="exp">Correct answer: 6D &nbsp;(0110=6, 1101=D)</span></div>
+        <div class="ans-row" data-mode="hex" data-key="2814"><span class="mr-l"><span class="dnum">3.4</span>101011111110₂ =</span><input type="text" placeholder="hex" aria-label="101011111110 in hex"><span class="exp">Correct answer: AFE &nbsp;(1010=A, 1111=F, 1110=E)</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="3">Grade Task 3</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 4 -->
+    <div class="acc open" id="task4">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🔁</span>
+        <span class="at"><h3>Task 4 — Hexadecimal → Binary</h3><span class="asub">4 POINTS · EXPAND EACH HEX DIGIT INTO ITS FOUR BITS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st4">NOT GRADED</span></div>
+        <p>Convert each hex value to binary (leading zeros optional).</p>
+        <div class="ans-row" data-mode="bin" data-key="47"><span class="mr-l"><span class="dnum">4.1</span>0x2F =</span><input type="text" placeholder="binary" aria-label="2F in binary"><span class="exp">Correct answer: 00101111 &nbsp;(2=0010, F=1111)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="201"><span class="mr-l"><span class="dnum">4.2</span>0xC9 =</span><input type="text" placeholder="binary" aria-label="C9 in binary"><span class="exp">Correct answer: 11001001 &nbsp;(C=1100, 9=1001)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="122"><span class="mr-l"><span class="dnum">4.3</span>0x7A =</span><input type="text" placeholder="binary" aria-label="7A in binary"><span class="exp">Correct answer: 01111010 &nbsp;(7=0111, A=1010)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="255"><span class="mr-l"><span class="dnum">4.4</span>0xFF =</span><input type="text" placeholder="binary" aria-label="FF in binary"><span class="exp">Correct answer: 11111111 — 0xFF, 255, and eight ones are the same number in three costumes</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="4">Grade Task 4</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 5 -->
+    <div class="acc open" id="task5">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">➖</span>
+        <span class="at"><h3>Task 5 — Two's Complement (8-Bit)</h3><span class="asub">4 POINTS · INVERT EVERY BIT, THEN ADD ONE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st5">NOT GRADED</span></div>
+        <p>Two's complement is how computers store negative numbers. To encode −N in 8 bits: write +N in 8 bits, <strong>invert every bit, add 1</strong>. Answers 5.1–5.3 must be <strong>exactly 8 bits</strong>. In this system the leftmost bit is the sign: 1 means negative.</p>
+        <div class="ans-row" data-mode="bits8" data-key="11111011"><span class="mr-l"><span class="dnum">5.1 · ENCODE</span>−5 =</span><input type="text" placeholder="8 bits" maxlength="9" aria-label="negative 5 in twos complement"><span class="exp">Correct answer: 11111011 &nbsp;(+5=00000101 → invert 11111010 → +1)</span></div>
+        <div class="ans-row" data-mode="bits8" data-key="11101110"><span class="mr-l"><span class="dnum">5.2 · ENCODE</span>−18 =</span><input type="text" placeholder="8 bits" maxlength="9" aria-label="negative 18 in twos complement"><span class="exp">Correct answer: 11101110 &nbsp;(+18=00010010 → invert 11101101 → +1)</span></div>
+        <div class="ans-row" data-mode="bits8" data-key="11111111"><span class="mr-l"><span class="dnum">5.3 · ENCODE</span>−1 =</span><input type="text" placeholder="8 bits" maxlength="9" aria-label="negative 1 in twos complement"><span class="exp">Correct answer: 11111111 — negative one is ALL ones, in any width</span></div>
+        <div class="ans-row" data-mode="dec" data-key="-100"><span class="mr-l"><span class="dnum">5.4 · DECODE</span>10011100₂ (two's complement) = decimal</span><input type="text" placeholder="decimal" aria-label="decode 10011100"><span class="exp">Correct answer: −100 &nbsp;(sign bit is 1 → invert 01100011, +1 = 01100100 = 100, so −100)</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="5">Grade Task 5</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 6 -->
+    <div class="acc open" id="task6">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">➕</span>
+        <span class="at"><h3>Task 6 — Binary Addition &amp; Subtraction</h3><span class="asub">5 POINTS · CARRY THE ONES · 1+1=10 · SUBTRACT BY ADDING THE COMPLEMENT</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st6">NOT GRADED</span></div>
+        <p>Addition rules: 0+0=0, 0+1=1, 1+1=<strong>10</strong> (write 0, carry 1), 1+1+1=<strong>11</strong> (write 1, carry 1). For 6.5, subtract by <em>adding the two's complement</em> of the second number and discarding the carry-out — exactly what the CPU does.</p>
+        <div class="ans-row" data-mode="bin" data-key="8"><span class="mr-l"><span class="dnum">6.1 · ADD</span>0101 + 0011 =</span><input type="text" placeholder="binary" aria-label="0101 plus 0011"><span class="exp">Correct answer: 1000 &nbsp;(5+3=8; watch the carries ripple)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="17"><span class="mr-l"><span class="dnum">6.2 · ADD</span>1011 + 0110 =</span><input type="text" placeholder="binary" aria-label="1011 plus 0110"><span class="exp">Correct answer: 10001 &nbsp;(11+6=17 — the sum grows a fifth bit)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="147"><span class="mr-l"><span class="dnum">6.3 · ADD</span>01100110 + 00101101 =</span><input type="text" placeholder="binary" aria-label="01100110 plus 00101101"><span class="exp">Correct answer: 10010011 &nbsp;(102+45=147)</span></div>
+        <div class="ans-row" data-mode="bin" data-key="7"><span class="mr-l"><span class="dnum">6.4 · SUBTRACT</span>1101 − 0110 =</span><input type="text" placeholder="binary" aria-label="1101 minus 0110"><span class="exp">Correct answer: 0111 &nbsp;(13−6=7; borrow twice, or add the complement)</span></div>
+        <div class="ans-row" data-mode="bin8" data-key="41"><span class="mr-l"><span class="dnum">6.5 · SUBTRACT VIA 2's COMPLEMENT</span>01010110 − 00101101 = (8-bit answer, discard the carry)</span><input type="text" placeholder="8 bits" aria-label="01010110 minus 00101101"><span class="exp">Correct answer: 00101001 &nbsp;(86−45=41: add 11010011, the two's complement of 45, and drop the ninth bit)</span></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Why this matters:</strong> "AND the address with the mask" — the heart of subnetting — is bitwise binary math. And hardware has no subtraction circuit at all: it negates with two's complement and adds. You just did arithmetic the way silicon does.</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="6">Grade Task 6</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MASTER SCORE ================= -->
+  <div class="score-panel" id="scorePanel">
+    <h2>📊 Exercise Score</h2>
+    <div class="big" id="masterScore">— / 25</div>
+    <div class="brk" id="masterBreakdown">Grade each task above, then press the button to compute your final score. Enter your name and download the PDF summary for the LMS.</div>
+    <div style="margin-top:16px">
+      <label for="studentName" style="font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;display:block;margin-bottom:6px;opacity:.92">STUDENT NAME (appears on the PDF summary)</label>
+      <input type="text" id="studentName" placeholder="Your name…" style="width:min(340px,100%);padding:10px 14px;border-radius:9px;border:none;font-size:.9rem;font-family:var(--sans)">
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn primary" id="masterGrade" style="background:#fff;color:var(--blue)">✅ Grade Entire Exercise</button>
+      <button class="btn primary" id="pdfBtn" style="background:var(--amber);color:#fff">📄 Download Grade Summary (PDF)</button>
+    </div>
+  </div>
+
+  <div class="navrow">
+    <a href="lesson02.html">← Back to Lesson 2</a>
+    <a href="index.html">Course Home →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Exercise 3 · Number Systems Workout</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ================= ANSWER CHECKING ================= */
+  /* Modes:
+     dec   — decimal number (negatives ok):     value must equal key
+     bin   — binary string, any leading zeros:  parseInt(x,2) === key
+     bin8  — binary, compared modulo 256:       parseInt(x,2) & 255 === key (carry forgiveness)
+     hex   — hex string, 0x optional, any case: parseInt(x,16) === key
+     bits8 — exact 8-bit pattern required       (two's complement encodings)              */
+  function checkAnswer(mode, key, raw){
+    var x = (raw || '').replace(/\s+/g, '').toLowerCase();
+    if (!x) return false;
+    if (mode === 'dec') {
+      x = x.replace('\u2212', '-');                     /* allow the unicode minus sign */
+      if (!/^-?\d+$/.test(x)) return false;
+      return parseInt(x, 10) === parseInt(key, 10);
+    }
+    if (mode === 'bin' || mode === 'bin8') {
+      if (!/^[01]+$/.test(x) || x.length > 24) return false;
+      var v = parseInt(x, 2);
+      return mode === 'bin' ? v === parseInt(key, 10) : (v & 255) === (parseInt(key, 10) & 255);
+    }
+    if (mode === 'hex') {
+      x = x.replace(/^0x/, '');
+      if (!/^[0-9a-f]+$/.test(x)) return false;
+      return parseInt(x, 16) === parseInt(key, 10);
+    }
+    if (mode === 'bits8') {
+      return /^[01]{8}$/.test(x) && x === key;
+    }
+    return false;
+  }
+
+  var TOTAL = { 1:4, 2:4, 3:4, 4:4, 5:4, 6:5 };
+  var earned = { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null };
+
+  function setStatus(n, pts){
+    var el = document.getElementById('st' + n);
+    el.textContent = pts + '/' + TOTAL[n] + ' PTS';
+    el.className = 'task-status ' + (pts === TOTAL[n] ? 'good' : pts > 0 ? 'part' : 'none');
+    if (pts === 0) el.textContent += ' — TRY AGAIN';
+  }
+
+  function gradeTask(n){
+    var pts = 0;
+    document.querySelectorAll('#task' + n + ' .ans-row').forEach(function(row){
+      row.classList.remove('right','wrong');
+      var ok = checkAnswer(row.getAttribute('data-mode'), row.getAttribute('data-key'), row.querySelector('input').value);
+      row.classList.add(ok ? 'right' : 'wrong');
+      if (ok) pts++;
+    });
+    earned[n] = pts;
+    setStatus(n, pts);
+    return pts;
+  }
+
+  document.querySelectorAll('[data-grade]').forEach(function(b){
+    b.addEventListener('click', function(){ gradeTask(parseInt(b.getAttribute('data-grade'), 10)); });
+  });
+
+  /* ---------- Master grade ---------- */
+  function gradeAll(){
+    var sum = 0, max = 0, lines = [];
+    for (var n = 1; n <= 6; n++) {
+      gradeTask(n);
+      sum += earned[n]; max += TOTAL[n];
+      lines.push('Task ' + n + ': ' + earned[n] + '/' + TOTAL[n]);
+    }
+    var pct = Math.round(sum / max * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    document.getElementById('masterScore').textContent = sum + ' / ' + max + '  (' + pct + '%) ' + emoji;
+    document.getElementById('masterBreakdown').innerHTML = lines.join(' &nbsp;·&nbsp; ') +
+      '<br>' + (pct === 100 ? 'Perfect — you compute like the silicon does. Download your PDF and submit it.' :
+      'Wrong rows now show the correct answer AND the technique — rework them by hand, regrade, then download your PDF summary for the LMS.');
+    return { sum: sum, max: max, pct: pct };
+  }
+  document.getElementById('masterGrade').addEventListener('click', gradeAll);
+
+  /* ---------- PDF grade summary ---------- */
+  var TASK_NAMES = {
+    1: 'Binary to Decimal Conversion',
+    2: 'Decimal to Binary Conversion',
+    3: 'Binary to Hexadecimal Conversion',
+    4: 'Hexadecimal to Binary Conversion',
+    5: "Two's Complement (8-Bit) Encode & Decode",
+    6: 'Binary Addition & Subtraction'
+  };
+
+  function buildPdf(jsPDF, result){
+    var doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    var W = doc.internal.pageSize.getWidth();
+    var name = (document.getElementById('studentName').value || 'Name not entered').trim() || 'Name not entered';
+    var now = new Date();
+    var stamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+    doc.setFillColor(31, 78, 121);
+    doc.rect(0, 0, W, 92, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(19);
+    doc.text('LAN 121 — Network Essentials', 48, 40);
+    doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+    doc.text('Exercise 3: Number Systems Workout — Grade Summary', 48, 62);
+
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Student:', 48, 128); doc.text('Generated:', 48, 148);
+    doc.setFont('helvetica', 'normal');
+    doc.text(name, 118, 128); doc.text(stamp, 118, 148);
+
+    var pct = result.pct;
+    doc.setFillColor(pct >= 77 ? 76 : 224, pct >= 77 ? 175 : 101, pct >= 77 ? 80 : 92);
+    doc.roundedRect(W - 220, 108, 172, 56, 8, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+    doc.text(result.sum + ' / ' + result.max + '  (' + pct + '%)', W - 134, 142, { align: 'center' });
+
+    var y = 200;
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Task', 48, y); doc.text('Score', W - 110, y);
+    doc.setDrawColor(180); doc.line(48, y + 8, W - 48, y + 8);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    y += 30;
+    for (var n = 1; n <= 6; n++) {
+      doc.text('Task ' + n + ' — ' + TASK_NAMES[n], 48, y);
+      doc.text(earned[n] + ' / ' + TOTAL[n], W - 110, y);
+      doc.setDrawColor(230); doc.line(48, y + 9, W - 48, y + 9);
+      y += 26;
+    }
+
+    y += 8;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('TOTAL', 48, y); doc.text(result.sum + ' / ' + result.max + '   (' + pct + '%)', W - 158, y);
+    y += 34;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9.5); doc.setTextColor(90, 90, 90);
+    var note = 'Scores are computed in the browser at the time of download. Submit this summary to the LMS as directed by your instructor. Regrading before download is permitted — mastery is the goal.';
+    doc.text(doc.splitTextToSize(note, W - 96), 48, y);
+
+    y += 58;
+    doc.setDrawColor(120); doc.line(48, y, 280, y);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30); doc.setFontSize(10);
+    doc.text('Student signature', 48, y + 14);
+
+    doc.setFontSize(8.5); doc.setTextColor(130, 130, 130);
+    doc.text('Moraine Valley Community College · Computer Integrated Technologies Department · LAN 121 Exercise 3', 48, 760);
+
+    doc.save('LAN121_Exercise3_' + name.replace(/[^a-z0-9]+/gi, '_') + '.pdf');
+  }
+
+  document.getElementById('pdfBtn').addEventListener('click', function(){
+    var result = gradeAll();
+    function go(){ buildPdf(window.jspdf.jsPDF, result); }
+    if (window.jspdf && window.jspdf.jsPDF) return go();
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = go;
+    s.onerror = function(){
+      alert('The PDF library could not be loaded (no internet connection?). Your graded page will open the print dialog instead — choose "Save as PDF".');
+      window.print();
+    };
+    document.head.appendChild(s);
+  });
+})();
+</script>
+
+</body>
+</html>
