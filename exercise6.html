@@ -1,975 +1,1012 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNS Interactive Learning Tool</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 6 | DHCP & DNS Workshop — LAN 121</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2c5530 0%, #1a3a1e 100%);
-            color: white;
-            min-height: 100vh;
-        }
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            color: #90EE90;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
 
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
 
-        .tab-container {
-            margin-bottom: 30px;
-        }
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
 
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
 
-        .tab {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #90EE90;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
 
-        .tab:hover {
-            background: rgba(144, 238, 144, 0.2);
-            transform: translateY(-2px);
-        }
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
 
-        .tab.active {
-            background: #90EE90;
-            color: #1a3a1e;
-        }
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
 
-        .tab-content {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1a3a1e;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
 
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
 
-        .dns-flow {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 20px 0;
-            justify-content: center;
-        }
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
 
-        .dns-step {
-            background: linear-gradient(135deg, #90EE90, #32CD32);
-            color: #1a3a1e;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 150px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
+  /* ---------- Exercise additions ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+  .match-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .match-row .mr-l{font-weight:700;font-size:.88rem}
+  .match-row .mr-l .dnum{font-family:var(--mono);font-size:.68rem;color:var(--muted);display:block;letter-spacing:.06em}
+  select.exsel{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.82rem;cursor:pointer}
+  select.exsel:focus-visible{outline:3px solid var(--blue)}
+  .match-row.right{border-color:var(--green);background:var(--green-soft)}
+  .match-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 15px;flex-wrap:wrap}
+  .alloc-row input{width:80px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:.9rem;text-align:center}
+  .alloc-row.right{border-color:var(--green);background:var(--green-soft)}
+  .alloc-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-total{font-family:var(--mono);font-size:.8rem;margin-top:8px}
+  .task-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .pts{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:4px 11px;font-weight:800}
+  .task-status{font-family:var(--mono);font-size:.75rem;margin-left:auto}
+  .task-status.good{color:var(--green)} .task-status.part{color:var(--amber)} .task-status.none{color:var(--muted)}
+  .score-panel{background:linear-gradient(135deg,var(--blue),#1F4E79);color:#fff;border-radius:16px;padding:26px 28px;margin:26px 0}
+  [data-theme="dark"] .score-panel{background:linear-gradient(135deg,#123A5C,#0E2C46)}
+  .score-panel h2{font-size:1.15rem;margin-bottom:6px}
+  .score-panel .big{font-size:2.3rem;font-weight:800;font-family:var(--mono)}
+  .score-panel .brk{font-family:var(--mono);font-size:.78rem;opacity:.92;margin-top:10px;line-height:1.9}
+  .score-panel .btn{margin-top:14px}
 
-        .dns-step:hover {
-            transform: translateY(-5px);
-        }
+  /* ---------- typed-answer rows (from exercise 3) ---------- */
+  .ans-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .ans-row .mr-l{font-weight:700;font-size:.9rem}
+  .ans-row .mr-l .dnum{font-family:var(--mono);font-size:.66rem;color:var(--muted);display:block;letter-spacing:.06em;font-weight:400}
+  .ans-row input{width:min(160px,40vw);background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:.92rem}
+  .ans-row.right{border-color:var(--green);background:var(--green-soft)}
+  .ans-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .ans-row .exp{font-family:var(--mono);font-size:.72rem;color:var(--red);width:100%;display:none}
+  .ans-row.wrong .exp{display:block}
 
-        .arrow {
-            align-self: center;
-            font-size: 24px;
-            color: #90EE90;
-        }
+  /* ---------- switch CLI simulator (from lesson 4) ---------- */
+  .sim{background:#0E1822;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+  [data-theme="dark"] .sim{background:#0A1118}
+  .sim-bar{display:flex;align-items:center;gap:8px;background:#1B2836;padding:9px 14px}
+  .sim-bar .dot{width:11px;height:11px;border-radius:50%}
+  .sim-bar .d1{background:#E0655C}.sim-bar .d2{background:#E0A458}.sim-bar .d3{background:#4FC08D}
+  .sim-bar .stitle{margin-left:6px;color:#9FB2C3;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em}
+  .sim-out{height:250px;overflow-y:auto;padding:13px 16px;font-family:var(--mono);font-size:.8rem;line-height:1.55;color:#D7E4EE;white-space:pre-wrap;word-break:break-word}
+  .sim-out .ok{color:#4FC08D}.sim-out .err{color:#E0827B}.sim-out .dim{color:#7E93A6}.sim-out .cmd{color:#8FC7F2}
+  .sim-in{display:flex;align-items:center;gap:8px;border-top:1px solid #223447;padding:9px 14px}
+  .sim-in .pr{font-family:var(--mono);font-size:.8rem;color:#4FC08D;white-space:nowrap}
+  .sim-in input{flex:1;background:none;border:none;outline:none;color:#EAF2F8;font-family:var(--mono);font-size:.84rem}
+  .sim-in input::placeholder{color:#5E7386}
+  .sim-help{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 15px;font-size:.8rem;margin-top:10px}
+  .sim-help code{display:inline-block;margin:2px 3px}
+  .ck-list{list-style:none;padding:0;margin:10px 0}
+  .ck-list li{font-size:.8rem;padding:5px 0 5px 26px;position:relative;font-family:var(--mono)}
+  .ck-list li::before{content:'○';position:absolute;left:2px;color:var(--muted)}
+  .ck-list li.done{color:var(--green)}
+  .ck-list li.done::before{content:'✔';color:var(--green);font-weight:800}
 
-        .record-type {
-            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-            border: 2px solid #90EE90;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .record-type:hover {
-            background: linear-gradient(135deg, #90EE90, #32CD32);
-            color: white;
-            transform: scale(1.02);
-        }
-
-        .record-type h3 {
-            color: #2c5530;
-            margin-bottom: 5px;
-        }
-
-        .record-type:hover h3 {
-            color: white;
-        }
-
-        .dns-header {
-            background: #f0f0f0;
-            border: 2px solid #90EE90;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .header-row {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            gap: 2px;
-            margin: 5px 0;
-            text-align: center;
-        }
-
-        .header-bit {
-            background: #90EE90;
-            color: #1a3a1e;
-            padding: 8px 4px;
-            font-size: 10px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-
-        .header-field {
-            background: #2c5530;
-            color: white;
-            padding: 8px 4px;
-            font-size: 11px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-
-        .simulator {
-            background: #f0f0f0;
-            border: 2px solid #90EE90;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-        }
-
-        .form-group {
-            margin: 15px 0;
-        }
-
-        .form-group label {
-            display: block;
-            color: #2c5530;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #90EE90;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #32CD32;
-            box-shadow: 0 0 10px rgba(144, 238, 144, 0.3);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #90EE90, #32CD32);
-            color: #1a3a1e;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 10px 5px;
-        }
-
-        .btn:hover {
-            background: linear-gradient(135deg, #32CD32, #228B22);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .output {
-            background: #1a3a1e;
-            color: #90EE90;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .quiz {
-            background: rgba(144, 238, 144, 0.1);
-            border: 2px solid #90EE90;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-
-        .quiz-question {
-            margin: 20px 0;
-        }
-
-        .quiz-options {
-            margin: 10px 0;
-        }
-
-        .quiz-option {
-            margin: 8px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .quiz-option:hover {
-            background: #90EE90;
-            color: #1a3a1e;
-        }
-
-        .quiz-option.correct {
-            background: #32CD32;
-            color: white;
-        }
-
-        .quiz-option.incorrect {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.3);
-            height: 10px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-
-        .progress {
-            background: linear-gradient(90deg, #90EE90, #32CD32);
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-
-        @media (max-width: 768px) {
-            .dns-flow {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .arrow {
-                transform: rotate(90deg);
-            }
-            
-            .header-row {
-                grid-template-columns: repeat(8, 1fr);
-            }
-        }
-    </style>
+  /* ---------- STP failover widget ---------- */
+  .stp-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .stp-widget svg{width:100%;height:auto;display:block}
+  .stp-read{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.85rem;margin-top:10px;background:var(--blue-soft)}
+  .flow{stroke-width:4;fill:none;transition:opacity .3s}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌐 DNS Learning Center</h1>
-            <p>Master the Domain Name System with interactive lessons and hands-on practice</p>
+
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Exercise 6 — DHCP &amp; DNS Workshop</h1>
+      <div class="sub">Graded Exercise · DORA · Scope Design · Pool Configuration · Records &amp; Resolution · Simulations</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">GRADED EXERCISE 6</span>
+      <span class="tag">ACCOMPANIES LESSON 5 · DOMAIN 3.0</span>
+      <span class="tag exam">6 GRADED TASKS · 30 POINTS · 2 SIMULATORS</span>
+    </div>
+    <h2>Hand Out the Addresses, Answer the Names</h2>
+    <p class="lede">DHCP and DNS are the two services every network stands on — one leases identities, the other resolves them. In this exercise you'll prove both directions of mastery: first the operations (the DORA exchange, its ports and broadcasts, and what an APIPA address confesses), then the design (carve a real scope for a /24 with static servers, exclusions, and options), then the build — a router-style DHCP simulator where you create the pool and watch a client actually lease an address, and a DNS zone builder where you create A, AAAA, CNAME, MX, and PTR records and run live lookups that walk your own alias chain. Finish with a troubleshooting gauntlet, grade the whole exercise, and download your PDF summary for the LMS.</p>
+  </div>
+
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Explain</b> DHCP operations — the DORA sequence, its ports and broadcast behavior, and lease renewal timing. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Design</b> a DHCP scope for a real subnet: exclusion ranges, leasable range, and the gateway and DNS options clients receive. <span class="bloom">BLOOM: CREATE</span></li>
+        <li><b>Configure</b> a DHCP pool with exclusions, network, default-router, and DNS options using router-style commands, and verify a client lease. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Match</b> DNS record types — A, AAAA, CNAME, MX, PTR — to the jobs they perform. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Create</b> a working DNS zone — address records, an alias chain, mail routing, and reverse lookup — and validate it with queries. <span class="bloom">BLOOM: CREATE</span></li>
+        <li><b>Diagnose</b> DHCP and DNS failures from their symptoms: APIPA, name-vs-IP reachability splits, rogue servers, and bad scope options. <span class="bloom">BLOOM: ANALYZE</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= RESOURCES ================= -->
+  <section id="resources">
+    <div class="sec-head"><span class="ic">📚</span><h2>Resources — Rehearse With the Interactive Tools First</h2></div>
+    <div class="panel">
+      <div class="tool-row">
+        <a class="tool-card" href="lesson05.html">
+          <div class="tt">🏠 LAN 121 Lesson 5</div>
+          <div class="td">Sections 2 and 3 are this exercise's textbook — DNS architecture and DHCP/SLAAC, diagrams included.</div>
+          <div class="tg">OPEN LESSON →</div>
+        </a>
+        <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dhcp.html" target="_blank" rel="noopener">
+          <div class="tt">🧪 Interactive DHCP Protocol Tool</div>
+          <div class="td">Watch DORA fire message by message before you answer Task 1.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dhcppools.html" target="_blank" rel="noopener">
+          <div class="tt">🧪 DHCP Server Configuration Simulator</div>
+          <div class="td">A visual scope builder — perfect rehearsal for the command-line pool you'll build in Task 3.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dns.html" target="_blank" rel="noopener">
+          <div class="tt">🧪 DNS Interactive Learning Tool</div>
+          <div class="td">Record types and hierarchy, hands-on — the warm-up for Tasks 4 and 5.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://sands-mvcc.github.io/MVCC/dnslookup.html" target="_blank" rel="noopener">
+          <div class="tt">🧪 DNS Lookup Simulation</div>
+          <div class="td">Step through recursive resolution — root → TLD → authoritative — one packet at a time.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TASKS ================= -->
+  <section id="tasks">
+    <div class="sec-head"><span class="ic">📝</span><h2>Graded Tasks</h2></div>
+
+    <!-- TASK 1: DORA OPS -->
+    <div class="acc open" id="task1">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📬</span>
+        <span class="at"><h3>Task 1 — DHCP Operations: DORA, Ports &amp; APIPA</h3><span class="asub">4 POINTS · KNOW THE EXCHANGE BEFORE YOU CONFIGURE THE SERVER</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st1">NOT GRADED</span></div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">1.1</span> What is the correct order of the DHCP lease exchange?</div>
+          <label><input type="radio" name="t1q1" value="a"> Offer → Discover → Ack → Request</label>
+          <label><input type="radio" name="t1q1" value="b"> Discover → Offer → Request → Acknowledge</label>
+          <label><input type="radio" name="t1q1" value="c"> Request → Offer → Discover → Acknowledge</label>
+          <label><input type="radio" name="t1q1" value="d"> Discover → Request → Offer → Acknowledge</label>
+          <div class="rat"><strong>Answer:</strong> D-O-R-A. The client asks the room (Discover), a server proposes (Offer), the client accepts publicly (Request), and the server seals it (Ack) with the address, gateway, DNS, and lease time.</div>
         </div>
-
-        <div class="tab-container">
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('overview')">Overview</div>
-                <div class="tab" onclick="showTab('operation')">How DNS Works</div>
-                <div class="tab" onclick="showTab('records')">Record Types</div>
-                <div class="tab" onclick="showTab('header')">DNS Header</div>
-                <div class="tab" onclick="showTab('simulator')">DNS Builder</div>
-                <div class="tab" onclick="showTab('quiz')">Quiz</div>
-            </div>
-
-            <div id="overview" class="tab-content active">
-                <h2>What is DNS?</h2>
-                <p>The Domain Name System (DNS) is like the phone book of the internet. It translates human-readable domain names (like google.com) into IP addresses (like 172.217.12.142) that computers use to communicate.</p>
-                
-                <h3>Why Do We Need DNS?</h3>
-                <ul>
-                    <li><strong>User-Friendly:</strong> Remembering "google.com" is easier than "172.217.12.142"</li>
-                    <li><strong>Flexibility:</strong> Websites can change IP addresses without users noticing</li>
-                    <li><strong>Load Distribution:</strong> One domain can point to multiple servers</li>
-                    <li><strong>Hierarchical Structure:</strong> Distributes the workload across millions of servers</li>
-                </ul>
-
-                <h3>Key Components</h3>
-                <div class="dns-flow">
-                    <div class="dns-step">
-                        <h4>🏠 Resolver</h4>
-                        <p>Your device's DNS client</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>🏢 Recursive Server</h4>
-                        <p>ISP's DNS server</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>🌍 Root Servers</h4>
-                        <p>Top-level directory</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>📋 Authoritative</h4>
-                        <p>Final answer source</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="operation" class="tab-content">
-                <h2>How DNS Resolution Works</h2>
-                <p>When you type a website address, here's what happens behind the scenes:</p>
-                
-                <div class="dns-flow">
-                    <div class="dns-step">
-                        <h4>1. Query Starts</h4>
-                        <p>You type "example.com" in your browser</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>2. Check Cache</h4>
-                        <p>System checks local DNS cache</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>3. Recursive Query</h4>
-                        <p>Ask ISP's DNS server</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>4. Root Server</h4>
-                        <p>Ask "Where are .com servers?"</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>5. TLD Server</h4>
-                        <p>Ask "Where is example.com?"</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>6. Authoritative</h4>
-                        <p>Get the final IP address</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="dns-step">
-                        <h4>7. Connection</h4>
-                        <p>Browser connects to website</p>
-                    </div>
-                </div>
-
-                <h3>DNS Hierarchy</h3>
-                <p>DNS uses a tree-like structure:</p>
-                <ul>
-                    <li><strong>Root (.)</strong> - The top of the hierarchy</li>
-                    <li><strong>Top-Level Domains (TLD)</strong> - .com, .org, .net, country codes</li>
-                    <li><strong>Second-Level Domains</strong> - google, facebook, example</li>
-                    <li><strong>Subdomains</strong> - www, mail, ftp</li>
-                </ul>
-            </div>
-
-            <div id="records" class="tab-content">
-                <h2>DNS Record Types</h2>
-                <p>DNS stores different types of information using various record types:</p>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'A Record (Address)', 'Maps a domain name to an IPv4 address.', 'example.com. 300 IN A 192.0.2.1')">
-                    <h3>A Record</h3>
-                    <p>Domain → IPv4 Address</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'AAAA Record', 'Maps a domain name to an IPv6 address.', 'example.com. 300 IN AAAA 2001:db8::1')">
-                    <h3>AAAA Record</h3>
-                    <p>Domain → IPv6 Address</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'CNAME Record (Canonical Name)', 'Creates an alias from one domain to another.', 'www.example.com. 300 IN CNAME example.com.')">
-                    <h3>CNAME Record</h3>
-                    <p>Domain Alias</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'MX Record (Mail Exchange)', 'Specifies mail servers for a domain.', 'example.com. 300 IN MX 10 mail.example.com.')">
-                    <h3>MX Record</h3>
-                    <p>Mail Server</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'NS Record (Name Server)', 'Specifies authoritative name servers for a domain.', 'example.com. 300 IN NS ns1.example.com.')">
-                    <h3>NS Record</h3>
-                    <p>Name Server</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'TXT Record', 'Stores arbitrary text data, often used for verification.', 'example.com. 300 IN TXT \"v=spf1 include:_spf.google.com ~all\"')">
-                    <h3>TXT Record</h3>
-                    <p>Text Data</p>
-                </div>
-
-                <div class="record-type" onclick="showRecordDetails(this, 'PTR Record (Pointer)', 'Reverse DNS lookup - IP address to domain name.', '1.2.0.192.in-addr.arpa. 300 IN PTR example.com.')">
-                    <h3>PTR Record</h3>
-                    <p>Reverse Lookup</p>
-                </div>
-
-                <div id="record-details" class="output" style="display: none;">
-                    <div id="record-info"></div>
-                </div>
-            </div>
-
-            <div id="header" class="tab-content">
-                <h2>DNS Header Format</h2>
-                <p>Every DNS message contains a 12-byte header with the following structure:</p>
-
-                <div class="dns-header">
-                    <h3>DNS Header (12 bytes)</h3>
-                    
-                    <div class="header-row">
-                        <div class="header-bit">0</div>
-                        <div class="header-bit">1</div>
-                        <div class="header-bit">2</div>
-                        <div class="header-bit">3</div>
-                        <div class="header-bit">4</div>
-                        <div class="header-bit">5</div>
-                        <div class="header-bit">6</div>
-                        <div class="header-bit">7</div>
-                        <div class="header-bit">8</div>
-                        <div class="header-bit">9</div>
-                        <div class="header-bit">10</div>
-                        <div class="header-bit">11</div>
-                        <div class="header-bit">12</div>
-                        <div class="header-bit">13</div>
-                        <div class="header-bit">14</div>
-                        <div class="header-bit">15</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field" style="grid-column: 1 / 17;">ID (16 bits)</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field">QR</div>
-                        <div class="header-field" style="grid-column: 2 / 6;">Opcode</div>
-                        <div class="header-field">AA</div>
-                        <div class="header-field">TC</div>
-                        <div class="header-field">RD</div>
-                        <div class="header-field">RA</div>
-                        <div class="header-field" style="grid-column: 10 / 13;">Z</div>
-                        <div class="header-field" style="grid-column: 13 / 17;">RCODE</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field" style="grid-column: 1 / 17;">QDCOUNT (16 bits)</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field" style="grid-column: 1 / 17;">ANCOUNT (16 bits)</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field" style="grid-column: 1 / 17;">NSCOUNT (16 bits)</div>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="header-field" style="grid-column: 1 / 17;">ARCOUNT (16 bits)</div>
-                    </div>
-                </div>
-
-                <h3>Field Descriptions</h3>
-                <ul>
-                    <li><strong>ID:</strong> Unique identifier for matching queries with responses</li>
-                    <li><strong>QR:</strong> Query (0) or Response (1)</li>
-                    <li><strong>Opcode:</strong> Type of query (Standard, Inverse, Status)</li>
-                    <li><strong>AA:</strong> Authoritative Answer flag</li>
-                    <li><strong>TC:</strong> Truncation flag (message was truncated)</li>
-                    <li><strong>RD:</strong> Recursion Desired flag</li>
-                    <li><strong>RA:</strong> Recursion Available flag</li>
-                    <li><strong>Z:</strong> Reserved for future use (must be zero)</li>
-                    <li><strong>RCODE:</strong> Response code (No Error, Format Error, Server Failure, etc.)</li>
-                    <li><strong>QDCOUNT:</strong> Number of questions</li>
-                    <li><strong>ANCOUNT:</strong> Number of answer records</li>
-                    <li><strong>NSCOUNT:</strong> Number of authority records</li>
-                    <li><strong>ARCOUNT:</strong> Number of additional records</li>
-                </ul>
-            </div>
-
-            <div id="simulator" class="tab-content">
-                <h2>DNS Record Builder</h2>
-                <p>Create your own DNS records and see how they work!</p>
-
-                <div class="simulator">
-                    <h3>Build a DNS Record</h3>
-                    
-                    <div class="form-group">
-                        <label for="recordName">Domain Name:</label>
-                        <input type="text" id="recordName" placeholder="example.com" value="example.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="recordType">Record Type:</label>
-                        <select id="recordType" onchange="updateRecordForm()">
-                            <option value="A">A (IPv4 Address)</option>
-                            <option value="AAAA">AAAA (IPv6 Address)</option>
-                            <option value="CNAME">CNAME (Canonical Name)</option>
-                            <option value="MX">MX (Mail Exchange)</option>
-                            <option value="NS">NS (Name Server)</option>
-                            <option value="TXT">TXT (Text)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="recordTTL">TTL (Time To Live) in seconds:</label>
-                        <input type="number" id="recordTTL" value="300" min="1">
-                    </div>
-
-                    <div id="dynamicFields">
-                        <div class="form-group">
-                            <label for="recordValue">IPv4 Address:</label>
-                            <input type="text" id="recordValue" placeholder="192.0.2.1">
-                        </div>
-                    </div>
-
-                    <button class="btn" onclick="createDNSRecord()">Create DNS Record</button>
-                    <button class="btn" onclick="clearRecords()">Clear All Records</button>
-                </div>
-
-                <div class="output" id="dnsOutput">
-                    Click "Create DNS Record" to see your DNS records here!
-                </div>
-
-                <div class="simulator">
-                    <h3>DNS Lookup Simulator</h3>
-                    
-                    <div class="form-group">
-                        <label for="lookupDomain">Domain to lookup:</label>
-                        <input type="text" id="lookupDomain" placeholder="example.com">
-                    </div>
-                    
-                    <button class="btn" onclick="simulateLookup()">Simulate DNS Lookup</button>
-                    
-                    <div class="output" id="lookupOutput">
-                        Enter a domain and click "Simulate DNS Lookup" to see the resolution process!
-                    </div>
-                </div>
-            </div>
-
-            <div id="quiz" class="tab-content">
-                <h2>DNS Knowledge Quiz</h2>
-                <p>Test your understanding of DNS concepts!</p>
-                
-                <div class="progress-bar">
-                    <div class="progress" id="quizProgress" style="width: 0%"></div>
-                </div>
-
-                <div class="quiz" id="quizContainer">
-                    <!-- Quiz questions will be generated here -->
-                </div>
-
-                <div class="quiz">
-                    <button class="btn" onclick="startQuiz()">Start Quiz</button>
-                    <button class="btn" onclick="resetQuiz()">Reset Quiz</button>
-                    <div id="quizResults"></div>
-                </div>
-            </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">1.2</span> Which two DORA messages does the CLIENT send as broadcasts?</div>
+          <label><input type="radio" name="t1q2" value="a"> Offer and Acknowledge</label>
+          <label><input type="radio" name="t1q2" value="b"> Discover and Offer</label>
+          <label><input type="radio" name="t1q2" value="c"> Discover and Request</label>
+          <label><input type="radio" name="t1q2" value="d"> None — DHCP is entirely unicast</label>
+          <div class="rat"><strong>Answer:</strong> The client owns no address yet, so its messages (Discover, Request) go to 255.255.255.255. The broadcast Request also politely tells any OTHER offering servers they weren't chosen.</div>
         </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">1.3</span> Which UDP ports does DHCP use?</div>
+          <label><input type="radio" name="t1q3" value="a"> Server 67, client 68</label>
+          <label><input type="radio" name="t1q3" value="b"> Server 53, client 54</label>
+          <label><input type="radio" name="t1q3" value="c"> Server 80, client 443</label>
+          <label><input type="radio" name="t1q3" value="d"> Server 123, client 124</label>
+          <div class="rat"><strong>Answer:</strong> UDP 67 (server) / 68 (client) — one of the port pairs the exam expects cold. 53 is DNS; 123 is NTP.</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">1.4</span> A workstation shows the address 169.254.31.7. What does that tell you?</div>
+          <label><input type="radio" name="t1q4" value="a"> DHCP succeeded normally</label>
+          <label><input type="radio" name="t1q4" value="b"> The workstation was assigned a public internet address</label>
+          <label><input type="radio" name="t1q4" value="c"> The subnet mask is wrong</label>
+          <label><input type="radio" name="t1q4" value="d"> DHCP failed — the client self-assigned an APIPA address after its Discover went unanswered</label>
+          <div class="rat"><strong>Answer:</strong> 169.254.x.x is APIPA, the self-assigned fallback. It's not the problem — it's the SYMPTOM that says "investigate DHCP: server down, scope exhausted, or missing relay."</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="1">Grade Task 1</button></div>
+      </div>
     </div>
 
-    <script>
-        let dnsRecords = [];
-        let quizQuestions = [
-            {
-                question: "What does DNS stand for?",
-                options: ["Domain Name System", "Dynamic Network Service", "Digital Name Server", "Distributed Network System"],
-                correct: 0
-            },
-            {
-                question: "Which record type maps a domain to an IPv4 address?",
-                options: ["AAAA", "CNAME", "A", "MX"],
-                correct: 2
-            },
-            {
-                question: "What is the purpose of an MX record?",
-                options: ["Maps to IPv6", "Specifies mail servers", "Creates domain alias", "Stores text data"],
-                correct: 1
-            },
-            {
-                question: "Which DNS field indicates if a message is a query or response?",
-                options: ["ID", "QR", "AA", "RCODE"],
-                correct: 1
-            },
-            {
-                question: "What does TTL stand for in DNS?",
-                options: ["Time To Live", "Transfer To Location", "Total Time Limit", "Type To Load"],
-                correct: 0
-            },
-            {
-                question: "Which record type is used for reverse DNS lookups?",
-                options: ["A", "CNAME", "PTR", "NS"],
-                correct: 2
-            }
-        ];
-        
-        let currentQuiz = [];
-        let quizScore = 0;
-        let currentQuestionIndex = 0;
+    <!-- TASK 2: SCOPE DESIGN -->
+    <div class="acc open" id="task2">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📐</span>
+        <span class="at"><h3>Task 2 — Design the Scope on Paper First</h3><span class="asub">5 POINTS · THE SCENARIO EVERY OTHER TASK BUILDS ON</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st2">NOT GRADED</span></div>
+        <div class="callout tip"><span class="cic">🏢</span><span><strong>SCENARIO (used in Tasks 2, 3 and 5):</strong> Subnet <code>192.168.50.0/24</code>. The router/default gateway is <code>192.168.50.1</code>. Statically addressed servers occupy <code>192.168.50.2</code> through <code>192.168.50.10</code> — the DNS server itself is <code>192.168.50.2</code>. Everything else may be leased to clients.</span></div>
+        <div class="ans-row" data-mode="ip" data-key="192.168.50.1"><span class="mr-l"><span class="dnum">2.1</span>Exclusion range START address =</span><input type="text" placeholder="x.x.x.x" aria-label="exclusion start"><span class="exp">Correct answer: 192.168.50.1 — the gateway must never be leased to a client</span></div>
+        <div class="ans-row" data-mode="ip" data-key="192.168.50.10"><span class="mr-l"><span class="dnum">2.2</span>Exclusion range END address =</span><input type="text" placeholder="x.x.x.x" aria-label="exclusion end"><span class="exp">Correct answer: 192.168.50.10 — the last statically assigned server</span></div>
+        <div class="ans-row" data-mode="ip" data-key="192.168.50.11"><span class="mr-l"><span class="dnum">2.3</span>The FIRST address the server will actually lease =</span><input type="text" placeholder="x.x.x.x" aria-label="first leasable"><span class="exp">Correct answer: 192.168.50.11 — the first address after the exclusions</span></div>
+        <div class="match-row" data-key="gateway"><span class="mr-l"><span class="dnum">2.4</span>DHCP <strong>option 3</strong> delivers the client its…</span><select class="exsel"><option value="">— select —</option><option value="gateway">Default gateway</option><option value="dns">DNS server list</option><option value="lease">Lease duration</option><option value="mask">Subnet mask</option></select></div>
+        <div class="match-row" data-key="dns"><span class="mr-l"><span class="dnum">2.5</span>DHCP <strong>option 6</strong> delivers the client its…</span><select class="exsel"><option value="">— select —</option><option value="gateway">Default gateway</option><option value="dns">DNS server list</option><option value="lease">Lease duration</option><option value="mask">Subnet mask</option></select></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>Exam note:</strong> Option 3 = router (gateway), option 6 = DNS. A client with an address but "nothing works" often received a scope whose OPTIONS are wrong — the lease succeeded, the directions were bad.</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="2">Grade Task 2</button></div>
+      </div>
+    </div>
 
-        function showTab(tabName) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Remove active from all tabs
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Mark selected tab as active
-            event.target.classList.add('active');
+    <!-- TASK 3: DHCP POOL SIMULATOR -->
+    <div class="acc open" id="task3">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⌨️</span>
+        <span class="at"><h3>Task 3 — DHCP Pool Simulator: Build It, Then Lease From It</h3><span class="asub">6 POINTS · CONFIGURE THE POOL FROM TASK 2 · THEN RUN "test client"</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">6 PTS</span><span class="task-status none" id="st3">NOT GRADED</span></div>
+        <p>Implement your Task 2 design on router R1. Complete all six milestones — the last one only succeeds if your pool is correct enough for a simulated client to complete DORA. Type <code>?</code> for the command reference.</p>
+        <ul class="ck-list">
+          <li id="d1">Exclude 192.168.50.1 – 192.168.50.10 from leasing</li>
+          <li id="d2">Create a DHCP pool named LAN50</li>
+          <li id="d3">Define the pool's network: 192.168.50.0 /24</li>
+          <li id="d4">Set the default-router to 192.168.50.1</li>
+          <li id="d5">Set the dns-server to 192.168.50.2</li>
+          <li id="d6">Run <code>test client</code> — a client completes DORA and leases 192.168.50.11</li>
+        </ul>
+        <div class="sim">
+          <div class="sim-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="stitle">R1 — LAN 121 DHCP SIMULATOR · type ? for help</span></div>
+          <div class="sim-out" id="dhcpOut" aria-live="polite"></div>
+          <div class="sim-in">
+            <span class="pr" id="dhcpPrompt">R1&gt;</span>
+            <input id="dhcpIn" type="text" autocomplete="off" spellcheck="false" placeholder="type a command and press Enter…" aria-label="DHCP router command input">
+          </div>
+        </div>
+        <div class="sim-help">
+          <strong>Command reference:</strong>
+          <code>enable</code> <code>configure terminal</code> <code>ip dhcp excluded-address &lt;first&gt; &lt;last&gt;</code> <code>ip dhcp pool &lt;NAME&gt;</code> <code>network &lt;net&gt; &lt;mask&gt;</code> <code>default-router &lt;ip&gt;</code> <code>dns-server &lt;ip&gt;</code> <code>lease &lt;days&gt;</code> <code>show run</code> <code>test client</code> <code>exit</code> <code>reset</code>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="3">Grade Task 3</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 4: DNS RECORDS -->
+    <div class="acc open" id="task4">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🗂️</span>
+        <span class="at"><h3>Task 4 — DNS Records: The Right Type for the Job</h3><span class="asub">5 POINTS · EVERY ROW IS A REAL ADMINISTRATIVE REQUEST</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">5 PTS</span><span class="task-status none" id="st4">NOT GRADED</span></div>
+        <p>You administer the zone <code>mvcc-lab.edu</code>. Choose the record type each request requires.</p>
+        <div class="match-row" data-key="A"><span class="mr-l">"Point www.mvcc-lab.edu at the web server's IPv4 address."</span><select class="exsel"><option value="">— record —</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>PTR</option></select></div>
+        <div class="match-row" data-key="AAAA"><span class="mr-l">"The web server also has an IPv6 address — publish it."</span><select class="exsel"><option value="">— record —</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>PTR</option></select></div>
+        <div class="match-row" data-key="CNAME"><span class="mr-l">"Make portal.mvcc-lab.edu an alias that follows wherever www points."</span><select class="exsel"><option value="">— record —</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>PTR</option></select></div>
+        <div class="match-row" data-key="MX"><span class="mr-l">"Email for @mvcc-lab.edu must be delivered to our mail server, with a preference value."</span><select class="exsel"><option value="">— record —</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>PTR</option></select></div>
+        <div class="match-row" data-key="PTR"><span class="mr-l">"Reverse lookups of the web server's IP must return its hostname (mail filters check this)."</span><select class="exsel"><option value="">— record —</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>PTR</option></select></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="4">Grade Task 4</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 5: DNS ZONE SIMULATOR -->
+    <div class="acc open" id="task5">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🌐</span>
+        <span class="at"><h3>Task 5 — DNS Zone Builder: Create the Records, Then Query Them</h3><span class="asub">6 POINTS · BUILD mvcc-lab.edu · YOUR LOOKUPS WALK YOUR OWN RECORDS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">6 PTS</span><span class="task-status none" id="st5">NOT GRADED</span></div>
+        <p>Now build Task 4's requests for real. The web server is <code>192.168.50.20</code> (IPv6 <code>2001:db8:50::20</code>); the mail server is <code>mail</code>. The final milestone requires a <code>lookup portal</code> that successfully chases your CNAME to the A record.</p>
+        <ul class="ck-list">
+          <li id="z1">A record: www → 192.168.50.20</li>
+          <li id="z2">AAAA record: www → 2001:db8:50::20</li>
+          <li id="z3">CNAME record: portal → www</li>
+          <li id="z4">MX record: mail, preference 10</li>
+          <li id="z5">PTR record: 192.168.50.20 → www.mvcc-lab.edu</li>
+          <li id="z6">Run <code>lookup portal</code> — resolves through the CNAME to 192.168.50.20</li>
+        </ul>
+        <div class="sim">
+          <div class="sim-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="stitle">ns1.mvcc-lab.edu — LAN 121 DNS ZONE BUILDER · type ? for help</span></div>
+          <div class="sim-out" id="dnsOut" aria-live="polite"></div>
+          <div class="sim-in">
+            <span class="pr">zone&gt;</span>
+            <input id="dnsIn" type="text" autocomplete="off" spellcheck="false" placeholder="type a command and press Enter…" aria-label="DNS zone command input">
+          </div>
+        </div>
+        <div class="sim-help">
+          <strong>Command reference:</strong>
+          <code>add a &lt;name&gt; &lt;ipv4&gt;</code> <code>add aaaa &lt;name&gt; &lt;ipv6&gt;</code> <code>add cname &lt;alias&gt; &lt;target&gt;</code> <code>add mx &lt;host&gt; &lt;preference&gt;</code> <code>add ptr &lt;ipv4&gt; &lt;fqdn&gt;</code> <code>lookup &lt;name&gt;</code> <code>show zone</code> <code>delete &lt;type&gt; &lt;name&gt;</code> <code>reset</code>
+        </div>
+        <div class="callout tip"><span class="cic">💡</span><span><strong>Watch what lookup shows you:</strong> querying the alias prints the whole chain — <em>portal → CNAME → www → A → 192.168.50.20</em>. That two-step walk is exactly what a resolver does in the real world, and why a CNAME can't coexist with other records for the same name.</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="5">Grade Task 5</button></div>
+      </div>
+    </div>
+
+    <!-- TASK 6: TROUBLESHOOTING -->
+    <div class="acc open" id="task6">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🩺</span>
+        <span class="at"><h3>Task 6 — Troubleshooting DHCP &amp; DNS</h3><span class="asub">4 POINTS · SYMPTOM IN, ROOT CAUSE OUT</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st6">NOT GRADED</span></div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">6.1</span> Every client on VLAN 30 has a 169.254.x.x address. The only DHCP server lives on VLAN 10 and is healthy. Most likely fix?</div>
+          <label><input type="radio" name="t6q1" value="a"> Increase the lease time</label>
+          <label><input type="radio" name="t6q1" value="b"> Add more addresses to the scope</label>
+          <label><input type="radio" name="t6q1" value="c"> Configure a DHCP relay (IP helper address) on VLAN 30's router interface</label>
+          <label><input type="radio" name="t6q1" value="d"> Replace the clients' NICs</label>
+          <div class="rat"><strong>Answer:</strong> Discover is a broadcast, and routers don't forward broadcasts. Whole-subnet APIPA with a healthy remote server is the relay-is-missing signature — <code>ip helper-address</code> converts the broadcast to unicast.</div>
+        </div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">6.2</span> A host can <code>ping 8.8.8.8</code> but <code>ping www.google.com</code> fails with "could not find host." Which layer of service failed?</div>
+          <label><input type="radio" name="t6q2" value="a"> The default gateway is wrong</label>
+          <label><input type="radio" name="t6q2" value="b"> DNS — IP connectivity works but name resolution doesn't; verify with nslookup/dig against the configured server</label>
+          <label><input type="radio" name="t6q2" value="c"> The DHCP lease expired</label>
+          <label><input type="radio" name="t6q2" value="d"> The Ethernet cable is damaged</label>
+          <div class="rat"><strong>Answer:</strong> Reaching 8.8.8.8 proves addressing, gateway, and routing all work. Only the name lookup fails — the four-ping ladder broke on its last rung. nslookup/dig shows what the resolver returns.</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">6.3</span> After a visitor plugged a home router into a wall jack, some clients received leases with a wrong gateway and lost internet access. What happened?</div>
+          <label><input type="radio" name="t6q3" value="a"> The DNS zone expired</label>
+          <label><input type="radio" name="t6q3" value="b"> APIPA took over the subnet</label>
+          <label><input type="radio" name="t6q3" value="c"> The scope's lease time was too long</label>
+          <label><input type="radio" name="t6q3" value="d"> A rogue DHCP server answered Discovers first, handing out its own gateway — enable DHCP snooping to block it</label>
+          <div class="rat"><strong>Answer:</strong> A rogue server races the real one; whoever Offers first wins the client. Wrong-gateway leases appearing after new hardware = rogue DHCP. DHCP snooping (Lesson 7's Layer 2 defenses) permits Offers only from trusted ports.</div>
+        </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">6.4</span> You created a new A record an hour ago, but remote users still reach the OLD address. Local tests against your authoritative server return the new one. Why?</div>
+          <label><input type="radio" name="t6q4" value="a"> Caching — resolvers elsewhere hold the old record until its TTL expires; propagation isn't instant</label>
+          <label><input type="radio" name="t6q4" value="b"> The record type should have been PTR</label>
+          <label><input type="radio" name="t6q4" value="c"> DHCP hasn't renewed the leases yet</label>
+          <label><input type="radio" name="t6q4" value="d"> The A record only works for local users</label>
+          <div class="rat"><strong>Answer:</strong> Every resolver that answered a query before your change caches the old answer for the record's TTL. That's why admins lower the TTL BEFORE a planned migration — and why "it works here but not there" right after a DNS change is usually just time.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="6">Grade Task 6</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MASTER SCORE ================= -->
+  <div class="score-panel" id="scorePanel">
+    <h2>📊 Exercise Score</h2>
+    <div class="big" id="masterScore">— / 30</div>
+    <div class="brk" id="masterBreakdown">Grade each task above, then press the button to compute your final score. Enter your name and download the PDF summary for the LMS.</div>
+    <div style="margin-top:16px">
+      <label for="studentName" style="font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;display:block;margin-bottom:6px;opacity:.92">STUDENT NAME (appears on the PDF summary)</label>
+      <input type="text" id="studentName" placeholder="Your name…" style="width:min(340px,100%);padding:10px 14px;border-radius:9px;border:none;font-size:.9rem;font-family:var(--sans)">
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn primary" id="masterGrade" style="background:#fff;color:var(--blue)">✅ Grade Entire Exercise</button>
+      <button class="btn primary" id="pdfBtn" style="background:var(--amber);color:#fff">📄 Download Grade Summary (PDF)</button>
+    </div>
+  </div>
+
+  <div class="navrow">
+    <a href="lesson05.html">← Back to Lesson 5</a>
+    <a href="index.html">Course Home →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Exercise 6 · DHCP &amp; DNS Workshop</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ---------- shared helpers ---------- */
+  function validIp(ip){
+    var p = (ip || '').split('.');
+    return p.length === 4 && p.every(function(n){ return /^\d+$/.test(n) && +n >= 0 && +n <= 255; });
+  }
+  function validIp6(x){
+    return /^[0-9a-f:]+$/i.test(x) && x.indexOf(':') !== -1 && x.length >= 3;
+  }
+  function mkPrint(outEl){
+    return function(t, cls){
+      var s = document.createElement('span');
+      if (cls) s.className = cls;
+      s.textContent = t + '\n';
+      outEl.appendChild(s);
+      outEl.scrollTop = outEl.scrollHeight;
+    };
+  }
+  function ck(id){ var el = document.getElementById(id); if (el) el.classList.add('done'); }
+
+  /* ================= DHCP POOL SIMULATOR (Task 3) ================= */
+  var dFlags = { d1:false, d2:false, d3:false, d4:false, d5:false, d6:false };
+  (function(){
+    var out = document.getElementById('dhcpOut');
+    var inp = document.getElementById('dhcpIn');
+    var promptEl = document.getElementById('dhcpPrompt');
+    if (!out || !inp) return;
+    var print = mkPrint(out);
+    var st;
+    function fresh(){ return { mode:'user', pool:null, pools:{}, excl:[] }; }
+    function pText(){
+      switch (st.mode) {
+        case 'user': return 'R1>';
+        case 'priv': return 'R1#';
+        case 'config': return 'R1(config)#';
+        case 'pool': return 'R1(dhcp-config)#';
+      }
+    }
+    function refresh(){
+      var covered = st.excl.some(function(e){ return e[0] === '192.168.50.1' && e[1] === '192.168.50.10'; });
+      if (covered) { dFlags.d1 = true; ck('d1'); }
+      var p = st.pools['LAN50'];
+      if (p) { dFlags.d2 = true; ck('d2'); }
+      if (p && p.net === '192.168.50.0' && p.mask === '255.255.255.0') { dFlags.d3 = true; ck('d3'); }
+      if (p && p.gw === '192.168.50.1') { dFlags.d4 = true; ck('d4'); }
+      if (p && p.dns === '192.168.50.2') { dFlags.d5 = true; ck('d5'); }
+    }
+    function banner(){
+      print('LAN 121 DHCP Simulator — router R1 · interface g0/0 = 192.168.50.1/24', 'dim');
+      print('Build the pool from Task 2, then prove it works with "test client".', 'dim');
+      print('Type ? for help.', 'dim'); print('');
+    }
+    function showRun(){
+      print('!', 'dim'); print('hostname R1', 'dim');
+      st.excl.forEach(function(e){ print('ip dhcp excluded-address ' + e[0] + ' ' + e[1]); });
+      Object.keys(st.pools).forEach(function(n){
+        var p = st.pools[n];
+        print('ip dhcp pool ' + n);
+        if (p.net) print(' network ' + p.net + ' ' + p.mask);
+        if (p.gw) print(' default-router ' + p.gw);
+        if (p.dns) print(' dns-server ' + p.dns);
+        if (p.lease) print(' lease ' + p.lease);
+      });
+      print('!', 'dim');
+    }
+    function testClient(){
+      var p = st.pools['LAN50'] || st.pools[Object.keys(st.pools)[0]];
+      if (!p || !p.net) return print('% No usable pool — create the pool and define its network first', 'err');
+      print('client → DISCOVER (broadcast, UDP 68→67): "any DHCP servers out there?"', 'dim');
+      /* find first lease: net .1 upward, skipping exclusions and the network address */
+      var base = p.net.split('.').slice(0,3).join('.');
+      var excluded = {};
+      st.excl.forEach(function(e){
+        var s = +e[0].split('.')[3], t = +e[1].split('.')[3];
+        if (e[0].indexOf(base) === 0) for (var i = s; i <= t; i++) excluded[i] = true;
+      });
+      var host = -1;
+      for (var i = 1; i <= 254; i++) { if (!excluded[i]) { host = i; break; } }
+      if (host === -1) return print('% Pool exhausted — every address is excluded', 'err');
+      var addr = base + '.' + host;
+      print('R1     → OFFER: "how about ' + addr + '?"', 'ok');
+      print('client → REQUEST (broadcast): "I accept ' + addr + '"', 'dim');
+      var opts = [];
+      if (p.gw) opts.push('gateway ' + p.gw); else opts.push('gateway MISSING ⚠');
+      if (p.dns) opts.push('dns ' + p.dns); else opts.push('dns MISSING ⚠');
+      print('R1     → ACK: lease granted — ' + addr + '/24 · ' + opts.join(' · ') + ' · lease ' + (p.lease || 1) + ' day(s)', 'ok');
+      if (!p.gw) print('% The client has an address but no default gateway — it can\'t leave the subnet. Fix the pool.', 'err');
+      if (addr === '192.168.50.11' && dFlags.d1 && p.gw === '192.168.50.1') { dFlags.d6 = true; ck('d6'); print('✔ Milestone complete: correct first lease from a correctly excluded pool', 'ok'); }
+      else if (addr !== '192.168.50.11') print('% Note: the client leased ' + addr + ' — Task 2 says the first LEASABLE address should be 192.168.50.11. Check your exclusions.', 'err');
+    }
+    function help(){
+      print('— Modes —', 'dim');
+      print('  enable · configure terminal · exit');
+      print('— DHCP (config mode) —', 'dim');
+      print('  ip dhcp excluded-address <first> <last>');
+      print('  ip dhcp pool <NAME>          then, inside the pool:');
+      print('  network <net> <mask> · default-router <ip> · dns-server <ip> · lease <days>');
+      print('— Verify —', 'dim');
+      print('  show run · test client · reset');
+    }
+    function handle(raw){
+      var line = raw.trim().replace(/\s+/g, ' ');
+      if (!line) return;
+      print(pText() + ' ' + line, 'cmd');
+      var l = line.toLowerCase(), m;
+      if (l === '?' || l === 'help') return help();
+      if (l === 'reset' || l === 'reload') {
+        st = fresh(); out.textContent = ''; banner();
+        Object.keys(dFlags).forEach(function(k){ dFlags[k] = false; });
+        ['d1','d2','d3','d4','d5','d6'].forEach(function(id){ document.getElementById(id).classList.remove('done'); });
+        return;
+      }
+      if (l === 'show run' || l === 'sh run' || l === 'show running-config') return showRun();
+      if (l === 'test client') return testClient();
+      if (l === 'exit' || l === 'end') {
+        if (st.mode === 'pool') st.mode = 'config';
+        else if (st.mode === 'config') st.mode = 'priv';
+        else if (st.mode === 'priv') st.mode = 'user';
+        return;
+      }
+      if (l === 'enable' || l === 'en') { if (st.mode === 'user') { st.mode = 'priv'; return; } return print('% Already privileged', 'dim'); }
+      if (l === 'configure terminal' || l === 'conf t' || l === 'config t' || l === 'configure t') {
+        if (st.mode === 'user') return print('% Type "enable" first', 'err');
+        st.mode = 'config';
+        return print('Enter configuration commands, one per line.', 'dim');
+      }
+      if ((m = l.match(/^ip dhcp excluded-address (\S+) ?(\S+)?$/))) {
+        if (st.mode !== 'config' && st.mode !== 'pool') return print('% Enter global configuration mode first (enable → configure terminal)', 'err');
+        var a = m[1], b = m[2] || m[1];
+        if (!validIp(a) || !validIp(b)) return print('% Invalid address', 'err');
+        st.excl.push([a, b]);
+        print('✔ Addresses ' + a + ' – ' + b + ' will never be leased', 'ok');
+        refresh(); return;
+      }
+      if ((m = line.match(/^ip dhcp pool (\S+)$/i))) {
+        if (st.mode !== 'config' && st.mode !== 'pool') return print('% Enter global configuration mode first', 'err');
+        var name = m[1].toUpperCase();
+        if (!st.pools[name]) { st.pools[name] = { net:null, mask:null, gw:null, dns:null, lease:null }; print('✔ DHCP pool ' + name + ' created', 'ok'); }
+        st.mode = 'pool'; st.pool = name;
+        refresh(); return;
+      }
+      if (st.mode === 'pool') {
+        if ((m = l.match(/^network (\S+) (\S+)$/))) {
+          if (!validIp(m[1]) || !validIp(m[2])) return print('% Invalid network or mask', 'err');
+          st.pools[st.pool].net = m[1]; st.pools[st.pool].mask = m[2];
+          print('✔ Pool serves network ' + m[1] + ' ' + m[2], 'ok'); refresh(); return;
         }
-
-        function showRecordDetails(element, title, description, example) {
-            const detailsDiv = document.getElementById('record-details');
-            const infoDiv = document.getElementById('record-info');
-            
-            infoDiv.innerHTML = `
-                <h3>${title}</h3>
-                <p><strong>Description:</strong> ${description}</p>
-                <p><strong>Example:</strong></p>
-                <code>${example}</code>
-            `;
-            
-            detailsDiv.style.display = 'block';
+        if ((m = l.match(/^default-router (\S+)$/))) {
+          if (!validIp(m[1])) return print('% Invalid address', 'err');
+          st.pools[st.pool].gw = m[1];
+          print('✔ Clients will receive default gateway ' + m[1] + ' (option 3)', 'ok'); refresh(); return;
         }
-
-        function updateRecordForm() {
-            const recordType = document.getElementById('recordType').value;
-            const dynamicFields = document.getElementById('dynamicFields');
-            
-            let fieldHTML = '';
-            
-            switch(recordType) {
-                case 'A':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="recordValue">IPv4 Address:</label>
-                            <input type="text" id="recordValue" placeholder="192.0.2.1">
-                        </div>
-                    `;
-                    break;
-                case 'AAAA':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="recordValue">IPv6 Address:</label>
-                            <input type="text" id="recordValue" placeholder="2001:db8::1">
-                        </div>
-                    `;
-                    break;
-                case 'CNAME':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="recordValue">Target Domain:</label>
-                            <input type="text" id="recordValue" placeholder="target.example.com">
-                        </div>
-                    `;
-                    break;
-                case 'MX':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="mxPriority">Priority:</label>
-                            <input type="number" id="mxPriority" value="10" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="recordValue">Mail Server:</label>
-                            <input type="text" id="recordValue" placeholder="mail.example.com">
-                        </div>
-                    `;
-                    break;
-                case 'NS':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="recordValue">Name Server:</label>
-                            <input type="text" id="recordValue" placeholder="ns1.example.com">
-                        </div>
-                    `;
-                    break;
-                case 'TXT':
-                    fieldHTML = `
-                        <div class="form-group">
-                            <label for="recordValue">Text Data:</label>
-                            <textarea id="recordValue" placeholder="v=spf1 include:_spf.google.com ~all"></textarea>
-                        </div>
-                    `;
-                    break;
-            }
-            
-            dynamicFields.innerHTML = fieldHTML;
+        if ((m = l.match(/^dns-server (\S+)$/))) {
+          if (!validIp(m[1])) return print('% Invalid address', 'err');
+          st.pools[st.pool].dns = m[1];
+          print('✔ Clients will receive DNS server ' + m[1] + ' (option 6)', 'ok'); refresh(); return;
         }
-
-        function createDNSRecord() {
-            const name = document.getElementById('recordName').value;
-            const type = document.getElementById('recordType').value;
-            const ttl = document.getElementById('recordTTL').value;
-            const value = document.getElementById('recordValue').value;
-            
-            if (!name || !value) {
-                alert('Please fill in all required fields!');
-                return;
-            }
-            
-            let recordData = {
-                name: name,
-                type: type,
-                ttl: parseInt(ttl),
-                value: value
-            };
-            
-            if (type === 'MX') {
-                const priority = document.getElementById('mxPriority').value;
-                recordData.priority = parseInt(priority);
-            }
-            
-            dnsRecords.push(recordData);
-            updateDNSOutput();
+        if ((m = l.match(/^lease (\d+)$/))) {
+          st.pools[st.pool].lease = +m[1];
+          print('✔ Lease time set to ' + m[1] + ' day(s) — clients renew at 50% (T1)', 'ok'); return;
         }
+      }
+      if (/^(network|default-router|dns-server|lease) /.test(l)) return print('% Pool subcommand — enter "ip dhcp pool <NAME>" first', 'err');
+      print('% Unrecognized command: "' + line + '" — type ? for help', 'err');
+    }
+    st = fresh(); banner();
+    inp.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { handle(inp.value); inp.value = ''; promptEl.textContent = pText(); }
+    });
+  })();
 
-        function updateDNSOutput() {
-            const output = document.getElementById('dnsOutput');
-            
-            if (dnsRecords.length === 0) {
-                output.textContent = 'No DNS records created yet.';
-                return;
-            }
-            
-            let outputText = 'Your DNS Records:\n';
-            outputText += '===================\n\n';
-            
-            dnsRecords.forEach((record, index) => {
-                outputText += `Record ${index + 1}:\n`;
-                outputText += `Name: ${record.name}\n`;
-                outputText += `Type: ${record.type}\n`;
-                outputText += `TTL: ${record.ttl} seconds\n`;
-                
-                if (record.type === 'MX') {
-                    outputText += `Priority: ${record.priority}\n`;
-                    outputText += `Mail Server: ${record.value}\n`;
-                } else {
-                    outputText += `Value: ${record.value}\n`;
-                }
-                
-                outputText += `\nFormatted Record:\n`;
-                if (record.type === 'MX') {
-                    outputText += `${record.name}. ${record.ttl} IN ${record.type} ${record.priority} ${record.value}.\n`;
-                } else {
-                    outputText += `${record.name}. ${record.ttl} IN ${record.type} ${record.value}${record.type !== 'TXT' ? '.' : ''}\n`;
-                }
-                outputText += '\n' + '-'.repeat(50) + '\n\n';
-            });
-            
-            output.textContent = outputText;
-        }
+  /* ================= DNS ZONE BUILDER (Task 5) ================= */
+  var zFlags = { z1:false, z2:false, z3:false, z4:false, z5:false, z6:false };
+  (function(){
+    var out = document.getElementById('dnsOut');
+    var inp = document.getElementById('dnsIn');
+    if (!out || !inp) return;
+    var print = mkPrint(out);
+    var zone;
+    function fresh(){ return { a:{}, aaaa:{}, cname:{}, mx:[], ptr:{} }; }
+    function banner(){
+      print('LAN 121 DNS Zone Builder — authoritative for mvcc-lab.edu', 'dim');
+      print('Create the records from Task 4, then prove them with lookups.', 'dim');
+      print('Type ? for help.', 'dim'); print('');
+    }
+    function refresh(){
+      if (zone.a['www'] === '192.168.50.20') { zFlags.z1 = true; ck('z1'); }
+      if (zone.aaaa['www']) { zFlags.z2 = true; ck('z2'); }
+      if (zone.cname['portal'] === 'www') { zFlags.z3 = true; ck('z3'); }
+      if (zone.mx.some(function(r){ return r.pref === 10; })) { zFlags.z4 = true; ck('z4'); }
+      if (zone.ptr['192.168.50.20'] && zone.ptr['192.168.50.20'].indexOf('www') === 0) { zFlags.z5 = true; ck('z5'); }
+    }
+    function showZone(){
+      print('$ORIGIN mvcc-lab.edu.', 'dim');
+      Object.keys(zone.a).forEach(function(n){ print((n + '            ').slice(0,14) + 'IN  A      ' + zone.a[n], 'ok'); });
+      Object.keys(zone.aaaa).forEach(function(n){ print((n + '            ').slice(0,14) + 'IN  AAAA   ' + zone.aaaa[n], 'ok'); });
+      Object.keys(zone.cname).forEach(function(n){ print((n + '            ').slice(0,14) + 'IN  CNAME  ' + zone.cname[n], 'ok'); });
+      zone.mx.forEach(function(r){ print('@             IN  MX     ' + r.pref + '  ' + r.host, 'ok'); });
+      Object.keys(zone.ptr).forEach(function(ip){ print(ip.split('.').reverse().join('.') + '.in-addr.arpa.  IN  PTR  ' + zone.ptr[ip], 'ok'); });
+      if (!Object.keys(zone.a).length && !Object.keys(zone.cname).length && !zone.mx.length) print('(zone is empty — add some records)', 'dim');
+    }
+    function lookup(name){
+      var n = name.toLowerCase().replace(/\.mvcc-lab\.edu\.?$/, '');
+      print('query: ' + n + '.mvcc-lab.edu', 'dim');
+      var hops = 0, cur = n, chain = [];
+      while (zone.cname[cur] && hops < 5) { chain.push(cur + ' → CNAME → ' + zone.cname[cur]); cur = zone.cname[cur]; hops++; }
+      chain.forEach(function(c){ print('  ' + c, 'dim'); });
+      if (zone.a[cur] || zone.aaaa[cur]) {
+        if (zone.a[cur]) print('  ' + cur + ' → A → ' + zone.a[cur], 'ok');
+        if (zone.aaaa[cur]) print('  ' + cur + ' → AAAA → ' + zone.aaaa[cur], 'ok');
+        print('ANSWER: ' + (zone.a[cur] || zone.aaaa[cur]), 'ok');
+        if (n === 'portal' && hops > 0 && zone.a[cur] === '192.168.50.20') { zFlags.z6 = true; ck('z6'); print('✔ Milestone complete: the alias chain resolved end to end', 'ok'); }
+      } else if (hops >= 5) {
+        print('SERVFAIL: CNAME loop detected — an alias chain must end at an address record', 'err');
+      } else {
+        print('NXDOMAIN: no record for "' + cur + '" — the resolver has nothing to answer with', 'err');
+      }
+    }
+    function help(){
+      print('— Add records —', 'dim');
+      print('  add a <name> <ipv4>           e.g., add a www 192.168.50.20');
+      print('  add aaaa <name> <ipv6>        e.g., add aaaa www 2001:db8:50::20');
+      print('  add cname <alias> <target>    e.g., add cname portal www');
+      print('  add mx <host> <preference>    e.g., add mx mail 10');
+      print('  add ptr <ipv4> <fqdn>         e.g., add ptr 192.168.50.20 www.mvcc-lab.edu');
+      print('— Verify —', 'dim');
+      print('  lookup <name> · show zone · delete <type> <name> · reset');
+    }
+    function handle(raw){
+      var line = raw.trim().replace(/\s+/g, ' ');
+      if (!line) return;
+      print('zone> ' + line, 'cmd');
+      var l = line.toLowerCase(), m;
+      if (l === '?' || l === 'help') return help();
+      if (l === 'reset') {
+        zone = fresh(); out.textContent = ''; banner();
+        Object.keys(zFlags).forEach(function(k){ zFlags[k] = false; });
+        ['z1','z2','z3','z4','z5','z6'].forEach(function(id){ document.getElementById(id).classList.remove('done'); });
+        return;
+      }
+      if (l === 'show zone' || l === 'show') return showZone();
+      if ((m = l.match(/^lookup (\S+)$/))) return lookup(m[1]);
+      if ((m = l.match(/^add a (\S+) (\S+)$/))) {
+        if (!validIp(m[2])) return print('% Invalid IPv4 address', 'err');
+        if (zone.cname[m[1]]) return print('% "' + m[1] + '" is a CNAME — an alias cannot also hold an A record', 'err');
+        zone.a[m[1]] = m[2];
+        print('✔ A record: ' + m[1] + '.mvcc-lab.edu → ' + m[2], 'ok'); refresh(); return;
+      }
+      if ((m = l.match(/^add aaaa (\S+) (\S+)$/))) {
+        if (!validIp6(m[2])) return print('% Invalid IPv6 address', 'err');
+        if (zone.cname[m[1]]) return print('% "' + m[1] + '" is a CNAME — an alias cannot also hold an AAAA record', 'err');
+        zone.aaaa[m[1]] = m[2];
+        print('✔ AAAA record: ' + m[1] + '.mvcc-lab.edu → ' + m[2], 'ok'); refresh(); return;
+      }
+      if ((m = l.match(/^add cname (\S+) (\S+)$/))) {
+        if (zone.a[m[1]] || zone.aaaa[m[1]]) return print('% "' + m[1] + '" already has an address record — a CNAME cannot coexist with other records for the same name', 'err');
+        if (m[1] === m[2]) return print('% An alias cannot point at itself', 'err');
+        zone.cname[m[1]] = m[2].replace(/\.mvcc-lab\.edu\.?$/, '');
+        print('✔ CNAME record: ' + m[1] + ' is now an alias for ' + zone.cname[m[1]], 'ok'); refresh(); return;
+      }
+      if ((m = l.match(/^add mx (\S+) (\d+)$/))) {
+        zone.mx.push({ host: m[1], pref: +m[2] });
+        print('✔ MX record: mail for @mvcc-lab.edu → ' + m[1] + ' (preference ' + m[2] + ' — lowest wins)', 'ok'); refresh(); return;
+      }
+      if ((m = l.match(/^add ptr (\S+) (\S+)$/))) {
+        if (!validIp(m[1])) return print('% Invalid IPv4 address', 'err');
+        zone.ptr[m[1]] = m[2];
+        print('✔ PTR record: ' + m[1] + ' reverse-resolves to ' + m[2], 'ok'); refresh(); return;
+      }
+      if ((m = l.match(/^delete (a|aaaa|cname|ptr) (\S+)$/))) {
+        var store = zone[m[1]];
+        if (store[m[2]]) { delete store[m[2]]; return print('Record removed.', 'ok'); }
+        return print('% No such record', 'err');
+      }
+      print('% Unrecognized command: "' + line + '" — type ? for help', 'err');
+    }
+    zone = fresh(); banner();
+    inp.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { handle(inp.value); inp.value = ''; }
+    });
+  })();
 
-        function clearRecords() {
-            dnsRecords = [];
-            updateDNSOutput();
-        }
+  /* ================= TASK GRADING ================= */
+  var TOTAL = { 1:4, 2:5, 3:6, 4:5, 5:6, 6:4 };
+  var earned = { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null };
 
-        function simulateLookup() {
-            const domain = document.getElementById('lookupDomain').value;
-            const output = document.getElementById('lookupOutput');
-            
-            if (!domain) {
-                alert('Please enter a domain name!');
-                return;
-            }
-            
-            let simulation = `DNS Lookup Simulation for: ${domain}\n`;
-            simulation += '='.repeat(50) + '\n\n';
-            
-            simulation += 'Step 1: Check local DNS cache\n';
-            simulation += '   → Cache miss, proceeding to recursive resolution\n\n';
-            
-            simulation += 'Step 2: Query recursive DNS server (ISP)\n';
-            simulation += '   → 8.8.8.8 (Google DNS)\n\n';
-            
-            simulation += 'Step 3: Query root name server\n';
-            simulation += '   → "Where can I find .com domains?"\n';
-            simulation += '   ← "Try these .com TLD servers: a.gtld-servers.net"\n\n';
-            
-            simulation += 'Step 4: Query TLD server\n';
-            simulation += '   → "Where can I find ' + domain + '?"\n';
-            simulation += '   ← "Try these authoritative servers: ns1.example.com"\n\n';
-            
-            simulation += 'Step 5: Query authoritative server\n';
-            simulation += '   → "What is the A record for ' + domain + '?"\n';
-            simulation += '   ← "' + domain + ' IN A 192.0.2.1"\n\n';
-            
-            simulation += 'Step 6: Return result to client\n';
-            simulation += '   → IP Address: 192.0.2.1\n';
-            simulation += '   → TTL: 300 seconds\n\n';
-            
-            simulation += 'Step 7: Browser connects to 192.0.2.1\n';
-            simulation += '   → HTTP/HTTPS connection established\n';
-            simulation += '   → Website loads successfully!\n\n';
-            
-            simulation += 'Total Resolution Time: ~50ms\n';
-            simulation += 'Record cached for 300 seconds';
-            
-            output.textContent = simulation;
-        }
+  function setStatus(n, pts){
+    var el = document.getElementById('st' + n);
+    el.textContent = pts + '/' + TOTAL[n] + ' PTS';
+    el.className = 'task-status ' + (pts === TOTAL[n] ? 'good' : pts > 0 ? 'part' : 'none');
+    if (pts === 0) el.textContent += ' — TRY AGAIN';
+  }
+  function checkAnswer(mode, key, raw){
+    var x = (raw || '').trim();
+    if (!x) return false;
+    if (mode === 'ip') return validIp(x) && x === key;
+    if (mode === 'dec') return /^-?\d+$/.test(x) && parseInt(x, 10) === parseInt(key, 10);
+    return false;
+  }
+  function gradeTask(n){
+    var taskEl = document.getElementById('task' + n);
+    var pts = 0;
+    if (n === 3) { ['d1','d2','d3','d4','d5','d6'].forEach(function(k){ if (dFlags[k]) pts++; }); }
+    else if (n === 5) { ['z1','z2','z3','z4','z5','z6'].forEach(function(k){ if (zFlags[k]) pts++; }); }
+    else {
+      taskEl.querySelectorAll('.match-row').forEach(function(row){
+        var sel = row.querySelector('select');
+        if (!sel) return;
+        row.classList.remove('right','wrong');
+        var ok = sel.value === row.getAttribute('data-key');
+        row.classList.add(ok ? 'right' : 'wrong');
+        if (ok) pts++;
+      });
+      taskEl.querySelectorAll('.ans-row').forEach(function(row){
+        row.classList.remove('right','wrong');
+        var ok = checkAnswer(row.getAttribute('data-mode'), row.getAttribute('data-key'), row.querySelector('input').value);
+        row.classList.add(ok ? 'right' : 'wrong');
+        if (ok) pts++;
+      });
+      taskEl.querySelectorAll('.q').forEach(function(q){
+        q.classList.remove('correct','wrong');
+        q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+        var key = q.getAttribute('data-answer');
+        var picked = q.querySelector('input:checked');
+        q.querySelectorAll('label').forEach(function(l){
+          if (l.querySelector('input').value === key) l.classList.add('ans');
+        });
+        if (picked && picked.value === key) { pts++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); if (picked) picked.closest('label').classList.add('picked'); }
+      });
+    }
+    earned[n] = pts;
+    setStatus(n, pts);
+    return pts;
+  }
+  document.querySelectorAll('[data-grade]').forEach(function(b){
+    b.addEventListener('click', function(){ gradeTask(parseInt(b.getAttribute('data-grade'), 10)); });
+  });
 
-        function startQuiz() {
-            currentQuiz = [...quizQuestions];
-            quizScore = 0;
-            currentQuestionIndex = 0;
-            showNextQuestion();
-        }
+  /* ---------- Master grade ---------- */
+  function gradeAll(){
+    var sum = 0, max = 0, lines = [];
+    for (var n = 1; n <= 6; n++) {
+      gradeTask(n);
+      sum += earned[n]; max += TOTAL[n];
+      lines.push('Task ' + n + ': ' + earned[n] + '/' + TOTAL[n]);
+    }
+    var pct = Math.round(sum / max * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    document.getElementById('masterScore').textContent = sum + ' / ' + max + '  (' + pct + '%) ' + emoji;
+    document.getElementById('masterBreakdown').innerHTML = lines.join(' &nbsp;·&nbsp; ') +
+      '<br>' + (pct === 100 ? 'Perfect — leases granted, names resolved. Download your PDF and submit it.' :
+      'Review the highlighted items (the milestone lists show what\u2019s missing in the simulators), fix, regrade, then download your PDF summary for the LMS.');
+    return { sum: sum, max: max, pct: pct };
+  }
+  document.getElementById('masterGrade').addEventListener('click', gradeAll);
 
-        function showNextQuestion() {
-            const container = document.getElementById('quizContainer');
-            
-            if (currentQuestionIndex >= currentQuiz.length) {
-                showQuizResults();
-                return;
-            }
-            
-            const question = currentQuiz[currentQuestionIndex];
-            
-            let html = `
-                <div class="quiz-question">
-                    <h3>Question ${currentQuestionIndex + 1} of ${currentQuiz.length}</h3>
-                    <p><strong>${question.question}</strong></p>
-                    <div class="quiz-options">
-            `;
-            
-            question.options.forEach((option, index) => {
-                html += `<div class="quiz-option" onclick="selectAnswer(${index})">${option}</div>`;
-            });
-            
-            html += `
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-            updateQuizProgress();
-        }
+  /* ---------- PDF grade summary ---------- */
+  var TASK_NAMES = {
+    1: 'DHCP Operations — DORA, Ports & APIPA',
+    2: 'DHCP Scope Design',
+    3: 'DHCP Pool Simulator',
+    4: 'DNS Records — Type Selection',
+    5: 'DNS Zone Builder Simulator',
+    6: 'Troubleshooting DHCP & DNS'
+  };
 
-        function selectAnswer(selectedIndex) {
-            const question = currentQuiz[currentQuestionIndex];
-            const options = document.querySelectorAll('.quiz-option');
-            
-            options.forEach((option, index) => {
-                if (index === question.correct) {
-                    option.classList.add('correct');
-                } else if (index === selectedIndex && index !== question.correct) {
-                    option.classList.add('incorrect');
-                }
-                option.style.pointerEvents = 'none';
-            });
-            
-            if (selectedIndex === question.correct) {
-                quizScore++;
-            }
-            
-            setTimeout(() => {
-                currentQuestionIndex++;
-                showNextQuestion();
-            }, 2000);
-        }
+  function buildPdf(jsPDF, result){
+    var doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    var W = doc.internal.pageSize.getWidth();
+    var name = (document.getElementById('studentName').value || 'Name not entered').trim() || 'Name not entered';
+    var now = new Date();
+    var stamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
 
-        function updateQuizProgress() {
-            const progress = document.getElementById('quizProgress');
-            const percentage = (currentQuestionIndex / currentQuiz.length) * 100;
-            progress.style.width = percentage + '%';
-        }
+    doc.setFillColor(31, 78, 121);
+    doc.rect(0, 0, W, 92, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(19);
+    doc.text('LAN 121 — Network Essentials', 48, 40);
+    doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+    doc.text('Exercise 6: DHCP & DNS Workshop — Grade Summary', 48, 62);
 
-        function showQuizResults() {
-            const container = document.getElementById('quizContainer');
-            const resultsDiv = document.getElementById('quizResults');
-            
-            const percentage = Math.round((quizScore / currentQuiz.length) * 100);
-            
-            let message = '';
-            if (percentage >= 90) {
-                message = 'Excellent! You have mastered DNS! 🎉';
-            } else if (percentage >= 70) {
-                message = 'Great job! You have a solid understanding of DNS! 👍';
-            } else if (percentage >= 50) {
-                message = 'Good effort! Review the concepts and try again. 📚';
-            } else {
-                message = 'Keep studying! DNS is complex but you can master it! 💪';
-            }
-            
-            container.innerHTML = `
-                <div class="quiz-question">
-                    <h3>Quiz Complete!</h3>
-                    <p>You scored ${quizScore} out of ${currentQuiz.length} questions correctly.</p>
-                    <p>That's ${percentage}%!</p>
-                    <p><strong>${message}</strong></p>
-                </div>
-            `;
-            
-            updateQuizProgress();
-        }
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Student:', 48, 128); doc.text('Generated:', 48, 148);
+    doc.setFont('helvetica', 'normal');
+    doc.text(name, 118, 128); doc.text(stamp, 118, 148);
 
-        function resetQuiz() {
-            document.getElementById('quizContainer').innerHTML = '<p>Click "Start Quiz" to begin testing your DNS knowledge!</p>';
-            document.getElementById('quizProgress').style.width = '0%';
-            document.getElementById('quizResults').innerHTML = '';
-        }
+    var pct = result.pct;
+    doc.setFillColor(pct >= 77 ? 76 : 224, pct >= 77 ? 175 : 101, pct >= 77 ? 80 : 92);
+    doc.roundedRect(W - 220, 108, 172, 56, 8, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+    doc.text(result.sum + ' / ' + result.max + '  (' + pct + '%)', W - 134, 142, { align: 'center' });
 
-        // Initialize the form
-        updateRecordForm();
-    </script>
+    var y = 200;
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Task', 48, y); doc.text('Score', W - 110, y);
+    doc.setDrawColor(180); doc.line(48, y + 8, W - 48, y + 8);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    y += 30;
+    for (var n = 1; n <= 6; n++) {
+      doc.text('Task ' + n + ' — ' + TASK_NAMES[n], 48, y);
+      doc.text(earned[n] + ' / ' + TOTAL[n], W - 110, y);
+      doc.setDrawColor(230); doc.line(48, y + 9, W - 48, y + 9);
+      y += 26;
+    }
+
+    y += 8;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('TOTAL', 48, y); doc.text(result.sum + ' / ' + result.max + '   (' + pct + '%)', W - 158, y);
+    y += 34;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9.5); doc.setTextColor(90, 90, 90);
+    var note = 'Scores are computed in the browser at the time of download. Submit this summary to the LMS as directed by your instructor. Regrading before download is permitted — mastery is the goal.';
+    doc.text(doc.splitTextToSize(note, W - 96), 48, y);
+
+    y += 58;
+    doc.setDrawColor(120); doc.line(48, y, 280, y);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30); doc.setFontSize(10);
+    doc.text('Student signature', 48, y + 14);
+
+    doc.setFontSize(8.5); doc.setTextColor(130, 130, 130);
+    doc.text('Moraine Valley Community College · Computer Integrated Technologies Department · LAN 121 Exercise 6', 48, 760);
+
+    doc.save('LAN121_Exercise6_' + name.replace(/[^a-z0-9]+/gi, '_') + '.pdf');
+  }
+
+  document.getElementById('pdfBtn').addEventListener('click', function(){
+    var result = gradeAll();
+    function go(){ buildPdf(window.jspdf.jsPDF, result); }
+    if (window.jspdf && window.jspdf.jsPDF) return go();
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = go;
+    s.onerror = function(){
+      alert('The PDF library could not be loaded (no internet connection?). Your graded page will open the print dialog instead — choose "Save as PDF".');
+      window.print();
+    };
+    document.head.appendChild(s);
+  });
+})();
+</script>
+
 </body>
 </html>
