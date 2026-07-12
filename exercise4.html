@@ -1,2136 +1,977 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CompTIA Network+ Interactive Lesson: Network Devices</title>
-    <style>
-        :root {
-            --primary-green: #2d7b32;
-            --secondary-green: #4caf50;
-            --light-green: #a5d6a7;
-            --dark-green: #1b5e20;
-            --bg-white: #ffffff;
-            --bg-light: #f8f9fa;
-            --text-black: #212121;
-            --text-gray: #424242;
-            --border-gray: #e0e0e0;
-            --shadow: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-hover: 0 8px 15px rgba(0,0,0,0.2);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-white);
-            color: var(--text-black);
-            line-height: 1.6;
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-            color: white;
-            padding: 2rem 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 0 2rem 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            text-align: center;
-        }
-
-        .nav-section {
-            margin-bottom: 2rem;
-        }
-
-        .nav-section-title {
-            padding: 0 2rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.7;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .nav-item {
-            display: block;
-            padding: 1rem 2rem;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            border-left-color: var(--light-green);
-            transform: translateX(5px);
-        }
-
-        .nav-item.active {
-            background: rgba(255,255,255,0.15);
-            border-left-color: white;
-            font-weight: 600;
-        }
-
-        .nav-item::before {
-            content: '▶';
-            position: absolute;
-            left: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-item.active::before {
-            opacity: 1;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
-            background-color: var(--bg-light);
-        }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .section-header {
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            color: white;
-            padding: 3rem;
-            border-radius: 15px;
-            margin-bottom: 3rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .section-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
-            animation: drift 20s linear infinite;
-        }
-
-        @keyframes drift {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-100px, -100px) rotate(360deg); }
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .section-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Cards */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .device-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-gray);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .device-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .device-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-title::before {
-            content: '🔧';
-            margin-right: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .card-content {
-            color: var(--text-gray);
-            line-height: 1.7;
-        }
-
-        /* Specifications Grid */
-        .spec-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .spec-item {
-            background: var(--bg-light);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary-green);
-            transition: all 0.3s ease;
-        }
-
-        .spec-item:hover {
-            background: var(--light-green);
-            transform: translateX(5px);
-        }
-
-        .spec-label {
-            font-weight: 700;
-            color: var(--primary-green);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .spec-value {
-            color: var(--text-black);
-            font-weight: 500;
-        }
-
-        /* Configuration Code */
-        .config-code {
-            background: #1a1a1a;
-            color: #00ff00;
-            padding: 2rem;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin: 1.5rem 0;
-            overflow-x: auto;
-            position: relative;
-            box-shadow: var(--shadow);
-        }
-
-        .config-code::before {
-            content: 'Configuration Example';
-            position: absolute;
-            top: -15px;
-            left: 1rem;
-            background: var(--primary-green);
-            color: white;
-            padding: 0.3rem 1rem;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Tables */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            color: white;
-            padding: 1rem;
-            font-weight: 700;
-            text-align: left;
-        }
-
-        .comparison-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-gray);
-            color: var(--text-gray);
-        }
-
-        .comparison-table tr:hover td {
-            background-color: var(--bg-light);
-        }
-
-        .comparison-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Scenario Boxes */
-        .scenario-box {
-            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-            border: 2px solid var(--light-green);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .scenario-box::before {
-            content: '💡';
-            position: absolute;
-            top: -15px;
-            left: 2rem;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 50%;
-            font-size: 1.2rem;
-        }
-
-        .scenario-title {
-            color: var(--primary-green);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        /* Assessment Styles */
-        .quiz-container {
-            background: white;
-            border-radius: 15px;
-            padding: 3rem;
-            box-shadow: var(--shadow);
-            margin: 2rem 0;
-        }
-
-        .progress-container {
-            margin-bottom: 3rem;
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary-green);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 15px;
-            background: var(--bg-light);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
-            width: 0%;
-            transition: width 1s ease;
-            border-radius: 10px;
-        }
-
-        .question {
-            background: var(--bg-light);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 5px solid var(--primary-green);
-            transition: all 0.3s ease;
-        }
-
-        .question:hover {
-            box-shadow: var(--shadow);
-            transform: translateX(5px);
-        }
-
-        .question-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 35px;
-            height: 35px;
-            background: var(--primary-green);
-            color: white;
-            border-radius: 50%;
-            font-weight: 700;
-            margin-right: 1rem;
-        }
-
-        .question-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-black);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .options {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .option {
-            background: white;
-            border: 2px solid var(--border-gray);
-            border-radius: 10px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .option:hover {
-            border-color: var(--primary-green);
-            background: #f8fff8;
-        }
-
-        .option input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-        }
-
-        .option-text {
-            flex: 1;
-            color: var(--text-gray);
-            line-height: 1.5;
-        }
-
-        .option.selected {
-            border-color: var(--primary-green);
-            background: var(--light-green);
-        }
-
-        /* Buttons */
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 3rem 0;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        /* Answer Feedback */
-        .answer-feedback {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 10px;
-            display: none;
-            font-weight: 500;
-            line-height: 1.6;
-        }
-
-        .answer-feedback.correct {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .answer-feedback.incorrect {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .answer-feedback.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Grade Display */
-        .grade-display {
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            color: white;
-            padding: 3rem;
-            border-radius: 15px;
-            margin-top: 3rem;
-            text-align: center;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .grade-display.show {
-            display: block;
-            animation: zoomIn 0.5s ease;
-        }
-
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .grade-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .grade-score {
-            font-size: 4rem;
-            font-weight: 800;
-            margin: 1rem 0;
-        }
-
-        .grade-feedback {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        /* Lists */
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            padding-left: 2rem;
-            position: relative;
-            color: var(--text-gray);
-        }
-
-        .feature-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--primary-green);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .spec-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block;
-            }
-        }
-
-        /* Activity Styles */
-        .activity-container {
-            background: white;
-            border-radius: 15px;
-            padding: 3rem;
-            box-shadow: var(--shadow);
-            margin: 2rem 0;
-            border: 2px solid var(--light-green);
-        }
-
-        .activity-title {
-            color: var(--primary-green);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .simulation-panel {
-            background: var(--bg-light);
-            border-radius: 10px;
-            padding: 2rem;
-            margin: 1rem 0;
-        }
-
-        .device-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .device-option {
-            background: white;
-            border: 2px solid var(--border-gray);
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .device-option:hover {
-            border-color: var(--primary-green);
-            background: var(--light-green);
-        }
-
-        .device-option.selected {
-            border-color: var(--primary-green);
-            background: var(--primary-green);
-            color: white;
-        }
-
-        .config-panel {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            margin: 1rem 0;
-            border: 1px solid var(--border-gray);
-        }
-
-        .config-input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--border-gray);
-            border-radius: 5px;
-            margin: 0.5rem 0;
-            font-size: 1rem;
-        }
-
-        .config-input:focus {
-            border-color: var(--primary-green);
-            outline: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 4 | Spanning Tree & VLANs — LAN 121</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78;
+    --line:#DCE4EA; --blue:#145DA0; --blue-soft:#E3EEF8;
+    --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --amber:#B45309; --amber-soft:#FDF0DF;
+    --red:#B3403A; --red-soft:#FBEAE9;
+    --shadow:0 2px 10px rgba(23,36,46,.08);
+    --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4;
+    --line:#26384A; --blue:#5BA3E0; --blue-soft:#123049;
+    --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --amber:#E0A458; --amber-soft:#33270F;
+    --red:#E08079; --red-soft:#3A1B19;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;transition:background .3s,color .3s}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .badge{font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--blue);color:#fff;padding:6px 10px;border-radius:8px;letter-spacing:.06em;white-space:nowrap}
+  .hdr h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+  .hdr .sub{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+  .hdr-spacer{flex:1}
+  .hdr a.back{font-size:.8rem;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .hdr a.back:hover{color:var(--blue)}
+  #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
+  #themeBtn:focus-visible,.hdr a.back:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:40px 0 10px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--d1)}
+  .tag.exam{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+  .hero h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:10px}
+  .hero p.lede{max-width:840px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- Sections ---------- */
+  section{padding:30px 0 6px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .sec-head .ic{font-size:1.3rem}
+  .sec-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  /* ---------- Objectives ---------- */
+  .obj-list{list-style:none;counter-reset:obj}
+  .obj-list li{counter-increment:obj;position:relative;padding:10px 0 10px 52px;border-bottom:1px dashed var(--line);font-size:.93rem}
+  .obj-list li:last-child{border-bottom:none}
+  .obj-list li::before{content:counter(obj);position:absolute;left:0;top:9px;width:32px;height:32px;border-radius:9px;background:var(--blue-soft);color:var(--blue);font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .obj-list b{color:var(--blue)}
+  .bloom{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap}
+
+  /* ---------- Accordion ---------- */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;gap:13px;background:none;border:none;color:var(--ink);cursor:pointer;padding:17px 20px;text-align:left;font-family:var(--sans)}
+  .acc-btn .aic{font-size:1.25rem;width:30px;text-align:center;flex-shrink:0}
+  .acc-btn .at{flex:1}
+  .acc-btn .at h3{font-size:1.02rem;font-weight:700;line-height:1.3}
+  .acc-btn .at .asub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;margin-top:2px}
+  .acc-btn .chev{flex-shrink:0;transition:transform .25s;color:var(--muted);font-size:.85rem}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-btn:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .acc-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+  .acc.open .acc-body{display:block}
+  .acc-body h4{font-size:.95rem;margin:18px 0 8px;color:var(--blue)}
+  .acc-body p{font-size:.92rem;margin-bottom:10px}
+  .acc-body ul{padding-left:22px;font-size:.92rem;margin-bottom:10px}
+  .acc-body ul li{margin-bottom:5px}
+  .acc-body code{font-family:var(--mono);font-size:.83em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  /* ---------- Callouts ---------- */
+  .callout{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.87rem;margin:12px 0}
+  .callout .cic{flex-shrink:0}
+  .callout.tip{background:var(--green-soft)}
+  .callout.warn{background:var(--amber-soft)}
+  .callout.examnote{background:var(--blue-soft)}
+
+  /* ---------- Tables ---------- */
+  .tbl-scroll{overflow-x:auto;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+  tr:last-child td{border-bottom:none}
+  td.mono, .mono{font-family:var(--mono)}
+  td .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px}
+  .pill.tcp{background:var(--blue-soft);color:var(--blue)}
+  .pill.udp{background:var(--green-soft);color:var(--green)}
+  .pill.both{background:var(--amber-soft);color:var(--amber)}
+
+  /* ---------- Flip cards ---------- */
+  .kt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;padding-top:14px}
+  .flip{perspective:900px;height:158px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;border:1px solid var(--line)}
+  .flip-front{background:var(--card);box-shadow:var(--shadow)}
+  .flip-front .fic{font-size:1.5rem;margin-bottom:8px}
+  .flip-front b{font-size:.9rem;line-height:1.25}
+  .flip-front .hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:9px;letter-spacing:.06em}
+  .flip-back{background:var(--blue);color:#fff;transform:rotateY(180deg);font-size:.76rem;line-height:1.42}
+  .flip:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+  /* ---------- SVG figures ---------- */
+  .fig{margin:14px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+  .fig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .fig-cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center}
+  .fig-cell .fname{font-weight:700;font-size:.84rem;margin-top:6px}
+  .fig-cell .fdesc{font-size:.75rem;color:var(--muted)}
+  .sv-line{stroke:var(--muted);stroke-width:2;fill:none}
+  .sv-node{fill:var(--blue)} .sv-node2{fill:var(--green)} .sv-node3{fill:var(--amber)}
+  .sv-txt{fill:var(--ink);font-family:var(--sans);font-size:11px}
+  .sv-mono{fill:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:10px}
+
+  /* ---------- CIDR slider widget ---------- */
+  .cidr-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .cidr-widget label{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-bottom:8px}
+  .cidr-widget input[type=range]{width:100%;accent-color:var(--blue)}
+  .cidr-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cidr-out .co{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .cidr-out .co .lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .cidr-out .co .val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--blue);word-break:break-all}
+
+  /* ---------- Activity links ---------- */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .act-card{display:block;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s}
+  .act-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
+  .act-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .act-card.examcard{border-left-color:var(--amber)}
+  .act-card h3{font-size:1rem;margin-bottom:5px}
+  .act-card p{font-size:.85rem;color:var(--muted)}
+  .act-card .go{margin-top:9px;font-weight:700;font-size:.85rem;color:var(--blue)}
+
+  /* ---------- Quiz ---------- */
+  .q{border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin-bottom:15px;background:var(--paper)}
+  .q .qt{font-weight:700;font-size:.93rem;margin-bottom:11px}
+  .q .qnum{font-family:var(--mono);color:var(--blue);margin-right:6px}
+  .q label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .q label:hover{border-color:var(--blue)}
+  .q input{margin-top:4px;accent-color:var(--blue)}
+  .q .rat{display:none;border-radius:9px;padding:11px 14px;font-size:.85rem;margin-top:9px}
+  .q.correct .rat{display:block;background:var(--green-soft)}
+  .q.wrong .rat{display:block;background:var(--red-soft)}
+  .q.correct label.ans{border-color:var(--green);background:var(--green-soft)}
+  .q.wrong label.picked{border-color:var(--red);background:var(--red-soft)}
+  .q.wrong label.ans{border-color:var(--green)}
+  .quiz-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .btn{border:none;border-radius:999px;padding:11px 26px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--sans)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #quizScore{font-weight:800;font-size:1rem}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);background:var(--card);padding:24px 0 32px;text-align:center;font-size:.8rem;color:var(--muted)}
+  .navrow{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .navrow a{text-decoration:none;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:11px 22px;color:var(--ink);box-shadow:var(--shadow)}
+  .navrow a:hover{color:var(--blue)}
+
+  @media(max-width:640px){ .hdr h1{font-size:.85rem} .hdr .sub{display:none} }
+
+  /* ---------- Exercise additions ---------- */
+  .tool-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin:14px 0}
+  .tool-card{display:block;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:11px;padding:13px 16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tool-card .tt{font-weight:700;font-size:.88rem}
+  .tool-card .td{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .tool-card .tg{font-family:var(--mono);font-size:.68rem;color:var(--amber);font-weight:700;margin-top:8px;letter-spacing:.05em}
+  .match-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .match-row .mr-l{font-weight:700;font-size:.88rem}
+  .match-row .mr-l .dnum{font-family:var(--mono);font-size:.68rem;color:var(--muted);display:block;letter-spacing:.06em}
+  select.exsel{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.82rem;cursor:pointer}
+  select.exsel:focus-visible{outline:3px solid var(--blue)}
+  .match-row.right{border-color:var(--green);background:var(--green-soft)}
+  .match-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 15px;flex-wrap:wrap}
+  .alloc-row input{width:80px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:.9rem;text-align:center}
+  .alloc-row.right{border-color:var(--green);background:var(--green-soft)}
+  .alloc-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .alloc-total{font-family:var(--mono);font-size:.8rem;margin-top:8px}
+  .task-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .pts{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:4px 11px;font-weight:800}
+  .task-status{font-family:var(--mono);font-size:.75rem;margin-left:auto}
+  .task-status.good{color:var(--green)} .task-status.part{color:var(--amber)} .task-status.none{color:var(--muted)}
+  .score-panel{background:linear-gradient(135deg,var(--blue),#1F4E79);color:#fff;border-radius:16px;padding:26px 28px;margin:26px 0}
+  [data-theme="dark"] .score-panel{background:linear-gradient(135deg,#123A5C,#0E2C46)}
+  .score-panel h2{font-size:1.15rem;margin-bottom:6px}
+  .score-panel .big{font-size:2.3rem;font-weight:800;font-family:var(--mono)}
+  .score-panel .brk{font-family:var(--mono);font-size:.78rem;opacity:.92;margin-top:10px;line-height:1.9}
+  .score-panel .btn{margin-top:14px}
+
+  /* ---------- typed-answer rows (from exercise 3) ---------- */
+  .ans-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 15px;margin:8px 0;flex-wrap:wrap}
+  .ans-row .mr-l{font-weight:700;font-size:.9rem}
+  .ans-row .mr-l .dnum{font-family:var(--mono);font-size:.66rem;color:var(--muted);display:block;letter-spacing:.06em;font-weight:400}
+  .ans-row input{width:min(160px,40vw);background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:.92rem}
+  .ans-row.right{border-color:var(--green);background:var(--green-soft)}
+  .ans-row.wrong{border-color:var(--red);background:var(--red-soft)}
+  .ans-row .exp{font-family:var(--mono);font-size:.72rem;color:var(--red);width:100%;display:none}
+  .ans-row.wrong .exp{display:block}
+
+  /* ---------- switch CLI simulator (from lesson 4) ---------- */
+  .sim{background:#0E1822;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+  [data-theme="dark"] .sim{background:#0A1118}
+  .sim-bar{display:flex;align-items:center;gap:8px;background:#1B2836;padding:9px 14px}
+  .sim-bar .dot{width:11px;height:11px;border-radius:50%}
+  .sim-bar .d1{background:#E0655C}.sim-bar .d2{background:#E0A458}.sim-bar .d3{background:#4FC08D}
+  .sim-bar .stitle{margin-left:6px;color:#9FB2C3;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em}
+  .sim-out{height:250px;overflow-y:auto;padding:13px 16px;font-family:var(--mono);font-size:.8rem;line-height:1.55;color:#D7E4EE;white-space:pre-wrap;word-break:break-word}
+  .sim-out .ok{color:#4FC08D}.sim-out .err{color:#E0827B}.sim-out .dim{color:#7E93A6}.sim-out .cmd{color:#8FC7F2}
+  .sim-in{display:flex;align-items:center;gap:8px;border-top:1px solid #223447;padding:9px 14px}
+  .sim-in .pr{font-family:var(--mono);font-size:.8rem;color:#4FC08D;white-space:nowrap}
+  .sim-in input{flex:1;background:none;border:none;outline:none;color:#EAF2F8;font-family:var(--mono);font-size:.84rem}
+  .sim-in input::placeholder{color:#5E7386}
+  .sim-help{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 15px;font-size:.8rem;margin-top:10px}
+  .sim-help code{display:inline-block;margin:2px 3px}
+  .ck-list{list-style:none;padding:0;margin:10px 0}
+  .ck-list li{font-size:.8rem;padding:5px 0 5px 26px;position:relative;font-family:var(--mono)}
+  .ck-list li::before{content:'○';position:absolute;left:2px;color:var(--muted)}
+  .ck-list li.done{color:var(--green)}
+  .ck-list li.done::before{content:'✔';color:var(--green);font-weight:800}
+
+  /* ---------- STP failover widget ---------- */
+  .stp-widget{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .stp-widget svg{width:100%;height:auto;display:block}
+  .stp-read{display:flex;gap:11px;border-radius:10px;padding:12px 15px;font-size:.85rem;margin-top:10px;background:var(--blue-soft)}
+  .flow{stroke-width:4;fill:none;transition:opacity .3s}
+</style>
 </head>
 <body>
-    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
-    
-    <div class="container">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h1 class="sidebar-title">Network Devices</h1>
-                <p class="sidebar-subtitle">CompTIA Network+ Interactive Lesson</p>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-section-title">Course Modules</div>
-                <a class="nav-item active" onclick="showSection('overview')">
-                    Course Overview
-                </a>
-                <a class="nav-item" onclick="showSection('hubs')">
-                    Ethernet Hubs
-                </a>
-                <a class="nav-item" onclick="showSection('switches')">
-                    Network Switches
-                </a>
-                <a class="nav-item" onclick="showSection('routers')">
-                    Network Routers
-                </a>
-                <a class="nav-item" onclick="showSection('vlans')">
-                    VLANs & Trunking
-                </a>
-                <a class="nav-item" onclick="showSection('wireless')">
-                    Wireless Access Points
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-section-title">Activities</div>
-                <a class="nav-item" onclick="showSection('comparison')">
-                    Device Comparison
-                </a>
-                <a class="nav-item" onclick="showSection('activity')">
-                    Hands-On Activity
-                </a>
-                <a class="nav-item" onclick="showSection('assessment')">
-                    Final Assessment
-                </a>
-            </div>
-        </nav>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Overview Section -->
-            <section class="content-section active" id="overview">
-                <div class="section-header">
-                    <h1 class="section-title">Network Devices Mastery</h1>
-                    <p class="section-subtitle">Essential CompTIA Network+ knowledge for modern network infrastructure</p>
-                </div>
-                
-                <div class="card-grid">
-                    <div class="device-card">
-                        <h2 class="card-title">Learning Objectives</h2>
-                        <div class="card-content">
-                            <p>Upon completion of this interactive lesson, you will be able to:</p>
-                            <ul class="feature-list">
-                                <li>Analyze the purpose and characteristics of Ethernet hubs, switches, routers, VLANs, and wireless access points</li>
-                                <li>Configure network devices with appropriate settings for different scenarios</li>
-                                <li>Implement best practices for network device deployment</li>
-                                <li>Troubleshoot common network device issues and misconfigurations</li>
-                                <li>Make informed decisions about device selection for specific network requirements</li>
-                            </ul>
-                        </div>
-                    </div>
+<header>
+  <div class="wrap hdr">
+    <span class="badge">LAN 121</span>
+    <div>
+      <h1>Exercise 4 — Spanning Tree &amp; VLAN Workshop</h1>
+      <div class="sub">Graded Exercise · Root Bridge Math · Port Roles · VLAN Configuration · Simulations</div>
+    </div>
+    <div class="hdr-spacer"></div>
+    <a class="back" href="index.html">← Course Home</a>
+    <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
+</header>
 
-                    <div class="device-card">
-                        <h2 class="card-title">OSI Model Reference</h2>
-                        <div class="card-content">
-                            <p>Understanding device operation within the OSI model framework:</p>
-                            <table class="comparison-table">
-                                <tr>
-                                    <th>OSI Layer</th>
-                                    <th>Device Type</th>
-                                    <th>Key Function</th>
-                                    <th>Decision Criteria</th>
-                                </tr>
-                                <tr>
-                                    <td>Layer 1 (Physical)</td>
-                                    <td>Hubs, Repeaters</td>
-                                    <td>Signal regeneration</td>
-                                    <td>Electrical signals</td>
-                                </tr>
-                                <tr>
-                                    <td>Layer 2 (Data Link)</td>
-                                    <td>Switches, Bridges</td>
-                                    <td>Frame forwarding</td>
-                                    <td>MAC addresses</td>
-                                </tr>
-                                <tr>
-                                    <td>Layer 3 (Network)</td>
-                                    <td>Routers</td>
-                                    <td>Packet routing</td>
-                                    <td>IP addresses</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+<main class="wrap">
 
-                <div class="scenario-box">
-                    <h3 class="scenario-title">Modern Network Architecture</h3>
-                    <p>Today's enterprise networks employ a hierarchical design that optimizes performance, security, and scalability. This lesson explores how different network devices work together to create robust, efficient network infrastructures that support modern business requirements including cloud connectivity, mobility, and security.</p>
-                </div>
-            </section>
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="tagrow">
+      <span class="tag">GRADED EXERCISE 4</span>
+      <span class="tag">ACCOMPANIES LESSON 3 · DOMAIN 2.0</span>
+      <span class="tag exam">6 GRADED TASKS · 27 POINTS · 2 SIMULATORS</span>
+    </div>
+    <h2>Elect the Root, Block the Loop, Build the VLANs</h2>
+    <p class="lede">This is Layer 2 engineering with your hands on the wheel. First the math: elect a root bridge from real priority and MAC values, compute root path costs from link speeds, and assign every port its role — including the one STP must block. Then the failure drill: predict what happens when the active path dies, and cut the link in a live topology widget to check yourself. Finally, the build: create VLANs, name them, assign access ports, and bring up an 802.1Q trunk in a real command-line simulator that checks off each milestone as your commands land. Grade each task, then grade the exercise and download your PDF summary for the LMS.</p>
+  </div>
 
-            <!-- Hubs Section -->
-            <section class="content-section" id="hubs">
-                <div class="section-header">
-                    <h1 class="section-title">Ethernet Hubs</h1>
-                    <p class="section-subtitle">Understanding legacy physical layer devices and their operational characteristics</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">Purpose and Characteristics</h2>
-                    <div class="card-content">
-                        <p>Ethernet hubs are simple Layer 1 devices that operate as multiport repeaters. They receive electrical signals on one port and regenerate them out all other ports, creating a single collision domain for all connected devices.</p>
-                        
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <div class="spec-label">OSI Layer</div>
-                                <div class="spec-value">Layer 1 (Physical)</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Collision Domains</div>
-                                <div class="spec-value">Single for all ports</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Broadcast Domains</div>
-                                <div class="spec-value">Single domain</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Duplex Mode</div>
-                                <div class="spec-value">Half-duplex only</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Intelligence Level</div>
-                                <div class="spec-value">No MAC learning</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Modern Usage</div>
-                                <div class="spec-value">Obsolete technology</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- ================= OBJECTIVES ================= -->
+  <section id="objectives">
+    <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
+    <div class="panel">
+      <ol class="obj-list">
+        <li><b>Determine</b> the root bridge from switch priorities and MAC addresses, applying the bridge ID comparison correctly. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Calculate</b> root path costs from link speeds and assign root, designated, and blocked port roles in a redundant topology. <span class="bloom">BLOOM: ANALYZE</span></li>
+        <li><b>Sequence</b> the 802.1D port states and explain how RSTP, PortFast, and BPDU Guard change convergence behavior. <span class="bloom">BLOOM: UNDERSTAND</span></li>
+        <li><b>Justify</b> core VLAN design decisions — segmentation, native VLAN hygiene, voice VLANs, and inter-VLAN routing requirements. <span class="bloom">BLOOM: EVALUATE</span></li>
+        <li><b>Configure</b> VLANs, access ports, and an 802.1Q trunk using IOS-style commands in a live simulator. <span class="bloom">BLOOM: APPLY</span></li>
+        <li><b>Predict</b> STP failover behavior — which blocked port unblocks, and what convergence costs — then verify by simulation. <span class="bloom">BLOOM: ANALYZE</span></li>
+      </ol>
+    </div>
+  </section>
 
-                <div class="device-card">
-                    <h2 class="card-title">Hub Types and Implementation</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Hub Type</th>
-                                <th>Signal Processing</th>
-                                <th>Features</th>
-                                <th>Use Cases</th>
-                            </tr>
-                            <tr>
-                                <td>Passive Hub</td>
-                                <td>No amplification</td>
-                                <td>Simple signal distribution</td>
-                                <td>Basic connectivity (legacy)</td>
-                            </tr>
-                            <tr>
-                                <td>Active Hub</td>
-                                <td>Signal regeneration</td>
-                                <td>Extended range capability</td>
-                                <td>Longer cable runs</td>
-                            </tr>
-                            <tr>
-                                <td>Smart Hub</td>
-                                <td>Enhanced processing</td>
-                                <td>SNMP, stacking, basic VLANs</td>
-                                <td>Managed environments</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+  <!-- ================= RESOURCES ================= -->
+  <section id="resources">
+    <div class="sec-head"><span class="ic">📚</span><h2>Resources — Review Before You Calculate</h2></div>
+    <div class="panel">
+      <div class="tool-row">
+        <a class="tool-card" href="lesson03.html">
+          <div class="tt">🏠 LAN 121 Lesson 3</div>
+          <div class="td">Sections 1–3 are this exercise's textbook: VLANs &amp; SVIs, 802.1Q trunking, and Spanning Tree Protocol.</div>
+          <div class="tg">OPEN LESSON →</div>
+        </a>
+        <a class="tool-card" href="https://d2hie3dpn9wvbb.cloudfront.net/vlan/vlan.html" target="_blank" rel="noopener">
+          <div class="tt">🧪 NCyTE Activity: VLANs</div>
+          <div class="td">Interactive VLAN walkthrough — a good warm-up before the configuration simulator in Task 5.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+        <a class="tool-card" href="https://www.professormesser.com/network-plus/n10-009/n10-009-video/n10-009-training-course/" target="_blank" rel="noopener">
+          <div class="tt">🎬 Professor Messer — N10-009 Course</div>
+          <div class="td">The STP and VLAN videos in section 2.2 cover every calculation this exercise asks for.</div>
+          <div class="tg">OPEN RESOURCE ↗</div>
+        </a>
+      </div>
+      <h4 style="margin-top:14px">STP Cost Reference (IEEE 802.1D short values)</h4>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>Link Speed</th><th>10 Mbps</th><th>100 Mbps</th><th>1 Gbps</th><th>10 Gbps</th></tr></thead>
+        <tbody><tr><td><strong>STP Cost</strong></td><td class="mono">100</td><td class="mono">19</td><td class="mono">4</td><td class="mono">2</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
 
-                <div class="scenario-box">
-                    <h3 class="scenario-title">Why Hubs Became Obsolete</h3>
-                    <p><strong>Performance Issues:</strong> All connected devices share the total bandwidth and operate in a single collision domain. As network usage increases, collision frequency rises, dramatically reducing effective throughput.</p>
-                    <p><strong>Security Vulnerabilities:</strong> All traffic is visible to all connected devices, making packet capture and eavesdropping trivial for any connected device.</p>
-                    <p><strong>Scalability Limitations:</strong> Half-duplex operation and shared collision domains make hubs unsuitable for modern network demands.</p>
-                </div>
-            </section>
+  <!-- ================= TASKS ================= -->
+  <section id="tasks">
+    <div class="sec-head"><span class="ic">📝</span><h2>Graded Tasks</h2></div>
 
-            <!-- Switches Section -->
-            <section class="content-section" id="switches">
-                <div class="section-header">
-                    <h1 class="section-title">Network Switches</h1>
-                    <p class="section-subtitle">Intelligent Layer 2 devices for efficient frame forwarding and network segmentation</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">Core Functionality</h2>
-                    <div class="card-content">
-                        <p>Switches operate at Layer 2 of the OSI model, making intelligent forwarding decisions based on MAC addresses. They learn and store MAC addresses in a dynamic table, forwarding frames only to the intended recipient port.</p>
-                        
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <div class="spec-label">OSI Layer</div>
-                                <div class="spec-value">Layer 2 (Data Link)</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Collision Domains</div>
-                                <div class="spec-value">One per port</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">MAC Address Learning</div>
-                                <div class="spec-value">Dynamic table building</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Duplex Mode</div>
-                                <div class="spec-value">Full-duplex capable</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Processing Method</div>
-                                <div class="spec-value">ASIC hardware-based</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Frame Handling</div>
-                                <div class="spec-value">Store-and-forward</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Switch Types Comparison</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Feature</th>
-                                <th>Unmanaged Switch</th>
-                                <th>Managed Switch</th>
-                            </tr>
-                            <tr>
-                                <td>Configuration</td>
-                                <td>Plug-and-play operation</td>
-                                <td>Web GUI, CLI, SNMP management</td>
-                            </tr>
-                            <tr>
-                                <td>VLAN Support</td>
-                                <td>None</td>
-                                <td>Full 802.1Q VLAN support</td>
-                            </tr>
-                            <tr>
-                                <td>Quality of Service</td>
-                                <td>Basic priority handling</td>
-                                <td>Advanced QoS policies</td>
-                            </tr>
-                            <tr>
-                                <td>Security Features</td>
-                                <td>Basic switching only</td>
-                                <td>Port security, ACLs, 802.1X</td>
-                            </tr>
-                            <tr>
-                                <td>Monitoring</td>
-                                <td>No monitoring capabilities</td>
-                                <td>SNMP, port mirroring, logging</td>
-                            </tr>
-                            <tr>
-                                <td>Cost</td>
-                                <td>Lower initial investment</td>
-                                <td>Higher cost, more features</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Basic Switch Configuration</h2>
-                    <div class="card-content">
-                        <p>Essential configuration steps for enterprise managed switches:</p>
-                        
-                        <div class="config-code">
-! Enter privileged mode and global configuration
-Switch> enable
-Switch# configure terminal
-
-! Set hostname and security parameters
-Switch(config)# hostname CoreSwitch-01
-CoreSwitch-01(config)# enable secret Str0ngP@ssw0rd!
-
-! Configure management VLAN interface
-CoreSwitch-01(config)# interface vlan1
-CoreSwitch-01(config-if)# ip address 192.168.1.10 255.255.255.0
-CoreSwitch-01(config-if)# no shutdown
-CoreSwitch-01(config-if)# exit
-
-! Set default gateway for management
-CoreSwitch-01(config)# ip default-gateway 192.168.1.1
-
-! Configure console access
-CoreSwitch-01(config)# line console 0
-CoreSwitch-01(config-line)# password Cons0le123!
-CoreSwitch-01(config-line)# login
-CoreSwitch-01(config-line)# exit
-
-! Save configuration
-CoreSwitch-01(config)# exit
-CoreSwitch-01# copy running-config startup-config
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scenario-box">
-                    <h3 class="scenario-title">Switch Advantages Over Hubs</h3>
-                    <p><strong>Microsegmentation:</strong> Each port creates a separate collision domain, eliminating collisions and providing dedicated bandwidth.</p>
-                    <p><strong>Full-Duplex Operation:</strong> Simultaneous send and receive capabilities double the effective bandwidth.</p>
-                    <p><strong>MAC Address Learning:</strong> Intelligent frame forwarding reduces unnecessary network traffic.</p>
-                    <p><strong>Enhanced Security:</strong> Unicast traffic is sent only to the intended recipient port.</p>
-                </div>
-            </section>
-
-            <!-- Routers Section -->
-            <section class="content-section" id="routers">
-                <div class="section-header">
-                    <h1 class="section-title">Network Routers</h1>
-                    <p class="section-subtitle">Layer 3 devices for inter-network communication and intelligent path determination</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">Router Fundamentals</h2>
-                    <div class="card-content">
-                        <p>Routers operate at Layer 3 of the OSI model, making routing decisions based on IP addresses. They connect different networks, determine optimal paths, and control traffic flow between network segments.</p>
-                        
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <div class="spec-label">OSI Layer</div>
-                                <div class="spec-value">Layer 3 (Network)</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Primary Function</div>
-                                <div class="spec-value">Inter-network routing</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Broadcast Handling</div>
-                                <div class="spec-value">Blocks broadcast traffic</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Routing Table</div>
-                                <div class="spec-value">Static/dynamic routes</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Path Selection</div>
-                                <div class="spec-value">Best path algorithms</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Security Features</div>
-                                <div class="spec-value">ACLs, firewall capabilities</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Routing Protocols Overview</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Protocol</th>
-                                <th>Type</th>
-                                <th>Algorithm</th>
-                                <th>Metric</th>
-                                <th>Best Use Case</th>
-                            </tr>
-                            <tr>
-                                <td>Static Routes</td>
-                                <td>Manual</td>
-                                <td>Administrator-defined</td>
-                                <td>Administrative distance</td>
-                                <td>Small, stable networks</td>
-                            </tr>
-                            <tr>
-                                <td>RIP v2</td>
-                                <td>Distance Vector</td>
-                                <td>Bellman-Ford</td>
-                                <td>Hop count (max 15)</td>
-                                <td>Small networks</td>
-                            </tr>
-                            <tr>
-                                <td>EIGRP</td>
-                                <td>Hybrid</td>
-                                <td>DUAL algorithm</td>
-                                <td>Composite metric</td>
-                                <td>Enterprise networks</td>
-                            </tr>
-                            <tr>
-                                <td>OSPF</td>
-                                <td>Link State</td>
-                                <td>Dijkstra SPF</td>
-                                <td>Cost (bandwidth-based)</td>
-                                <td>Large enterprise</td>
-                            </tr>
-                            <tr>
-                                <td>BGP</td>
-                                <td>Path Vector</td>
-                                <td>Best path selection</td>
-                                <td>Multiple attributes</td>
-                                <td>Internet, ISP connections</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Router Configuration Example</h2>
-                    <div class="card-content">
-                        <p>Basic router setup for connecting multiple networks with NAT:</p>
-                        
-                        <div class="config-code">
-! Configure WAN interface
-Router(config)# interface gigabitethernet 0/0
-Router(config-if)# description "WAN Connection to ISP"
-Router(config-if)# ip address dhcp
-Router(config-if)# no shutdown
-
-! Configure LAN interface
-Router(config)# interface gigabitethernet 0/1  
-Router(config-if)# description "LAN Connection"
-Router(config-if)# ip address 192.168.1.1 255.255.255.0
-Router(config-if)# no shutdown
-
-! Configure static default route
-Router(config)# ip route 0.0.0.0 0.0.0.0 gigabitethernet 0/0
-
-! Enable NAT for internet access
-Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
-Router(config)# ip nat inside source list 1 interface g0/0 overload
-Router(config)# interface g0/1
-Router(config-if)# ip nat inside
-Router(config)# interface g0/0  
-Router(config-if)# ip nat outside
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- VLANs Section -->
-            <section class="content-section" id="vlans">
-                <div class="section-header">
-                    <h1 class="section-title">VLANs & Trunking</h1>
-                    <p class="section-subtitle">Virtual LANs and 802.1Q trunking for logical network segmentation</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">VLAN Fundamentals</h2>
-                    <div class="card-content">
-                        <p>Virtual LANs allow logical segmentation of networks without physical separation, providing security, performance, and organizational benefits.</p>
-                        
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <div class="spec-label">Security Benefits</div>
-                                <div class="spec-value">Broadcast domain isolation</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Performance</div>
-                                <div class="spec-value">Reduced broadcast traffic</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Flexibility</div>
-                                <div class="spec-value">Location-independent grouping</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">VLAN Range</div>
-                                <div class="spec-value">1-4094 (0, 4095 reserved)</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Tagging Standard</div>
-                                <div class="spec-value">IEEE 802.1Q</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Management</div>
-                                <div class="spec-value">Centralized administration</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">802.1Q Trunking</h2>
-                    <div class="card-content">
-                        <p>IEEE 802.1Q standard enables multiple VLANs to traverse a single physical link by adding VLAN tags to Ethernet frames.</p>
-                        
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Port Type</th>
-                                <th>VLAN Support</th>
-                                <th>Frame Tagging</th>
-                                <th>Typical Use</th>
-                            </tr>
-                            <tr>
-                                <td>Access Port</td>
-                                <td>Single VLAN only</td>
-                                <td>Untagged frames</td>
-                                <td>End devices (PCs, phones)</td>
-                            </tr>
-                            <tr>
-                                <td>Trunk Port</td>
-                                <td>Multiple VLANs</td>
-                                <td>Tagged frames (except native)</td>
-                                <td>Switch-to-switch links</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">VLAN Configuration</h2>
-                    <div class="card-content">
-                        <p>Complete VLAN setup including creation, access ports, and trunk configuration:</p>
-                        
-                        <div class="config-code">
-! Create VLANs
-Switch(config)# vlan 10
-Switch(config-vlan)# name Sales-Department
-Switch(config-vlan)# exit
-
-Switch(config)# vlan 20  
-Switch(config-vlan)# name Engineering-Department
-Switch(config-vlan)# exit
-
-Switch(config)# vlan 99
-Switch(config-vlan)# name Management-Network
-Switch(config-vlan)# exit
-
-! Configure access ports
-Switch(config)# interface range fastethernet 0/1-10
-Switch(config-if-range)# switchport mode access
-Switch(config-if-range)# switchport access vlan 10
-
-Switch(config)# interface range fastethernet 0/11-20
-Switch(config-if-range)# switchport mode access  
-Switch(config-if-range)# switchport access vlan 20
-
-! Configure trunk port
-Switch(config)# interface gigabitethernet 0/1
-Switch(config-if)# switchport mode trunk
-Switch(config-if)# switchport trunk allowed vlan 10,20,99
-Switch(config-if)# switchport trunk native vlan 99
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scenario-box">
-                    <h3 class="scenario-title">VLAN Security Considerations</h3>
-                    <p><strong>Native VLAN Security:</strong> Change from default VLAN 1 to prevent VLAN hopping attacks. Mismatched native VLANs can create security vulnerabilities.</p>
-                    <p><strong>Trunk Security:</strong> Explicitly define allowed VLANs on trunk ports and use VLAN pruning to remove unnecessary VLANs from trunk links.</p>
-                </div>
-            </section>
-
-            <!-- Wireless Section -->
-            <section class="content-section" id="wireless">
-                <div class="section-header">
-                    <h1 class="section-title">Wireless Access Points</h1>
-                    <p class="section-subtitle">Wi-Fi infrastructure for secure wireless connectivity and mobility</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">Wireless AP Fundamentals</h2>
-                    <div class="card-content">
-                        <p>Wireless access points bridge wired and wireless networks, providing radio frequency connectivity while maintaining security and performance standards.</p>
-                        
-                        <div class="spec-grid">
-                            <div class="spec-item">
-                                <div class="spec-label">OSI Layer</div>
-                                <div class="spec-value">Layer 2 (Data Link)</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Function</div>
-                                <div class="spec-value">Wireless-to-wired bridge</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Network ID</div>
-                                <div class="spec-value">SSID/BSSID/ESSID</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Frequency Bands</div>
-                                <div class="spec-value">2.4 GHz, 5 GHz, 6 GHz</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Security Standards</div>
-                                <div class="spec-value">WPA3, WPA2, Enterprise</div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-label">Management</div>
-                                <div class="spec-value">Standalone or controller-based</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">802.11 Standards Comparison</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Standard</th>
-                                <th>Wi-Fi Name</th>
-                                <th>Frequency</th>
-                                <th>Max Speed</th>
-                                <th>Key Features</th>
-                            </tr>
-                            <tr>
-                                <td>802.11a</td>
-                                <td>Wi-Fi 1</td>
-                                <td>5 GHz</td>
-                                <td>54 Mbps</td>
-                                <td>OFDM modulation</td>
-                            </tr>
-                            <tr>
-                                <td>802.11b</td>
-                                <td>Wi-Fi 1</td>
-                                <td>2.4 GHz</td>
-                                <td>11 Mbps</td>
-                                <td>Better range</td>
-                            </tr>
-                            <tr>
-                                <td>802.11g</td>
-                                <td>Wi-Fi 3</td>
-                                <td>2.4 GHz</td>
-                                <td>54 Mbps</td>
-                                <td>Backward compatible</td>
-                            </tr>
-                            <tr>
-                                <td>802.11n</td>
-                                <td>Wi-Fi 4</td>
-                                <td>2.4/5 GHz</td>
-                                <td>600 Mbps</td>
-                                <td>MIMO, channel bonding</td>
-                            </tr>
-                            <tr>
-                                <td>802.11ac</td>
-                                <td>Wi-Fi 5</td>
-                                <td>5 GHz</td>
-                                <td>6.93 Gbps</td>
-                                <td>MU-MIMO, beamforming</td>
-                            </tr>
-                            <tr>
-                                <td>802.11ax</td>
-                                <td>Wi-Fi 6/6E</td>
-                                <td>2.4/5/6 GHz</td>
-                                <td>9.6 Gbps</td>
-                                <td>OFDMA, improved efficiency</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Wireless Security Configuration</h2>
-                    <div class="card-content">
-                        <p>Essential security settings for enterprise wireless deployments:</p>
-                        
-                        <ul class="feature-list">
-                            <li><strong>WPA3-Enterprise:</strong> Strongest encryption with 802.1X authentication and RADIUS integration</li>
-                            <li><strong>SSID Management:</strong> Descriptive names, disable broadcast for hidden networks if required</li>
-                            <li><strong>MAC Filtering:</strong> Additional access control (security through obscurity)</li>
-                            <li><strong>Guest Networks:</strong> Isolated network segments for visitor access</li>
-                            <li><strong>Channel Planning:</strong> Non-overlapping channels (1, 6, 11 for 2.4GHz)</li>
-                            <li><strong>Power Management:</strong> Optimize signal coverage and reduce interference</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="scenario-box">
-                    <h3 class="scenario-title">Enterprise Wireless Deployment</h3>
-                    <p><strong>Site Survey:</strong> Conduct RF analysis to determine optimal AP placement, channel assignment, and power levels.</p>
-                    <p><strong>Controller-Based Architecture:</strong> Use wireless controllers for centralized management, seamless roaming, and consistent policy enforcement across multiple access points.</p>
-                </div>
-            </section>
-
-            <!-- Comparison Section -->
-            <section class="content-section" id="comparison">
-                <div class="section-header">
-                    <h1 class="section-title">Device Comparison Matrix</h1>
-                    <p class="section-subtitle">Comprehensive analysis and selection guide for network devices</p>
-                </div>
-                
-                <div class="device-card">
-                    <h2 class="card-title">Complete Device Comparison</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Device</th>
-                                <th>OSI Layer</th>
-                                <th>Collision Domains</th>
-                                <th>Broadcast Domains</th>
-                                <th>Key Function</th>
-                                <th>Modern Usage</th>
-                            </tr>
-                            <tr>
-                                <td>Hub</td>
-                                <td>Layer 1</td>
-                                <td>Single</td>
-                                <td>Single</td>
-                                <td>Signal regeneration</td>
-                                <td>Obsolete</td>
-                            </tr>
-                            <tr>
-                                <td>Switch</td>
-                                <td>Layer 2</td>
-                                <td>Per port</td>
-                                <td>Single (unless VLANs)</td>
-                                <td>MAC learning & forwarding</td>
-                                <td>Primary LAN device</td>
-                            </tr>
-                            <tr>
-                                <td>Router</td>
-                                <td>Layer 3</td>
-                                <td>Per interface</td>
-                                <td>Per interface</td>
-                                <td>IP routing between networks</td>
-                                <td>WAN/Internet connectivity</td>
-                            </tr>
-                            <tr>
-                                <td>Wireless AP</td>
-                                <td>Layer 2</td>
-                                <td>Shared wireless medium</td>
-                                <td>Single (unless VLANs)</td>
-                                <td>Wireless-to-wired bridge</td>
-                                <td>Mobility & wireless access</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="device-card">
-                    <h2 class="card-title">Implementation Decision Guide</h2>
-                    <div class="card-content">
-                        <table class="comparison-table">
-                            <tr>
-                                <th>Scenario</th>
-                                <th>Recommended Device</th>
-                                <th>Justification</th>
-                            </tr>
-                            <tr>
-                                <td>Connect 48 workstations in same subnet</td>
-                                <td>Managed Switch</td>
-                                <td>Dedicated collision domains, VLAN support, management features</td>
-                            </tr>
-                            <tr>
-                                <td>Connect three different networks</td>
-                                <td>Router with routing protocols</td>
-                                <td>Layer 3 routing between different IP subnets</td>
-                            </tr>
-                            <tr>
-                                <td>Segment departments logically</td>
-                                <td>VLAN-capable switch</td>
-                                <td>Virtual segmentation without physical separation</td>
-                            </tr>
-                            <tr>
-                                <td>Provide wireless access for 200 users</td>
-                                <td>Controller + multiple APs</td>
-                                <td>Centralized management, seamless roaming, scalability</td>
-                            </tr>
-                            <tr>
-                                <td>Home internet connectivity</td>
-                                <td>Wireless router</td>
-                                <td>Combined router, switch, and AP functionality</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Hands-On Activity Section -->
-            <section class="content-section" id="activity">
-                <div class="section-header">
-                    <h1 class="section-title">Hands-On Network Design Activity</h1>
-                    <p class="section-subtitle">Apply your knowledge to solve real-world networking scenarios</p>
-                </div>
-
-                <div class="activity-container">
-                    <h2 class="activity-title">Scenario-Based Network Design Challenge</h2>
-                    
-                    <div class="scenario-box">
-                        <h3 class="scenario-title">Company Network Requirements</h3>
-                        <p><strong>Scenario:</strong> You are tasked with designing a network for a 3-story office building housing 120 employees across 4 departments:</p>
-                        <ul class="feature-list">
-                            <li><strong>Sales Department (30 employees):</strong> Requires high-speed internet access and VoIP phones</li>
-                            <li><strong>Engineering Department (40 employees):</strong> Needs secure access to development servers and CAD applications</li>
-                            <li><strong>Finance Department (25 employees):</strong> Requires isolated network for sensitive financial data</li>
-                            <li><strong>Management (25 employees):</strong> Needs access to all departments with executive-level security</li>
-                        </ul>
-                        <p><strong>Additional Requirements:</strong></p>
-                        <ul class="feature-list">
-                            <li>Guest wireless access completely isolated from internal networks</li>
-                            <li>Server room with 10 physical servers requiring redundant connectivity</li>
-                            <li>All employees need wireless connectivity throughout the building</li>
-                            <li>Internet connectivity with 500 Mbps bandwidth</li>
-                        </ul>
-                    </div>
-
-                    <div class="simulation-panel">
-                        <h3>Device Selection</h3>
-                        <p>Select the appropriate devices for your network design:</p>
-                        
-                        <div class="device-selector">
-                            <div class="device-option" onclick="selectDevice('core-switch')" id="core-switch">
-                                <h4>Core Switch</h4>
-                                <p>48-port Layer 3</p>
-                            </div>
-                            <div class="device-option" onclick="selectDevice('access-switch')" id="access-switch">
-                                <h4>Access Switch</h4>
-                                <p>24-port Layer 2</p>
-                            </div>
-                            <div class="device-option" onclick="selectDevice('router')" id="router">
-                                <h4>Edge Router</h4>
-                                <p>Gigabit WAN/LAN</p>
-                            </div>
-                            <div class="device-option" onclick="selectDevice('wireless-controller')" id="wireless-controller">
-                                <h4>Wireless Controller</h4>
-                                <p>Centralized management</p>
-                            </div>
-                            <div class="device-option" onclick="selectDevice('access-points')" id="access-points">
-                                <h4>Access Points</h4>
-                                <p>Wi-Fi 6 APs</p>
-                            </div>
-                            <div class="device-option" onclick="selectDevice('firewall')" id="firewall">
-                                <h4>Firewall</h4>
-                                <p>Network security</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="config-panel">
-                        <h3>VLAN Configuration</h3>
-                        <p>Configure VLANs for department segmentation:</p>
-                        
-                        <div>
-                            <label for="sales-vlan">Sales Department VLAN ID:</label>
-                            <input type="number" id="sales-vlan" class="config-input" placeholder="Enter VLAN ID (10-4094)" min="10" max="4094">
-                        </div>
-                        
-                        <div>
-                            <label for="engineering-vlan">Engineering Department VLAN ID:</label>
-                            <input type="number" id="engineering-vlan" class="config-input" placeholder="Enter VLAN ID (10-4094)" min="10" max="4094">
-                        </div>
-                        
-                        <div>
-                            <label for="finance-vlan">Finance Department VLAN ID:</label>
-                            <input type="number" id="finance-vlan" class="config-input" placeholder="Enter VLAN ID (10-4094)" min="10" max="4094">
-                        </div>
-                        
-                        <div>
-                            <label for="management-vlan">Management VLAN ID:</label>
-                            <input type="number" id="management-vlan" class="config-input" placeholder="Enter VLAN ID (10-4094)" min="10" max="4094">
-                        </div>
-                        
-                        <div>
-                            <label for="guest-vlan">Guest Network VLAN ID:</label>
-                            <input type="number" id="guest-vlan" class="config-input" placeholder="Enter VLAN ID (10-4094)" min="10" max="4094">
-                        </div>
-                    </div>
-
-                    <div class="config-panel">
-                        <h3>Wireless Configuration</h3>
-                        <p>Configure wireless network settings:</p>
-                        
-                        <div>
-                            <label for="internal-ssid">Internal Network SSID:</label>
-                            <input type="text" id="internal-ssid" class="config-input" placeholder="Enter SSID name">
-                        </div>
-                        
-                        <div>
-                            <label for="guest-ssid">Guest Network SSID:</label>
-                            <input type="text" id="guest-ssid" class="config-input" placeholder="Enter Guest SSID name">
-                        </div>
-                        
-                        <div>
-                            <label for="security-type">Security Type:</label>
-                            <select id="security-type" class="config-input">
-                                <option value="">Select Security Type</option>
-                                <option value="wpa3-enterprise">WPA3-Enterprise</option>
-                                <option value="wpa2-enterprise">WPA2-Enterprise</option>
-                                <option value="wpa3-personal">WPA3-Personal</option>
-                                <option value="wpa2-personal">WPA2-Personal</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="button-group">
-                        <button class="btn btn-primary" onclick="validateActivity()">
-                            🔍 Validate Design
-                        </button>
-                        <button class="btn btn-secondary" onclick="resetActivity()">
-                            🔄 Reset Activity
-                        </button>
-                    </div>
-
-                    <div class="answer-feedback" id="activity-feedback"></div>
-                </div>
-            </section>
-
-            <!-- Assessment Section -->
-            <section class="content-section" id="assessment">
-                <div class="section-header">
-                    <h1 class="section-title">Final Assessment</h1>
-                    <p class="section-subtitle">Comprehensive evaluation of your network device knowledge</p>
-                </div>
-
-                <div class="progress-container">
-                    <div class="progress-label">
-                        <span>Assessment Progress</span>
-                        <span id="progress-percentage">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                </div>
-
-                <div class="quiz-container">
-                    <form id="assessment-form">
-                        <!-- Question 1 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">1</span>
-                                A network administrator needs to connect 48 workstations while ensuring each device has dedicated bandwidth and collision domain separation. Which solution provides the best performance and scalability?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q1" value="a">
-                                    <span class="option-text">Ethernet hub with 48 ports for simple plug-and-play connectivity</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q1" value="b">
-                                    <span class="option-text">Managed switch with 48 ports providing dedicated collision domains and VLAN support</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q1" value="c">
-                                    <span class="option-text">Router with 48 Ethernet interfaces for Layer 3 connectivity</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q1" value="d">
-                                    <span class="option-text">Wireless access point to eliminate cable requirements</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback1"></div>
-                        </div>
-
-                        <!-- Question 2 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">2</span>
-                                A company needs to separate the Sales department (VLAN 10) and Engineering department (VLAN 20) while allowing both departments to share the same physical switch infrastructure. What configuration approach is required?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q2" value="a">
-                                    <span class="option-text">Configure access ports for end devices and trunk ports between switches using 802.1Q tagging</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q2" value="b">
-                                    <span class="option-text">Use completely separate physical switches for each department</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q2" value="c">
-                                    <span class="option-text">Configure all switch ports as trunk ports carrying multiple VLANs</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q2" value="d">
-                                    <span class="option-text">Replace switches with hubs to eliminate VLAN complexity</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback2"></div>
-                        </div>
-
-                        <!-- Question 3 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">3</span>
-                                Two buildings are connected by a single fiber link, and each building has multiple VLANs (10, 20, 30, 40) that need to communicate across the link. What configuration is required on the inter-building connection?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q3" value="a">
-                                    <span class="option-text">Access port configured for VLAN 10 only</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q3" value="b">
-                                    <span class="option-text">Trunk port with 802.1Q tagging allowing VLANs 10, 20, 30, 40</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q3" value="c">
-                                    <span class="option-text">Four separate fiber connections, one dedicated to each VLAN</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q3" value="d">
-                                    <span class="option-text">Router interface to handle inter-VLAN routing</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback3"></div>
-                        </div>
-
-                        <!-- Question 4 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">4</span>
-                                A wireless access point deployment shows neighboring APs operating on channels 1 and 6 in the 2.4 GHz band. Which channel should you select for optimal performance and minimal interference?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q4" value="a">
-                                    <span class="option-text">Channel 3 - positioned between the existing channels</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q4" value="b">
-                                    <span class="option-text">Channel 11 - the third non-overlapping channel in 2.4 GHz</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q4" value="c">
-                                    <span class="option-text">Channel 8 - higher frequency for better performance</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q4" value="d">
-                                    <span class="option-text">Channel 2 - adjacent to channel 1 for coverage continuity</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback4"></div>
-                        </div>
-
-                        <!-- Question 5 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">5</span>
-                                You need to connect three separate IP networks (192.168.1.0/24, 192.168.2.0/24, 192.168.3.0/24) and allow controlled communication between them. What is the minimum device configuration required?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q5" value="a">
-                                    <span class="option-text">Three Layer 2 switches connected with trunk links</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q5" value="b">
-                                    <span class="option-text">Router with three interfaces, routing protocols, and access control lists</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q5" value="c">
-                                    <span class="option-text">Single switch with three VLANs configured</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q5" value="d">
-                                    <span class="option-text">Three hubs connected with crossover cables</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback5"></div>
-                        </div>
-
-                        <!-- Question 6 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">6</span>
-                                Configuration Analysis: Identify the error in this switch configuration:
-                            </h3>
-                            <div class="config-code">
-Switch(config)# vlan 100
-Switch(config-vlan)# name Finance-Dept
-Switch(config-vlan)# exit
-Switch(config)# interface fastethernet 0/1
-Switch(config-if)# switchport mode trunk
-Switch(config-if)# switchport access vlan 100
-                            </div>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q6" value="a">
-                                    <span class="option-text">VLAN 100 is outside the valid range</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q6" value="b">
-                                    <span class="option-text">Cannot configure both trunk mode and access VLAN on the same interface</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q6" value="c">
-                                    <span class="option-text">VLAN name contains invalid characters</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q6" value="d">
-                                    <span class="option-text">Interface specification is incorrect</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback6"></div>
-                        </div>
-
-                        <!-- Question 7 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">7</span>
-                                Troubleshooting Scenario: Users in VLAN 20 can communicate internally but cannot access the internet, while VLAN 10 users have full connectivity. Both VLANs are on the same switch connected to the same router. What is the most likely cause?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q7" value="a">
-                                    <span class="option-text">VLAN 20 is not allowed on the trunk port to the router</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q7" value="b">
-                                    <span class="option-text">VLAN 20 users have incorrect IP address configuration</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q7" value="c">
-                                    <span class="option-text">The switch hardware is malfunctioning</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q7" value="d">
-                                    <span class="option-text">VLAN 20 requires different cable types</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback7"></div>
-                        </div>
-
-                        <!-- Question 8 -->
-                        <div class="question">
-                            <h3 class="question-title">
-                                <span class="question-number">8</span>
-                                Network Design Challenge: A company needs secure wireless access for 300 employees across a 5-building campus with seamless roaming between buildings. Which wireless architecture provides the best solution?
-                            </h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q8" value="a">
-                                    <span class="option-text">Centralized wireless controller with lightweight access points and unified SSID</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q8" value="b">
-                                    <span class="option-text">Standalone access points with different SSIDs per building</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q8" value="c">
-                                    <span class="option-text">Consumer wireless routers in each building</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q8" value="d">
-                                    <span class="option-text">Single high-power access point for campus-wide coverage</span>
-                                </label>
-                            </div>
-                            <div class="answer-feedback" id="feedback8"></div>
-                        </div>
-
-                        <div class="button-group">
-                            <button type="button" class="btn btn-primary" onclick="submitAssessment()">
-                                📊 Submit Assessment
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="resetAssessment()">
-                                🔄 Reset Quiz
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="grade-display" id="grade-display">
-                        <h2 class="grade-title">Assessment Complete!</h2>
-                        <div class="grade-score" id="grade-score"></div>
-                        <p id="score-text"></p>
-                        <p class="grade-feedback" id="grade-feedback"></p>
-                    </div>
-                </div>
-            </section>
-        </main>
+    <!-- TASK 1: ROOT BRIDGE -->
+    <div class="acc open" id="task1">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">👑</span>
+        <span class="at"><h3>Task 1 — Root Bridge Election</h3><span class="asub">4 POINTS · LOWEST BRIDGE ID WINS: PRIORITY FIRST, MAC BREAKS TIES</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st1">NOT GRADED</span></div>
+        <p>Four switches boot with these bridge IDs:</p>
+        <div class="tbl-scroll"><table>
+          <thead><tr><th>Switch</th><th>Priority</th><th>MAC Address</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">SW1</td><td class="mono">32768</td><td class="mono">00:1A:4C:22:9B:10</td></tr>
+            <tr><td class="mono">SW2</td><td class="mono">32768</td><td class="mono">00:0C:85:11:2E:05</td></tr>
+            <tr><td class="mono">SW3</td><td class="mono">32768</td><td class="mono">00:1B:0D:73:C4:88</td></tr>
+            <tr><td class="mono">SW4</td><td class="mono">32768</td><td class="mono">00:2A:6F:41:07:3C</td></tr>
+          </tbody>
+        </table></div>
+        <div class="match-row" data-key="SW2"><span class="mr-l"><span class="dnum">1.1</span>Which switch is elected root bridge?</span><select class="exsel"><option value="">— select —</option><option>SW1</option><option>SW2</option><option>SW3</option><option>SW4</option></select></div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">1.2</span> Why does that switch win?</div>
+          <label><input type="radio" name="t1q2" value="a"> It has the most ports</label>
+          <label><input type="radio" name="t1q2" value="b"> It has the highest MAC address</label>
+          <label><input type="radio" name="t1q2" value="c"> All priorities tie at 32768, so the lowest MAC address wins the bridge ID comparison</label>
+          <label><input type="radio" name="t1q2" value="d"> It booted first</label>
+          <div class="rat"><strong>Answer:</strong> Bridge ID = priority + MAC, compared lowest-wins. With every priority at the default 32768, SW2's 00:0C:… is numerically lowest. Note the trap: default elections crown the switch with the OLDEST MAC — often your oldest hardware.</div>
+        </div>
+        <div class="match-row" data-key="SW4"><span class="mr-l"><span class="dnum">1.3</span>An engineer runs <code>spanning-tree vlan 1 priority 24576</code> on SW4. Now which switch is root?</span><select class="exsel"><option value="">— select —</option><option>SW1</option><option>SW2</option><option>SW3</option><option>SW4</option></select></div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">1.4</span> What is the design best practice this demonstrates?</div>
+          <label><input type="radio" name="t1q4" value="a"> Always leave priorities at their defaults for fairness</label>
+          <label><input type="radio" name="t1q4" value="b"> Deliberately lower the core/distribution switch's priority so the root bridge is chosen by design, not by MAC accident</label>
+          <label><input type="radio" name="t1q4" value="c"> Set every switch to the same low priority</label>
+          <label><input type="radio" name="t1q4" value="d"> Disable STP on the core</label>
+          <div class="rat"><strong>Answer:</strong> Priority beats MAC, so setting the core lower (e.g., 24576 or 4096) makes the topology deterministic. An accidental root in a closet switch drags all traffic through the slowest part of the network.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="1">Grade Task 1</button></div>
+      </div>
     </div>
 
-    <script>
-        // Navigation functionality
-        function showSection(sectionId) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-            
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Add active class to clicked nav item
-            event.target.classList.add('active');
-            
-            // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        }
+    <!-- TASK 2: PATH COST -->
+    <div class="acc open" id="task2">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🧮</span>
+        <span class="at"><h3>Task 2 — Path Cost Calculation &amp; Port Roles</h3><span class="asub">6 POINTS · SUM THE COSTS TOWARD THE ROOT · LOWEST TOTAL WINS</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">6 PTS</span><span class="task-status none" id="st2">NOT GRADED</span></div>
+        <p>SW1 has already been elected root. Use the cost table from the resources panel — and don't assume the direct link wins.</p>
+        <figure class="fig">
+          <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Triangle topology: SW1 root, 1 Gbps to SW2, 100 Mbps to SW3, 1 Gbps between SW2 and SW3">
+            <rect x="235" y="18" width="150" height="50" rx="10" fill="var(--blue)"/><text x="310" y="40" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">SW1 · ROOT 👑</text><text x="310" y="57" text-anchor="middle" fill="#fff" font-size="9" font-family="ui-monospace,Consolas,monospace">priority 8192</text>
+            <rect x="60" y="170" width="130" height="48" rx="10" fill="var(--green)"/><text x="125" y="198" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW2</text>
+            <rect x="430" y="170" width="130" height="48" rx="10" fill="var(--green)"/><text x="495" y="198" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW3</text>
+            <line x1="250" y1="68" x2="140" y2="170" stroke="var(--green)" stroke-width="3.5"/>
+            <text x="160" y="110" text-anchor="middle" class="sv-mono" fill="var(--green)" font-weight="700">1 Gbps</text>
+            <line x1="370" y1="68" x2="480" y2="170" stroke="var(--amber)" stroke-width="3.5"/>
+            <text x="465" y="110" text-anchor="middle" class="sv-mono" fill="var(--amber)" font-weight="700">100 Mbps</text>
+            <line x1="190" y1="194" x2="430" y2="194" stroke="var(--green)" stroke-width="3.5"/>
+            <text x="310" y="184" text-anchor="middle" class="sv-mono" fill="var(--green)" font-weight="700">1 Gbps</text>
+            <text x="310" y="232" text-anchor="middle" class="sv-mono">three links · one must be logically broken</text>
+          </svg>
+          <figcaption>FIG E4.1 — THE TOPOLOGY FOR ALL OF TASK 2</figcaption>
+        </figure>
+        <div class="ans-row" data-mode="dec" data-key="4"><span class="mr-l"><span class="dnum">2.1</span>SW2's root path cost via its direct link =</span><input type="text" inputmode="numeric" placeholder="cost" aria-label="SW2 root path cost"><span class="exp">Correct answer: 4 &nbsp;(one 1 Gbps hop)</span></div>
+        <div class="ans-row" data-mode="dec" data-key="19"><span class="mr-l"><span class="dnum">2.2</span>SW3's root path cost via its DIRECT 100 Mbps link =</span><input type="text" inputmode="numeric" placeholder="cost" aria-label="SW3 direct cost"><span class="exp">Correct answer: 19 &nbsp;(one 100 Mbps hop)</span></div>
+        <div class="ans-row" data-mode="dec" data-key="8"><span class="mr-l"><span class="dnum">2.3</span>SW3's root path cost via SW2 =</span><input type="text" inputmode="numeric" placeholder="cost" aria-label="SW3 cost via SW2"><span class="exp">Correct answer: 8 &nbsp;(SW3→SW2 = 4, plus SW2→SW1 = 4)</span></div>
+        <div class="match-row" data-key="SW2"><span class="mr-l"><span class="dnum">2.4</span>Therefore SW3's ROOT PORT faces which neighbor?</span><select class="exsel"><option value="">— select —</option><option>SW1</option><option>SW2</option></select></div>
+        <div class="match-row" data-key="SW1-SW3"><span class="mr-l"><span class="dnum">2.5</span>Which link ends up carrying the BLOCKED port?</span><select class="exsel"><option value="">— select —</option><option>SW1-SW2</option><option>SW1-SW3</option><option>SW2-SW3</option></select></div>
+        <div class="match-row" data-key="SW3"><span class="mr-l"><span class="dnum">2.6</span>The blocked port itself is on which switch? (The root's ports are always designated.)</span><select class="exsel"><option value="">— select —</option><option>SW1</option><option>SW2</option><option>SW3</option></select></div>
+        <div class="callout examnote"><span class="cic">🎓</span><span><strong>The lesson in the math:</strong> two gigabit hops (cost 8) beat one Fast Ethernet hop (cost 19). STP counts cost, not hops — the "longer" path is the better path, and the slow direct link is what gets blocked.</span></div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="2">Grade Task 2</button></div>
+      </div>
+    </div>
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
+    <!-- TASK 3: STATES -->
+    <div class="acc open" id="task3">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">🚦</span>
+        <span class="at"><h3>Task 3 — Port States, RSTP &amp; Edge Protections</h3><span class="asub">4 POINTS · WHAT HAPPENS BETWEEN "BLOCKED" AND "FORWARDING"</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st3">NOT GRADED</span></div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">3.1</span> What is the correct order of classic 802.1D port states on the way to forwarding?</div>
+          <label><input type="radio" name="t3q1" value="a"> Listening → Blocking → Learning → Forwarding</label>
+          <label><input type="radio" name="t3q1" value="b"> Blocking → Listening → Learning → Forwarding</label>
+          <label><input type="radio" name="t3q1" value="c"> Learning → Listening → Forwarding → Blocking</label>
+          <label><input type="radio" name="t3q1" value="d"> Forwarding → Learning → Listening → Blocking</label>
+          <div class="rat"><strong>Answer:</strong> Blocking → Listening → Learning → Forwarding (plus Disabled) — 30–50 seconds of caution before passing traffic.</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">3.2</span> What is RSTP's (802.1w) headline improvement?</div>
+          <label><input type="radio" name="t3q2" value="a"> It eliminates the need for a root bridge</label>
+          <label><input type="radio" name="t3q2" value="b"> It allows loops on purpose</label>
+          <label><input type="radio" name="t3q2" value="c"> It encrypts BPDUs</label>
+          <label><input type="radio" name="t3q2" value="d"> Convergence in seconds instead of 30–50, with simplified states (discarding/learning/forwarding)</label>
+          <div class="rat"><strong>Answer:</strong> Rapid Spanning Tree collapses the state machine and adds proposal/agreement handshakes — failover in seconds. It's the default on modern switches.</div>
+        </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">3.3</span> Why enable PortFast on ports facing PCs and printers?</div>
+          <label><input type="radio" name="t3q3" value="a"> The port skips straight to forwarding, so end devices don't wait through STP convergence at boot</label>
+          <label><input type="radio" name="t3q3" value="b"> It makes the port a trunk automatically</label>
+          <label><input type="radio" name="t3q3" value="c"> It increases the port's speed</label>
+          <label><input type="radio" name="t3q3" value="d"> It elects the PC as root bridge</label>
+          <div class="rat"><strong>Answer:</strong> A PC can't create a loop by itself, so edge ports may safely skip the states — fixing "DHCP fails at boot" complaints caused by STP's delay.</div>
+        </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">3.4</span> A PortFast port protected by BPDU Guard receives a BPDU (someone plugged in a switch). What happens?</div>
+          <label><input type="radio" name="t3q4" value="a"> The BPDU is forwarded to the root</label>
+          <label><input type="radio" name="t3q4" value="b"> The port becomes a trunk</label>
+          <label><input type="radio" name="t3q4" value="c"> The port is shut down into the err-disabled state</label>
+          <label><input type="radio" name="t3q4" value="d"> Nothing — BPDUs are ignored</label>
+          <div class="rat"><strong>Answer:</strong> BPDU Guard err-disables the port the instant a switch appears where only an end device should be — protecting your topology from rogue switches and accidental loops. (You met err-disabled in Lesson 8's port states.)</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="3">Grade Task 3</button></div>
+      </div>
+    </div>
 
-        // Activity functionality
-        let selectedDevices = [];
+    <!-- TASK 4: VLAN DESIGN -->
+    <div class="acc open" id="task4">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">📐</span>
+        <span class="at"><h3>Task 4 — VLAN Design Decisions</h3><span class="asub">4 POINTS · DESIGN BEFORE YOU TYPE</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">4 PTS</span><span class="task-status none" id="st4">NOT GRADED</span></div>
+        <p>You're designing for a small campus: Sales staff, guest Wi-Fi, and IP phones sharing ports with PCs. Make the calls a network engineer would make.</p>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">4.1</span> Why put Sales and Guest traffic in separate VLANs on the same switch?</div>
+          <label><input type="radio" name="t4q1" value="a"> VLANs make the cables faster</label>
+          <label><input type="radio" name="t4q1" value="b"> Each VLAN is its own broadcast domain — guests can't reach Sales without crossing a Layer 3 boundary where policy is enforced</label>
+          <label><input type="radio" name="t4q1" value="c"> Switches require at least two VLANs to boot</label>
+          <label><input type="radio" name="t4q1" value="d"> Guests need their own physical switch by law</label>
+          <div class="rat"><strong>Answer:</strong> Segmentation = separate broadcast domains + a routed chokepoint for ACLs/firewalls. Same hardware, isolated traffic.</div>
+        </div>
+        <div class="q" data-answer="d"><div class="qt"><span class="qnum">4.2</span> Best practice for the NATIVE VLAN on your 802.1Q trunks?</div>
+          <label><input type="radio" name="t4q2" value="a"> Leave it as VLAN 1 — it's the default for a reason</label>
+          <label><input type="radio" name="t4q2" value="b"> Set it to the Guest VLAN</label>
+          <label><input type="radio" name="t4q2" value="c"> Set a different native VLAN on each end of the trunk</label>
+          <label><input type="radio" name="t4q2" value="d"> Move it off VLAN 1 to a dedicated unused VLAN, matching on both ends</label>
+          <div class="rat"><strong>Answer:</strong> The native VLAN rides untagged; leaving it on the default VLAN 1 enables VLAN-hopping tricks (Lesson 7), and a mismatch leaks traffic between VLANs. Dedicated, unused, and matched.</div>
+        </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">4.3</span> The IP phones share ports with PCs. What's the standard solution?</div>
+          <label><input type="radio" name="t4q3" value="a"> Configure a voice VLAN on each access port — phone and PC ride separate VLANs on one cable, and voice can get QoS</label>
+          <label><input type="radio" name="t4q3" value="b"> Run a second cable to every desk</label>
+          <label><input type="radio" name="t4q3" value="c"> Make every desk port a full trunk</label>
+          <label><input type="radio" name="t4q3" value="d"> Put phones and PCs in the same VLAN and hope</label>
+          <div class="rat"><strong>Answer:</strong> The voice VLAN is a purpose-built second VLAN on an access port: the phone tags its traffic, the PC stays untagged, and QoS can prioritize calls.</div>
+        </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">4.4</span> Sales (VLAN 10) needs to reach a printer in VLAN 20. What does that require?</div>
+          <label><input type="radio" name="t4q4" value="a"> Nothing — the switch forwards it automatically</label>
+          <label><input type="radio" name="t4q4" value="b"> A crossover cable between the VLANs</label>
+          <label><input type="radio" name="t4q4" value="c"> A Layer 3 device — SVIs on a multilayer switch, or a router(-on-a-stick)</label>
+          <label><input type="radio" name="t4q4" value="d"> Setting both ports to the native VLAN</label>
+          <div class="rat"><strong>Answer:</strong> Crossing VLANs is routing, full stop. Lesson 3's SVIs or Lesson 4's router-on-a-stick subinterfaces — either way, a Layer 3 hop where policy can live.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="4">Grade Task 4</button></div>
+      </div>
+    </div>
 
-        function selectDevice(deviceId) {
-            const device = document.getElementById(deviceId);
-            device.classList.toggle('selected');
-            
-            if (selectedDevices.includes(deviceId)) {
-                selectedDevices = selectedDevices.filter(id => id !== deviceId);
-            } else {
-                selectedDevices.push(deviceId);
-            }
-        }
+    <!-- TASK 5: VLAN CONFIG SIMULATOR -->
+    <div class="acc open" id="task5">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⌨️</span>
+        <span class="at"><h3>Task 5 — VLAN Configuration Simulator</h3><span class="asub">6 POINTS · TYPE THE REAL COMMANDS · MILESTONES CHECK THEMSELVES</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">6 PTS</span><span class="task-status none" id="st5">NOT GRADED</span></div>
+        <p>Build the design from Task 4 on switch SW-A. Complete all six milestones, verify with <code>show vlan brief</code>, then press Grade — points equal completed milestones. Type <code>?</code> for the command reference.</p>
+        <ul class="ck-list" id="ckList">
+          <li id="c1">Create VLAN 10</li>
+          <li id="c2">Name VLAN 10 "SALES"</li>
+          <li id="c3">Create VLAN 20 and name it "GUEST"</li>
+          <li id="c4">Set interface g0/1 to access mode</li>
+          <li id="c5">Assign g0/1 to VLAN 10</li>
+          <li id="c6">Set interface g0/24 to trunk mode (the uplink)</li>
+        </ul>
+        <div class="sim">
+          <div class="sim-bar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="stitle">SW-A — LAN 121 VLAN SIMULATOR · type ? for help</span></div>
+          <div class="sim-out" id="simOut" aria-live="polite"></div>
+          <div class="sim-in">
+            <span class="pr" id="simPrompt">SW-A&gt;</span>
+            <input id="simIn" type="text" autocomplete="off" spellcheck="false" placeholder="type a command and press Enter…" aria-label="Switch command input">
+          </div>
+        </div>
+        <div class="sim-help">
+          <strong>Command reference:</strong>
+          <code>enable</code> <code>configure terminal</code> <code>vlan &lt;id&gt;</code> <code>name &lt;text&gt;</code> <code>interface g0/&lt;n&gt;</code> <code>switchport mode access|trunk</code> <code>switchport access vlan &lt;id&gt;</code> <code>show vlan brief</code> <code>show run</code> <code>exit</code> <code>reset</code>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="5">Grade Task 5</button></div>
+      </div>
+    </div>
 
-        function validateActivity() {
-            const feedback = document.getElementById('activity-feedback');
-            const requiredDevices = ['core-switch', 'access-switch', 'router', 'wireless-controller', 'access-points'];
-            const salesVlan = document.getElementById('sales-vlan').value;
-            const engineeringVlan = document.getElementById('engineering-vlan').value;
-            const financeVlan = document.getElementById('finance-vlan').value;
-            const managementVlan = document.getElementById('management-vlan').value;
-            const guestVlan = document.getElementById('guest-vlan').value;
-            const internalSsid = document.getElementById('internal-ssid').value;
-            const guestSsid = document.getElementById('guest-ssid').value;
-            const securityType = document.getElementById('security-type').value;
+    <!-- TASK 6: STP FAILOVER SIM -->
+    <div class="acc open" id="task6">
+      <button class="acc-btn" aria-expanded="true">
+        <span class="aic">⚡</span>
+        <span class="at"><h3>Task 6 — STP Failover: Predict, Then Break It</h3><span class="asub">3 POINTS · ANSWER FIRST, THEN CUT THE LINK AND WATCH</span></span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="acc-body">
+        <div class="task-head"><span class="pts">3 PTS</span><span class="task-status none" id="st6">NOT GRADED</span></div>
+        <p>All three links below are 1 Gbps; SW1 is root, and STP has blocked SW3's port on the SW2–SW3 segment. <strong>Answer the three predictions first</strong>, then use the button to fail the SW1–SW3 link and check yourself.</p>
+        <div class="stp-widget">
+          <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="STP failover simulation triangle">
+            <rect x="235" y="14" width="150" height="48" rx="10" fill="var(--blue)"/><text x="310" y="42" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">SW1 · ROOT 👑</text>
+            <rect x="60" y="172" width="130" height="46" rx="10" fill="var(--green)"/><text x="125" y="199" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW2</text>
+            <rect x="430" y="172" width="130" height="46" rx="10" fill="var(--green)"/><text x="495" y="199" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">SW3</text>
+            <line id="lnA" class="flow" x1="250" y1="62" x2="140" y2="172" stroke="var(--green)"/>
+            <line id="lnB" class="flow" x1="370" y1="62" x2="480" y2="172" stroke="var(--green)"/>
+            <line id="lnC" class="flow" x1="190" y1="196" x2="430" y2="196" stroke="var(--red)" stroke-dasharray="8 6"/>
+            <circle id="blkDot" cx="410" cy="196" r="11" fill="var(--red)"/><text id="blkX" x="410" y="200" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">✕</text>
+            <text id="lnBLabel" x="465" y="112" text-anchor="middle" class="sv-mono" fill="var(--green)">forwarding</text>
+            <text id="lnCLabel" x="310" y="186" text-anchor="middle" class="sv-mono" fill="var(--red)">BLOCKED on SW3</text>
+            <text id="cutIc" x="425" y="118" text-anchor="middle" font-size="18" style="opacity:0">✂️</text>
+          </svg>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn primary" id="cutBtn">✂️ Fail the SW1–SW3 Link</button>
+            <button class="btn ghost" id="restoreBtn" disabled>Restore Link</button>
+          </div>
+          <div class="stp-read"><span class="cic">🧠</span><span id="stpRead">Topology healthy: SW3 reaches the root directly; its port toward SW2 is blocked to break the loop.</span></div>
+        </div>
+        <div class="q" data-answer="b"><div class="qt"><span class="qnum">6.1</span> PREDICT: when the SW1–SW3 link fails, what does STP do?</div>
+          <label><input type="radio" name="t6q1" value="a"> SW3 is permanently isolated</label>
+          <label><input type="radio" name="t6q1" value="b"> SW3's blocked port toward SW2 transitions to forwarding, restoring a path via SW2</label>
+          <label><input type="radio" name="t6q1" value="c"> SW3 becomes the new root bridge</label>
+          <label><input type="radio" name="t6q1" value="d"> The whole network re-elects and reboots</label>
+          <div class="rat"><strong>Answer:</strong> That standby port is the entire reason STP blocks instead of disabling: the redundant path is held in reserve and activated on failure. Cut the link above and watch exactly this.</div>
+        </div>
+        <div class="q" data-answer="c"><div class="qt"><span class="qnum">6.2</span> PREDICT: with classic 802.1D, roughly how long is SW3 cut off during that transition?</div>
+          <label><input type="radio" name="t6q2" value="a"> Zero — failover is instant</label>
+          <label><input type="radio" name="t6q2" value="b"> 2–3 seconds</label>
+          <label><input type="radio" name="t6q2" value="c"> 30–50 seconds, as the port walks listening and learning</label>
+          <label><input type="radio" name="t6q2" value="d"> Several hours</label>
+          <div class="rat"><strong>Answer:</strong> The classic state machine costs 30–50 seconds of outage — which is precisely why RSTP (seconds) is the modern default. Users notice 45 seconds.</div>
+        </div>
+        <div class="q" data-answer="a"><div class="qt"><span class="qnum">6.3</span> After failover, SW3's path to the root is…</div>
+          <label><input type="radio" name="t6q3" value="a"> SW3 → SW2 → SW1</label>
+          <label><input type="radio" name="t6q3" value="b"> SW3 → SW1 directly, over the failed link</label>
+          <label><input type="radio" name="t6q3" value="c"> There is no path</label>
+          <label><input type="radio" name="t6q3" value="d"> SW3 → SW4</label>
+          <div class="rat"><strong>Answer:</strong> The formerly blocked SW2–SW3 segment is now the working route: SW3 → SW2 → SW1. Redundancy preserved, loop still impossible.</div>
+        </div>
+        <div class="quiz-actions"><button class="btn primary" data-grade="6">Grade Task 6</button></div>
+      </div>
+    </div>
+  </section>
 
-            let score = 0;
-            let errors = [];
+  <!-- ================= MASTER SCORE ================= -->
+  <div class="score-panel" id="scorePanel">
+    <h2>📊 Exercise Score</h2>
+    <div class="big" id="masterScore">— / 27</div>
+    <div class="brk" id="masterBreakdown">Grade each task above, then press the button to compute your final score. Enter your name and download the PDF summary for the LMS.</div>
+    <div style="margin-top:16px">
+      <label for="studentName" style="font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;display:block;margin-bottom:6px;opacity:.92">STUDENT NAME (appears on the PDF summary)</label>
+      <input type="text" id="studentName" placeholder="Your name…" style="width:min(340px,100%);padding:10px 14px;border-radius:9px;border:none;font-size:.9rem;font-family:var(--sans)">
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn primary" id="masterGrade" style="background:#fff;color:var(--blue)">✅ Grade Entire Exercise</button>
+      <button class="btn primary" id="pdfBtn" style="background:var(--amber);color:#fff">📄 Download Grade Summary (PDF)</button>
+    </div>
+  </div>
 
-            // Check device selection
-            const hasAllDevices = requiredDevices.every(device => selectedDevices.includes(device));
-            if (hasAllDevices) score += 25;
-            else errors.push('Missing required devices for enterprise deployment');
+  <div class="navrow">
+    <a href="lesson03.html">← Back to Lesson 3</a>
+    <a href="index.html">Course Home →</a>
+  </div>
 
-            // Check VLAN configuration
-            const vlans = [salesVlan, engineeringVlan, financeVlan, managementVlan, guestVlan];
-            const validVlans = vlans.filter(vlan => vlan >= 10 && vlan <= 4094);
-            const uniqueVlans = new Set(validVlans);
-            
-            if (validVlans.length === 5 && uniqueVlans.size === 5) score += 25;
-            else errors.push('VLAN IDs must be unique and between 10-4094');
+</main>
 
-            // Check wireless configuration
-            if (internalSsid && guestSsid && internalSsid !== guestSsid) score += 25;
-            else errors.push('SSIDs must be configured and unique');
+<footer>
+  <div class="wrap">
+    <div><b>LAN 121 — Network Essentials</b> · Exercise 4 · Spanning Tree &amp; VLAN Workshop</div>
+    <div>Moraine Valley Community College · Computer Integrated Technologies Department</div>
+  </div>
+</footer>
 
-            if (securityType === 'wpa3-enterprise' || securityType === 'wpa2-enterprise') score += 25;
-            else errors.push('Enterprise security required for business environment');
+<script>
+(function(){
+  /* ---------- Theme toggle (shared key with course index) ---------- */
+  var btn = document.getElementById('themeBtn');
+  var saved = localStorage.getItem('lan121-theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent = '☀️ Light'; }
+  btn.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('lan121-theme','light'); btn.textContent = '🌙 Dark'; }
+    else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('lan121-theme','dark'); btn.textContent = '☀️ Light'; }
+  });
 
-            // Display results
-            feedback.style.display = 'block';
-            if (score === 100) {
-                feedback.className = 'answer-feedback correct show';
-                feedback.innerHTML = `<strong>Excellent!</strong> Perfect network design! You've correctly selected enterprise-grade devices, configured unique VLANs for each department, and chosen appropriate wireless security. Your design provides scalability, security, and centralized management. Score: ${score}/100`;
-            } else {
-                feedback.className = 'answer-feedback incorrect show';
-                feedback.innerHTML = `<strong>Good attempt!</strong> Score: ${score}/100<br><br>Areas for improvement:<br>• ${errors.join('<br>• ')}`;
-            }
-        }
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var acc = b.closest('.acc');
+      var open = acc.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
 
-        function resetActivity() {
-            selectedDevices = [];
-            document.querySelectorAll('.device-option').forEach(device => device.classList.remove('selected'));
-            document.querySelectorAll('.config-input').forEach(input => input.value = '');
-            document.getElementById('activity-feedback').style.display = 'none';
-        }
+  /* ================= VLAN CLI SIMULATOR (Task 5) ================= */
+  var flags = { c1:false, c2:false, c3n:false, c3created:false, c4:false, c5:false, c6:false };
+  var out = document.getElementById('simOut');
+  var inp = document.getElementById('simIn');
+  var promptEl = document.getElementById('simPrompt');
+  if (out && inp) {
+    var st;
+    function fresh(){
+      return { mode:'user', ctx:null, vlans:{}, ifs:{ 'g0/1':{mode:'access', vlan:1}, 'g0/24':{mode:'access', vlan:1} } };
+    }
+    function pText(){
+      switch (st.mode) {
+        case 'user': return 'SW-A>';
+        case 'priv': return 'SW-A#';
+        case 'config': return 'SW-A(config)#';
+        case 'vlan': return 'SW-A(config-vlan)#';
+        case 'if': return 'SW-A(config-if)#';
+      }
+    }
+    function print(t, cls){
+      var s = document.createElement('span');
+      if (cls) s.className = cls;
+      s.textContent = t + '\n';
+      out.appendChild(s);
+      out.scrollTop = out.scrollHeight;
+    }
+    function ck(id){ var el = document.getElementById(id); if (el) el.classList.add('done'); }
+    function normIf(x){
+      var m = x.match(/^(?:g|gi|gig|gigabitethernet)\s*0\/(\d+)$/);
+      return m ? 'g0/' + m[1] : null;
+    }
+    function refreshChecks(){
+      if (st.vlans[10]) { flags.c1 = true; ck('c1'); }
+      if (st.vlans[10] && st.vlans[10].name === 'SALES') { flags.c2 = true; ck('c2'); }
+      if (st.vlans[20] && st.vlans[20].name === 'GUEST') { flags.c3 = true; ck('c3'); }
+      var i1 = st.ifs['g0/1'], i24 = st.ifs['g0/24'];
+      if (i1.mode === 'access' && i1.modeSet) { flags.c4 = true; ck('c4'); }
+      if (i1.vlan === 10) { flags.c5 = true; ck('c5'); }
+      if (i24.mode === 'trunk') { flags.c6 = true; ck('c6'); }
+    }
+    function banner(){
+      print('LAN 121 VLAN Simulator — switch SW-A', 'dim');
+      print('Ports: g0/1 (Sales desk) · g0/24 (uplink to SW-B)', 'dim');
+      print('Milestones check themselves as your commands land. Type ? for help.', 'dim');
+      print('');
+    }
+    function showVlans(){
+      print('VLAN Name                             Status    Ports', 'dim');
+      print('---- -------------------------------- --------- -----', 'dim');
+      var ports1 = [];
+      Object.keys(st.ifs).forEach(function(i){ if (st.ifs[i].mode === 'access' && st.ifs[i].vlan === 1) ports1.push(i); });
+      print('1    default                          active    ' + ports1.join(', '));
+      Object.keys(st.vlans).sort(function(a,b){ return a-b; }).forEach(function(v){
+        var ports = [];
+        Object.keys(st.ifs).forEach(function(i){ if (st.ifs[i].mode === 'access' && st.ifs[i].vlan == v) ports.push(i); });
+        print((v + '    ').slice(0,5) + ((st.vlans[v].name || 'VLAN' + ('000' + v).slice(-4)) + '                                ').slice(0,33) + 'active    ' + ports.join(', '), 'ok');
+      });
+      var trunks = Object.keys(st.ifs).filter(function(i){ return st.ifs[i].mode === 'trunk'; });
+      if (trunks.length) print('(trunk ports: ' + trunks.join(', ') + ' — carry all VLANs, tagged)', 'dim');
+    }
+    function showRun(){
+      print('!', 'dim'); print('hostname SW-A', 'dim');
+      Object.keys(st.vlans).sort(function(a,b){ return a-b; }).forEach(function(v){
+        print('vlan ' + v);
+        if (st.vlans[v].name) print(' name ' + st.vlans[v].name);
+      });
+      Object.keys(st.ifs).forEach(function(i){
+        print('interface GigabitEthernet' + i.slice(1));
+        if (st.ifs[i].mode === 'trunk') print(' switchport mode trunk');
+        else { if (st.ifs[i].modeSet) print(' switchport mode access'); if (st.ifs[i].vlan !== 1) print(' switchport access vlan ' + st.ifs[i].vlan); }
+      });
+      print('!', 'dim');
+    }
+    function help(){
+      print('— Modes —', 'dim');
+      print('  enable · configure terminal · exit');
+      print('— VLANs (config mode) —', 'dim');
+      print('  vlan <id>            create/enter a VLAN (e.g., vlan 10)');
+      print('  name <text>          name it (inside vlan mode)');
+      print('— Interfaces (config mode) —', 'dim');
+      print('  interface g0/1       enter an interface (g0/1 or g0/24)');
+      print('  switchport mode access | switchport mode trunk');
+      print('  switchport access vlan <id>');
+      print('— Verify —', 'dim');
+      print('  show vlan brief · show run · reset');
+    }
+    function handle(raw){
+      var line = raw.trim().replace(/\s+/g, ' ');
+      if (!line) return;
+      print(pText() + ' ' + line, 'cmd');
+      var l = line.toLowerCase();
 
-        // Assessment functionality
-        const answers = {
-            q1: 'b', q2: 'a', q3: 'b', q4: 'b',
-            q5: 'b', q6: 'b', q7: 'a', q8: 'a'
-        };
+      if (l === '?' || l === 'help') return help();
+      if (l === 'reset' || l === 'reload') {
+        st = fresh(); out.textContent = ''; banner();
+        Object.keys(flags).forEach(function(k){ flags[k] = false; });
+        document.querySelectorAll('.ck-list li').forEach(function(li){ li.classList.remove('done'); });
+        return;
+      }
+      if (l === 'show vlan brief' || l === 'show vlan' || l === 'sh vlan brief' || l === 'sh vlan') return showVlans();
+      if (l === 'show run' || l === 'show running-config' || l === 'sh run') return showRun();
+      if (l === 'exit' || l === 'end') {
+        if (st.mode === 'vlan' || st.mode === 'if') { st.mode = 'config'; st.ctx = null; }
+        else if (st.mode === 'config') st.mode = 'priv';
+        else if (st.mode === 'priv') st.mode = 'user';
+        return;
+      }
+      if (l === 'enable' || l === 'en') {
+        if (st.mode === 'user') { st.mode = 'priv'; return; }
+        return print('% Already privileged', 'dim');
+      }
+      if (l === 'configure terminal' || l === 'conf t' || l === 'config t' || l === 'configure t') {
+        if (st.mode === 'user') return print('% Type "enable" first', 'err');
+        st.mode = 'config'; st.ctx = null;
+        return print('Enter configuration commands, one per line.', 'dim');
+      }
 
-        const explanations = {
-            q1: {
-                correct: "Excellent! A managed switch provides dedicated collision domains per port, dedicated bandwidth, and VLAN capabilities essential for scalable enterprise networks.",
-                incorrect: "A managed switch is optimal because it provides dedicated collision domains per port, full-duplex operation, and VLAN support for future network segmentation."
-            },
-            q2: {
-                correct: "Perfect! Access ports connect end devices to specific VLANs (untagged), while trunk ports use 802.1Q tagging to carry multiple VLANs between switches.",
-                incorrect: "VLAN segmentation requires access ports for end devices and trunk ports between switches. Access ports are untagged, trunk ports use 802.1Q tagging."
-            },
-            q3: {
-                correct: "Correct! A trunk port with 802.1Q tagging efficiently carries multiple VLANs across a single physical link while maintaining VLAN separation.",
-                incorrect: "Inter-building links carrying multiple VLANs require trunk configuration with 802.1Q tagging to properly separate and identify VLAN traffic."
-            },
-            q4: {
-                correct: "Outstanding! Channel 11 is one of the three non-overlapping channels (1, 6, 11) in 2.4 GHz and avoids interference with existing channels 1 and 6.",
-                incorrect: "In 2.4 GHz, only channels 1, 6, and 11 are non-overlapping. Channel 11 provides optimal performance without interfering with channels 1 and 6."
-            },
-            q5: {
-                correct: "Excellent! Different IP networks require Layer 3 routing. A router with multiple interfaces and routing protocols can connect and control inter-network communication.",
-                incorrect: "Different IP subnets require Layer 3 routing capabilities. Switches operate at Layer 2 and cannot route between different IP networks."
-            },
-            q6: {
-                correct: "Perfect analysis! You cannot configure both 'switchport mode trunk' and 'switchport access vlan' on the same interface - these are mutually exclusive.",
-                incorrect: "The configuration error is attempting to set both trunk mode and access VLAN assignment on the same interface, which creates conflicting port modes."
-            },
-            q7: {
-                correct: "Excellent troubleshooting! If VLAN 20 works internally but cannot reach external networks, VLAN 20 is likely not allowed on the trunk to the router.",
-                incorrect: "Since VLAN 20 communicates internally but lacks external connectivity, the most likely cause is that VLAN 20 traffic cannot reach the router via the trunk."
-            },
-            q8: {
-                correct: "Outstanding choice! A centralized wireless controller with lightweight APs provides unified management, seamless roaming, and scalable enterprise-grade wireless.",
-                incorrect: "Large campus deployments require centralized wireless controllers for unified management, seamless roaming between buildings, and consistent security policies."
-            }
-        };
+      var m;
+      if ((m = l.match(/^vlan (\d+)$/))) {
+        if (st.mode !== 'config' && st.mode !== 'vlan' && st.mode !== 'if') return print('% Enter global configuration mode first (enable → configure terminal)', 'err');
+        var id = parseInt(m[1], 10);
+        if (id < 2 || id > 4094) return print('% VLAN id must be 2-4094 (1 is the default VLAN)', 'err');
+        if (!st.vlans[id]) { st.vlans[id] = { name: null }; print('✔ VLAN ' + id + ' created', 'ok'); }
+        st.mode = 'vlan'; st.ctx = id;
+        refreshChecks();
+        return;
+      }
+      if ((m = line.match(/^name (\S.*)$/i))) {
+        if (st.mode !== 'vlan') return print('% "name" is a VLAN subcommand — enter "vlan <id>" first', 'err');
+        st.vlans[st.ctx].name = m[1].toUpperCase();
+        print('✔ VLAN ' + st.ctx + ' named ' + st.vlans[st.ctx].name, 'ok');
+        refreshChecks();
+        return;
+      }
+      if ((m = l.match(/^interface (.+)$/) )) {
+        if (st.mode === 'user' || st.mode === 'priv') return print('% Enter global configuration mode first', 'err');
+        var iid = normIf(m[1]);
+        if (!iid || !st.ifs[iid]) return print('% Unknown interface — this switch exposes g0/1 and g0/24', 'err');
+        st.mode = 'if'; st.ctx = iid;
+        return;
+      }
+      if (l === 'switchport mode access' || l === 'switchport mode trunk') {
+        if (st.mode !== 'if') return print('% Interface subcommand — enter "interface g0/N" first', 'err');
+        var mode = l.endsWith('trunk') ? 'trunk' : 'access';
+        st.ifs[st.ctx].mode = mode; st.ifs[st.ctx].modeSet = true;
+        print('✔ ' + st.ctx + ' set to ' + mode + ' mode' + (mode === 'trunk' ? ' — 802.1Q tagging enabled' : ''), 'ok');
+        refreshChecks();
+        return;
+      }
+      if ((m = l.match(/^switchport access vlan (\d+)$/))) {
+        if (st.mode !== 'if') return print('% Interface subcommand — enter "interface g0/N" first', 'err');
+        var v = parseInt(m[1], 10);
+        if (!st.vlans[v] && v !== 1) print('% Warning: VLAN ' + v + ' does not exist yet — creating it is better practice first', 'err');
+        st.ifs[st.ctx].vlan = v;
+        print('✔ ' + st.ctx + ' assigned to VLAN ' + v, 'ok');
+        refreshChecks();
+        return;
+      }
+      print('% Unrecognized command: "' + line + '" — type ? for help', 'err');
+    }
+    st = fresh();
+    banner();
+    inp.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { handle(inp.value); inp.value = ''; promptEl.textContent = pText(); }
+    });
+  }
 
-        function submitAssessment() {
-            let score = 0;
-            let totalQuestions = Object.keys(answers).length;
-            let answered = 0;
+  /* ================= STP FAILOVER WIDGET (Task 6) ================= */
+  var cutBtn = document.getElementById('cutBtn');
+  if (cutBtn) {
+    var el = function(id){ return document.getElementById(id); };
+    var restoreBtn = el('restoreBtn');
+    function setHealthy(){
+      el('lnB').setAttribute('stroke', 'var(--green)'); el('lnB').removeAttribute('stroke-dasharray'); el('lnB').style.opacity = 1;
+      el('lnC').setAttribute('stroke', 'var(--red)'); el('lnC').setAttribute('stroke-dasharray', '8 6');
+      el('blkDot').style.opacity = 1; el('blkX').style.opacity = 1;
+      el('lnBLabel').textContent = 'forwarding'; el('lnBLabel').setAttribute('fill', 'var(--green)');
+      el('lnCLabel').textContent = 'BLOCKED on SW3'; el('lnCLabel').setAttribute('fill', 'var(--red)');
+      el('cutIc').style.opacity = 0;
+      el('stpRead').textContent = 'Topology healthy: SW3 reaches the root directly; its port toward SW2 is blocked to break the loop.';
+      cutBtn.disabled = false; restoreBtn.disabled = true;
+    }
+    function setFailed(){
+      el('lnB').setAttribute('stroke', 'var(--muted)'); el('lnB').setAttribute('stroke-dasharray', '3 7'); el('lnB').style.opacity = .5;
+      el('lnC').setAttribute('stroke', 'var(--green)'); el('lnC').removeAttribute('stroke-dasharray');
+      el('blkDot').style.opacity = 0; el('blkX').style.opacity = 0;
+      el('lnBLabel').textContent = 'LINK FAILED'; el('lnBLabel').setAttribute('fill', 'var(--muted)');
+      el('lnCLabel').textContent = 'now FORWARDING'; el('lnCLabel').setAttribute('fill', 'var(--green)');
+      el('cutIc').style.opacity = 1;
+      el('stpRead').textContent = 'Link down! SW3 lost its root port — the blocked port toward SW2 walked the states and is now forwarding. New path: SW3 → SW2 → SW1. With classic 802.1D that transition took 30–50 seconds; with RSTP, about a second.';
+      cutBtn.disabled = true; restoreBtn.disabled = false;
+    }
+    cutBtn.addEventListener('click', setFailed);
+    restoreBtn.addEventListener('click', setHealthy);
+  }
 
-            // Check each question
-            for (let question in answers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                const feedback = document.getElementById(`feedback${question.slice(1)}`);
-                
-                if (selected) {
-                    answered++;
-                    if (selected.value === answers[question]) {
-                        score++;
-                        feedback.textContent = explanations[question].correct;
-                        feedback.className = 'answer-feedback correct show';
-                    } else {
-                        feedback.textContent = explanations[question].incorrect;
-                        feedback.className = 'answer-feedback incorrect show';
-                    }
-                    feedback.style.display = 'block';
-                } else {
-                    const feedback = document.getElementById(`feedback${question.slice(1)}`);
-                    feedback.textContent = 'Please answer this question before submitting.';
-                    feedback.className = 'answer-feedback incorrect show';
-                    feedback.style.display = 'block';
-                }
-            }
+  /* ================= TASK GRADING ================= */
+  var TOTAL = { 1:4, 2:6, 3:4, 4:4, 5:6, 6:3 };
+  var earned = { 1:null, 2:null, 3:null, 4:null, 5:null, 6:null };
 
-            if (answered === totalQuestions) {
-                displayGrade(score, totalQuestions);
-                updateProgress((score / totalQuestions) * 100);
-            }
-        }
-
-        function displayGrade(score, total) {
-            const percentage = Math.round((score / total) * 100);
-            let grade, feedback;
-
-            if (percentage >= 90) {
-                grade = 'A';
-                feedback = 'Outstanding performance! You have mastered network device concepts and are well-prepared for CompTIA Network+ certification and professional networking roles.';
-            } else if (percentage >= 80) {
-                grade = 'B';
-                feedback = 'Very good understanding! Review the explanations for missed questions and you\'ll be ready for certification and real-world application.';
-            } else if (percentage >= 70) {
-                grade = 'C';
-                feedback = 'Good foundation, but more study recommended. Focus on the detailed explanations and review the lesson sections for missed topics.';
-            } else if (percentage >= 60) {
-                grade = 'D';
-                feedback = 'Basic understanding present, but significant improvement needed. Please review all lesson sections thoroughly and retake the assessment.';
-            } else {
-                grade = 'F';
-                feedback = 'Foundational concepts need reinforcement. Study each device type carefully, practice configurations, and retake when ready.';
-            }
-
-            document.getElementById('grade-score').textContent = grade;
-            document.getElementById('score-text').textContent = `Score: ${score}/${total} (${percentage}%)`;
-            document.getElementById('grade-feedback').textContent = feedback;
-            document.getElementById('grade-display').classList.add('show');
-        }
-
-        function updateProgress(percentage) {
-            document.getElementById('progress-fill').style.width = percentage + '%';
-            document.getElementById('progress-percentage').textContent = Math.round(percentage) + '%';
-        }
-
-        function resetAssessment() {
-            // Clear all selections and feedback
-            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
-            document.querySelectorAll('.option').forEach(option => option.classList.remove('selected'));
-            document.querySelectorAll('.answer-feedback').forEach(feedback => feedback.style.display = 'none');
-            document.getElementById('grade-display').classList.remove('show');
-            updateProgress(0);
-        }
-
-        // Add selection styling for options
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove selected class from all options in this question
-                    const questionOptions = this.closest('.question').querySelectorAll('.option');
-                    questionOptions.forEach(option => option.classList.remove('selected'));
-                    
-                    // Add selected class to chosen option
-                    this.closest('.option').classList.add('selected');
-                });
-            });
+  function setStatus(n, pts){
+    var el = document.getElementById('st' + n);
+    el.textContent = pts + '/' + TOTAL[n] + ' PTS';
+    el.className = 'task-status ' + (pts === TOTAL[n] ? 'good' : pts > 0 ? 'part' : 'none');
+    if (pts === 0) el.textContent += ' — TRY AGAIN';
+  }
+  function checkAnswer(mode, key, raw){
+    var x = (raw || '').replace(/\s+/g, '');
+    if (!x) return false;
+    if (mode === 'dec') return /^-?\d+$/.test(x) && parseInt(x, 10) === parseInt(key, 10);
+    return false;
+  }
+  function gradeTask(n){
+    var taskEl = document.getElementById('task' + n);
+    var pts = 0;
+    if (n === 5) {
+      ['c1','c2','c3','c4','c5','c6'].forEach(function(k){ if (flags[k]) pts++; });
+    } else {
+      taskEl.querySelectorAll('.match-row').forEach(function(row){
+        var sel = row.querySelector('select');
+        if (!sel) return;
+        row.classList.remove('right','wrong');
+        var ok = sel.value === row.getAttribute('data-key');
+        row.classList.add(ok ? 'right' : 'wrong');
+        if (ok) pts++;
+      });
+      taskEl.querySelectorAll('.ans-row').forEach(function(row){
+        row.classList.remove('right','wrong');
+        var ok = checkAnswer(row.getAttribute('data-mode'), row.getAttribute('data-key'), row.querySelector('input').value);
+        row.classList.add(ok ? 'right' : 'wrong');
+        if (ok) pts++;
+      });
+      taskEl.querySelectorAll('.q').forEach(function(q){
+        q.classList.remove('correct','wrong');
+        q.querySelectorAll('label').forEach(function(l){ l.classList.remove('ans','picked'); });
+        var key = q.getAttribute('data-answer');
+        var picked = q.querySelector('input:checked');
+        q.querySelectorAll('label').forEach(function(l){
+          if (l.querySelector('input').value === key) l.classList.add('ans');
         });
+        if (picked && picked.value === key) { pts++; q.classList.add('correct'); }
+        else { q.classList.add('wrong'); if (picked) picked.closest('label').classList.add('picked'); }
+      });
+    }
+    earned[n] = pts;
+    setStatus(n, pts);
+    return pts;
+  }
+  document.querySelectorAll('[data-grade]').forEach(function(b){
+    b.addEventListener('click', function(){ gradeTask(parseInt(b.getAttribute('data-grade'), 10)); });
+  });
 
-        // Initialize progress
-        updateProgress(0);
-    </script>
+  /* ---------- Master grade ---------- */
+  function gradeAll(){
+    var sum = 0, max = 0, lines = [];
+    for (var n = 1; n <= 6; n++) {
+      gradeTask(n);
+      sum += earned[n]; max += TOTAL[n];
+      lines.push('Task ' + n + ': ' + earned[n] + '/' + TOTAL[n]);
+    }
+    var pct = Math.round(sum / max * 100);
+    var emoji = pct >= 92 ? '🏆' : pct >= 77 ? '👍' : '📚';
+    document.getElementById('masterScore').textContent = sum + ' / ' + max + '  (' + pct + '%) ' + emoji;
+    document.getElementById('masterBreakdown').innerHTML = lines.join(' &nbsp;·&nbsp; ') +
+      '<br>' + (pct === 100 ? 'Perfect — root elected, loop blocked, VLANs built. Download your PDF and submit it.' :
+      'Review the highlighted items (the simulator milestones list shows what\u2019s missing in Task 5), fix, regrade, then download your PDF summary for the LMS.');
+    return { sum: sum, max: max, pct: pct };
+  }
+  document.getElementById('masterGrade').addEventListener('click', gradeAll);
+
+  /* ---------- PDF grade summary ---------- */
+  var TASK_NAMES = {
+    1: 'Root Bridge Election',
+    2: 'Path Cost Calculation & Port Roles',
+    3: 'Port States, RSTP & Edge Protections',
+    4: 'VLAN Design Decisions',
+    5: 'VLAN Configuration Simulator',
+    6: 'STP Failover — Predict & Simulate'
+  };
+
+  function buildPdf(jsPDF, result){
+    var doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    var W = doc.internal.pageSize.getWidth();
+    var name = (document.getElementById('studentName').value || 'Name not entered').trim() || 'Name not entered';
+    var now = new Date();
+    var stamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+    doc.setFillColor(31, 78, 121);
+    doc.rect(0, 0, W, 92, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(19);
+    doc.text('LAN 121 — Network Essentials', 48, 40);
+    doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+    doc.text('Exercise 4: Spanning Tree & VLAN Workshop — Grade Summary', 48, 62);
+
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Student:', 48, 128); doc.text('Generated:', 48, 148);
+    doc.setFont('helvetica', 'normal');
+    doc.text(name, 118, 128); doc.text(stamp, 118, 148);
+
+    var pct = result.pct;
+    doc.setFillColor(pct >= 77 ? 76 : 224, pct >= 77 ? 175 : 101, pct >= 77 ? 80 : 92);
+    doc.roundedRect(W - 220, 108, 172, 56, 8, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+    doc.text(result.sum + ' / ' + result.max + '  (' + pct + '%)', W - 134, 142, { align: 'center' });
+
+    var y = 200;
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Task', 48, y); doc.text('Score', W - 110, y);
+    doc.setDrawColor(180); doc.line(48, y + 8, W - 48, y + 8);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    y += 30;
+    for (var n = 1; n <= 6; n++) {
+      doc.text('Task ' + n + ' — ' + TASK_NAMES[n], 48, y);
+      doc.text(earned[n] + ' / ' + TOTAL[n], W - 110, y);
+      doc.setDrawColor(230); doc.line(48, y + 9, W - 48, y + 9);
+      y += 26;
+    }
+
+    y += 8;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('TOTAL', 48, y); doc.text(result.sum + ' / ' + result.max + '   (' + pct + '%)', W - 158, y);
+    y += 34;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9.5); doc.setTextColor(90, 90, 90);
+    var note = 'Scores are computed in the browser at the time of download. Submit this summary to the LMS as directed by your instructor. Regrading before download is permitted — mastery is the goal.';
+    doc.text(doc.splitTextToSize(note, W - 96), 48, y);
+
+    y += 58;
+    doc.setDrawColor(120); doc.line(48, y, 280, y);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30); doc.setFontSize(10);
+    doc.text('Student signature', 48, y + 14);
+
+    doc.setFontSize(8.5); doc.setTextColor(130, 130, 130);
+    doc.text('Moraine Valley Community College · Computer Integrated Technologies Department · LAN 121 Exercise 4', 48, 760);
+
+    doc.save('LAN121_Exercise4_' + name.replace(/[^a-z0-9]+/gi, '_') + '.pdf');
+  }
+
+  document.getElementById('pdfBtn').addEventListener('click', function(){
+    var result = gradeAll();
+    function go(){ buildPdf(window.jspdf.jsPDF, result); }
+    if (window.jspdf && window.jspdf.jsPDF) return go();
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = go;
+    s.onerror = function(){
+      alert('The PDF library could not be loaded (no internet connection?). Your graded page will open the print dialog instead — choose "Save as PDF".');
+      window.print();
+    };
+    document.head.appendChild(s);
+  });
+})();
+</script>
+
 </body>
 </html>
