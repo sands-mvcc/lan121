@@ -30,7 +30,6 @@
   body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;transition:background .3s,color .3s}
   a{color:inherit}
   .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
-
   /* ---------- Header ---------- */
   header{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
   .hdr{display:flex;align-items:center;gap:14px;padding:12px 0}
@@ -40,7 +39,6 @@
   .hdr-spacer{flex:1}
   #themeBtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:var(--mono)}
   #themeBtn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-
   /* ---------- Hero ---------- */
   .hero{padding:46px 0 30px}
   .hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-weight:700}
@@ -48,7 +46,6 @@
   .hero p.lede{max-width:860px;color:var(--muted);font-size:1.02rem}
   .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
   .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem;box-shadow:var(--shadow)}
-
   /* ---------- Domain meter (signature) ---------- */
   .meter{margin:30px 0 8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
   .meter h3{font-size:.8rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
@@ -59,17 +56,14 @@
   .meter-key span{display:inline-flex;align-items:center;gap:7px;color:var(--muted)}
   .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
   .dot.k1{background:var(--d1)}.dot.k2{background:var(--d2)}.dot.k3{background:var(--d3)}.dot.k4{background:var(--d4)}.dot.k5{background:var(--d5)}
-
   .notice{display:flex;gap:12px;align-items:flex-start;background:var(--blue-soft);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin:18px 0 6px;font-size:.9rem}
   .notice .ic{font-size:1.1rem;line-height:1.4}
-
   /* ---------- Sections ---------- */
   section{padding:38px 0 8px}
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
   .sec-head .ic{font-size:1.4rem}
   .sec-head h2{font-size:1.45rem;font-weight:800;letter-spacing:-.01em}
   .sec-sub{color:var(--muted);max-width:900px;margin-bottom:22px;font-size:.95rem}
-
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
   .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:var(--radius);padding:20px 20px 18px;box-shadow:var(--shadow);text-decoration:none;transition:transform .18s,box-shadow .18s}
   .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(23,36,46,.14)}
@@ -88,7 +82,6 @@
   .card ul.acts{list-style:none;font-size:.8rem;color:var(--muted);margin:2px 0 8px}
   .card ul.acts li{padding-left:18px;position:relative;margin-bottom:2px}
   .card ul.acts li::before{content:"▸";position:absolute;left:2px;color:var(--green)}
-
   /* ---------- Objectives ---------- */
   .obj-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
   .obj-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
@@ -98,7 +91,6 @@
   .obj-card ul{list-style:none;font-size:.88rem;color:var(--muted)}
   .obj-card ul li{padding-left:20px;position:relative;margin-bottom:7px}
   .obj-card ul li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
-
   /* ---------- Grading ---------- */
   .grade-wrap{display:grid;grid-template-columns:1fr;gap:18px}
   @media(min-width:840px){.grade-wrap{grid-template-columns:1.35fr 1fr}}
@@ -111,10 +103,8 @@
   .scale-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 14px;box-shadow:var(--shadow);font-size:.9rem}
   .scale-row .g{font-family:var(--mono);font-weight:800;width:26px;text-align:center;border-radius:6px;color:#fff;padding:2px 0}
   .gA{background:var(--green)} .gB{background:var(--d1)} .gC{background:var(--d5)} .gD{background:var(--d4)} .gF{background:#8B2E2E}
-
   footer{margin-top:52px;border-top:1px solid var(--line);background:var(--card);padding:26px 0 34px;text-align:center;font-size:.82rem;color:var(--muted)}
   footer .mono{font-family:var(--mono)}
-
   @media(max-width:640px){
     .hdr h1{font-size:.9rem}
     .hdr .sub{display:none}
@@ -123,7 +113,6 @@
 </style>
 </head>
 <body>
-
 <header>
   <div class="wrap hdr">
     <span class="badge">LAN 121</span>
@@ -135,9 +124,7 @@
     <button id="themeBtn" aria-label="Toggle dark mode">🌙 Dark</button>
   </div>
 </header>
-
 <main class="wrap">
-
   <!-- ================= HERO ================= -->
   <div class="hero">
     <div class="eyebrow">Course Launch Page</div>
@@ -151,7 +138,6 @@
       <span class="chip">✏️ 8 Graded Exercises</span>
       <span class="chip">📝 4 Chapter Exams + Comprehensive Final</span>
     </div>
-
     <!-- Signature element: N10-009 domain weight meter -->
     <div class="meter">
       <h3>CompTIA Network+ N10-009 — Official Exam Domain Weights</h3>
@@ -170,19 +156,16 @@
         <span><i class="dot k5"></i>5.0 Network Troubleshooting — 24%</span>
       </div>
     </div>
-
     <div class="notice">
       <span class="ic">📌</span>
       <span>Select a lesson below to begin. Each lesson pairs lecture content with a graded exercise and a hands-on Packet Tracer lab. Domain colors on each card map to the exam weight meter above — Troubleshooting (Domain 5) carries the single largest weight on the exam, so troubleshooting practice is woven into every lab.</span>
     </div>
   </div>
-
   <!-- ================= LESSONS ================= -->
   <section id="lessons">
     <div class="sec-head"><span class="ic">📚</span><h2>Course Lessons — 8 Sessions</h2></div>
     <p class="sec-sub">Each lesson includes lecture content, interactive activities, embedded simulators, a graded exercise, and a link to the matching lab. Topics have been expanded to give full coverage of the N10-009 objectives — including modern-environment additions such as SDN/SD-WAN, VXLAN, Zero Trust, SASE/SSE, and Infrastructure as Code.</p>
     <div class="grid">
-
       <a class="card dom1" href="lesson01.html">
         <div class="tagrow"><span class="tag t1">LESSON 1</span><span class="tag t1">DOMAIN 1.0 · 23%</span><span class="tag">NO EXAM</span></div>
         <h3>Network Concepts I — Models, Devices &amp; the Modern Network</h3>
@@ -196,7 +179,6 @@
         <div class="kt"><b>Key terms:</b> OSI Layers 1–7, Encapsulation, NFV, VPC, SD-WAN, VXLAN, Zero Trust, SASE, IaC</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom1" href="lesson02.html">
         <div class="tagrow"><span class="tag t1">LESSON 2</span><span class="tag t1">DOMAIN 1.0 · 23%</span><span class="tag exam">EXAM 1</span></div>
         <h3>Network Concepts II — Protocols, Media, Topologies &amp; Addressing</h3>
@@ -210,7 +192,6 @@
         <div class="kt"><b>Key terms:</b> Well-Known Ports, TCP/UDP, SMF/MMF, Spine-and-Leaf, CIDR, VLSM, RFC 1918, SLAAC, Dual Stack</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom2" href="lesson03.html">
         <div class="tagrow"><span class="tag t2">LESSON 3</span><span class="tag t2">DOMAIN 2.0 · 20%</span><span class="tag">NO EXAM</span></div>
         <h3>Network Implementation I — Switching, Wireless &amp; Physical Installations</h3>
@@ -223,7 +204,6 @@
         <div class="kt"><b>Key terms:</b> VLAN, 802.1Q, STP, Jumbo Frames, Band Steering, BSSID, Captive Portal, PDU, UPS</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom2" href="lesson04.html">
         <div class="tagrow"><span class="tag t2">LESSON 4</span><span class="tag t2">DOMAIN 2.0 · 20%</span><span class="tag exam">EXAM 2</span></div>
         <h3>Network Implementation II — Routing &amp; Address Translation</h3>
@@ -237,7 +217,6 @@
         <div class="kt"><b>Key terms:</b> OSPF, BGP, Administrative Distance, Metric, NAT, PAT, VRRP, Virtual IP, Subinterface</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom3" href="lesson05.html">
         <div class="tagrow"><span class="tag t3">LESSON 5</span><span class="tag t3">DOMAIN 3.0 · 19%</span><span class="tag">NO EXAM</span></div>
         <h3>Network Operations I — Core Network Services</h3>
@@ -250,7 +229,6 @@
         <div class="kt"><b>Key terms:</b> A/AAAA/MX/CNAME Records, DNSSEC, DoH/DoT, DHCP Relay, Lease, PTP, NTS, IPAM</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom3" href="lesson06.html">
         <div class="tagrow"><span class="tag t3">LESSON 6</span><span class="tag t3">DOMAIN 3.0 · 19%</span><span class="tag exam">EXAM 3</span></div>
         <h3>Network Operations II — Management, Monitoring &amp; Disaster Recovery</h3>
@@ -263,7 +241,6 @@
         <div class="kt"><b>Key terms:</b> SLA, EOL/EOS, Baseline, SNMP Trap, NetFlow, Syslog, RPO/RTO, Hot Site, Split Tunnel, OOB Management</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom4" href="lesson07.html">
         <div class="tagrow"><span class="tag t4">LESSON 7</span><span class="tag t4">DOMAIN 4.0 · 14%</span><span class="tag exam">EXAM 4</span></div>
         <h3>Network Security — Threats, Vulnerabilities &amp; Countermeasures</h3>
@@ -277,7 +254,6 @@
         <div class="kt"><b>Key terms:</b> CIA Triad, PKI, MFA, RADIUS, 802.1X, Evil Twin, ARP Poisoning, Honeypot, Screened Subnet, SCADA</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
       <a class="card dom5" href="lesson08.html">
         <div class="tagrow"><span class="tag t5">LESSON 8</span><span class="tag t5">DOMAIN 5.0 · 24%</span><span class="tag exam">FINAL EXAM</span></div>
         <h3>Network Troubleshooting — Methodology, Tools &amp; Performance</h3>
@@ -291,10 +267,63 @@
         <div class="kt"><b>Key terms:</b> Troubleshooting Methodology, Attenuation, Crosstalk, Jitter, Latency, traceroute, dig, LLDP, Toner Probe</div>
         <div class="go">Launch Lesson →</div>
       </a>
-
     </div>
   </section>
-
+  <!-- ================= EXERCISES ================= -->
+  <section id="exercises">
+    <div class="sec-head"><span class="ic">✏️</span><h2>Graded Exercises — 8 Exercises</h2></div>
+    <p class="sec-sub">Short, focused exercises that reinforce the concepts introduced in each lesson before you move into the hands-on lab. Each is submitted individually for a grade.</p>
+    <div class="grid">
+      <a class="card dom1" href="exercise01.html">
+        <div class="tagrow"><span class="tag t1">EXERCISE 1 · LESSON 1</span></div>
+        <h3>Exploring the CompTIA Network+ Exam</h3>
+        <p>Get oriented with the N10-009 exam: domain weights, question formats, and how to build a study plan for the course.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom1" href="exercise02.html">
+        <div class="tagrow"><span class="tag t1">EXERCISE 2 · LESSON 1</span></div>
+        <h3>Analyzing the OSI Model</h3>
+        <p>Map real network functions and devices to the seven OSI layers and trace how data is encapsulated as it moves down the stack.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom1" href="exercise03.html">
+        <div class="tagrow"><span class="tag t1">EXERCISE 3 · LESSON 2</span></div>
+        <h3>Computer Math (Binary &amp; Hexadecimal)</h3>
+        <p>Practice binary and hexadecimal conversions, the number systems that underpin IP addressing, subnetting, and MAC addresses.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom2" href="exercise04.html">
+        <div class="tagrow"><span class="tag t2">EXERCISE 4 · LESSON 3</span></div>
+        <h3>Network Switches (STP and VLANs)</h3>
+        <p>Work through switching scenarios involving Spanning Tree Protocol and VLAN configuration to prevent loops and segment traffic.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom2" href="exercise05.html">
+        <div class="tagrow"><span class="tag t2">EXERCISE 5 · LESSON 4</span></div>
+        <h3>Wireless Network Configuration Challenge</h3>
+        <p>Apply routing and addressing concepts to a wireless configuration scenario, choosing settings that fit the network's requirements.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom3" href="exercise06.html">
+        <div class="tagrow"><span class="tag t3">EXERCISE 6 · LESSON 5</span></div>
+        <h3>Analyzing Domain Name Services (DNS)</h3>
+        <p>Interpret DNS record types and walk through the recursive resolution process from client query to authoritative answer.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom4" href="exercise07.html">
+        <div class="tagrow"><span class="tag t4">EXERCISE 7 · LESSON 7</span></div>
+        <h3>Network Security Challenge</h3>
+        <p>Identify attack types and match each to the appropriate hardening, authentication, or segmentation countermeasure.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+      <a class="card dom5" href="exercise08.html">
+        <div class="tagrow"><span class="tag t5">EXERCISE 8 · LESSON 8</span></div>
+        <h3>Troubleshooting Methods and Techniques</h3>
+        <p>Apply the CompTIA seven-step troubleshooting methodology to written network problem scenarios and justify each step.</p>
+        <div class="go">Open Exercise →</div>
+      </a>
+    </div>
+  </section>
   <!-- ================= OBJECTIVES ================= -->
   <section id="objectives">
     <div class="sec-head"><span class="ic">🎯</span><h2>Learning Objectives</h2></div>
@@ -332,7 +361,6 @@
       </div>
     </div>
   </section>
-
   <!-- ================= GRADING ================= -->
   <section id="grading">
     <div class="sec-head"><span class="ic">📊</span><h2>Grading &amp; Assignments</h2></div>
@@ -356,7 +384,6 @@
       </div>
     </div>
   </section>
-
   <!-- ================= PRACTICE EXAMS ================= -->
   <section id="practice">
     <div class="sec-head"><span class="ic">🎓</span><h2>Practice Exam Builder</h2></div>
@@ -378,13 +405,11 @@
       </a>
     </div>
   </section>
-
   <!-- ================= LABS ================= -->
   <section id="labs">
     <div class="sec-head"><span class="ic">🔬</span><h2>Lab Activities — 8 Hands-On Labs</h2></div>
     <p class="sec-sub">Eight hands-on lab exercises built in Cisco Packet Tracer, covering network construction, configuration, services, and analysis. Each lab is linked to its corresponding lesson and includes embedded cybersecurity-crossover analysis questions.</p>
     <div class="grid">
-
       <a class="card dom1" href="lab01.html">
         <div class="tagrow"><span class="tag t1">LAB 1 · LESSON 1</span></div>
         <h3>🖧 Using Packet Tracer to Build a Simple Network</h3>
@@ -392,7 +417,6 @@
         <div class="kt"><b>Skills:</b> Packet Tracer · Device Cabling · IP Assignment · Ping · Simulation Mode · OSI Encapsulation</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom1" href="lab02.html">
         <div class="tagrow"><span class="tag t1">LAB 2 · LESSON 2</span></div>
         <h3>🔢 Network Addressing and DHCP</h3>
@@ -400,7 +424,6 @@
         <div class="kt"><b>Skills:</b> Subnetting · CIDR/VLSM · DHCP Scopes · Reservations · ipconfig · APIPA Recognition</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom2" href="lab03.html">
         <div class="tagrow"><span class="tag t2">LAB 3 · LESSON 3</span></div>
         <h3>🔀 Using NAT/PAT</h3>
@@ -408,7 +431,6 @@
         <div class="kt"><b>Skills:</b> Static NAT · Dynamic NAT · PAT · Translation Tables · RFC 1918 · Verification Commands</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom2" href="lab04.html">
         <div class="tagrow"><span class="tag t2">LAB 4 · LESSON 4</span></div>
         <h3>🧩 Network Segmentation with VLANs and Trunking</h3>
@@ -416,7 +438,6 @@
         <div class="kt"><b>Skills:</b> VLAN Creation · Access/Trunk Ports · 802.1Q · Subinterfaces · Inter-VLAN Routing</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom3" href="lab05.html">
         <div class="tagrow"><span class="tag t3">LAB 5 · LESSON 5</span></div>
         <h3>🌐 Configuring Network Services (DNS, Email, HTTP/HTTPS, NTP)</h3>
@@ -424,7 +445,6 @@
         <div class="kt"><b>Skills:</b> DNS Records · Mail Services · Web Server · NTP Sync · nslookup · Service Verification</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom3" href="lab06.html">
         <div class="tagrow"><span class="tag t3">LAB 6 · LESSON 6</span></div>
         <h3>🗺️ Static and Dynamic Routing</h3>
@@ -432,7 +452,6 @@
         <div class="kt"><b>Skills:</b> Static Routes · Default Routes · OSPF · Routing Tables · Convergence · Redundancy</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom4" href="lab07.html">
         <div class="tagrow"><span class="tag t4">LAB 7 · LESSON 7</span></div>
         <h3>📶 Wireless Networking</h3>
@@ -440,7 +459,6 @@
         <div class="kt"><b>Skills:</b> SSID Config · Channel Planning · WPA2/WPA3 · Guest Segmentation · Rogue AP Detection</div>
         <div class="go">Open Lab →</div>
       </a>
-
       <a class="card dom5" href="lab08.html">
         <div class="tagrow"><span class="tag t5">LAB 8 · LESSON 8</span><span class="tag">FINAL REVIEW</span></div>
         <h3>🛠️ Network Troubleshooting Capstone</h3>
@@ -448,10 +466,8 @@
         <div class="kt"><b>Skills:</b> 7-Step Methodology · ping/traceroute · nslookup · show Commands · Root-Cause Documentation</div>
         <div class="go">Open Lab →</div>
       </a>
-
     </div>
   </section>
-
   <!-- ================= DEV TOOLS ================= -->
   <section id="tools">
     <div class="sec-head"><span class="ic">🛠️</span><h2>Content Development Tools</h2></div>
@@ -473,9 +489,7 @@
       </a>
     </div>
   </section>
-
 </main>
-
 <footer>
   <div class="wrap">
     <div><b>LAN 121 — Network Essentials</b> | 8-Lesson Course · CompTIA Network+ N10-009 Aligned</div>
@@ -483,7 +497,6 @@
     <div class="mono">8 Graded Exercises · 8 Labs · 4 Chapter Exams + Comprehensive Final</div>
   </div>
 </footer>
-
 <script>
   (function(){
     var btn = document.getElementById('themeBtn');
@@ -503,6 +516,5 @@
     });
   })();
 </script>
-
 </body>
 </html>
