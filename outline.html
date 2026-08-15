@@ -1,1030 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CompTIA Network+ N10-009 - 8-Week Course Outline</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Requirements Outline — LAN 121 | Network Essentials</title>
+<style>
+  :root{
+    --paper:#F4F7F9; --card:#FFFFFF; --ink:#17242E; --muted:#5B6B78; --line:#DCE4EA;
+    --blue:#145DA0; --blue-soft:#E3EEF8; --green:#1E9E62; --green-soft:#E4F4EC;
+    --d1:#145DA0; --d2:#1E9E62; --d3:#7C5CBF; --d4:#C2410C; --d5:#B4880B;
+    --amber:#B45309; --amber-soft:#FDF0DF;
+    --shadow:0 2px 10px rgba(23,36,46,.08); --radius:14px;
+    --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper:#0D1620; --card:#16222E; --ink:#E5EDF3; --muted:#93A5B4; --line:#26384A;
+    --blue:#5BA3E0; --blue-soft:#123049; --green:#4FC08D; --green-soft:#123626;
+    --d1:#5BA3E0; --d2:#4FC08D; --d3:#A98BE0; --d4:#F08A54; --d5:#D9B24A;
+    --amber:#E0A458; --amber-soft:#33270F;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--sans); background:var(--paper); color:var(--ink);
+    transition:background .2s ease, color .2s ease; line-height:1.5;
+  }
+  a{color:var(--blue);}
+  header.top{
+    position:sticky; top:0; z-index:20; background:var(--card); border-bottom:1px solid var(--line);
+    padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    box-shadow:var(--shadow); flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .brand h1{font-size:1.15rem; margin:0; letter-spacing:.2px;}
+  .brand .sub{color:var(--muted); font-size:.85rem;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.72rem; font-weight:600; padding:3px 10px;
+    border-radius:999px; white-space:nowrap;
+  }
+  .top-actions{display:flex; gap:8px; align-items:center;}
+  button, .btn{
+    font-family:var(--sans); cursor:pointer; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); padding:8px 12px; font-size:.85rem; font-weight:600;
+  }
+  #themeBtn{background:var(--paper); border:1px solid var(--line);}
+  .btn.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+  main{max-width:980px; margin:0 auto; padding:26px 20px 70px;}
+  .hero{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px; margin-bottom:20px;
+  }
+  .hero h2{margin:0 0 6px; font-size:1.3rem;}
+  .hero p{margin:0; color:var(--muted); font-size:.92rem;}
+  .hero .src{margin-top:10px; font-size:.8rem;}
+  .meter{display:flex; height:26px; border-radius:8px; overflow:hidden; margin:16px 0 8px; border:1px solid var(--line);}
+  .meter span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:.72rem; font-weight:700;}
+  .meter-legend{display:flex; flex-wrap:wrap; gap:14px; font-size:.78rem; color:var(--muted);}
+  .meter-legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:middle;}
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: white;
-            color: black;
-            line-height: 1.6;
-        }
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px;}
+  @media (max-width:720px){.grid2{grid-template-columns:1fr;}}
 
-        .header {
-            background-color: #2e7d32;
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px;}
+  .panel h3{margin:0 0 10px; font-size:.95rem;}
+  .scale{display:flex; height:28px; border-radius:8px; overflow:hidden; margin-bottom:8px; border:1px solid var(--line);}
+  .scale span{flex:1; display:flex; align-items:center; justify-content:center; font-size:.68rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px;}
+  .gA{background:var(--green);} .gB{background:var(--d1);} .gC{background:var(--d5);} .gD{background:var(--d4);} .gF{background:#8B2E2E;}
+  .scale-labels{display:flex; justify-content:space-between; font-size:.72rem; color:var(--muted);}
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
+  .progress-wrap{margin-top:4px;}
+  .progress-track{background:var(--blue-soft); border-radius:999px; height:14px; overflow:hidden; border:1px solid var(--line);}
+  .progress-fill{background:var(--green); height:100%; width:0%; transition:width .3s ease;}
+  .progress-txt{font-size:.8rem; color:var(--muted); margin-top:6px;}
 
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
+  .toolbar{display:flex; gap:10px; align-items:center; margin:22px 0 14px; flex-wrap:wrap;}
+  .toolbar input[type="search"]{
+    flex:1; min-width:180px; padding:9px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); font-family:var(--sans); font-size:.88rem;
+  }
 
-        .navigation {
-            background-color: #1b5e20;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+  .lesson{
+    background:var(--card); border:1px solid var(--line); border-left:6px solid var(--blue);
+    border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:14px; overflow:hidden;
+  }
+  .lesson.dom1{border-left-color:var(--d1);} .lesson.dom2{border-left-color:var(--d2);}
+  .lesson.dom3{border-left-color:var(--d3);} .lesson.dom4{border-left-color:var(--d4);}
+  .lesson.dom5{border-left-color:var(--d5);}
 
-        .nav-dropdown {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+  .lesson-head{
+    padding:16px 18px; cursor:pointer; display:flex; justify-content:space-between; gap:14px;
+    align-items:center; flex-wrap:wrap;
+  }
+  .lesson-head:hover{background:var(--blue-soft);}
+  .lh-left{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .lh-title{font-weight:700; font-size:1rem;}
+  .lh-meta{font-size:.78rem; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .dombadge{
+    font-size:.68rem; font-weight:700; color:#fff; padding:2px 9px; border-radius:999px;
+  }
+  .dom1 .dombadge{background:var(--d1);} .dom2 .dombadge{background:var(--d2);} .dom3 .dombadge{background:var(--d3);}
+  .dom4 .dombadge{background:var(--d4);} .dom5 .dombadge{background:var(--d5);}
+  .chev{transition:transform .2s ease; color:var(--muted); font-size:1.1rem;}
+  .lesson.open .chev{transform:rotate(90deg);}
+  .lh-progress{font-size:.75rem; color:var(--muted); white-space:nowrap;}
 
-        .nav-dropdown select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            background-color: white;
-            border: 2px solid #2e7d32;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+  .lesson-body{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+  .lesson.open .lesson-body{max-height:2400px;}
+  .lesson-inner{padding:0 18px 18px;}
+  .lesson-inner h4{font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:14px 0 6px;}
+  .objectives{margin:0; padding-left:18px; font-size:.88rem;}
+  .objectives li{margin-bottom:4px;}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+  .req-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .req-item{
+    display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--line);
+    border-radius:10px; padding:9px 12px; flex-wrap:wrap;
+  }
+  .req-item input[type="checkbox"]{width:17px; height:17px; accent-color:var(--green); flex-shrink:0;}
+  .req-item label{flex:1; font-size:.88rem; min-width:180px;}
+  .req-item label.done{text-decoration:line-through; color:var(--muted);}
+  .req-tag{
+    font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
+    padding:2px 8px; border-radius:999px; color:#fff; flex-shrink:0;
+  }
+  .tag-read{background:var(--blue);} .tag-ex{background:var(--green);} .tag-lab{background:var(--amber); color:#3a2600;}
+  .tag-exam{background:#8B2E2E;}
+  .req-item a{font-size:.8rem; font-weight:600; text-decoration:none; white-space:nowrap;}
+  .req-note{font-size:.75rem; color:var(--muted); width:100%; margin-top:-2px;}
 
-        .exam-info {
-            background-color: #f1f8e9;
-            border: 2px solid #2e7d32;
-            border-radius: 10px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
+  footer{text-align:center; color:var(--muted); font-size:.8rem; padding:30px 20px 50px;}
+  footer a{color:var(--muted);}
 
-        .exam-info h2 {
-            color: #1b5e20;
-            margin-bottom: 1rem;
-        }
-
-        .exam-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .detail-box {
-            background-color: white;
-            border: 1px solid #2e7d32;
-            border-radius: 5px;
-            padding: 1rem;
-        }
-
-        .detail-box h3 {
-            color: #2e7d32;
-            margin-bottom: 0.5rem;
-        }
-
-        .week-section {
-            margin-bottom: 3rem;
-            border: 2px solid #2e7d32;
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: white;
-        }
-
-        .week-header {
-            background-color: #2e7d32;
-            color: white;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .week-header:hover {
-            background-color: #1b5e20;
-        }
-
-        .week-header h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .week-content {
-            padding: 2rem;
-            display: none;
-        }
-
-        .week-content.active {
-            display: block;
-        }
-
-        .domain-info {
-            background-color: #e8f5e8;
-            border: 1px solid #2e7d32;
-            border-radius: 5px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .domain-info h3 {
-            color: #1b5e20;
-            margin-bottom: 0.5rem;
-        }
-
-        .objectives-list {
-            list-style: none;
-            margin-top: 1rem;
-        }
-
-        .objective-item {
-            background-color: #f9f9f9;
-            border-left: 4px solid #2e7d32;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 0 5px 5px 0;
-        }
-
-        .objective-title {
-            font-weight: bold;
-            color: #1b5e20;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .objective-details {
-            display: none;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #ddd;
-        }
-
-        .objective-details.active {
-            display: block;
-        }
-
-        .sub-topics {
-            list-style: none;
-            margin-left: 1rem;
-        }
-
-        .sub-topics li {
-            margin-bottom: 0.3rem;
-            padding-left: 1rem;
-            position: relative;
-        }
-
-        .sub-topics li::before {
-            content: "→";
-            color: #2e7d32;
-            position: absolute;
-            left: 0;
-        }
-
-        .toggle-icon {
-            font-size: 1.2rem;
-            transition: transform 0.3s;
-        }
-
-        .toggle-icon.rotated {
-            transform: rotate(90deg);
-        }
-
-        .progress-bar {
-            background-color: #e0e0e0;
-            height: 10px;
-            border-radius: 5px;
-            margin: 1rem 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background-color: #2e7d32;
-            height: 100%;
-            transition: width 0.5s ease;
-        }
-
-        .week-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-box {
-            background-color: #f1f8e9;
-            border: 1px solid #2e7d32;
-            border-radius: 5px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2e7d32;
-        }
-
-        .footer {
-            background-color: #1b5e20;
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .exam-details {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  .empty-msg{text-align:center; color:var(--muted); padding:30px; display:none;}
+  @media print{
+    header.top, .toolbar, .top-actions{display:none;}
+    .lesson-body{max-height:none !important;}
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>CompTIA Network+ N10-009</h1>
-        <p>8-Week Interactive Course Outline</p>
+
+<header class="top">
+  <div class="brand">
+    <h1>LAN 121 <span style="color:var(--muted); font-weight:400;">| Network Essentials</span></h1>
+    <span class="sub">Student Requirements Outline</span>
+    <span class="badge">CompTIA Network+ N10-009</span>
+  </div>
+  <div class="top-actions">
+    <button id="expandAllBtn" class="btn">Expand All</button>
+    <button id="themeBtn">🌙 Dark</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>📌 Course Requirements, Mapped Lesson by Lesson</h2>
+    <p>This companion outline maps every reading, graded exercise, hands-on lab, and exam required across the 8 lessons of LAN 121, built from the live course site. Check items off as you complete them to track your progress — your checklist stays in this browser tab only.</p>
+    <div class="meter" id="domainMeter"></div>
+    <div class="meter-legend" id="domainLegend"></div>
+    <div class="src">🏫 Moraine Valley Community College · Computer Integrated Technologies Dept &nbsp;·&nbsp; <a href="https://sands-mvcc.github.io/lan121/index.html" target="_blank" rel="noopener">Open full course site →</a></div>
+  </section>
+
+  <section class="grid2">
+    <div class="panel">
+      <h3>📊 Grading Breakdown</h3>
+      <div class="scale">
+        <span style="flex:25; background:var(--green);">Exercises 25%</span>
+        <span style="flex:40; background:var(--amber); color:#3a2600;">Labs 40%</span>
+        <span style="flex:25; background:var(--d1);">Exams 25%</span>
+        <span style="flex:10; background:var(--d3);">Final 10%</span>
+      </div>
+      <div class="scale-labels"><span>8 Exercises</span><span>8 Labs</span><span>4 Chapter Exams</span><span>1 Final</span></div>
+      <h3 style="margin-top:16px;">🎓 Letter Grade Scale</h3>
+      <div class="scale">
+        <span class="gA">A 92–100</span><span class="gB">B 85–91</span><span class="gC">C 77–84</span><span class="gD">D 70–76</span><span class="gF">F &lt;70</span>
+      </div>
     </div>
-
-    <nav class="navigation">
-        <div class="nav-dropdown">
-            <select id="weekSelector" onchange="navigateToWeek()">
-                <option value="">Select a Week to Navigate</option>
-                <option value="exam-info">Exam Information</option>
-                <option value="week1">Week 1 - Networking Concepts Part 1</option>
-                <option value="week2">Week 2 - Networking Concepts Part 2</option>
-                <option value="week3">Week 3 - Network Implementation Part 1</option>
-                <option value="week4">Week 4 - Network Implementation Part 2</option>
-                <option value="week5">Week 5 - Network Operations</option>
-                <option value="week6">Week 6 - Network Security</option>
-                <option value="week7">Week 7 - Network Troubleshooting Part 1</option>
-                <option value="week8">Week 8 - Network Troubleshooting Part 2</option>
-            </select>
-        </div>
-    </nav>
-
-    <div class="container">
-        <section id="exam-info" class="exam-info">
-            <h2>Exam Information</h2>
-            <p>The CompTIA Network+ certification exam validates the knowledge and skills required to establish network connectivity, explain documentation purposes, configure network services, and troubleshoot network issues.</p>
-            
-            <div class="exam-details">
-                <div class="detail-box">
-                    <h3>Exam Details</h3>
-                    <ul>
-                        <li><strong>Exam Code:</strong> N10-009</li>
-                        <li><strong>Questions:</strong> Maximum of 90</li>
-                        <li><strong>Duration:</strong> 90 minutes</li>
-                        <li><strong>Question Types:</strong> Multiple-choice and performance-based</li>
-                        <li><strong>Experience:</strong> 9-12 months recommended</li>
-                    </ul>
-                </div>
-                <div class="detail-box">
-                    <h3>Domain Breakdown</h3>
-                    <ul>
-                        <li><strong>1.0 Networking Concepts:</strong> 23%</li>
-                        <li><strong>2.0 Network Implementation:</strong> 20%</li>
-                        <li><strong>3.0 Network Operations:</strong> 19%</li>
-                        <li><strong>4.0 Network Security:</strong> 14%</li>
-                        <li><strong>5.0 Network Troubleshooting:</strong> 24%</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Week 1 -->
-        <div id="week1" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week1')">
-                <h2>Week 1 - Networking Concepts Part 1 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 1.0 - OSI Model, Appliances, Cloud Concepts, and Protocols (23% of exam)</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Fundamental networking concepts including the OSI model, networking appliances, cloud technologies, and core protocols that form the foundation of modern networks.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">4</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">23%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.1 Explain concepts related to the Open Systems Interconnection (OSI) reference model
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Dynamic addressing:</strong> DHCP (Reservations, Scope, Lease time, Options, Relay, Exclusions), SLAAC</li>
-                                <li><strong>Name resolution:</strong> DNS (DNSSEC, DoH/DoT, Record types: A/AAAA/CNAME/MX/TXT/NS/PTR, Zone types, Authoritative vs. non-authoritative), Hosts file</li>
-                                <li><strong>Time protocols:</strong> NTP, PTP, NTS</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            3.5 Compare and contrast network access and management methods
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>VPN types:</strong> Site-to-site VPN, Client-to-site VPN (Clientless, Split tunnel vs. full tunnel)</li>
-                                <li><strong>Connection methods:</strong> SSH, GUI, API, Console</li>
-                                <li><strong>Management:</strong> Jump box/host, In-band vs. out-of-band management</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 6 -->
-        <div id="week6" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week6')">
-                <h2>Week 6 - Network Security <span class="toggle-icon">▶</span></h2>
-                <p>Domain 4.0 - Security Concepts, Attack Types, and Defense Solutions (14% of exam)</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Network security fundamentals, common attack vectors, security technologies, and defense strategies to protect network infrastructure and data.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">3</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">14%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            4.1 Explain the importance of basic network security concepts
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Logical security:</strong> Encryption (Data in transit/at rest), Certificates (PKI, Self-signed)</li>
-                                <li><strong>Identity and access management:</strong> Authentication (MFA, SSO, RADIUS, LDAP, SAML, TACACS+), Authorization (Least privilege, RBAC), Geofencing</li>
-                                <li><strong>Physical security:</strong> Camera, Locks</li>
-                                <li><strong>Deception technologies:</strong> Honeypot, Honeynet</li>
-                                <li><strong>Security terminology:</strong> Risk, Vulnerability, Exploit, Threat, CIA triad</li>
-                                <li><strong>Compliance:</strong> Data locality, PCI DSS, GDPR</li>
-                                <li><strong>Network segmentation:</strong> IoT/IIoT, SCADA/ICS/OT, Guest, BYOD</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            4.2 Summarize various types of attacks and their impact to the network
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Network attacks:</strong> DoS/DDoS, VLAN hopping, MAC flooding, ARP poisoning/spoofing, DNS poisoning/spoofing</li>
-                                <li><strong>Rogue devices:</strong> DHCP, AP, Evil twin</li>
-                                <li><strong>On-path attack</strong></li>
-                                <li><strong>Social engineering:</strong> Phishing, Dumpster diving, Shoulder surfing, Tailgating</li>
-                                <li><strong>Malware</strong></li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            4.3 Given a scenario, apply network security features, defense techniques, and solutions
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Device hardening:</strong> Disable unused ports/services, Change default passwords</li>
-                                <li><strong>Network access control:</strong> Port security, 802.1X, MAC filtering</li>
-                                <li><strong>Key management</strong></li>
-                                <li><strong>Security rules:</strong> ACL, URL filtering, Content filtering</li>
-                                <li><strong>Zones:</strong> Trusted vs. untrusted, Screened subnet</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 7 -->
-        <div id="week7" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week7')">
-                <h2>Week 7 - Network Troubleshooting Part 1 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 5.0 - Methodology and Hardware Issues (24% of exam)</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Systematic troubleshooting methodology, physical layer issues, cabling problems, and interface troubleshooting techniques.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">3</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">24%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            5.1 Explain the troubleshooting methodology
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>1. Identify the problem:</strong> Gather information, Question users, Identify symptoms, Determine changes, Duplicate problem, Approach individually</li>
-                                <li><strong>2. Establish theory:</strong> Question the obvious, Consider multiple approaches (Top-to-bottom/bottom-to-top OSI, Divide and conquer)</li>
-                                <li><strong>3. Test theory:</strong> If confirmed determine next steps, If not confirmed establish new theory or escalate</li>
-                                <li><strong>4. Establish plan of action</strong></li>
-                                <li><strong>5. Implement solution or escalate</strong></li>
-                                <li><strong>6. Verify functionality and preventive measures</strong></li>
-                                <li><strong>7. Document findings, actions, outcomes, lessons learned</strong></li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            5.2 Given a scenario, troubleshoot common cabling and physical interface issues
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Cable issues:</strong> Incorrect cable (Single/multimode, Cat5/6/7/8, STP vs. UTP), Signal degradation (Crosstalk, Interference, Attenuation), Improper termination, TX/RX transposed</li>
-                                <li><strong>Interface issues:</strong> Increasing counters (CRC, Runts, Giants, Drops), Port status (Error disabled, Admin down, Suspended)</li>
-                                <li><strong>Hardware issues:</strong> PoE (Power budget exceeded, Incorrect standard), Transceivers (Mismatch, Signal strength)</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            5.3 Given a scenario, troubleshoot common issues with network services
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Switching issues:</strong> STP (Network loops, Root bridge selection, Port roles/states), Incorrect VLAN assignment, ACLs</li>
-                                <li><strong>Route selection:</strong> Routing table, Default routes</li>
-                                <li><strong>Addressing issues:</strong> Address pool exhaustion, Incorrect default gateway, Incorrect IP address, Duplicate IP address, Incorrect subnet mask</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 8 -->
-        <div id="week8" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week8')">
-                <h2>Week 8 - Network Troubleshooting Part 2 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 5.0 - Performance Issues and Troubleshooting Tools</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Performance troubleshooting, wireless issues, and comprehensive coverage of troubleshooting tools including software, hardware, and device commands.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">2</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">24%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            5.4 Given a scenario, troubleshoot common performance issues
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Performance metrics:</strong> Congestion/contention, Bottlenecking, Bandwidth/Throughput capacity, Latency, Packet loss, Jitter</li>
-                                <li><strong>Wireless issues:</strong> Interference (Channel overlap), Signal degradation or loss, Insufficient wireless coverage, Client disassociation issues, Roaming misconfiguration</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            5.5 Given a scenario, use the appropriate tool or protocol to solve networking issues
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Software tools:</strong> Protocol analyzer, Command line (ping, traceroute/tracert, nslookup, tcpdump, dig, netstat, ip/ifconfig/ipconfig, arp), Nmap, LLDP/CDP, Speed tester</li>
-                                <li><strong>Hardware tools:</strong> Toner, Cable tester, Taps, Wi-Fi analyzer, Visual fault locator</li>
-                                <li><strong>Device commands:</strong> show mac-address-table, show route, show interface, show config, show arp, show vlan, show power</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="domain-info" style="margin-top: 2rem;">
-                    <h3>Course Completion</h3>
-                    <p>Congratulations! You have completed all 5 domains of the CompTIA Network+ N10-009 certification course. You should now be prepared to take the certification exam. Review all domains, practice with performance-based questions, and use the troubleshooting methodology consistently.</p>
-                </div>
-            </div>
-        </div>
+    <div class="panel">
+      <h3>✅ Your Progress</h3>
+      <p style="font-size:.85rem; color:var(--muted); margin-top:0;">Tracks every checkbox below (reading, exercises, labs, exams) across all 8 lessons.</p>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-txt" id="progressTxt">0 of 0 requirements complete (0%)</div>
+      </div>
+      <div style="margin-top:14px;">
+        <button id="resetBtn" class="btn">Reset Checklist</button>
+      </div>
     </div>
+  </section>
 
-    <div class="footer">
-        <p>&copy; 2024 CompTIA Network+ N10-009 Course Outline | Interactive Learning Guide</p>
-        <p>Exam covers 5 domains with 90 questions in 90 minutes | 9-12 months experience recommended</p>
-    </div>
+  <div class="toolbar">
+    <input type="search" id="searchBox" placeholder="🔎 Filter lessons by topic keyword (e.g. VLAN, DNS, subnetting)…">
+  </div>
 
-    <script>
-        function toggleWeek(weekId) {
-            const content = document.querySelector(`#${weekId} .week-content`);
-            const icon = document.querySelector(`#${weekId} .week-header .toggle-icon`);
-            
-            content.classList.toggle('active');
-            icon.classList.toggle('rotated');
-            
-            // Close other weeks
-            const allWeeks = document.querySelectorAll('.week-section');
-            allWeeks.forEach(week => {
-                if (week.id !== weekId) {
-                    const otherContent = week.querySelector('.week-content');
-                    const otherIcon = week.querySelector('.week-header .toggle-icon');
-                    otherContent.classList.remove('active');
-                    otherIcon.classList.remove('rotated');
-                }
-            });
-        }
+  <div id="lessonList"></div>
+  <div class="empty-msg" id="emptyMsg">No lessons match that search — try a different keyword.</div>
 
-        function toggleObjective(element) {
-            const details = element.nextElementSibling;
-            const icon = element.querySelector('.toggle-icon');
-            
-            details.classList.toggle('active');
-            icon.classList.toggle('rotated');
-        }
+  <footer>
+    LAN 121 — Network Essentials · Lesson 1–8 · Moraine Valley Community College · CIT Department<br>
+    This is an unofficial student companion outline generated from the
+    <a href="https://sands-mvcc.github.io/lan121/index.html" target="_blank" rel="noopener">live course site</a>.
+    Always confirm exercise/exam windows and due dates in the LMS.
+  </footer>
+</main>
 
-        function navigateToWeek() {
-            const selector = document.getElementById('weekSelector');
-            const selectedValue = selector.value;
-            
-            if (selectedValue) {
-                const targetElement = document.getElementById(selectedValue);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth' });
-                    
-                    // If it's a week section, open it
-                    if (selectedValue.startsWith('week')) {
-                        const content = targetElement.querySelector('.week-content');
-                        const icon = targetElement.querySelector('.week-header .toggle-icon');
-                        
-                        if (!content.classList.contains('active')) {
-                            content.classList.add('active');
-                            icon.classList.add('rotated');
-                        }
-                        
-                        // Close other weeks
-                        const allWeeks = document.querySelectorAll('.week-section');
-                        allWeeks.forEach(week => {
-                            if (week.id !== selectedValue) {
-                                const otherContent = week.querySelector('.week-content');
-                                const otherIcon = week.querySelector('.week-header .toggle-icon');
-                                otherContent.classList.remove('active');
-                                otherIcon.classList.remove('rotated');
-                            }
-                        });
-                    }
-                }
-            }
-        }
+<script>
+const BASE = "https://sands-mvcc.github.io/lan121/";
 
-        // Auto-expand Week 1 on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const week1Content = document.querySelector('#week1 .week-content');
-            const week1Icon = document.querySelector('#week1 .week-header .toggle-icon');
-            week1Content.classList.add('active');
-            week1Icon.classList.add('rotated');
-        });
+const DOMAINS = [
+  {id:1, name:"Networking Concepts", weight:23, key:"d1"},
+  {id:2, name:"Network Implementation", weight:20, key:"d2"},
+  {id:3, name:"Network Operations", weight:19, key:"d3"},
+  {id:4, name:"Network Security", weight:14, key:"d4"},
+  {id:5, name:"Network Troubleshooting", weight:24, key:"d5"},
+];
 
-        // Add progress tracking
-        function updateProgress() {
-            const completedObjectives = document.querySelectorAll('.objective-details.active').length;
-            const totalObjectives = document.querySelectorAll('.objective-item').length;
-            const progressPercentage = (completedObjectives / totalObjectives) * 100;
-            
-            // You can add a progress bar here if desired
-            console.log(`Progress: ${progressPercentage.toFixed(1)}% (${completedObjectives}/${totalObjectives} objectives viewed)`);
-        }
+const LESSONS = [
+  {
+    n:1, domain:1, weight:23,
+    title:"Network Concepts I — Models, Devices & the Modern Network",
+    objectives:[
+      "Sequence the seven OSI layers and map PDUs/protocols to each",
+      "Distinguish core networking appliances (routers, switches, firewalls, IDS/IPS, load balancers, proxies, NAS/SAN, WLC)",
+      "Compare cloud service models (SaaS/PaaS/IaaS) and deployment models, including VPC architecture",
+      "Explain SDN, SD-WAN, and VXLAN, and how they differ from traditional architectures",
+      "Apply Zero Trust principles (NIST SP 800-207) and describe SASE/SSE and Infrastructure as Code"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 1 interactive lecture (OSI model, appliances, cloud, SDN/Zero Trust) — plus CompTIA Network+ N10-009 Cert Guide chapters for Domain 1.0", href:"lesson01.html", linktext:"Open Lesson 1"},
+      {tag:"ex", label:"Exercise 1 — Exploring the CompTIA Network+ Exam Profile", href:"exercise1.html", linktext:"Open Exercise 1"},
+      {tag:"ex", label:"Exercise 2 — OSI / appliance practice", href:"exercise2.html", linktext:"Open Exercise 2"},
+      {tag:"lab", label:"Lab 1 — Network Concepts Foundations", href:"lab01.html", linktext:"Open Lab 1"},
+    ]
+  },
+  {
+    n:2, domain:1, weight:23,
+    title:"Network Concepts II — Protocols, Media, Topologies & Addressing",
+    objectives:[
+      "Match common ports/protocols/services to their transport layer and function",
+      "Differentiate unicast, multicast, anycast, and broadcast traffic",
+      "Compare TCP and UDP, including the three-way handshake",
+      "Compare transmission media/transceivers and network topologies for a given scenario",
+      "Calculate IPv4 subnets with CIDR/VLSM and explain IPv6 addressing and transition mechanisms"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 2 interactive lecture (protocols, media, topologies, IPv4/IPv6) — plus Cert Guide chapters for Domain 1.0 continued", href:"lesson02.html", linktext:"Open Lesson 2"},
+      {tag:"ex", label:"Exercise 3 — Protocols & addressing practice", href:"exercise3.html", linktext:"Open Exercise 3"},
+      {tag:"lab", label:"Lab 2 — Media, Topologies & Subnetting", href:"lab02.html", linktext:"Open Lab 2"},
+      {tag:"exam", label:"Chapter Exam 1 — Domain 1.0 (Networking Concepts)", note:"Scheduled and delivered via the LMS — confirm the exam window there.", href:null},
+    ]
+  },
+  {
+    n:3, domain:2, weight:20,
+    title:"Network Implementation I — Switching, Wireless & Physical Installations",
+    objectives:[
+      "Explain how VLANs segment broadcast domains and the role of SVIs in routing",
+      "Configure trunking, interfaces, and link aggregation; identify MTU/jumbo frame mismatches",
+      "Describe how Spanning Tree Protocol prevents Layer 2 loops",
+      "Compare 802.11 standards, frequency bands, and channel selection",
+      "Differentiate SSID/BSSID/ESSID, mesh networks, AP architectures, and antenna types",
+      "Plan physical rack, power, and environmental installations"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 3 interactive lecture (VLANs, STP, wireless, physical installs) — plus Cert Guide chapters for Domain 2.0", href:"lesson03.html", linktext:"Open Lesson 3"},
+      {tag:"ex", label:"Exercise 4 — Switching & wireless practice", href:"exercise4.html", linktext:"Open Exercise 4"},
+      {tag:"lab", label:"Lab 3 — VLANs, Trunking & Wireless", href:"lab03.html", linktext:"Open Lab 3"},
+    ]
+  },
+  {
+    n:4, domain:2, weight:20,
+    title:"Network Implementation II — Routing & Address Translation",
+    objectives:[
+      "Differentiate static and dynamic routing and identify appropriate use cases",
+      "Configure static/default routes and RIPv2; verify with show ip route",
+      "Classify routing protocols as IGP/EGP and distance-vector/link-state; compare OSPF, EIGRP, and BGP",
+      "Predict route selection using longest prefix match, administrative distance, and metric",
+      "Explain NAT/PAT translation and FHRP/VRRP virtual IPs, including router-on-a-stick"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 4 interactive lecture (routing, OSPF/EIGRP/BGP, NAT/PAT, FHRP) — plus Cert Guide chapters for Domain 2.0 continued", href:"lesson04.html", linktext:"Open Lesson 4"},
+      {tag:"ex", label:"Exercise 5 — Routing & NAT practice", href:"exercise5.html", linktext:"Open Exercise 5"},
+      {tag:"lab", label:"Lab 4 — Routing & NAT/PAT Configuration", href:"lab04.html", linktext:"Open Lab 4"},
+      {tag:"exam", label:"Chapter Exam 2 — Domain 2.0 (Network Implementation)", note:"Scheduled and delivered via the LMS — confirm the exam window there.", href:null},
+    ]
+  },
+  {
+    n:5, domain:3, weight:19,
+    title:"Network Operations I — Core Network Services",
+    objectives:[
+      "Explain how ARP resolves IP addresses to MAC addresses and read ARP cache entries",
+      "Walk through recursive DNS resolution and identify record types (A, AAAA, CNAME, MX, PTR, NS, SOA, TXT)",
+      "Differentiate DNSSEC, DoH, and DoT",
+      "Configure DHCP scopes/reservations/exclusions and contrast with IPv6 SLAAC",
+      "Describe NTP stratum hierarchy, PTP precision timing, and NTS authentication",
+      "Apply ICMP diagnostic tools and describe IPAM and core web/mail services"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 5 interactive lecture (ARP, DNS, DHCP, NTP/PTP, ICMP) — plus Cert Guide chapters for Domain 3.0", href:"lesson05.html", linktext:"Open Lesson 5"},
+      {tag:"ex", label:"Exercise 6 — DNS/DHCP analysis practice", href:"exercise6.html", linktext:"Open Exercise 6"},
+      {tag:"lab", label:"Lab 5 — Core Network Services (DNS/DHCP)", href:"lab05.html", linktext:"Open Lab 5"},
+    ]
+  },
+  {
+    n:6, domain:3, weight:19,
+    title:"Network Operations II — Management, Monitoring & Disaster Recovery",
+    objectives:[
+      "Differentiate documentation artifacts (physical/logical diagrams, rack diagrams, cable maps, asset inventory, SLAs)",
+      "Explain lifecycle and change management, including EOL/EOS and firmware/patch stages",
+      "Compare full, incremental, differential, and snapshot backups",
+      "Select monitoring technology (SNMP, flow data, packet capture, syslog, APIs) for a visibility need",
+      "Apply RPO/RTO to choose disaster recovery sites, designs, and testing methods",
+      "Contrast site-to-site and client-to-site VPNs and describe secure administrative access (jump boxes, in-band/out-of-band)"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 6 interactive lecture (documentation, monitoring, DR, VPNs, admin access) — plus Cert Guide chapters for Domain 3.0 continued", href:"lesson06.html", linktext:"Open Lesson 6"},
+      {tag:"lab", label:"Lab 6 — Monitoring, Backup & VPN Configuration", href:"lab06.html", linktext:"Open Lab 6"},
+      {tag:"exam", label:"Chapter Exam 3 — Domain 3.0 (Network Operations)", note:"Scheduled and delivered via the LMS — confirm the exam window there.", href:null},
+    ]
+  },
+  {
+    n:7, domain:4, weight:14,
+    title:"Network Security — Threats, Vulnerabilities & Countermeasures",
+    objectives:[
+      "Explain the CIA triad and map encryption methods to the properties they protect",
+      "Differentiate IAM protocols (Kerberos, RADIUS, TACACS+, LDAP, SAML) and access control models",
+      "Identify attack types from symptoms (DoS/DDoS, VLAN hopping, ARP poisoning, and more)",
+      "Describe 802.1X network access control and configure port security behaviors",
+      "Compare firewalls, IDS vs. IPS placement, ACLs, and security zones",
+      "Justify segmentation strategies for IoT, SCADA/OT, guest, and BYOD networks",
+      "Explain physical security, deception technologies, and compliance drivers"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 7 interactive lecture (CIA triad, IAM, attacks, firewalls/IDS/IPS, segmentation) — plus Cert Guide chapters for Domain 4.0", href:"lesson07.html", linktext:"Open Lesson 7"},
+      {tag:"ex", label:"Exercise 7 — Security challenge practice", href:"exercise7.html", linktext:"Open Exercise 7"},
+      {tag:"lab", label:"Lab 7 — Wireless & Network Security Hardening", href:"lab07.html", linktext:"Open Lab 7"},
+      {tag:"exam", label:"Chapter Exam 4 — Domain 4.0 (Network Security)", note:"Scheduled and delivered via the LMS — confirm the exam window there.", href:null},
+    ]
+  },
+  {
+    n:8, domain:5, weight:24,
+    title:"Network Troubleshooting — Methodology, Tools & Performance",
+    objectives:[
+      "Apply the CompTIA seven-step troubleshooting methodology in sequence",
+      "Select a hypothesis strategy — top-down, bottom-up, or divide-and-conquer — based on symptoms",
+      "Diagnose physical layer issues using error counters, port states, and interface data",
+      "Trace service failures (DNS, DHCP, NTP, authentication, VPN, NAT) to root cause",
+      "Identify performance/congestion issues and wireless degradation factors",
+      "Choose correct diagnostic tools, interpret output, and document completed incidents"
+    ],
+    reqs:[
+      {tag:"read", label:"Required reading: Lesson 8 interactive lecture (troubleshooting methodology, tools, performance) — plus Cert Guide chapters for Domain 5.0", href:"lesson08.html", linktext:"Open Lesson 8"},
+      {tag:"ex", label:"Exercise 8 — Troubleshooting methodology practice", href:"exercise8.html", linktext:"Open Exercise 8"},
+      {tag:"lab", label:"Lab 8 — Troubleshooting Capstone (multi-domain injected faults)", href:"lab08.html", linktext:"Open Lab 8"},
+      {tag:"exam", label:"Comprehensive Final Exam — all five N10-009 domains", note:"Cumulative exam delivered via the LMS — no makeup date; confirm the window in advance.", href:null},
+    ]
+  },
+];
 
-        // Track objective viewing
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('objective-title') || e.target.closest('.objective-title')) {
-                setTimeout(updateProgress, 100);
-            }
-        });
+const TAGMETA = {
+  read:{cls:"tag-read", label:"Reading"},
+  ex:{cls:"tag-ex", label:"Exercise"},
+  lab:{cls:"tag-lab", label:"Lab"},
+  exam:{cls:"tag-exam", label:"Exam"},
+};
 
-        // Smooth scrolling for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
+function domainKey(d){return "d"+d;}
+
+function buildDomainMeter(){
+  const meter = document.getElementById('domainMeter');
+  const legend = document.getElementById('domainLegend');
+  meter.innerHTML = DOMAINS.map(d=>
+    `<span style="flex:${d.weight}; background:var(--${d.key});">${d.weight}%</span>`
+  ).join('');
+  legend.innerHTML = DOMAINS.map(d=>
+    `<span><i style="background:var(--${d.key});"></i>Domain ${d.id}.0 — ${d.name} (${d.weight}%)</span>`
+  ).join('');
+}
+
+function buildLessons(){
+  const list = document.getElementById('lessonList');
+  list.innerHTML = LESSONS.map((L, idx)=>{
+    const dk = domainKey(L.domain);
+    const reqRows = L.reqs.map((r,ri)=>{
+      const meta = TAGMETA[r.tag];
+      const id = `l${L.n}-r${ri}`;
+      const linkHtml = r.href ? `<a href="${BASE}${r.href}" target="_blank" rel="noopener">${r.linktext} →</a>` : '';
+      const noteHtml = r.note ? `<div class="req-note">${r.note}</div>` : '';
+      return `<li class="req-item">
+        <input type="checkbox" id="${id}" data-lesson="${L.n}">
+        <span class="req-tag ${meta.cls}">${meta.label}</span>
+        <label for="${id}">${r.label}</label>
+        ${linkHtml}
+        ${noteHtml}
+      </li>`;
+    }).join('');
+    return `<article class="lesson dom${L.domain}" data-idx="${idx}" data-search="${(L.title+' '+L.objectives.join(' ')).toLowerCase().replace(/"/g,'')}">
+      <div class="lesson-head" data-target="body-${L.n}">
+        <div class="lh-left">
+          <div class="lh-title">Lesson ${L.n}: ${L.title}</div>
+          <div class="lh-meta"><span class="dombadge">Domain ${L.domain}.0 · ${L.weight}%</span><span>${L.reqs.length} requirement${L.reqs.length>1?'s':''}</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="lh-progress" id="lp-${L.n}">0/${L.reqs.length}</span>
+          <span class="chev">▶</span>
+        </div>
+      </div>
+      <div class="lesson-body" id="body-${L.n}">
+        <div class="lesson-inner">
+          <h4>Learning Objectives</h4>
+          <ul class="objectives">${L.objectives.map(o=>`<li>${o}</li>`).join('')}</ul>
+          <h4>Student Requirements</h4>
+          <ul class="req-list">${reqRows}</ul>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function totalReqCount(){
+  return LESSONS.reduce((sum,L)=>sum+L.reqs.length,0);
+}
+
+function updateProgress(){
+  const all = document.querySelectorAll('.req-list input[type="checkbox"]');
+  let done = 0;
+  all.forEach(cb=>{ if(cb.checked) done++; });
+  const total = all.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressTxt').textContent = `${done} of ${total} requirements complete (${pct}%)`;
+
+  LESSONS.forEach(L=>{
+    const boxes = document.querySelectorAll(`.req-list input[data-lesson="${L.n}"]`);
+    let d = 0;
+    boxes.forEach(b=>{ if(b.checked) d++; });
+    const el = document.getElementById(`lp-${L.n}`);
+    if(el) el.textContent = `${d}/${boxes.length}`;
+  });
+}
+
+function wireCheckboxes(){
+  document.querySelectorAll('.req-list input[type="checkbox"]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const label = cb.parentElement.querySelector('label');
+      if(label) label.classList.toggle('done', cb.checked);
+      updateProgress();
+    });
+  });
+}
+
+function wireLessonToggles(){
+  document.querySelectorAll('.lesson-head').forEach(head=>{
+    head.addEventListener('click', ()=>{
+      head.closest('.lesson').classList.toggle('open');
+    });
+  });
+}
+
+function wireExpandAll(){
+  const btn = document.getElementById('expandAllBtn');
+  let expanded = false;
+  btn.addEventListener('click', ()=>{
+    expanded = !expanded;
+    document.querySelectorAll('.lesson').forEach(l=>{
+      l.classList.toggle('open', expanded);
+    });
+    btn.textContent = expanded ? 'Collapse All' : 'Expand All';
+  });
+}
+
+function wireReset(){
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('.req-list input[type="checkbox"]').forEach(cb=>{
+      cb.checked = false;
+      const label = cb.parentElement.querySelector('label');
+      if(label) label.classList.remove('done');
+    });
+    updateProgress();
+  });
+}
+
+function wireSearch(){
+  const box = document.getElementById('searchBox');
+  const empty = document.getElementById('emptyMsg');
+  box.addEventListener('input', ()=>{
+    const q = box.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.lesson').forEach(card=>{
+      const match = !q || card.dataset.search.includes(q);
+      card.style.display = match ? '' : 'none';
+      if(match) visible++;
+    });
+    empty.style.display = visible === 0 ? 'block' : 'none';
+  });
+}
+
+function wireTheme(){
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', ()=>{
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    btn.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+  });
+}
+
+buildDomainMeter();
+buildLessons();
+document.getElementById('lessonList').querySelector('.lesson').classList.add('open');
+wireCheckboxes();
+wireLessonToggles();
+wireExpandAll();
+wireReset();
+wireSearch();
+wireTheme();
+updateProgress();
+</script>
 </body>
-</html>sub-topics">
-                                <li>Layer 1 - Physical (cables, signals, connectors)</li>
-                                <li>Layer 2 - Data link (MAC addresses, switching)</li>
-                                <li>Layer 3 - Network (IP addresses, routing)</li>
-                                <li>Layer 4 - Transport (TCP, UDP, ports)</li>
-                                <li>Layer 5 - Session (session management)</li>
-                                <li>Layer 6 - Presentation (encryption, compression)</li>
-                                <li>Layer 7 - Application (user interfaces, applications)</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.2 Compare and contrast networking appliances, applications, and functions
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Physical and virtual appliances:</strong> Router, Switch, Firewall, IDS/IPS, Load balancer, Proxy, NAS, SAN</li>
-                                <li><strong>Wireless:</strong> Access point (AP), Controller</li>
-                                <li><strong>Applications:</strong> Content delivery network (CDN)</li>
-                                <li><strong>Functions:</strong> Virtual private network (VPN), Quality of service (QoS), Time to live (TTL)</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.3 Summarize cloud concepts and connectivity options
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Cloud Technologies:</strong> NFV, VPC, Network security groups/lists</li>
-                                <li><strong>Gateways:</strong> Internet gateway, NAT gateway</li>
-                                <li><strong>Connectivity:</strong> VPN, Direct Connect</li>
-                                <li><strong>Deployment Models:</strong> Public, Private, Hybrid</li>
-                                <li><strong>Service Models:</strong> SaaS, IaaS, PaaS</li>
-                                <li><strong>Characteristics:</strong> Scalability, Elasticity, Multitenancy</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.4 Explain common networking ports, protocols, services, and traffic types
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Common Protocols & Ports:</strong> FTP (20/21), SSH (22), Telnet (23), SMTP (25), DNS (53), DHCP (67/68), HTTP (80), HTTPS (443), RDP (3389)</li>
-                                <li><strong>IP Protocol Types:</strong> ICMP, TCP, UDP, GRE, IPSec (AH, ESP, IKE)</li>
-                                <li><strong>Traffic Types:</strong> Unicast, Multicast, Anycast, Broadcast</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 2 -->
-        <div id="week2" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week2')">
-                <h2>Week 2 - Networking Concepts Part 2 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 1.0 - Media, Topologies, Addressing, and Modern Networks</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Physical media, network topologies, IPv4 addressing concepts, and modern networking trends including SDN, VXLAN, and Zero Trust Architecture.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">4</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">23%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.5 Compare and contrast transmission media and transceivers
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Wireless:</strong> 802.11 standards, Cellular, Satellite</li>
-                                <li><strong>Wired:</strong> 802.3 standards, Single-mode vs. multimode fiber, DAC cable, Coaxial cable</li>
-                                <li><strong>Transceivers:</strong> Ethernet, Fibre Channel, SFP, QSFP form factors</li>
-                                <li><strong>Connectors:</strong> SC, LC, ST, MPO, RJ11, RJ45, F-type, BNC</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.6 Compare and contrast network topologies, architectures, and types
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Topologies:</strong> Mesh, Hybrid, Star/hub and spoke, Spine and leaf, Point to point</li>
-                                <li><strong>Three-tier model:</strong> Core, Distribution, Access layers</li>
-                                <li><strong>Collapsed core architecture</strong></li>
-                                <li><strong>Traffic flows:</strong> North-south, East-west</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.7 Given a scenario, use appropriate IPv4 network addressing
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Public vs. private:</strong> APIPA, RFC1918, Loopback/localhost</li>
-                                <li><strong>Subnetting:</strong> VLSM, CIDR</li>
-                                <li><strong>IPv4 address classes:</strong> Class A (1.0.0.0-126.255.255.255), Class B (128.0.0.0-191.255.255.255), Class C (192.0.0.0-223.255.255.255), Class D (Multicast), Class E (Reserved)</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            1.8 Summarize evolving use cases for modern network environments
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>SDN and SD-WAN:</strong> Application aware, Zero-touch provisioning, Transport agnostic, Central policy management</li>
-                                <li><strong>VXLAN:</strong> Data center interconnect (DCI), Layer 2 encapsulation</li>
-                                <li><strong>Zero Trust Architecture:</strong> Policy-based authentication, Authorization, Least privilege access</li>
-                                <li><strong>SASE/SSE</strong></li>
-                                <li><strong>Infrastructure as Code:</strong> Automation, Source control, Version control</li>
-                                <li><strong>IPv6 addressing:</strong> Address exhaustion mitigation, Compatibility (Tunneling, Dual stack, NAT64)</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 3 -->
-        <div id="week3" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week3')">
-                <h2>Week 3 - Network Implementation Part 1 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 2.0 - Routing and Switching Technologies (20% of exam)</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Routing protocols, switching technologies, VLANs, and the fundamental configuration concepts for network infrastructure devices.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">2</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">20%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            2.1 Explain characteristics of routing technologies
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Static routing:</strong> Manually configured routes</li>
-                                <li><strong>Dynamic routing:</strong> BGP (Border Gateway Protocol), EIGRP (Enhanced Interior Gateway Routing Protocol), OSPF (Open Shortest Path First)</li>
-                                <li><strong>Route selection:</strong> Administrative distance, Prefix length, Metric</li>
-                                <li><strong>Address translation:</strong> NAT, Port address translation (PAT)</li>
-                                <li><strong>First Hop Redundancy Protocol (FHRP)</strong></li>
-                                <li><strong>Virtual IP (VIP)</strong></li>
-                                <li><strong>Subinterfaces</strong></li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            2.2 Given a scenario, configure switching technologies and features
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Virtual Local Area Network (VLAN):</strong> VLAN database, Switch Virtual Interface (SVI)</li>
-                                <li><strong>Interface configuration:</strong> Native VLAN, Voice VLAN, 802.1Q tagging, Link aggregation, Speed, Duplex</li>
-                                <li><strong>Spanning tree protocol</strong></li>
-                                <li><strong>Maximum transmission unit (MTU):</strong> Jumbo frames</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 4 -->
-        <div id="week4" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week4')">
-                <h2>Week 4 - Network Implementation Part 2 <span class="toggle-icon">▶</span></h2>
-                <p>Domain 2.0 - Wireless Technologies and Physical Installations</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Wireless device configuration, RF concepts, physical installation considerations, and environmental factors for network infrastructure.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">2</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">20%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            2.3 Given a scenario, select and configure wireless devices and technologies
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Channels:</strong> Channel width, Non-overlapping channels, Regulatory impacts (802.11h)</li>
-                                <li><strong>Frequency options:</strong> 2.4GHz, 5GHz, 6GHz, Band steering</li>
-                                <li><strong>Service set identifiers:</strong> SSID, BSSID, ESSID</li>
-                                <li><strong>Network types:</strong> Mesh networks, Ad hoc, Point to point, Infrastructure</li>
-                                <li><strong>Encryption:</strong> WPA2, WPA3</li>
-                                <li><strong>Guest networks:</strong> Captive portals</li>
-                                <li><strong>Authentication:</strong> Pre-shared key (PSK) vs. Enterprise</li>
-                                <li><strong>Antennas:</strong> Omnidirectional vs. directional</li>
-                                <li><strong>Access point types:</strong> Autonomous vs. lightweight</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            2.4 Explain important factors of physical installations
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Installation implications:</strong> IDF/MDF locations, Rack size, Port-side exhaust/intake</li>
-                                <li><strong>Cabling:</strong> Patch panel, Fiber distribution panel, Lockable</li>
-                                <li><strong>Power:</strong> UPS, PDU, Power load, Voltage</li>
-                                <li><strong>Environmental factors:</strong> Humidity, Fire suppression, Temperature</li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Week 5 -->
-        <div id="week5" class="week-section">
-            <div class="week-header" onclick="toggleWeek('week5')">
-                <h2>Week 5 - Network Operations <span class="toggle-icon">▶</span></h2>
-                <p>Domain 3.0 - Documentation, Monitoring, Services, and Management (19% of exam)</p>
-            </div>
-            <div class="week-content">
-                <div class="domain-info">
-                    <h3>Learning Focus</h3>
-                    <p>Network documentation, monitoring technologies, network services implementation, disaster recovery concepts, and network management methods.</p>
-                </div>
-
-                <div class="week-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">5</div>
-                        <div>Objectives</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">19%</div>
-                        <div>Exam Weight</div>
-                    </div>
-                </div>
-
-                <ul class="objectives-list">
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            3.1 Explain the purpose of organizational processes and procedures
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Documentation:</strong> Physical vs. logical diagrams, Rack diagrams, Cable maps, Network diagrams (Layer 1/2/3), Asset inventory, IPAM, SLA, Wireless survey/heat map</li>
-                                <li><strong>Life-cycle management:</strong> EOL, EOS, Software management, Decommissioning</li>
-                                <li><strong>Change management:</strong> Request process tracking</li>
-                                <li><strong>Configuration management:</strong> Production, Backup, Baseline configurations</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            3.2 Given a scenario, use network monitoring technologies
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>Methods:</strong> SNMP (Traps, MIB, Versions, Community strings), Flow data, Packet capture, Baseline metrics, Log aggregation, API integration, Port mirroring</li>
-                                <li><strong>Solutions:</strong> Network discovery, Traffic analysis, Performance monitoring, Availability monitoring, Configuration monitoring</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            3.3 Explain disaster recovery (DR) concepts
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="sub-topics">
-                                <li><strong>DR metrics:</strong> RPO, RTO, MTTR, MTBF</li>
-                                <li><strong>DR sites:</strong> Cold site, Warm site, Hot site</li>
-                                <li><strong>High-availability:</strong> Active-active, Active-passive</li>
-                                <li><strong>Testing:</strong> Tabletop exercises, Validation tests</li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="objective-item">
-                        <div class="objective-title" onclick="toggleObjective(this)">
-                            3.4 Given a scenario, implement IPv4 and IPv6 network services
-                            <span class="toggle-icon">▶</span>
-                        </div>
-                        <div class="objective-details">
-                            <ul class="
+</html>
