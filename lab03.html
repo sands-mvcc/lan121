@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NAT &amp; PAT on a Cisco Router: Hands-on Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+(function(){try{var t=localStorage.getItem('natlab-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+<style>
+:root{
+  --bg:#F2F5F9; --surface:#FFFFFF; --surface-2:#E7EDF5; --ink:#14213D; --ink-2:#4B5A74; --line:#CAD5E4;
+  --navy:#0047AB; --navy-ink:#FFFFFF; --green:#00A86B; --green-soft:#DDF4EA; --amber:#C97A0E; --amber-soft:#FCEFD9;
+  --red:#C2372D; --red-soft:#FBE4E2; --zone-in:#E9F0FB; --zone-out:#EEF1F4;
+  --term-bg:#0A1628; --term-ink:#D3DEEC; --term-dim:#7C90AB; --term-cmd:#FFFFFF; --term-ok:#45D69B; --term-err:#FF8A7E; --term-warn:#F4B54A;
+  --sans:"Barlow","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1524; --surface:#152037; --surface-2:#1C2A46; --ink:#E5ECF6; --ink-2:#A1B1C9; --line:#2B3B5B;
+    --navy:#6C9BEA; --navy-ink:#0D1524; --green:#33C892; --green-soft:#123A2E; --amber:#F2A93B; --amber-soft:#3A2C14;
+    --red:#F07468; --red-soft:#3D1D1C; --zone-in:#17243E; --zone-out:#1A2234; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#152037; --surface-2:#1C2A46; --ink:#E5ECF6; --ink-2:#A1B1C9; --line:#2B3B5B;
+  --navy:#6C9BEA; --navy-ink:#0D1524; --green:#33C892; --green-soft:#123A2E; --amber:#F2A93B; --amber-soft:#3A2C14;
+  --red:#F07468; --red-soft:#3D1D1C; --zone-in:#17243E; --zone-out:#1A2234; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5}
+code,kbd,pre{font-family:var(--mono)}
+code{font-size:.86em;background:var(--surface-2);padding:.08em .35em;border-radius:4px;white-space:nowrap}
+a{color:var(--navy)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1260px;margin:0 auto;padding:0 20px}
+
+/* Header */
+.top{display:flex;gap:24px;align-items:flex-start;justify-content:space-between;padding:28px 0 8px}
+.course{margin:0 0 4px;color:var(--ink-2);font-weight:500;font-size:15px}
+h1{margin:0;font-size:clamp(30px,4.4vw,46px);line-height:1.05;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.lede{margin:10px 0 0;max-width:62ch;color:var(--ink-2)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:15px;white-space:nowrap}
+.ghost:hover{background:var(--surface-2)}
+
+/* The signature: an address being rewritten */
+.rewrite{display:flex;align-items:center;gap:0;margin:18px 0 22px;font-family:var(--mono);font-size:clamp(13px,1.7vw,16px);overflow-x:auto}
+.rewrite .a{padding:9px 14px;border:1px solid var(--line);background:var(--surface);border-radius:6px 0 0 6px;white-space:nowrap}
+.rewrite .r{padding:9px 14px;background:var(--navy);color:var(--navy-ink);font-family:var(--sans);font-weight:700;white-space:nowrap}
+.rewrite .b{padding:9px 14px;border:1px solid var(--amber);background:var(--amber-soft);color:var(--ink);border-radius:0 6px 6px 0;white-space:nowrap}
+.rewrite .note{margin-left:14px;font-family:var(--sans);color:var(--ink-2);font-size:15px;white-space:nowrap}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:24px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px 9px;color:var(--ink-2);font-weight:600;font-size:16px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tab .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;font-size:12px}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--navy)}
+.tab[aria-selected="true"] .n{background:var(--navy);border-color:var(--navy);color:var(--navy-ink)}
+.panel{padding-bottom:60px}
+h2{font-size:26px;line-height:1.2;margin:0 0 10px;font-weight:700}
+h3{font-size:19px;margin:0 0 8px;font-weight:700}
+.sub{color:var(--ink-2);max-width:68ch;margin:0 0 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.stack>*+*{margin-top:28px}
+
+/* Flip cards */
+.flips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.flip{perspective:900px;background:none;border:0;padding:0;text-align:left;min-height:200px;color:inherit;display:block;width:100%}
+.flip .in{display:block;position:relative;width:100%;height:100%;min-height:200px;transition:transform .45s ease;transform-style:preserve-3d}
+.flip[aria-pressed="true"] .in{transform:rotateY(180deg)}
+.flip .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;padding:18px;display:flex;flex-direction:column;border:1px solid var(--line)}
+.flip .front{background:var(--surface);justify-content:space-between}
+.flip .front .fterm{font-size:24px;font-weight:700;line-height:1.1}
+.flip .front .eg{font-family:var(--mono);font-size:14px;color:var(--ink-2)}
+.flip .front .tap{font-size:14px;color:var(--ink-2)}
+.flip .back{display:block;background:var(--navy);color:var(--navy-ink);transform:rotateY(180deg);font-size:15.5px;line-height:1.45}
+.flip .back code{background:rgba(255,255,255,.18);color:inherit}
+.flip.in-side .front{border-top:5px solid var(--navy)}
+.flip.out-side .front{border-top:5px solid var(--green)}
+.trick{margin-top:14px;padding:12px 16px;border-left:4px solid var(--amber);background:var(--amber-soft);border-radius:0 8px 8px 0;max-width:80ch}
+
+/* Accordion */
+details.acc{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin-bottom:10px}
+details.acc summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:18px;display:flex;justify-content:space-between;gap:12px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";font-weight:400;font-size:22px;line-height:1;color:var(--ink-2)}
+details.acc[open] summary::after{content:"\2212"}
+details.acc .body{padding:0 18px 16px;max-width:78ch}
+details.acc .body p{margin:0 0 10px}
+details.acc .body ul{margin:0 0 10px;padding-left:20px}
+.skills{columns:2;column-gap:32px;padding-left:20px;max-width:1000px}
+.skills li{margin-bottom:8px;break-inside:avoid}
+
+/* Commands */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface-2);font-weight:600}
+tr:last-child td{border-bottom:0}
+td code{white-space:pre}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px 14px}
+.steps li h3::before{content:counter(s);display:inline-grid;place-items:center;width:26px;height:26px;margin-right:10px;border-radius:50%;background:var(--navy);color:var(--navy-ink);font-size:14px;vertical-align:2px}
+.steps p{margin:0 0 10px;color:var(--ink-2);font-size:15.5px}
+pre.ios{background:var(--term-bg);color:var(--term-ink);padding:12px 14px;border-radius:6px;font-size:13.5px;line-height:1.55;overflow-x:auto;margin:0}
+pre.ios .p{color:var(--term-ok)}
+pre.ios .c{color:var(--term-dim)}
+.callout{padding:12px 16px;border-radius:8px;background:var(--surface-2);max-width:86ch}
+
+/* Lab */
+.scenarios{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 14px;color:var(--ink);font-weight:600;text-align:left;display:flex;flex-direction:column;line-height:1.25}
+.sc small{font-weight:400;color:var(--ink-2);font-size:13.5px}
+.sc[aria-pressed="true"]{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--zone-in)}
+.brief{margin:0 0 18px;max-width:90ch;padding:12px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.brief b{color:var(--navy)}
+.labgrid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:20px;align-items:start}
+.colL>*+*{margin-top:20px}
+.topo svg{width:100%;height:auto;display:block}
+.topo .zone-in{fill:var(--zone-in)}
+.topo .zone-out{fill:var(--zone-out)}
+.topo .zl{font:600 12.5px var(--sans);fill:var(--ink-2)}
+.topo .lnk{stroke:var(--line);stroke-width:3}
+.topo .dev{fill:var(--surface);stroke:var(--ink-2);stroke-width:1.6}
+.topo .dname{font:700 13px var(--sans);fill:var(--ink)}
+.topo .dip{font:500 11.5px var(--mono);fill:var(--ink-2)}
+.topo .router{fill:var(--navy);transition:fill .2s}
+.topo .router.hot{fill:var(--amber)}
+.topo .rtxt{font:700 15px var(--sans);fill:var(--navy-ink)}
+.topo .ifl{font:600 11.5px var(--mono);fill:var(--ink)}
+.role rect{fill:var(--surface-2);stroke:var(--line)}
+.role text{font:700 11px var(--sans);fill:var(--ink-2)}
+.role.inside rect{fill:var(--navy);stroke:var(--navy)} .role.inside text{fill:var(--navy-ink)}
+.role.outside rect{fill:var(--green);stroke:var(--green)} .role.outside text{fill:#fff}
+#pkt circle{fill:var(--navy);stroke:var(--surface);stroke-width:2}
+#pkt rect{fill:var(--surface);stroke:var(--navy);stroke-width:1.2}
+#pkt text{font:600 11.5px var(--mono);fill:var(--ink)}
+#pkt.x circle{fill:var(--amber)} #pkt.x rect{stroke:var(--amber);fill:var(--amber-soft)}
+#pkt.bad circle{fill:var(--red)} #pkt.bad rect{stroke:var(--red);fill:var(--red-soft)}
+#pkt.good circle{fill:var(--green)}
+.traffic{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.tbtn{border:1px solid var(--navy);color:var(--navy);background:var(--surface);border-radius:8px;padding:9px 8px;font-weight:600;font-size:15px;line-height:1.2}
+.tbtn small{display:block;font-weight:400;font-size:12.5px;color:var(--ink-2);font-family:var(--mono);margin-top:2px}
+.tbtn:hover:not(:disabled){background:var(--zone-in)}
+.tbtn:disabled{opacity:.5;cursor:wait}
+.inspector{margin-top:14px;font-size:14.5px}
+.inspector table{font-size:14px}
+.inspector td,.inspector th{padding:7px 10px}
+.inspector td.mono{font-family:var(--mono);font-size:13px}
+.inspector td.chg{background:var(--amber-soft);box-shadow:inset 3px 0 0 var(--amber)}
+.inspector .empty{color:var(--ink-2);margin:0}
+.verdict{margin:8px 0 0;font-size:15px}
+.verdict.ok{color:var(--green)} .verdict.bad{color:var(--red)}
+.verdict b{font-weight:700}
+
+/* Terminal */
+.colR{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.term{background:var(--term-bg);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;height:min(680px,calc(100vh - 40px));min-height:420px;border:1px solid #1B2C47}
+.termbar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#12233D;color:var(--term-ink);font-size:14px;gap:8px}
+.termbar b{font-weight:600}
+.termbar .mode{font-family:var(--mono);font-size:12px;color:var(--term-warn)}
+.termbar button{background:transparent;border:1px solid #2E4366;color:var(--term-ink);border-radius:6px;padding:3px 10px;font-size:13px}
+.termbar button:hover{background:#1B3050}
+#tout{flex:1;margin:0;padding:12px 14px 4px;overflow-y:auto;color:var(--term-ink);font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+#tout .cmd{color:var(--term-cmd)}
+#tout .err{color:var(--term-err)}
+#tout .dim{color:var(--term-dim)}
+#tout .tip{color:var(--term-warn)}
+#tout .ok{color:var(--term-ok)}
+.tin{display:flex;align-items:center;padding:6px 14px 12px;font-family:var(--mono);font-size:13.5px;color:var(--term-ok)}
+.tin input{flex:1;min-width:0;background:transparent;border:0;color:var(--term-cmd);font:inherit;outline:none;caret-color:var(--term-ok);padding:2px 0 2px 2px}
+.tin:focus-within{box-shadow:inset 0 -2px 0 var(--term-ok)}
+.keys{padding:0 14px 10px;font-size:12.5px;color:var(--term-dim);font-family:var(--sans)}
+.keys kbd{font-size:11.5px;border:1px solid #2E4366;border-radius:4px;padding:0 4px;color:var(--term-ink)}
+
+/* Tasks */
+.taskhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
+.score{font-weight:700;color:var(--navy);font-size:18px;white-space:nowrap}
+.tasklist{list-style:none;padding:0;margin:0}
+.task{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.task:first-child{border-top:0}
+.tnum{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:14px;color:var(--ink-2)}
+.task.done .tnum{background:var(--green);border-color:var(--green);color:#fff}
+.task.flash{animation:fl 1.1s ease}
+@keyframes fl{0%{background:var(--green-soft)}100%{background:transparent}}
+.task h4{margin:2px 0 3px;font-size:17px}
+.task p{margin:0;color:var(--ink-2);font-size:15.5px}
+.hint{margin-top:8px!important;padding:8px 12px;border-radius:6px;background:var(--amber-soft);color:var(--ink)!important;font-size:15px!important}
+.tfoot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px;flex-wrap:wrap}
+.hbtn{background:none;border:1px dashed var(--amber);color:var(--ink);border-radius:6px;padding:4px 10px;font-size:14px}
+.hbtn:hover{background:var(--amber-soft)}
+.pts{font-size:14px;color:var(--ink-2)}
+.task.done .pts{color:var(--green);font-weight:700}
+
+/* Log */
+.plog{list-style:none;margin:0;padding:0;max-height:240px;overflow-y:auto}
+.plog li{padding:9px 0 9px 14px;border-top:1px solid var(--line);font-size:15px;position:relative}
+.plog li:first-child{border-top:0}
+.plog li::before{content:"";position:absolute;left:0;top:14px;width:7px;height:7px;border-radius:50%;background:var(--green)}
+.plog li.bad::before{background:var(--red)}
+.plog .empty{color:var(--ink-2)}
+.plog .empty::before{display:none}
+
+/* Report */
+.report table td,.report table th{padding:8px 12px}
+.btn{background:var(--navy);color:var(--navy-ink);border:0;border-radius:8px;padding:9px 16px;font-weight:600}
+.btn:hover{filter:brightness(1.08)}
+.btn.alt{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+
+/* Quiz */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:12px;max-width:900px}
+.q h3{font-size:17.5px;font-weight:600;margin-bottom:10px}
+.q h3 .qn{color:var(--navy);margin-right:6px}
+.q pre{font-size:12.5px;margin:0 0 10px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:16px}
+.opt:hover{background:var(--surface-2)}
+.opt input{margin-top:5px;accent-color:var(--navy)}
+.opt.right{background:var(--green-soft)}
+.opt.wrong{background:var(--red-soft)}
+.why{display:none;margin:10px 0 0;padding:10px 14px;border-left:4px solid var(--navy);background:var(--surface-2);border-radius:0 6px 6px 0;font-size:15.5px}
+.q.graded .why{display:block}
+.qbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;max-width:900px}
+.qscore{font-weight:700;font-size:18px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;background:var(--green);color:#fff;padding:10px 18px;border-radius:8px;font-weight:600;transition:.25s;pointer-events:none;z-index:9;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+#printArea{display:none}
+
+@media (max-width:1000px){
+  .labgrid{grid-template-columns:1fr}
+  .colR{position:static;order:-1}
+  .term{height:460px}
+  .flips{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  body{font-size:16px}
+  .top{flex-direction:column;gap:10px}
+  .flips{grid-template-columns:1fr}
+  .skills{columns:1}
+  .traffic{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rewrite .note{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .flip .in,.toast{transition:none}
+  .task.flash{animation:none}
+}
+@media print{
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block;color:#000;font-family:var(--sans)}
+  #printArea table{border:1px solid #999}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header class="top">
+    <div>
+      <p class="course">LAN121 Network Essentials, hands-on lab</p>
+      <h1>NAT &amp; PAT on a Cisco router</h1>
+      <p class="lede">Give a private LAN internet access through one public address, publish a web server, and prove it works with the same show commands you'll use on the job.</p>
+    </div>
+    <button class="ghost" id="themeBtn" type="button">Dark mode</button>
+  </header>
+
+  <div class="rewrite" aria-label="Example: PC1 at 192.168.10.10 port 1025 leaves router R1 as 203.0.113.2 port 1025">
+    <span class="a">192.168.10.10:1025</span><span class="r">R1</span><span class="b">203.0.113.2:1025</span>
+    <span class="note">Private in, public out. That swap is the whole lab.</span>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Lab sections">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="tab-learn" id="t-learn" data-tab="learn"><span class="n">1</span>Learn</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cmds" id="t-cmds" data-tab="cmds"><span class="n">2</span>Commands</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-lab" id="t-lab" data-tab="lab"><span class="n">3</span>Lab</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-quiz" id="t-quiz" data-tab="quiz"><span class="n">4</span>Check your knowledge</button>
+  </nav>
+
+  <!-- LEARN -->
+  <section class="panel stack" id="tab-learn" role="tabpanel" aria-labelledby="t-learn">
+    <div>
+      <h2>The four NAT addresses</h2>
+      <p class="sub">Every line of <code>show ip nat translations</code> uses these four terms. Flip each card, then try to explain it without looking.</p>
+      <div class="flips">
+        <button class="flip in-side" aria-pressed="false" type="button"><span class="in">
+          <span class="face front"><span class="fterm">Inside local</span><span class="eg">192.168.10.10</span><span class="tap">Select to flip</span></span>
+          <span class="face back">The real address of a host on your network, as your network sees it. Usually an RFC 1918 private address. In this lab, PC1 is <code>192.168.10.10</code>.</span>
+        </span></button>
+        <button class="flip in-side" aria-pressed="false" type="button"><span class="in">
+          <span class="face front"><span class="fterm">Inside global</span><span class="eg">203.0.113.2</span><span class="tap">Select to flip</span></span>
+          <span class="face back">The public address your inside host appears to have on the internet. NAT assigns it. Here it's <code>203.0.113.2</code> for PAT or <code>203.0.113.5</code> for the web server.</span>
+        </span></button>
+        <button class="flip out-side" aria-pressed="false" type="button"><span class="in">
+          <span class="face front"><span class="fterm">Outside global</span><span class="eg">198.51.100.10</span><span class="tap">Select to flip</span></span>
+          <span class="face back">The real address of a host out on the internet, such as the web site PC1 is browsing: <code>198.51.100.10</code>.</span>
+        </span></button>
+        <button class="flip out-side" aria-pressed="false" type="button"><span class="in">
+          <span class="face front"><span class="fterm">Outside local</span><span class="eg">198.51.100.10</span><span class="tap">Select to flip</span></span>
+          <span class="face back">That outside host's address as your network sees it. It equals the outside global unless you also translate outside addresses, which this lab doesn't.</span>
+        </span></button>
+      </div>
+      <p class="trick"><b>Memory trick:</b> inside or outside tells you where the host lives. Local or global tells you who is looking at the address: your network (local) or the internet (global).</p>
+    </div>
+
+    <div>
+      <h2>What an entry-level network specialist needs to know</h2>
+      <p class="sub">The knowledge behind every command in the lab. Open each topic before you start configuring.</p>
+      <details class="acc" open><summary>Why NAT exists</summary><div class="body">
+        <p>IPv4 has about 4.3 billion addresses, far fewer than the devices that need them. RFC 1918 set aside private ranges that anyone may use internally but that are never routed on the internet:</p>
+        <ul><li><code>10.0.0.0/8</code></li><li><code>172.16.0.0/12</code></li><li><code>192.168.0.0/16</code></li></ul>
+        <p>A router running NAT rewrites the private source address to a public one on the way out and reverses it on the way back. That lets an entire enterprise share a small block of public addresses. If a private source address leaks out untranslated, the ISP drops it.</p>
+      </div></details>
+      <details class="acc"><summary>Static NAT, dynamic NAT, and PAT</summary><div class="body">
+        <p><b>Static NAT</b> is a permanent one-to-one mapping. Use it for servers that people on the internet must reach at a predictable address, like a public web or mail server.</p>
+        <p><b>Dynamic NAT</b> hands out addresses from a pool, one per inside host, first come, first served. When the pool is empty, the next host gets nothing.</p>
+        <p><b>PAT</b>, also called NAT overload, lets many inside hosts share one public address by tracking port numbers. It's what nearly every enterprise edge router and home router uses for outbound traffic.</p>
+      </div></details>
+      <details class="acc"><summary>How PAT tells conversations apart</summary><div class="body">
+        <p>PAT tracks each conversation by address <em>and</em> port: <code>192.168.10.10:1025</code> becomes <code>203.0.113.2:1025</code>. When a reply arrives for <code>203.0.113.2:1025</code>, the router looks up the table and knows it belongs to PC1.</p>
+        <p>If a second host also uses source port 1025, the router can't reuse <code>203.0.113.2:1025</code>, so it picks another free port for that host. You'll watch this happen in the lab.</p>
+      </div></details>
+      <details class="acc"><summary>How the router decides what to translate</summary><div class="body">
+        <p>Three things must line up. Traffic must arrive on an interface marked <code>ip nat inside</code> and leave on one marked <code>ip nat outside</code>. The inside source address must be permitted by the ACL named in the <code>ip nat inside source</code> command. And that command must point to a valid target: an interface, a pool, or a static mapping.</p>
+        <p>The ACL matches <em>inside local</em> addresses, and it ends with an implicit deny. Standard ACLs use wildcard masks, the inverse of a subnet mask: a /24 becomes <code>0.0.0.255</code>.</p>
+      </div></details>
+      <details class="acc"><summary>Where NAT causes trouble, and what it doesn't do</summary><div class="body">
+        <p>NAT breaks true end-to-end addressing. Protocols that embed IP addresses inside the payload, such as SIP, active FTP and IPsec AH, need helpers (application-level gateways or NAT traversal).</p>
+        <p>NAT is not a firewall. It hides internal addressing as a side effect, but a static mapping exposes that server to the whole internet, so pair it with an ACL or firewall policy.</p>
+        <p>For incident response, you need translation logs. Without them you can't map a public address and port in an abuse report back to the inside host that sent it.</p>
+        <p>IPv6 has enough addresses that NAT isn't needed for conservation. NAT64 exists for IPv6-to-IPv4 transition.</p>
+      </div></details>
+    </div>
+
+    <div>
+      <h2>Skills you'll demonstrate</h2>
+      <ul class="skills">
+        <li>Identify the inside and outside interfaces from a topology diagram</li>
+        <li>Write a standard ACL with the correct wildcard mask</li>
+        <li>Configure PAT using the outside interface's address</li>
+        <li>Configure static NAT so an internal server is reachable from the internet</li>
+        <li>Configure a dynamic NAT pool and recognize pool exhaustion</li>
+        <li>Verify with <code>show ip nat translations</code> and <code>show ip nat statistics</code>, and read every column</li>
+        <li>Troubleshoot a broken NAT configuration from evidence, not guesses</li>
+        <li>Clear translations and save the configuration</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- COMMANDS -->
+  <section class="panel stack" id="tab-cmds" role="tabpanel" aria-labelledby="t-cmds" hidden>
+    <div>
+      <h2>Lab addressing</h2>
+      <p class="sub">Your ISP assigned the public block <code>203.0.113.0/29</code>. Usable addresses are .1 through .6.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Device</th><th>Interface</th><th>Address</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td>R1</td><td>G0/0</td><td><code>192.168.10.1/24</code></td><td>Inside, the LAN's default gateway</td></tr>
+          <tr><td>R1</td><td>G0/1</td><td><code>203.0.113.2/29</code></td><td>Outside, link to the ISP</td></tr>
+          <tr><td>ISP router</td><td></td><td><code>203.0.113.1</code></td><td>R1's default route</td></tr>
+          <tr><td>PC1, PC2, PC3</td><td>NIC</td><td><code>192.168.10.10</code> to <code>.12</code></td><td>Inside hosts</td></tr>
+          <tr><td>Web server</td><td>NIC</td><td><code>192.168.10.50</code></td><td>Published to the internet as <code>203.0.113.5</code></td></tr>
+          <tr><td>Spare public addresses</td><td></td><td><code>203.0.113.3</code> to <code>.4</code></td><td>Dynamic NAT pool (Challenge 2)</td></tr>
+          <tr><td>Public web site</td><td></td><td><code>198.51.100.10</code></td><td>Internet destination</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div>
+      <h2>Configuration sequence</h2>
+      <p class="sub">Configure in this order. Each step depends on the one before it.</p>
+      <ol class="steps">
+        <li><h3>Mark the interfaces</h3><p>Tell R1 which side is private and which is public.</p>
+<pre class="ios"><span class="p">R1&gt;</span> enable
+<span class="p">R1#</span> configure terminal
+<span class="p">R1(config)#</span> interface g0/0
+<span class="p">R1(config-if)#</span> ip nat inside
+<span class="p">R1(config-if)#</span> interface g0/1
+<span class="p">R1(config-if)#</span> ip nat outside
+<span class="p">R1(config-if)#</span> exit</pre></li>
+        <li><h3>Select who gets translated</h3><p>A standard ACL that matches inside local addresses.</p>
+<pre class="ios"><span class="p">R1(config)#</span> access-list 1 permit 192.168.10.0 0.0.0.255</pre></li>
+        <li><h3>Enable PAT</h3><p>Everything ACL 1 permits shares G0/1's address.</p>
+<pre class="ios"><span class="p">R1(config)#</span> ip nat inside source list 1 interface g0/1 overload</pre></li>
+        <li><h3>Publish a server with static NAT</h3><p>Inside local first, then inside global.</p>
+<pre class="ios"><span class="p">R1(config)#</span> ip nat inside source static 192.168.10.50 203.0.113.5</pre></li>
+        <li><h3>Or use a dynamic pool</h3><p>An alternative to step 3 when you have spare public addresses.</p>
+<pre class="ios"><span class="p">R1(config)#</span> ip nat pool PUBLIC 203.0.113.3 203.0.113.4 netmask 255.255.255.248
+<span class="p">R1(config)#</span> ip nat inside source list 1 pool PUBLIC overload
+<span class="c">! leave off overload for one-to-one dynamic NAT</span></pre></li>
+        <li><h3>Verify</h3><p>Generate traffic first. The table is empty until something is translated.</p>
+<pre class="ios"><span class="p">R1#</span> show ip nat translations
+<span class="p">R1#</span> show ip nat statistics
+<span class="p">R1#</span> show access-lists
+<span class="p">R1#</span> show running-config | include nat</pre></li>
+        <li><h3>Troubleshoot</h3><p>Watch translations live, then turn debugging off. Use debug sparingly on a busy production router.</p>
+<pre class="ios"><span class="p">R1#</span> debug ip nat
+<span class="p">R1#</span> undebug all
+<span class="p">R1#</span> clear ip nat translation *</pre></li>
+        <li><h3>Save</h3><p>Running config is in RAM. Startup config survives a reload.</p>
+<pre class="ios"><span class="p">R1#</span> copy running-config startup-config</pre></li>
+      </ol>
+    </div>
+
+    <div>
+      <h2>Command reference</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Command</th><th>Mode</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>ip nat inside</code></td><td>Interface config</td><td>Marks the interface facing the private network</td></tr>
+          <tr><td><code>ip nat outside</code></td><td>Interface config</td><td>Marks the interface facing the public network</td></tr>
+          <tr><td><code>access-list 1 permit 192.168.10.0 0.0.0.255</code></td><td>Global config</td><td>Selects which inside local addresses may be translated</td></tr>
+          <tr><td><code>ip nat inside source list 1 interface g0/1 overload</code></td><td>Global config</td><td>PAT: every permitted host shares G0/1's address</td></tr>
+          <tr><td><code>ip nat inside source static 192.168.10.50 203.0.113.5</code></td><td>Global config</td><td>Permanent one-to-one mapping for a server</td></tr>
+          <tr><td><code>ip nat pool NAME start end netmask mask</code></td><td>Global config</td><td>Defines public addresses for dynamic NAT</td></tr>
+          <tr><td><code>ip nat inside source list 1 pool NAME [overload]</code></td><td>Global config</td><td>Dynamic NAT from the pool; overload adds PAT</td></tr>
+          <tr><td><code>show ip nat translations [verbose]</code></td><td>User or privileged EXEC</td><td>Lists active translations</td></tr>
+          <tr><td><code>show ip nat statistics</code></td><td>User or privileged EXEC</td><td>Inside and outside interfaces, hits, misses, mappings, pool use</td></tr>
+          <tr><td><code>show access-lists</code></td><td>User or privileged EXEC</td><td>ACL entries with match counts</td></tr>
+          <tr><td><code>debug ip nat</code> / <code>undebug all</code></td><td>Privileged EXEC</td><td>Turns live translation messages on and off</td></tr>
+          <tr><td><code>clear ip nat translation *</code></td><td>Privileged EXEC</td><td>Removes all dynamic translations; static entries stay</td></tr>
+          <tr><td><code>copy running-config startup-config</code></td><td>Privileged EXEC</td><td>Saves the configuration to NVRAM</td></tr>
+          <tr><td><code>do show ...</code></td><td>Any config mode</td><td>Runs an EXEC command without leaving config mode</td></tr>
+        </tbody>
+      </table></div>
+      <p class="callout" style="margin-top:14px">The simulator accepts IOS abbreviations, so <code>sh ip nat t</code>, <code>conf t</code> and <code>int g0/1</code> all work. Type <code>?</code> at any point for context help and press <kbd>Tab</kbd> to complete a keyword.</p>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section class="panel" id="tab-lab" role="tabpanel" aria-labelledby="t-lab" hidden>
+    <div class="scenarios" role="group" aria-label="Choose a scenario">
+      <button class="sc" type="button" data-sc="guided" aria-pressed="true">Guided lab<small>7 tasks, build NAT from scratch</small></button>
+      <button class="sc" type="button" data-sc="c1" aria-pressed="false">Challenge 1: Trouble ticket<small>4 tasks, fix a broken router</small></button>
+      <button class="sc" type="button" data-sc="c2" aria-pressed="false">Challenge 2: Address pool<small>4 tasks, dynamic NAT</small></button>
+    </div>
+    <p class="brief" id="scBrief"></p>
+
+    <div class="labgrid">
+      <div class="colL">
+        <div class="card topo">
+          <svg viewBox="0 0 780 272" role="img" aria-label="Topology. PC1, PC2, PC3 and a web server on 192.168.10.0/24 connect through a switch to router R1 interface G0/0. R1 G0/1 connects to the ISP, which reaches a public web site at 198.51.100.10 and a remote user at 198.51.100.77.">
+            <rect x="6" y="6" width="392" height="260" rx="10" class="zone-in"/>
+            <rect x="402" y="6" width="372" height="260" rx="10" class="zone-out"/>
+            <text x="18" y="25" class="zl">Inside: private 192.168.10.0/24</text>
+            <text x="762" y="25" class="zl" text-anchor="end">Outside: public internet</text>
+            <g id="links">
+              <line class="lnk" x1="55" y1="62" x2="185" y2="140"/>
+              <line class="lnk" x1="55" y1="140" x2="185" y2="140"/>
+              <line class="lnk" x1="55" y1="218" x2="185" y2="140"/>
+              <line class="lnk" x1="185" y1="140" x2="300" y2="222"/>
+              <line class="lnk" x1="185" y1="140" x2="400" y2="140"/>
+              <line class="lnk" x1="400" y1="140" x2="575" y2="140"/>
+              <line class="lnk" x1="575" y1="140" x2="715" y2="70"/>
+              <line class="lnk" x1="575" y1="140" x2="715" y2="210"/>
+            </g>
+            <g id="devices"></g>
+            <text class="ifl" x="365" y="126" text-anchor="end">G0/0 .1</text>
+            <text class="ifl" x="435" y="126">G0/1 .2</text>
+            <g class="role" id="roleG0" transform="translate(316,160)"><rect width="50" height="18" rx="9"/><text x="25" y="13" text-anchor="middle">no NAT</text></g>
+            <g class="role" id="roleG1" transform="translate(434,160)"><rect width="50" height="18" rx="9"/><text x="25" y="13" text-anchor="middle">no NAT</text></g>
+            <g id="pkt" style="display:none"><rect x="0" y="-36" height="20" rx="4"/><text x="0" y="-22"></text><circle r="7"/></g>
+          </svg>
+          <div class="traffic" role="group" aria-label="Send traffic">
+            <button class="tbtn" type="button" data-send="PC1">PC1 to web<small>192.168.10.10</small></button>
+            <button class="tbtn" type="button" data-send="PC2">PC2 to web<small>192.168.10.11</small></button>
+            <button class="tbtn" type="button" data-send="PC3">PC3 to web<small>192.168.10.12</small></button>
+            <button class="tbtn" type="button" data-send="IN">Internet to server<small>203.0.113.5:80</small></button>
+          </div>
+          <div class="inspector" id="inspector" aria-live="polite"><p class="empty">Send traffic to see the packet before and after R1.</p></div>
+        </div>
+
+        <div class="card">
+          <div class="taskhead"><h2 style="margin:0">Tasks</h2><span class="score" id="score"></span></div>
+          <p class="pts" style="margin:0 0 4px">Each task is worth 10 points. Each hint you open costs 3.</p>
+          <ol class="tasklist" id="tasklist"></ol>
+        </div>
+
+        <div class="card">
+          <h3>Packet log</h3>
+          <ol class="plog" id="plog" aria-live="polite"></ol>
+        </div>
+
+        <div class="card report">
+          <div class="taskhead"><h3 style="margin:0">Your lab report</h3><button class="btn alt" type="button" id="printBtn">Print report</button></div>
+          <div class="tablewrap"><table id="reportTable"></table></div>
+        </div>
+      </div>
+
+      <div class="colR">
+        <div class="term" id="term">
+          <div class="termbar"><span><b>R1 console</b> <span class="mode" id="modeLbl"></span></span><button type="button" id="resetBtn">Reset scenario</button></div>
+          <pre id="tout" aria-live="polite"></pre>
+          <label class="tin" for="tinput"><span id="tprompt">R1&gt;</span><input id="tinput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="IOS command line"></label>
+          <div class="keys"><kbd>?</kbd> help &nbsp; <kbd>Tab</kbd> complete &nbsp; <kbd>&uarr;</kbd><kbd>&darr;</kbd> history</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel" id="tab-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <h2>Check your knowledge</h2>
+    <p class="sub">Ten questions drawn from the lab. Answer them all, then check. Each answer comes with an explanation.</p>
+    <div id="quiz"></div>
+    <div class="qbar"><button class="btn" type="button" id="qCheck">Check my answers</button><button class="btn alt" type="button" id="qReset">Start over</button><span class="qscore" id="qScore" aria-live="polite"></span></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div id="printArea"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Theme ---------- */
+function curTheme(){const t=document.documentElement.getAttribute('data-theme');return t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+function paintThemeBtn(){$('#themeBtn').textContent=curTheme()==='dark'?'Light mode':'Dark mode';}
+$('#themeBtn').addEventListener('click',()=>{const n=curTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('natlab-theme',n);}catch(e){}paintThemeBtn();});
+paintThemeBtn();
+
+/* ---------- Tabs ---------- */
+function showTab(name){
+  $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===name?'true':'false'));
+  $$('.panel').forEach(p=>p.hidden=p.id!=='tab-'+name);
+  if(name==='lab'){scrollTerm();}
+}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+
+/* ---------- Flip cards ---------- */
+$$('.flip').forEach(f=>f.addEventListener('click',()=>f.setAttribute('aria-pressed',f.getAttribute('aria-pressed')==='true'?'false':'true')));
+
+/* ---------- IP helpers ---------- */
+function ip2n(s){const p=String(s).split('.');if(p.length!==4)return null;let n=0;for(const x of p){if(!/^\d{1,3}$/.test(x))return null;const v=+x;if(v>255)return null;n=n*256+v;}return n>>>0;}
+function n2ip(n){n=n>>>0;return [n>>>24,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+const isIp=s=>ip2n(s)!==null;
+function plen2mask(p){return n2ip(p===0?0:(0xFFFFFFFF<<(32-p))>>>0);}
+const G0='GigabitEthernet0/0',G1='GigabitEthernet0/1',IFS=[G0,G1];
+function normIf(tok){const m=String(tok).replace(/\s+/g,'').match(/^([a-z]+)(\d+\/\d+)$/i);if(!m)return null;if(!'gigabitethernet'.startsWith(m[1].toLowerCase()))return null;const n='GigabitEthernet'+m[2];return IFS.includes(n)?n:null;}
+const WEB='198.51.100.10',REM='198.51.100.77',SRV_GLOBAL='203.0.113.5',SRV_LOCAL='192.168.10.50';
+const HOSTS={PC1:{ip:'192.168.10.10',pos:[55,62]},PC2:{ip:'192.168.10.11',pos:[55,140]},PC3:{ip:'192.168.10.12',pos:[55,218]}};
+const POS={SW:[185,140],SRV:[300,222],R1:[400,140],ISP:[575,140],WEB:[715,70],REM:[715,210]};
+
+/* ---------- Draw devices ---------- */
+(function drawDevices(){
+  const g=$('#devices');let h='';
+  const pc=(x,y,n,ip)=>`<g transform="translate(${x},${y})"><rect class="dev" x="-17" y="-15" width="34" height="23" rx="3"/><rect class="dev" x="-11" y="11" width="22" height="3" rx="1"/><text class="dname" x="24" y="-2">${n}</text><text class="dip" x="24" y="12">${ip}</text></g>`;
+  h+=pc(55,62,'PC1','.10')+pc(55,140,'PC2','.11')+pc(55,218,'PC3','.12');
+  h+=`<g transform="translate(185,140)"><rect class="dev" x="-26" y="-11" width="52" height="22" rx="4"/><path d="M-14 -3h22m-5-4 5 4-5 4M14 4h-22m5-4-5 4 5 4" fill="none" stroke="var(--ink-2)" stroke-width="1.5"/><text class="dname" x="0" y="-18" text-anchor="middle">S1</text></g>`;
+  h+=`<g transform="translate(300,222)"><rect class="dev" x="-12" y="-19" width="24" height="38" rx="3"/><path d="M-7 -11h14M-7 -5h14M-7 1h14" stroke="var(--ink-2)" stroke-width="1.5"/><text class="dname" x="18" y="-4">Web server</text><text class="dip" x="18" y="10">.50</text></g>`;
+  h+=`<g transform="translate(400,140)"><circle class="router" id="r1c" r="25"/><text class="rtxt" y="5" text-anchor="middle">R1</text></g>`;
+  h+=`<g transform="translate(575,140)"><path class="dev" d="M-40 10c-12 0-14-17 0-18c2-14 22-17 30-7c8-12 30-8 30 6c14 0 16 19 0 19z"/><text class="dname" x="0" y="5" text-anchor="middle">ISP</text><text class="dip" x="0" y="38" text-anchor="middle">203.0.113.1</text></g>`;
+  h+=`<g transform="translate(715,70)"><rect class="dev" x="-12" y="-19" width="24" height="38" rx="3"/><path d="M-7 -11h14M-7 -5h14M-7 1h14" stroke="var(--ink-2)" stroke-width="1.5"/><text class="dname" x="0" y="-26" text-anchor="middle">Web site</text><text class="dip" x="0" y="34" text-anchor="middle">198.51.100.10</text></g>`;
+  h+=pc(715,210,'','').replace('</g>','')+`<text class="dname" x="0" y="-22" text-anchor="middle">Remote user</text><text class="dip" x="0" y="32" text-anchor="middle">198.51.100.77</text></g>`;
+  g.innerHTML=h;
+})();
+
+/* ---------- Scenarios and state ---------- */
+function ace(action,addr,wild){const w=ip2n(wild);return {action,net:(ip2n(addr)&~w)>>>0,wild:w,matches:0};}
+function makeState(sc){
+  const s={scenario:sc,mode:'user',curIf:null,hostname:'R1',
+    ifs:{[G0]:{ip:'192.168.10.1',mask:'255.255.255.0',desc:'Inside LAN',nat:null,shut:false},[G1]:{ip:'203.0.113.2',mask:'255.255.255.248',desc:'Link to ISP',nat:null,shut:false}},
+    acls:{},pools:{},rules:[],statics:[],trans:[],hits:0,misses:0,ports:{PC1:1025,PC2:1025,PC3:1025,IN:51000},ok:{},debug:false,saved:null,
+    ran:{},flags:{},done:{},hints:{},lines:[],hist:[],hpos:0,log:[],insp:null};
+  if(sc==='c1'){
+    s.ifs[G0].nat='outside';s.ifs[G1].nat='inside';
+    s.acls['1']=[ace('permit','192.168.1.0','0.0.0.255')];
+    s.rules=[{acl:'1',kind:'interface',target:G1,overload:true}];
+    s.statics=[{local:SRV_LOCAL,global:SRV_GLOBAL}];
+  }
+  if(sc==='c2'){
+    s.ifs[G0].nat='inside';s.ifs[G1].nat='outside';
+    s.acls['1']=[ace('permit','192.168.10.0','0.0.0.255')];
+    s.statics=[{local:SRV_LOCAL,global:SRV_GLOBAL}];
+  }
+  s.lines.push({t:'Cisco IOS simulator for the NAT/PAT lab. Router R1 is ready.',c:'dim'});
+  s.lines.push({t:'Type ? for help at any prompt. Start with: enable',c:'dim'});
+  s.lines.push({t:'',c:''});
+  return s;
+}
+const STATES={guided:makeState('guided'),c1:makeState('c1'),c2:makeState('c2')};
+let SC='guided';
+const cur=()=>STATES[SC];
+
+function aclPermits(s,acl,ip,count){
+  const list=s.acls[acl];if(!list)return false;const n=ip2n(ip);
+  for(const e of list){ if(((n&~e.wild)>>>0)===e.net){ if(count)e.matches++; return e.action==='permit'; } }
+  return false;
+}
+function aclGood(s,acl){
+  if(!s.acls[acl])return false;
+  return ['192.168.10.10','192.168.10.11','192.168.10.12','192.168.10.200'].every(i=>aclPermits(s,acl,i,false)) && !aclPermits(s,acl,'10.1.1.1',false) && !aclPermits(s,acl,'172.16.5.5',false);
+}
+function natChanged(s){s.ok={};}
+
+/* ---------- Tasks ---------- */
+const C=t=>`<code>${t}</code>`;
+const TASKS={
+ guided:[
+  {t:'Mark the inside and outside interfaces',d:'Tell R1 which interface faces the private LAN and which faces the ISP.',
+   h:['G0/0 connects to the 192.168.10.0/24 LAN, so it is inside. G0/1 connects to the ISP, so it is outside. These commands are entered in interface configuration mode.',
+      `${C('enable')} then ${C('configure terminal')}, ${C('interface g0/0')}, ${C('ip nat inside')}, ${C('interface g0/1')}, ${C('ip nat outside')}`],
+   c:s=>s.ifs[G0].nat==='inside'&&s.ifs[G1].nat==='outside'},
+  {t:'Define which hosts may be translated',d:'Create standard ACL 1 that matches the whole 192.168.10.0/24 LAN and nothing else.',
+   h:['A wildcard mask is the inverse of the subnet mask. For a /24 that is 0.0.0.255. Enter the ACL in global configuration mode.',`${C('access-list 1 permit 192.168.10.0 0.0.0.255')}`],
+   c:s=>aclGood(s,'1')},
+  {t:'Turn on PAT',d:'Translate everything ACL 1 permits to G0/1\u2019s public address, shared by port number.',
+   h:['The keyword that turns NAT into PAT is overload. The source is a list; the target is an interface.',`${C('ip nat inside source list 1 interface g0/1 overload')}`],
+   c:s=>s.rules.some(r=>r.kind==='interface'&&r.target===G1&&r.overload&&aclGood(s,r.acl))},
+  {t:'Publish the web server',d:'Make the internal web server, 192.168.10.50, permanently reachable from the internet as 203.0.113.5.',
+   h:['Inbound connections need a fixed one-to-one mapping, which is static NAT. Give the inside local address first, then the inside global address.',`${C('ip nat inside source static 192.168.10.50 203.0.113.5')}`],
+   c:s=>s.statics.some(x=>x.local===SRV_LOCAL&&x.global===SRV_GLOBAL)},
+  {t:'Test from both sides',d:'Use the traffic buttons: PC1 to web, PC2 to web, and internet to server. All three must be delivered with your current configuration. Both PCs start at source port 1025, so watch what PAT does with PC2.',
+   h:['If a packet is dropped, the packet log tells you why. A server failure points to task 4; a PC failure points to tasks 1 to 3.','Select PC1 to web, PC2 to web, then Internet to server. If you change the configuration afterwards, test again.'],
+   c:s=>s.ok.PC1&&s.ok.PC2&&s.ok.IN},
+  {t:'Verify the translation table',d:'While dynamic translations exist, run both NAT show commands. Find the inside global port R1 gave PC2.',
+   h:['One command lists the table; the other shows interfaces, hits and misses. Both begin with show ip nat. Send traffic first if the table is empty.',`${C('show ip nat translations')} and ${C('show ip nat statistics')}. Abbreviations like ${C('sh ip nat t')} work.`],
+   c:s=>s.ran.transDyn&&s.ran.statsDyn},
+  {t:'Save your work',d:'Save the running configuration so NAT survives a reload. If you change anything afterwards, save again.',
+   h:['Running config lives in RAM; startup config lives in NVRAM. Copy one to the other from privileged EXEC mode.',`${C('copy running-config startup-config')} or ${C('write memory')}`],
+   c:s=>s.saved&&s.saved===cfgBody(s)&&TASKS.guided.slice(0,4).every(t=>t.c(s))}
+ ],
+ c1:[
+  {t:'Gather evidence',d:'Before changing anything, run show ip nat statistics and show access-lists, and try sending PC1 to web.',
+   h:['Good troubleshooting starts with show commands, not guesses. Compare what you see with the addressing table on the Commands tab.',`${C('show ip nat statistics')}, ${C('show access-lists')}, then select PC1 to web and read the packet log.`],
+   c:s=>s.ran.stats&&s.ran.acl&&s.flags.tried},
+  {t:'Fix the interface roles',d:'The LAN interface must be inside and the ISP interface outside.',
+   h:['show ip nat statistics lists the inside and outside interfaces. Is the LAN interface really outside? Remove the wrong role before adding the right one.',`${C('interface g0/0')}, ${C('no ip nat outside')}, ${C('ip nat inside')}, then ${C('interface g0/1')}, ${C('no ip nat inside')}, ${C('ip nat outside')}`],
+   c:s=>s.ifs[G0].nat==='inside'&&s.ifs[G1].nat==='outside'},
+  {t:'Fix the ACL',d:'ACL 1 must match the real LAN, 192.168.10.0/24.',
+   h:['Look at the network address in show access-lists. One octet is wrong. Numbered ACL lines can\u2019t be edited in place here, so remove the ACL and recreate it.',`${C('no access-list 1')}, then ${C('access-list 1 permit 192.168.10.0 0.0.0.255')}`],
+   c:s=>aclGood(s,'1')},
+  {t:'Prove the fix',d:'PC1, PC2 and PC3 must all reach the web, and the internet must reach the server.',
+   h:['Test every host the ticket covers, not just one. Clearing old translations first gives you a clean table to read.',`${C('clear ip nat translation *')}, then send traffic from all three PCs and from the internet.`],
+   c:s=>s.ok.PC1&&s.ok.PC2&&s.ok.PC3&&s.ok.IN}
+ ],
+ c2:[
+  {t:'Create the address pool',d:'Create a NAT pool named PUBLIC containing 203.0.113.3 through 203.0.113.4 with a /29 mask.',
+   h:['A pool needs a name, a start address, an end address, and a netmask or prefix-length. A /29 mask is 255.255.255.248.',`${C('ip nat pool PUBLIC 203.0.113.3 203.0.113.4 netmask 255.255.255.248')}`],
+   c:s=>Object.values(s.pools).some(p=>p.start==='203.0.113.3'&&p.end==='203.0.113.4'&&p.mask==='255.255.255.248')},
+  {t:'Map ACL 1 to the pool',d:'Use the pool for dynamic NAT: one public address per host, no overload yet.',
+   h:['The command looks like the PAT command, but the target is pool instead of interface. Leave off overload.',`${C('ip nat inside source list 1 pool PUBLIC')}`],
+   c:s=>s.rules.some(r=>r.kind==='pool'&&!r.overload&&s.pools[r.target]&&aclGood(s,r.acl))},
+  {t:'Run out of addresses',d:'Send traffic from PC1, PC2 and PC3. With two addresses and three hosts, one must fail.',
+   h:['Dynamic NAT gives each host its own public address until the pool is empty.','Select PC1, PC2, then PC3. Afterwards, show ip nat statistics shows the pool 100% allocated.'],
+   c:s=>s.flags.exhausted},
+  {t:'Fix it with overload',d:'Change the mapping so all three hosts share the pool using port numbers, then prove all three work.',
+   h:['IOS won\u2019t change a mapping while translations use it. Clear the dynamic translations first, then enter the pool command again with overload.',`${C('clear ip nat translation *')}, ${C('configure terminal')}, ${C('ip nat inside source list 1 pool PUBLIC overload')}, then send traffic from all three PCs.`],
+   c:s=>s.rules.some(r=>r.kind==='pool'&&r.overload&&s.pools[r.target])&&s.ok.PC1&&s.ok.PC2&&s.ok.PC3}
+ ]
+};
+const BRIEFS={
+ guided:'<b>Your job:</b> R1 has its IP addresses and a default route to the ISP, but no NAT. Users on 192.168.10.0/24 can\u2019t reach the internet, and the web server can\u2019t be reached from outside. Configure PAT and static NAT, test, verify and save.',
+ c1:'<b>Ticket #4471:</b> \u201cSince last night\u2019s change, nobody on 192.168.10.0/24 can browse the web, and customers can\u2019t reach our web server.\u201d A coworker configured NAT on R1 and left for the day. Find the faults from evidence and fix them without rebuilding everything.',
+ c2:'<b>Your job:</b> The ISP has assigned two spare public addresses, 203.0.113.3 and 203.0.113.4. Interfaces and ACL 1 are already set. Try dynamic NAT with a pool, watch it run out, then fix it.'
+};
+function taskPts(s,i){const h=s.hints[i]||0;return s.done[i]?Math.max(4,10-3*h):0;}
+function scoreOf(s){return TASKS[s.scenario].reduce((a,_,i)=>a+taskPts(s,i),0);}
+function renderTasks(flashIdx){
+  const s=cur(),list=TASKS[SC];
+  $('#tasklist').innerHTML=list.map((t,i)=>{
+    const h=s.hints[i]||0,done=!!s.done[i];
+    const hints=t.h.slice(0,h).map((x,k)=>`<p class="hint"><b>Hint ${k+1}:</b> ${x}</p>`).join('');
+    const btn=(!done&&h<t.h.length)?`<button class="hbtn" type="button" data-hint="${i}">Show hint ${h+1} of ${t.h.length} (\u22123 pts)</button>`:'<span></span>';
+    const pts=done?`Done, +${taskPts(s,i)} pts`:`${Math.max(4,10-3*h)} pts available`;
+    return `<li class="task${done?' done':''}${flashIdx===i?' flash':''}"><span class="tnum" aria-hidden="true">${done?'\u2713':i+1}</span><div><h4>${t.t}${done?' <span class="visually-hidden" style="position:absolute;left:-9999px">(complete)</span>':''}</h4><p>${t.d}</p>${hints}<div class="tfoot">${btn}<span class="pts">${pts}</span></div></div></li>`;
+  }).join('');
+  $('#score').textContent=`${scoreOf(s)} / ${list.length*10}`;
+  renderReport();
+}
+$('#tasklist').addEventListener('click',e=>{const b=e.target.closest('[data-hint]');if(!b)return;const s=cur(),i=+b.dataset.hint;s.hints[i]=(s.hints[i]||0)+1;renderTasks();});
+function checkTasks(){
+  const s=cur();let newly=-1;
+  TASKS[SC].forEach((t,i)=>{if(!s.done[i]&&t.c(s)){s.done[i]=true;newly=i;toast(`Task ${i+1} complete: ${t.t}`);}});
+  renderTasks(newly);
+  if(newly>=0&&TASKS[SC].every((_,i)=>s.done[i]))setTimeout(()=>toast(`Scenario complete. Score ${scoreOf(s)} / ${TASKS[SC].length*10}`),1800);
+}
+function renderReport(){
+  const names={guided:'Guided lab',c1:'Challenge 1: Trouble ticket',c2:'Challenge 2: Address pool'};
+  let tot=0,max=0;
+  const rows=Object.keys(STATES).map(k=>{const s=STATES[k],n=TASKS[k].length,d=TASKS[k].filter((_,i)=>s.done[i]).length,h=Object.values(s.hints).reduce((a,b)=>a+b,0),sc=scoreOf(s);tot+=sc;max+=n*10;return `<tr><td>${names[k]}</td><td>${d} of ${n}</td><td>${h}</td><td>${sc} / ${n*10}</td></tr>`;}).join('');
+  $('#reportTable').innerHTML=`<thead><tr><th>Scenario</th><th>Tasks done</th><th>Hints used</th><th>Score</th></tr></thead><tbody>${rows}<tr><td><b>Total</b></td><td></td><td></td><td><b>${tot} / ${max}</b></td></tr></tbody>`;
+}
+$('#printBtn').addEventListener('click',()=>{
+  $('#printArea').innerHTML=`<h1>NAT &amp; PAT on a Cisco router: lab report</h1><p>LAN121 Network Essentials. Printed ${new Date().toLocaleString()}.</p><p>Student name: ______________________________</p><table>${$('#reportTable').innerHTML}</table><h2>Saved configuration (guided lab)</h2><pre>${esc(STATES.guided.saved||'Not saved yet.')}</pre>`;
+  try{window.print();}catch(e){toast('Printing is not available here. Use your browser\u2019s print command.');}
+});
+
+/* ---------- Terminal ---------- */
+const tout=$('#tout'),tin=$('#tinput');
+function promptOf(s){return s.hostname+({user:'>',priv:'#',config:'(config)#',if:'(config-if)#'}[s.mode]);}
+function scrollTerm(){tout.scrollTop=tout.scrollHeight;}
+function lineEl(l){const d=document.createElement('span');if(l.c)d.className=l.c;d.textContent=l.t+'\n';return d;}
+function print(s,text,cls){
+  const arr=String(text).split('\n');
+  for(const t of arr){const l={t,c:cls||''};s.lines.push(l);if(s===cur())tout.appendChild(lineEl(l));}
+  if(s.lines.length>1500){s.lines.splice(0,300);if(s===cur())redrawTerm();}
+  if(s===cur())scrollTerm();
+}
+function redrawTerm(){const s=cur();tout.textContent='';const f=document.createDocumentFragment();s.lines.forEach(l=>f.appendChild(lineEl(l)));tout.appendChild(f);paintPrompt();scrollTerm();}
+function paintPrompt(){const s=cur();$('#tprompt').textContent=promptOf(s);$('#modeLbl').textContent={user:'user EXEC',priv:'privileged EXEC',config:'global config',if:'interface config '+(s.curIf?s.curIf.replace('GigabitEthernet','G'):'')}[s.mode];}
+
+/* ---------- Command engine ---------- */
+const PARAMS={
+ '<ip>':{ok:isIp,help:['A.B.C.D','IP address']},
+ '<ip2>':{ok:isIp,help:['A.B.C.D','Inside global IP address']},
+ '<mask>':{ok:isIp,help:['A.B.C.D','Network mask']},
+ '<wild>':{ok:isIp,help:['A.B.C.D','Wildcard bits']},
+ '<acl>':{ok:t=>/^\d+$/.test(t)&&+t>=1&&+t<=99,help:['<1-99>','IP standard access list']},
+ '<if>':{ok:t=>!!normIf(t),help:['GigabitEthernet','GigabitEthernet IEEE 802.3z']},
+ '<name>':{ok:t=>/^[A-Za-z][\w-]{0,31}$/.test(t),help:['WORD','Pool name']},
+ '<host>':{ok:t=>/^[A-Za-z][\w-]{0,62}$/.test(t),help:['WORD','This system\u2019s network name']},
+ '<plen>':{ok:t=>/^\d+$/.test(t)&&+t>=1&&+t<=32,help:['<1-32>','Prefix length']},
+ '<rest>':{ok:()=>true,help:['LINE','Up to 240 characters']}
+};
+const KWH={enable:'Turn on privileged commands',disable:'Turn off privileged commands',exit:'Exit from the current mode',logout:'Exit from the EXEC',show:'Show running system information',ping:'Send echo messages',configure:'Enter configuration mode',terminal:'Configure from the terminal',clear:'Reset functions',copy:'Copy from one file to another',write:'Write running configuration to memory',memory:'Write to NV memory',debug:'Debugging functions',undebug:'Disable debugging functions',all:'Enable or disable all debugging',no:'Negate a command or set its defaults',interface:'Select an interface',
+ 'access-list':'Add an access list entry','access-lists':'List access lists',ip:'IP information',nat:'NAT configuration commands',inside:'Inside address translation',outside:'Outside address translation',source:'Source address translation',list:'Specify access list describing local addresses',pool:'Name pool of global addresses',static:'Specify static local->global mapping',overload:'Overload an address translation',permit:'Specify packets to forward',deny:'Specify packets to reject',any:'Any source host',host:'A single host address',netmask:'Specify the network mask','prefix-length':'Specify the prefix length',translations:'Translation entries',translation:'Clear dynamic translation',statistics:'Translation statistics',verbose:'Show extra information',
+ 'running-config':'Current operating configuration','startup-config':'Contents of startup configuration',brief:'Brief summary of IP status and configuration','*':'Delete all dynamic translations',hostname:'Set system\u2019s network name',end:'Exit from configure mode',do:'Run an exec command from a config mode',shutdown:'Shutdown the selected interface',description:'Interface specific description',address:'Set the IP address of an interface'};
+const P=(str,f)=>({t:str.split(' '),f});
+function showCmds(){return [
+ P('show ip nat translations',s=>showTrans(s,false)),
+ P('show ip nat translations verbose',s=>showTrans(s,true)),
+ P('show ip nat statistics',s=>showStats(s)),
+ P('show ip interface brief',s=>showIpBrief(s)),
+ P('show access-lists',s=>showAcl(s)),
+ P('ping <ip>',(s,a)=>ping(s,a[0]))
+];}
+const USER=[P('enable',s=>{s.mode='priv';}),P('exit',s=>'\nR1 con0 is now available\n\nPress RETURN to get started.'),P('logout',s=>'\nR1 con0 is now available\n\nPress RETURN to get started.'),...showCmds()];
+const PRIV=[
+ P('disable',s=>{s.mode='user';}),
+ P('exit',s=>{s.mode='user';return '\nR1 con0 is now available\n\nPress RETURN to get started.';}),
+ P('configure terminal',s=>{s.mode='config';return 'Enter configuration commands, one per line.  End with CNTL/Z.';}),
+ ...showCmds(),
+ P('show running-config',s=>runningConfig(s)),
+ P('show startup-config',s=>s.saved?`Using ${s.saved.length} out of 262136 bytes\n${s.saved}`:'startup-config is not present'),
+ P('clear ip nat translation *',s=>{s.trans=[];}),
+ P('copy running-config startup-config',s=>{s.saved=cfgBody(s);return 'Destination filename [startup-config]? \nBuilding configuration...\n[OK]';}),
+ P('write memory',s=>{s.saved=cfgBody(s);return 'Building configuration...\n[OK]';}),
+ P('write',s=>{s.saved=cfgBody(s);return 'Building configuration...\n[OK]';}),
+ P('debug ip nat',s=>{s.debug=true;return 'IP NAT debugging is on';}),
+ P('undebug all',s=>{s.debug=false;return 'All possible debugging has been turned off';}),
+ P('no debug all',s=>{s.debug=false;return 'All possible debugging has been turned off';})
+];
+function aclCmds(){const out=[];for(const act of ['permit','deny']){
+  out.push(P(`access-list <acl> ${act} <ip> <wild>`,(s,a)=>addAce(s,a[0],act,a[1],a[2])));
+  out.push(P(`access-list <acl> ${act} <ip>`,(s,a)=>addAce(s,a[0],act,a[1],'0.0.0.0')));
+  out.push(P(`access-list <acl> ${act} host <ip>`,(s,a)=>addAce(s,a[0],act,a[1],'0.0.0.0')));
+  out.push(P(`access-list <acl> ${act} any`,(s,a)=>addAce(s,a[0],act,'0.0.0.0','255.255.255.255')));
+ }return out;}
+const CFG=[
+ P('interface <if>',(s,a)=>{s.mode='if';s.curIf=normIf(a[0]);}),
+ ...aclCmds(),
+ P('no access-list <acl>',(s,a)=>{delete s.acls[a[0]];natChanged(s);}),
+ P('ip nat inside source list <acl> interface <if> overload',(s,a)=>addRule(s,a[0],'interface',normIf(a[1]),true)),
+ P('ip nat inside source list <acl> interface <if>',(s,a)=>addRule(s,a[0],'interface',normIf(a[1]),true)),
+ P('ip nat inside source list <acl> pool <name> overload',(s,a)=>addRule(s,a[0],'pool',a[1],true)),
+ P('ip nat inside source list <acl> pool <name>',(s,a)=>addRule(s,a[0],'pool',a[1],false)),
+ P('ip nat inside source static <ip> <ip2>',(s,a)=>addStatic(s,a[0],a[1])),
+ P('ip nat pool <name> <ip> <ip2> netmask <mask>',(s,a)=>addPool(s,a[0],a[1],a[2],a[3])),
+ P('ip nat pool <name> <ip> <ip2> prefix-length <plen>',(s,a)=>addPool(s,a[0],a[1],a[2],plen2mask(+a[3]))),
+ P('no ip nat inside source list <acl> interface <if> overload',(s,a)=>delRule(s,a[0],'interface',normIf(a[1]))),
+ P('no ip nat inside source list <acl> interface <if>',(s,a)=>delRule(s,a[0],'interface',normIf(a[1]))),
+ P('no ip nat inside source list <acl> pool <name> overload',(s,a)=>delRule(s,a[0],'pool',a[1])),
+ P('no ip nat inside source list <acl> pool <name>',(s,a)=>delRule(s,a[0],'pool',a[1])),
+ P('no ip nat inside source static <ip> <ip2>',(s,a)=>{const i=s.statics.findIndex(x=>x.local===a[0]&&x.global===a[1]);if(i<0)return '%Translation not found';s.statics.splice(i,1);s.trans=s.trans.filter(t=>!(t.fromStatic&&t.il===a[0]));natChanged(s);}),
+ P('no ip nat pool <name>',(s,a)=>{if(!s.pools[a[0]])return `%Pool ${a[0]} not found`;if(s.trans.some(t=>t.pool===a[0]))return `%Pool ${a[0]} in use, cannot destroy`;delete s.pools[a[0]];natChanged(s);}),
+ P('hostname <host>',(s,a)=>{s.hostname=a[0];}),
+ P('exit',s=>{s.mode='priv';return endMsg();}),
+ P('end',s=>{s.mode='priv';s.curIf=null;return endMsg();})
+];
+const IFP=[
+ P('ip nat inside',s=>{s.ifs[s.curIf].nat='inside';natChanged(s);}),
+ P('ip nat outside',s=>{s.ifs[s.curIf].nat='outside';natChanged(s);}),
+ P('no ip nat inside',s=>{if(s.ifs[s.curIf].nat==='inside')s.ifs[s.curIf].nat=null;natChanged(s);}),
+ P('no ip nat outside',s=>{if(s.ifs[s.curIf].nat==='outside')s.ifs[s.curIf].nat=null;natChanged(s);}),
+ P('shutdown',s=>{s.ifs[s.curIf].shut=true;natChanged(s);return `%LINK-5-CHANGED: Interface ${s.curIf}, changed state to administratively down\n%LINEPROTO-5-UPDOWN: Line protocol on Interface ${s.curIf}, changed state to down`;}),
+ P('no shutdown',s=>{const w=s.ifs[s.curIf].shut;s.ifs[s.curIf].shut=false;natChanged(s);if(w)return `%LINK-3-UPDOWN: Interface ${s.curIf}, changed state to up\n%LINEPROTO-5-UPDOWN: Line protocol on Interface ${s.curIf}, changed state to up`;}),
+ P('description <rest>',(s,a)=>{s.ifs[s.curIf].desc=a[0];}),
+ P('ip address <ip> <mask>',(s,a)=>{const i=s.ifs[s.curIf];if(a[0]===i.ip&&a[1]===i.mask)return;return {tip:'Lab note: this topology\u2019s addressing is fixed. The address was not changed.'};}),
+ P('exit',s=>{s.mode='config';s.curIf=null;}),
+ P('end',s=>{s.mode='priv';s.curIf=null;return endMsg();})
+];
+const CFGSET=new Set(CFG);
+function endMsg(){const d=new Date();return `%SYS-5-CONFIG_I: Configured from console by console`;}
+
+function addAce(s,acl,act,addr,wild){
+  if(!s.acls[acl])s.acls[acl]=[];
+  const e=ace(act,addr,wild);
+  if(!s.acls[acl].some(x=>x.net===e.net&&x.wild===e.wild&&x.action===e.action))s.acls[acl].push(e);
+  natChanged(s);
+}
+function ruleInUse(s,acl){return s.trans.some(t=>t.ruleAcl===acl);}
+function addRule(s,acl,kind,target,overload){
+  if(kind==='pool'&&!s.pools[target])return `%Pool ${target} not found`;
+  const i=s.rules.findIndex(r=>r.acl===acl);
+  const r={acl,kind,target,overload};
+  if(i>=0){
+    const o=s.rules[i];
+    if(o.kind===kind&&o.target===target&&o.overload===overload)return;
+    if(ruleInUse(s,acl))return '%Dynamic mapping in use, cannot change';
+    s.rules[i]=r;
+  } else s.rules.push(r);
+  natChanged(s);
+}
+function delRule(s,acl,kind,target){
+  const i=s.rules.findIndex(r=>r.acl===acl&&r.kind===kind&&r.target===target);
+  if(i<0)return '%Dynamic mapping not found';
+  if(ruleInUse(s,acl))return '%Dynamic mapping in use, cannot remove';
+  s.rules.splice(i,1);natChanged(s);
+}
+function addStatic(s,l,g){
+  const ex=s.statics.find(x=>x.local===l||x.global===g);
+  if(ex)return `% similar static entry (${ex.local} -> ${ex.global}) already exists`;
+  s.statics.push({local:l,global:g});natChanged(s);
+}
+function addPool(s,name,a,b,mask){
+  const m=ip2n(mask),na=ip2n(a),nb=ip2n(b);
+  if(((na&m)>>>0)!==((nb&m)>>>0))return '%Start and end addresses on different subnets';
+  if(nb<na)return '%End address less than starting address';
+  if(s.trans.some(t=>t.pool===name))return `%Pool ${name} in use, cannot redefine`;
+  s.pools[name]={start:a,end:b,mask};natChanged(s);
+}
+
+function tokenize(line){const out=[];const re=/\S+/g;let m;while((m=re.exec(line)))out.push({t:m[0],i:m.index});return out;}
+function tryPat(toks,pt){
+  const args=[];let exact=0;
+  for(let i=0;i<toks.length;i++){
+    if(i>=pt.length)return {st:'fail',at:i};
+    const k=pt[i];
+    if(k==='<rest>'){args.push(toks.slice(i).join(' '));return {st:'full',args,exact};}
+    if(k[0]==='<'){if(!PARAMS[k].ok(toks[i]))return {st:'fail',at:i};args.push(toks[i]);}
+    else{const t=toks[i].toLowerCase();if(!k.startsWith(t))return {st:'fail',at:i};if(t===k)exact++;}
+  }
+  if(toks.length<pt.length)return {st:'partial',at:toks.length};
+  return {st:'full',args,exact};
+}
+function resolve(toks,pats){
+  const full=[];let partial=false,maxAt=0;
+  for(const p of pats){const r=tryPat(toks,p.t);if(r.st==='full')full.push({p,r});else if(r.st==='partial')partial=true;else maxAt=Math.max(maxAt,r.at);}
+  if(full.length){
+    if(full.length>1){
+      for(let i=0;i<toks.length;i++){
+        const kws=new Set(full.map(f=>f.p.t[i]).filter(k=>k&&k[0]!=='<'));
+        if(kws.size>1&&![...kws].includes(toks[i].toLowerCase()))return {err:'ambig'};
+      }
+      full.sort((a,b)=>b.r.exact-a.r.exact);
+    }
+    return {ok:full[0]};
+  }
+  if(partial)return {err:'incomplete'};
+  return {err:'invalid',at:maxAt};
+}
+function patsFor(mode){return mode==='user'?USER:mode==='priv'?PRIV:mode==='config'?CFG:IFP.concat(CFG);}
+function prenorm(line){return line.replace(/\b(g[a-z]*)\s+(\d+\/\d+)/gi,'$1$2');}
+
+function exec(s,line,mode,offset){
+  line=prenorm(line);
+  const tk=tokenize(line),toks=tk.map(x=>x.t);
+  if((mode==='config'||mode==='if')&&toks[0]&&toks[0].toLowerCase()==='do'){
+    if(toks.length===1)return {err:'% Incomplete command.'};
+    const rest=line.slice(tk[1].i);
+    return exec(s,rest,'do',offset+tk[1].i);
+  }
+  const pats=mode==='do'?PRIV:patsFor(mode);
+  const r=resolve(toks,pats);
+  if(r.ok){
+    const p=r.ok.p;
+    if(mode==='do'&&['disable','exit','configure'].includes(p.t[0]))return {err:'% This command is not available with do.'};
+    if(mode==='if'&&CFGSET.has(p)){s.mode='config';s.curIf=null;}
+    const saveMode=s.mode;
+    const out=p.f(s,r.ok.r.args);
+    if(mode==='do')s.mode=saveMode;
+    return {out,isShow:p.t[0]==='show',cmd:p.t};
+  }
+  let msg;
+  if(r.err==='ambig')msg=`% Ambiguous command:  "${line}"`;
+  else if(r.err==='incomplete')msg='% Incomplete command.';
+  else{const pos=(tk[r.at]?tk[r.at].i:line.length)+offset;msg=' '.repeat(pos)+'^\n% Invalid input detected at \'^\' marker.';}
+  return {err:msg,tip:tipFor(s,toks,mode)};
+}
+function tipFor(s,toks,mode){
+  const works=m=>{const r=resolve(toks,patsFor(m));return !!r.ok;};
+  if(mode==='user'&&works('priv'))return 'Tip: that command needs privileged EXEC mode. Type enable first.';
+  if(mode==='user'&&works('config'))return 'Tip: that is a configuration command. Type enable, then configure terminal.';
+  if(mode==='priv'&&(works('config')||works('if')))return 'Tip: that is a configuration command. Type configure terminal first.';
+  if(mode==='config'&&resolve(toks,IFP).ok)return 'Tip: that is an interface command. Enter interface g0/0 or interface g0/1 first.';
+  if((mode==='config'||mode==='if')&&resolve(toks,PRIV).ok)return 'Tip: in configuration mode, put do in front of an EXEC command, for example do show ip nat translations.';
+  return null;
+}
+
+function applyPipe(text,pipe){
+  const m=pipe.match(/^(\S+)\s+(.+)$/);if(!m)return {err:'% Incomplete command.'};
+  const kw=m[1].toLowerCase(),arg=m[2];let re;try{re=new RegExp(arg);}catch(e){re={test:x=>x.includes(arg)};}
+  const lines=String(text||'').split('\n');
+  if('include'.startsWith(kw))return {out:lines.filter(l=>re.test(l)).join('\n')};
+  if('exclude'.startsWith(kw))return {out:lines.filter(l=>!re.test(l)).join('\n')};
+  if('begin'.startsWith(kw)){const i=lines.findIndex(l=>re.test(l));return {out:i<0?'':lines.slice(i).join('\n')};}
+  return {err:'% Invalid input detected at \'^\' marker.'};
+}
+
+function runLine(raw){
+  const s=cur();
+  print(s,promptOf(s)+raw,'cmd');
+  let line=raw.replace(/\s+$/,'');
+  if(!line.trim()){paintPrompt();return;}
+  s.hist.push(raw);s.hpos=s.hist.length;
+  let pipe=null;const bar=line.indexOf('|');
+  if(bar>=0){pipe=line.slice(bar+1).trim();line=line.slice(0,bar);}
+  const lead=line.length-line.trimStart().length;
+  const res=exec(s,line.trim(),s.mode,promptOf(s).length+lead);
+  if(res.err){print(s,res.err,'err');if(res.tip)print(s,res.tip,'tip');}
+  else{
+    let out=res.out;
+    if(out&&typeof out==='object'&&out.tip){print(s,out.tip,'tip');out=null;}
+    if(pipe!==null){
+      if(!res.isShow&&!(res.cmd&&res.cmd[0]==='show')){print(s,'% Output filtering is available on show commands.','err');}
+      else{const pr=applyPipe(out,pipe);if(pr.err)print(s,pr.err,'err');else if(pr.out)print(s,pr.out);}
+    } else if(out)print(s,out);
+  }
+  paintPrompt();updateRoles();checkTasks();
+}
+
+/* ---------- Show output ---------- */
+const pad=(t,n)=>{t=String(t);return t.length>=n?t+' ':t+' '.repeat(n-t.length);};
+function showTrans(s,verbose){
+  if(s.trans.length)s.ran.transDyn=true;
+  s.ran.trans=true;
+  const rows=[];
+  const fmt=(pro,a,b,c,d)=>pad(pro,4)+pad(a,22)+pad(b,22)+pad(c,22)+d;
+  rows.push(fmt('Pro','Inside global','Inside local','Outside local','Outside global'));
+  const ent=[...s.trans.filter(t=>t.proto),...s.trans.filter(t=>!t.proto)];
+  for(const t of ent){
+    if(t.proto)rows.push(fmt(t.proto,`${t.ig}:${t.igp}`,`${t.il}:${t.ilp}`,`${t.ol}:${t.olp}`,`${t.ol}:${t.olp}`));
+    else rows.push(fmt('---',t.ig,t.il,'---','---'));
+    if(verbose)rows.push(`  create 00:00:${String(t.age||5).padStart(2,'0')}, use 00:00:01, timeout:${t.proto?'86400000':'86400000'}, left 23:59:5${t.proto?'8':'9'},\n  flags:\n${t.proto?'extended':'none'}, use_count: ${t.proto?0:1}, entry-id: ${t.id}, lc_entries: 0`);
+  }
+  for(const st of s.statics){rows.push(fmt('---',st.global,st.local,'---','---'));if(verbose)rows.push('  create 00:10:12, use 00:00:00, timeout:0,\n  flags:\nstatic, use_count: 0, entry-id: 1, lc_entries: 0');}
+  rows.push(`Total number of translations: ${ent.length+s.statics.length}`);
+  return rows.join('\n');
+}
+function showStats(s){
+  s.ran.stats=true;if(s.trans.length)s.ran.statsDyn=true;
+  const ext=s.trans.filter(t=>t.proto).length,dyn=s.trans.length,st=s.statics.length;
+  const ins=IFS.filter(i=>s.ifs[i].nat==='inside'),outs=IFS.filter(i=>s.ifs[i].nat==='outside');
+  const L=[`Total active translations: ${dyn+st} (${st} static, ${dyn} dynamic; ${ext} extended)`,'Outside interfaces:',...(outs.length?outs.map(i=>'  '+i):[]),'Inside interfaces: ',...(ins.length?ins.map(i=>'  '+i):[]),`Hits: ${s.hits}  Misses: ${s.misses}`,`CEF Translated packets: ${s.hits}, CEF Punted packets: 0`,'Expired translations: 0','Dynamic mappings:'];
+  if(s.rules.length)L.push('-- Inside Source');
+  s.rules.forEach((r,i)=>{
+    const ref=s.trans.filter(t=>t.ruleAcl===r.acl).length;
+    if(r.kind==='interface')L.push(`[Id: ${i+1}] access-list ${r.acl} interface ${r.target} refcount ${ref}`);
+    else{
+      L.push(`[Id: ${i+1}] access-list ${r.acl} pool ${r.target}${r.overload?' overload':''} refcount ${ref}`);
+      const p=s.pools[r.target];
+      if(p){const tot=ip2n(p.end)-ip2n(p.start)+1;const alloc=new Set(s.trans.filter(t=>t.pool===r.target).map(t=>t.ig)).size;
+        L.push(` pool ${r.target}: netmask ${p.mask}`,`\tstart ${p.start} end ${p.end}`,`\ttype generic, total addresses ${tot}, allocated ${alloc} (${Math.round(alloc/tot*100)}%), misses ${s.flags.poolMiss||0}`);}
+    }
+  });
+  L.push('nat-limit statistics:',' max entry: max allowed 0, used 0, missed 0');
+  return L.join('\n');
+}
+function showIpBrief(s){
+  const L=[pad('Interface',23)+pad('IP-Address',16)+'OK? Method Status                Protocol'];
+  for(const i of IFS){const f=s.ifs[i];L.push(pad(i,23)+pad(f.ip,16)+'YES manual '+pad(f.shut?'administratively down':'up',22)+(f.shut?'down':'up'));}
+  return L.join('\n');
+}
+function showAcl(s){
+  s.ran.acl=true;
+  const keys=Object.keys(s.acls).sort((a,b)=>a-b);
+  if(!keys.length)return '';
+  return keys.map(k=>`Standard IP access list ${k}\n`+s.acls[k].map((e,i)=>`    ${(i+1)*10} ${e.action} ${aceText(e,true)}${e.matches?` (${e.matches} match${e.matches>1?'es':''})`:''}`).join('\n')).join('\n');
+}
+function aceText(e,show){if(e.wild===0xFFFFFFFF)return 'any';if(e.wild===0)return n2ip(e.net);return show?`${n2ip(e.net)}, wildcard bits ${n2ip(e.wild)}`:`${n2ip(e.net)} ${n2ip(e.wild)}`;}
+function cfgBody(s){
+  const L=['version 15.7','service timestamps debug datetime msec','service timestamps log datetime msec','no service password-encryption','!','hostname '+s.hostname,'!','boot-start-marker','boot-end-marker','!','no aaa new-model','!'];
+  for(const n of IFS){const i=s.ifs[n];L.push('interface '+n);if(i.desc)L.push(' description '+i.desc);L.push(' ip address '+i.ip+' '+i.mask);if(i.nat)L.push(' ip nat '+i.nat);if(i.shut)L.push(' shutdown');L.push(' duplex auto',' speed auto','!');}
+  L.push('ip forward-protocol nd','no ip http server','!');
+  for(const [n,p] of Object.entries(s.pools))L.push(`ip nat pool ${n} ${p.start} ${p.end} netmask ${p.mask}`);
+  for(const r of s.rules)L.push(`ip nat inside source list ${r.acl} ${r.kind} ${r.target}${r.overload?' overload':''}`);
+  for(const x of s.statics)L.push(`ip nat inside source static ${x.local} ${x.global}`);
+  L.push('ip route 0.0.0.0 0.0.0.0 203.0.113.1','!');
+  for(const k of Object.keys(s.acls).sort((a,b)=>a-b))for(const e of s.acls[k])L.push(`access-list ${k} ${e.action} ${aceText(e,false)}`);
+  L.push('!','line con 0',' logging synchronous','line vty 0 4',' login','!','end');
+  return L.join('\n');
+}
+function runningConfig(s){const b=cfgBody(s);return `Building configuration...\n\nCurrent configuration : ${b.length+3} bytes\n!\n${b}`;}
+function ping(s,ip){
+  const n=ip2n(ip);let ok=false;
+  const inLan=(n&0xFFFFFF00)>>>0===ip2n('192.168.10.0');
+  if(inLan)ok=!s.ifs[G0].shut&&['192.168.10.1','192.168.10.10','192.168.10.11','192.168.10.12','192.168.10.50'].includes(ip);
+  else if(ip==='203.0.113.2')ok=true;
+  else ok=!s.ifs[G1].shut&&!/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(ip)&&ip!=='0.0.0.0';
+  const res=ok?'!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms':'.....\nSuccess rate is 0 percent (0/5)';
+  return `Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to ${ip}, timeout is 2 seconds:\n${res}`;
+}
+
+/* ---------- Terminal input ---------- */
+function helpFor(s,raw){
+  let line=prenorm(raw);const endsWord=!/\s$/.test(line)&&line.length>0;
+  const tk=tokenize(line).map(x=>x.t);
+  let mode=s.mode,toks=tk;
+  if((mode==='config'||mode==='if')&&toks[0]&&toks[0].toLowerCase()==='do'&&(toks.length>1||!endsWord)){mode='do';toks=toks.slice(1);}
+  const pats=mode==='do'?PRIV:patsFor(mode);
+  const pre=endsWord?toks.slice(0,-1):toks,word=endsWord?toks[toks.length-1].toLowerCase():null;
+  const opts=new Map();let cr=false;
+  for(const p of pats){
+    const r=tryPat(pre,p.t);
+    if(r.st==='full'&&!endsWord&&pre.length===p.t.length){cr=true;continue;}
+    if(r.st!=='partial'&&!(r.st==='full'&&p.t[pre.length]))continue;
+    const k=p.t[pre.length];if(!k)continue;
+    if(word!==null){if(k[0]!=='<'&&k.startsWith(word))opts.set(k,'');}
+    else if(k[0]==='<'){const h=PARAMS[k].help;opts.set(h[0],h[1]);}
+    else opts.set(k,KWH[k]||'');
+  }
+  if(word!==null){return opts.size?[...opts.keys()].join('  '):'% Unrecognized command';}
+  const L=[...opts.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>'  '+pad(k,18)+v);
+  if(cr)L.push('  <cr>');
+  return L.length?L.join('\n'):'% Unrecognized command';
+}
+function complete(s,raw){
+  const line=raw;if(/\s$/.test(line)||!line)return raw;
+  const tk=tokenize(prenorm(line)).map(x=>x.t);let mode=s.mode,toks=tk;
+  if((mode==='config'||mode==='if')&&toks[0]&&toks[0].toLowerCase()==='do'&&toks.length>1){mode='do';toks=toks.slice(1);}
+  const pats=mode==='do'?PRIV:patsFor(mode);
+  const pre=toks.slice(0,-1),w=toks[toks.length-1].toLowerCase();
+  const c=new Set();
+  for(const p of pats){const r=tryPat(pre,p.t);if(r.st==='partial'||(r.st==='full'&&p.t[pre.length])){const k=p.t[pre.length];if(k&&k[0]!=='<'&&k.startsWith(w))c.add(k);}}
+  if(c.size===1){const k=[...c][0];return raw.slice(0,raw.length-toks[toks.length-1].length)+k+' ';}
+  return raw;
+}
+tin.addEventListener('keydown',e=>{
+  const s=cur();
+  if(e.key==='Enter'){e.preventDefault();const v=tin.value;tin.value='';runLine(v);}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(s.hpos>0){s.hpos--;tin.value=s.hist[s.hpos];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(s.hpos<s.hist.length-1){s.hpos++;tin.value=s.hist[s.hpos];}else{s.hpos=s.hist.length;tin.value='';}}
+  else if(e.key==='Tab'){e.preventDefault();tin.value=complete(s,tin.value);}
+  else if(e.key==='?'){e.preventDefault();print(s,promptOf(s)+tin.value+'?','cmd');print(s,helpFor(s,tin.value));}
+});
+$('#term').addEventListener('click',e=>{if(!e.target.closest('button')&&!window.getSelection().toString())tin.focus();});
+
+/* ---------- Topology state ---------- */
+function updateRoles(){
+  const s=cur();
+  for(const [id,ifn] of [['#roleG0',G0],['#roleG1',G1]]){
+    const g=$(id),r=s.ifs[ifn].nat;g.setAttribute('class','role'+(r?' '+r:''));
+    g.querySelector('text').textContent=s.ifs[ifn].shut?'down':(r||'no NAT');
+  }
+}
+
+/* ---------- Traffic ---------- */
+function allocPort(s,gip,want){let p=want;while(s.trans.some(t=>t.proto&&t.ig===gip&&t.igp===p))p++;return p;}
+let entryId=10;
+function ts(){const d=new Date(),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];return `*${m} ${String(d.getDate()).padStart(2,' ')} ${d.toTimeString().slice(0,8)}.${String(d.getMilliseconds()).padStart(3,'0')}:`;}
+function natPathWhy(s){
+  const a=s.ifs[G0].nat,b=s.ifs[G1].nat;
+  if(a==='inside'&&b==='outside')return null;
+  if(a==='outside'&&b==='inside')return 'The interface roles are reversed: G0/0 is marked outside and G0/1 inside, so R1 never translates LAN traffic heading to the ISP.';
+  if(!a&&!b)return 'Neither interface is marked for NAT, so R1 forwards packets without translating them.';
+  if(a!=='inside')return 'G0/0 is not marked ip nat inside, so R1 doesn\u2019t consider LAN traffic for translation.';
+  return 'G0/1 is not marked ip nat outside, so traffic leaving toward the ISP isn\u2019t translated.';
+}
+function sendOut(s,pc){
+  const H=HOSTS[pc],sp=s.ports[pc];s.ports[pc]=sp>=1099?1025:sp+1;
+  const before={src:`${H.ip}:${sp}`,dst:`${WEB}:80`};
+  const R=(ok,failAt,msg,after,dbg)=>({ok,failAt,msg,before,after:after||before,dbg:dbg||[],path:[H.pos,POS.SW,POS.R1,POS.ISP,POS.WEB],field:'src'});
+  if(SC==='c1')s.flags.tried=true;
+  if(s.ifs[G0].shut)return R(false,1,`${pc} can\u2019t reach its default gateway because G0/0 is administratively down.`);
+  if(s.ifs[G1].shut)return R(false,2,'G0/1 is administratively down, so R1 has no path to the ISP.');
+  const why=natPathWhy(s);
+  if(why)return R(false,3,why+' The packet leaves with a private source address, and the ISP drops it.');
+  const st=s.statics.find(x=>x.local===H.ip);
+  if(st){
+    s.hits++;s.trans.push({proto:'tcp',ig:st.global,igp:sp,il:H.ip,ilp:sp,ol:WEB,olp:80,fromStatic:true,id:entryId++});
+    s.ok[pc]=true;
+    return R(true,null,`Delivered using the static mapping: ${H.ip}:${sp} became ${st.global}:${sp}.`,{src:`${st.global}:${sp}`,dst:before.dst},[`NAT: s=${H.ip}->${st.global}, d=${WEB} [${entryId}]`]);
+  }
+  if(!s.rules.length){s.misses++;return R(false,3,'No ip nat inside source rule exists, so R1 has nothing telling it to translate this host. The packet leaves with a private source and the ISP drops it.');}
+  let rule=null;for(const r of s.rules){if(aclPermits(s,r.acl,H.ip,true)){rule=r;break;}}
+  if(!rule){s.misses++;const a=s.rules[0].acl;
+    const msg=s.acls[a]?`ACL ${a} does not permit ${H.ip}, so R1 doesn\u2019t translate it. The packet leaves with a private source and the ISP drops it.`:`The NAT rule points to ACL ${a}, which doesn\u2019t exist, so nothing matches. The packet leaves untranslated and the ISP drops it.`;
+    return R(false,3,msg);}
+  let gip,gp=sp,pool=null;
+  if(rule.kind==='interface'){
+    gip=s.ifs[rule.target].ip;
+    if(rule.target===G0){s.hits++;return R(false,3,`The rule overloads G0/0\u2019s address, ${gip}, which is private. Point the rule at G0/1 instead.`,{src:`${gip}:${sp}`,dst:before.dst});}
+    gp=allocPort(s,gip,sp);
+  } else {
+    const p=s.pools[rule.target];pool=rule.target;
+    if(!p){s.misses++;return R(false,2,`The rule uses pool ${rule.target}, which doesn\u2019t exist.`);}
+    if(rule.overload){gip=p.start;gp=allocPort(s,gip,sp);}
+    else{
+      const ex=s.trans.find(t=>!t.proto&&t.il===H.ip);
+      if(ex)gip=ex.ig;
+      else{
+        const used=new Set(s.trans.filter(t=>!t.proto).map(t=>t.ig).concat(s.statics.map(x=>x.global)));
+        for(let n=ip2n(p.start);n<=ip2n(p.end);n++){if(!used.has(n2ip(n))){gip=n2ip(n);break;}}
+        if(!gip){s.misses++;s.flags.exhausted=true;s.flags.poolMiss=(s.flags.poolMiss||0)+1;
+          return R(false,2,`Pool ${pool} is exhausted. Every address is already assigned to another host, and dynamic NAT without overload is one address per host. R1 drops the packet.`);}
+        s.trans.push({proto:null,ig:gip,il:H.ip,ruleAcl:rule.acl,pool,id:entryId++});
+      }
+    }
+  }
+  s.hits++;
+  s.trans.push({proto:'tcp',ig:gip,igp:gp,il:H.ip,ilp:sp,ol:WEB,olp:80,ruleAcl:rule.acl,pool,id:entryId++});
+  s.ok[pc]=true;
+  let msg=`Delivered. ${H.ip}:${sp} became ${gip}:${gp}`+(rule.kind==='pool'&&!rule.overload?' (dynamic NAT, one address for this host).':rule.kind==='pool'?' (PAT on the pool).':' (PAT on G0/1).');
+  if(gp!==sp)msg+=` Port ${sp} was already in use on ${gip}, so PAT picked ${gp}.`;
+  return R(true,null,msg,{src:`${gip}:${gp}`,dst:before.dst},[`NAT: s=${H.ip}->${gip}, d=${WEB} [${entryId}]`,`NAT*: s=${WEB}, d=${gip}->${H.ip} [${entryId+1}]`]);
+}
+function sendIn(s){
+  const sp=s.ports.IN++;
+  const before={src:`${REM}:${sp}`,dst:`${SRV_GLOBAL}:80`};
+  const R=(ok,failAt,msg,after,dbg)=>({ok,failAt,msg,before,after:after||before,dbg:dbg||[],path:[POS.REM,POS.ISP,POS.R1,POS.SW,POS.SRV],field:'dst'});
+  if(s.ifs[G1].shut)return R(false,1,'G0/1 is administratively down, so the ISP can\u2019t deliver anything to R1.');
+  const why=natPathWhy(s);
+  if(why)return R(false,2,why+' R1 only reverses a translation for traffic arriving on an ip nat outside interface, so it has nowhere to send a packet for 203.0.113.5.');
+  const st=s.statics.find(x=>x.global===SRV_GLOBAL);
+  if(!st){s.misses++;return R(false,2,'No static mapping exists for 203.0.113.5, so R1 drops the packet. PAT entries only exist for connections started from the inside, so a server needs static NAT.');}
+  if(s.ifs[G0].shut)return R(false,2,'G0/0 is administratively down, so R1 can\u2019t reach the LAN.');
+  s.hits++;
+  if(st.local!==SRV_LOCAL){return R(false,3,`The static mapping sends 203.0.113.5 to ${st.local}, but the web server is ${SRV_LOCAL}.`,{src:before.src,dst:`${st.local}:80`});}
+  s.trans.push({proto:'tcp',ig:SRV_GLOBAL,igp:80,il:SRV_LOCAL,ilp:80,ol:REM,olp:sp,fromStatic:true,id:entryId++});
+  s.ok.IN=true;
+  return R(true,null,`Delivered. The destination ${SRV_GLOBAL}:80 became ${SRV_LOCAL}:80 using the static mapping.`,{src:before.src,dst:`${SRV_LOCAL}:80`},[`NAT*: s=${REM}, d=${SRV_GLOBAL}->${SRV_LOCAL} [${entryId}]`,`NAT: s=${SRV_LOCAL}->${SRV_GLOBAL}, d=${REM} [${entryId+1}]`]);
+}
+
+/* ---------- Animation ---------- */
+const pkt=$('#pkt'),pRect=pkt.querySelector('rect'),pText=pkt.querySelector('text');
+function setLbl(t){pText.textContent=t;const w=pText.getComputedTextLength?pText.getComputedTextLength():t.length*7;pRect.setAttribute('width',w+12);pRect.setAttribute('x',-(w+12)/2);pText.setAttribute('x',-w/2);}
+function animate(res){
+  return new Promise(done=>{
+    if(reduced){done();return;}
+    const pts=res.failAt!=null?res.path.slice(0,res.failAt+1):res.path;
+    const segs=[];let total=0;for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);segs.push(d);total+=d;}
+    let toR1=0;for(let i=0;i<Math.min(2,segs.length);i++)toR1+=segs[i];
+    const before=res.field==='src'?'src '+res.before.src:'dst '+res.before.dst;
+    const after=res.field==='src'?'src '+res.after.src:'dst '+res.after.dst;
+    const changed=res.before[res.field]!==res.after[res.field];
+    pkt.setAttribute('class','');pkt.style.display='';setLbl(before);
+    const speed=0.36,t0=performance.now();let swapped=false;const rc=$('#r1c');
+    function frame(now){
+      let d=Math.min(total,(now-t0)*speed);
+      if(!swapped&&d>=toR1&&pts.length>2){swapped=true;if(changed){setLbl(after);pkt.setAttribute('class','x');rc.classList.add('hot');setTimeout(()=>rc.classList.remove('hot'),450);}}
+      let acc=0,i=0;while(i<segs.length-1&&acc+segs[i]<d){acc+=segs[i];i++;}
+      const f=segs[i]?(d-acc)/segs[i]:1,x=pts[i][0]+(pts[i+1][0]-pts[i][0])*f,y=pts[i][1]+(pts[i+1][1]-pts[i][1])*f;
+      pkt.setAttribute('transform',`translate(${x},${y})`);
+      if(d<total)requestAnimationFrame(frame);
+      else{
+        if(res.ok){pkt.setAttribute('class','good');setLbl(res.field==='src'?'reply on its way back':'server answered');}
+        else{pkt.setAttribute('class','bad');setLbl('dropped');}
+        setTimeout(()=>{pkt.style.display='none';done();},850);
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+let busy=false;
+async function traffic(kind){
+  if(busy)return;busy=true;$$('.tbtn').forEach(b=>b.disabled=true);
+  const s=cur(),res=kind==='IN'?sendIn(s):sendOut(s,kind);
+  const label=kind==='IN'?'Internet to server':`${kind} to web`;
+  await animate(res);
+  s.log.unshift({ok:res.ok,html:`<b>${label}:</b> ${esc(res.msg)}`});
+  s.insp={label,res};
+  if(s.debug&&res.ok)res.dbg.forEach(d=>print(s,`${ts()} ${d}`,'dim'));
+  renderLog();renderInspector();updateRoles();checkTasks();
+  busy=false;$$('.tbtn').forEach(b=>b.disabled=false);
+}
+$$('.tbtn').forEach(b=>b.addEventListener('click',()=>traffic(b.dataset.send)));
+function renderLog(){const s=cur();$('#plog').innerHTML=s.log.length?s.log.slice(0,30).map(l=>`<li class="${l.ok?'':'bad'}">${l.html}</li>`).join(''):'<li class="empty">No traffic yet.</li>';}
+function renderInspector(){
+  const s=cur(),el=$('#inspector');
+  if(!s.insp){el.innerHTML='<p class="empty">Send traffic to see the packet before and after R1.</p>';return;}
+  const {label,res}=s.insp;const sc=res.before.src!==res.after.src,dc=res.before.dst!==res.after.dst;
+  el.innerHTML=`<div class="tablewrap"><table><thead><tr><th>${esc(label)}</th><th>Arriving at R1</th><th>Leaving R1</th></tr></thead><tbody>
+  <tr><th scope="row">Source</th><td class="mono">${res.before.src}</td><td class="mono${sc?' chg':''}">${res.after.src}</td></tr>
+  <tr><th scope="row">Destination</th><td class="mono">${res.before.dst}</td><td class="mono${dc?' chg':''}">${res.after.dst}</td></tr></tbody></table></div>
+  <p class="verdict ${res.ok?'ok':'bad'}"><b>${res.ok?'Delivered':'Dropped'}.</b> ${!sc&&!dc?'R1 did not translate this packet.':(sc?'R1 rewrote the source.':'R1 rewrote the destination.')}</p>`;
+}
+
+/* ---------- Scenario switching ---------- */
+function loadScenario(k){
+  SC=k;$$('.sc').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sc===k?'true':'false'));
+  $('#scBrief').innerHTML=BRIEFS[k];redrawTerm();updateRoles();renderLog();renderInspector();renderTasks();
+}
+$$('.sc').forEach(b=>b.addEventListener('click',()=>loadScenario(b.dataset.sc)));
+$('#resetBtn').addEventListener('click',()=>{STATES[SC]=makeState(SC);loadScenario(SC);toast('Scenario reset. R1 is back to its starting configuration.');tin.focus();});
+
+/* ---------- Toast ---------- */
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ---------- Quiz ---------- */
+const QUIZ=[
+ {q:'In this translation entry, which value is the inside global address?',pre:'Pro Inside global      Inside local        Outside local      Outside global\ntcp 203.0.113.2:1025   192.168.10.10:1025  198.51.100.10:80   198.51.100.10:80',o:['203.0.113.2:1025','192.168.10.10:1025','198.51.100.10:80','There isn\u2019t one; PAT entries have no inside global'],a:0,w:'The second column is inside global: the public address and port your inside host appears to use on the internet. 192.168.10.10:1025 is the inside local address.'},
+ {q:'Which command lets every host permitted by ACL 1 share G0/1\u2019s public address?',o:['ip nat inside source list 1 interface g0/1 overload','ip nat outside source list 1 interface g0/1','ip nat inside source static 192.168.10.0 203.0.113.2','ip nat pool 1 interface g0/1'],a:0,w:'inside source list selects the inside hosts, interface g0/1 supplies the public address, and overload turns on PAT so many hosts can share it.'},
+ {q:'What wildcard mask matches the whole 192.168.10.0/24 network in a standard ACL?',o:['0.0.0.255','255.255.255.0','0.0.0.0','255.255.255.255'],a:0,w:'A wildcard mask is the inverse of the subnet mask. /24 is 255.255.255.0, so the wildcard is 0.0.0.255. Zero bits must match; one bits are ignored.'},
+ {q:'PC1 and PC2 both send from source port 1025 through a PAT router. What happens?',o:['The router gives one of them a different inside global port so replies can be told apart','The second packet is dropped because the port is taken','The router gives PC2 a different public IP address','Both share one translation entry'],a:0,w:'PAT identifies each conversation by address and port. If 203.0.113.2:1025 is already in use, the router picks another free port, such as 1026, for the second host.'},
+ {q:'show ip nat statistics lists G0/1 under inside interfaces and G0/0 under outside. Users can\u2019t browse. What is the fix?',o:['Swap ip nat inside and ip nat outside on the two interfaces','Add overload to the NAT rule','Clear the translation table','Change the ACL to permit any'],a:0,w:'R1 only translates traffic moving from an inside interface to an outside interface. With the roles reversed, LAN traffic is never translated, and the ISP drops the private source address.'},
+ {q:'Why does the web server need static NAT instead of PAT?',o:['Internet hosts must start connections to it at a predictable public address','PAT can\u2019t translate TCP traffic','Static NAT is faster than PAT','Servers can\u2019t use port numbers'],a:0,w:'PAT entries are created only when an inside host starts a conversation. A server waits for others to connect, so it needs a permanent mapping that always exists.'},
+ {q:'A dynamic NAT pool has two addresses and no overload. The third host can\u2019t reach the internet. What is the best fix?',o:['Add overload to the pool mapping','Add a second ACL for the third host','Clear the translations every few minutes','Create a static mapping for every host'],a:0,w:'Without overload, dynamic NAT is one public address per host. Adding overload lets all hosts share the pool addresses using port numbers.'},
+ {q:'You try to change a NAT mapping and IOS replies \u201c%Dynamic mapping in use, cannot change.\u201d What should you do first?',o:['clear ip nat translation *','reload the router','no ip nat inside on G0/0','write memory'],a:0,w:'IOS protects mappings that active translations depend on. Clearing the dynamic translations frees the mapping so you can change it. Static entries aren\u2019t affected.'},
+ {q:'The ACL referenced by ip nat inside source list should match which addresses?',o:['Inside local addresses','Inside global addresses','Outside global addresses','The ISP gateway address'],a:0,w:'The ACL is checked against the original source address of packets coming from the inside, which is the inside local address, for example 192.168.10.0/24.'},
+ {q:'Which statement about NAT and security is accurate?',o:['NAT hides internal addressing, but it isn\u2019t a substitute for a firewall','NAT encrypts traffic leaving the network','A static NAT mapping blocks unsolicited inbound traffic','PAT prevents malware from reaching inside hosts'],a:0,w:'NAT changes addresses; it doesn\u2019t inspect or filter traffic. A static mapping actually exposes the server to the internet, so it needs an ACL or firewall policy in front of it.'}
+];
+const ORDER=QUIZ.map(q=>{const idx=q.o.map((_,i)=>i);for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}return idx;});
+function renderQuiz(){
+  $('#quiz').innerHTML=QUIZ.map((q,n)=>`<fieldset class="q" id="q${n}" style="border:1px solid var(--line)"><legend class="visually-hidden" style="position:absolute;left:-9999px">Question ${n+1}</legend><h3><span class="qn">${n+1}.</span>${esc(q.q)}</h3>${q.pre?`<pre class="ios">${esc(q.pre)}</pre>`:''}${ORDER[n].map(i=>`<label class="opt" data-i="${i}"><input type="radio" name="q${n}" value="${i}"><span>${esc(q.o[i])}</span></label>`).join('')}<p class="why">${esc(q.w)}</p></fieldset>`).join('');
+  $('#qScore').textContent='';
+}
+$('#qCheck').addEventListener('click',()=>{
+  let sc=0,answered=0;
+  QUIZ.forEach((q,n)=>{const box=$('#q'+n),sel=box.querySelector('input:checked');box.classList.add('graded');
+    box.querySelectorAll('.opt').forEach(l=>{l.classList.remove('right','wrong');const i=+l.dataset.i;if(i===q.a)l.classList.add('right');else if(sel&&+sel.value===i)l.classList.add('wrong');});
+    if(sel){answered++;if(+sel.value===q.a)sc++;}});
+  $('#qScore').textContent=`Score: ${sc} of ${QUIZ.length}${answered<QUIZ.length?` (${QUIZ.length-answered} unanswered)`:''}`;
+});
+$('#qReset').addEventListener('click',renderQuiz);
+
+/* ---------- Init ---------- */
+renderQuiz();loadScenario('guided');
+})();
+</script>
+</body>
+</html>
