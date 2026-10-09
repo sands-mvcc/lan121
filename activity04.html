@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Static &amp; RIPv2 Routing Lab: Cisco IOS Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0047AB; --green:#00a86b; --brand-ink:#0047AB; --ok-ink:#007a4e;
+  --bg:#F2F5F9; --surface:#FFFFFF; --ink:#16202D; --muted:#566377; --rule:#D3DBE6;
+  --soft:#E7EEF9; --ok-soft:#E1F5EC; --hint:#8A5F00; --hint-bg:#FFF4D6; --err:#C02C38; --err-soft:#FCE8EA;
+  --console:#0D1828; --console-ink:#D2DDEB; --console-dim:#7E93AE;
+  --font:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --brand-ink:#86AEF5; --ok-ink:#3CCB93;
+    --bg:#0E1520; --surface:#162030; --ink:#E3E9F1; --muted:#9BA9BC; --rule:#283548;
+    --soft:#1B2C47; --ok-soft:#123326; --hint:#F2C55C; --hint-bg:#2D2614; --err:#F06A74; --err-soft:#3A1B20;
+    --console:#070D16;
+  }
+}
+:root[data-theme="dark"]{
+  --brand-ink:#86AEF5; --ok-ink:#3CCB93;
+  --bg:#0E1520; --surface:#162030; --ink:#E3E9F1; --muted:#9BA9BC; --rule:#283548;
+  --soft:#1B2C47; --ok-soft:#123326; --hint:#F2C55C; --hint-bg:#2D2614; --err:#F06A74; --err-soft:#3A1B20;
+  --console:#070D16;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55}
+a{color:var(--brand-ink)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+/* Header */
+.top{background:var(--navy);color:#fff;border-bottom:5px solid var(--green)}
+.top-in{max-width:1320px;margin:0 auto;padding:18px 22px 0;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px}
+.title{flex:1 1 420px;padding-bottom:14px}
+.title h1{margin:0;font-size:clamp(1.45rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.01em}
+.title p{margin:4px 0 0;opacity:.85;font-size:.95rem}
+.theme-btn{margin-bottom:14px;background:transparent;border:1.5px solid rgba(255,255,255,.6);color:#fff;border-radius:999px;padding:6px 14px;font-size:.9rem}
+.tabs{width:100%;display:flex;gap:4px;overflow-x:auto}
+.tab{background:transparent;border:0;color:rgba(255,255,255,.8);padding:10px 18px;border-radius:8px 8px 0 0;font-weight:700;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--ink)}
+main{max-width:1320px;margin:0 auto;padding:22px}
+.panel{display:none}
+.panel.on{display:block}
+
+/* Generic */
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px 20px}
+h2{font-size:1.35rem;margin:0 0 6px;line-height:1.25}
+h3{font-size:1.08rem;margin:0 0 6px}
+.muted{color:var(--muted)}
+.lead{max-width:72ch;margin:0 0 18px}
+code,kbd,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+.btn{border:1.5px solid var(--navy);background:var(--navy);color:#fff;border-radius:7px;padding:7px 14px;font-weight:700;font-size:.92rem}
+.btn.ghost{background:transparent;color:var(--brand-ink);border-color:var(--rule)}
+.btn.small{padding:4px 10px;font-size:.84rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Learn */
+.learn-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+.stack{display:grid;gap:20px}
+details.acc{border-top:1px solid var(--rule)}
+details.acc:last-child{border-bottom:1px solid var(--rule)}
+details.acc summary{list-style:none;cursor:pointer;padding:12px 2px;font-weight:700;display:flex;justify-content:space-between;gap:12px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";color:var(--brand-ink);font-size:1.2rem;line-height:1}
+details.acc[open] summary::after{content:"\2212"}
+details.acc .body{padding:0 2px 14px;max-width:72ch}
+details.acc ul{margin:6px 0;padding-left:20px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--muted);font-weight:700}
+td code{white-space:nowrap}
+.tbl-wrap{overflow-x:auto}
+.cmd-group{margin-top:14px}
+.cmd-group h3{color:var(--brand-ink)}
+.skills{columns:2 260px;column-gap:28px;padding-left:20px;margin:6px 0 0}
+.skills li{break-inside:avoid;margin-bottom:6px}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:10px}
+.flip{perspective:800px;height:130px;background:none;border:0;padding:0;text-align:left;color:inherit}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:9px;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--rule)}
+.face.front{background:var(--surface);font-weight:700;color:var(--brand-ink);font-size:1.02rem}
+.face.back{background:var(--soft);transform:rotateY(180deg);font-size:.86rem;line-height:1.4}
+
+/* Topology */
+.topo svg{width:100%;height:auto;display:block}
+.topo .rtr{cursor:pointer}
+.topo-cap{font-size:.86rem;color:var(--muted);margin-top:6px}
+
+/* Lab */
+.lab{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;align-items:start}
+.tasks{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding:0}
+.tasks-head{padding:16px 18px 10px;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--surface);z-index:2}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>span{display:block;height:100%;background:var(--green);width:0;transition:width .4s}
+.part{padding:12px 18px 4px;font-weight:700;color:var(--brand-ink);font-size:.95rem}
+.task{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:9px 18px;border-left:4px solid transparent}
+.task .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;border:1.5px solid var(--rule);color:var(--muted);margin-top:1px}
+.task.done .n{background:var(--green);border-color:var(--green);color:#fff}
+.task.locked{opacity:.55}
+.task.cur{background:var(--soft);border-left-color:var(--navy)}
+.task.cur .n{border-color:var(--navy);color:var(--brand-ink)}
+.task .tt{font-weight:700;line-height:1.3}
+.task.chal .tt::before{content:"Challenge: ";color:var(--hint)}
+.task-body{margin-top:8px;font-size:.94rem}
+.task-body p{margin:0 0 8px}
+.why{color:var(--muted);font-size:.88rem}
+.chip{display:inline-block;border:1.5px solid var(--navy);color:var(--brand-ink);background:var(--surface);border-radius:999px;padding:1px 10px;font-size:.82rem;font-weight:700;margin:0 0 8px}
+.hintbox{background:var(--hint-bg);border-left:4px solid var(--hint);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:.9rem}
+.solbox{background:var(--console);color:var(--console-ink);font-family:var(--mono);font-size:.8rem;padding:8px 10px;border-radius:6px;margin:8px 0;white-space:pre-wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.qin{flex:1 1 140px;min-width:0;padding:6px 9px;border:1.5px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
+.fb{margin-top:8px;padding:8px 10px;border-radius:6px;font-size:.9rem}
+.fb.ok{background:var(--ok-soft);border-left:4px solid var(--green)}
+.fb.no{background:var(--err-soft);border-left:4px solid var(--err)}
+.toast{margin:10px 18px;padding:9px 12px;border-radius:7px;background:var(--ok-soft);border-left:4px solid var(--green);font-size:.92rem;display:none}
+.toast.on{display:block}
+
+.sim{display:grid;gap:14px}
+.topo-card{padding:12px 14px}
+.console{background:var(--console);border-radius:10px;overflow:hidden;border:1px solid #1E2C42}
+.con-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#13233A;flex-wrap:wrap}
+.con-tab{background:transparent;border:1px solid #2F4566;color:var(--console-dim);border-radius:6px;padding:4px 12px;font-family:var(--mono);font-size:.82rem}
+.con-tab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:#04170F;font-weight:600}
+.con-bar .sp{flex:1}
+.con-key{background:#1B2F4C;border:1px solid #2F4566;color:var(--console-ink);border-radius:5px;padding:3px 9px;font-family:var(--mono);font-size:.78rem}
+.screen{height:440px;overflow:auto;padding:12px 14px;font-family:var(--mono);font-size:.84rem;line-height:1.45;color:var(--console-ink)}
+.screen pre{margin:0;white-space:pre-wrap;word-break:break-word;font:inherit}
+.t-err{color:#FF8C95}
+.t-ok{color:#4BE3A4}
+.inline{display:flex;align-items:baseline}
+.inline .pr{white-space:pre;color:#9FC2FF}
+.inline input{flex:1;min-width:0;background:transparent;border:0;color:var(--console-ink);font:inherit;padding:0;outline:none;caret-color:#4BE3A4}
+.tips{font-size:.86rem;color:var(--muted);margin:0}
+
+/* Quiz */
+.quiz{max-width:860px}
+.qq{border-top:1px solid var(--rule);padding:16px 0}
+.qq h3{font-size:1.02rem}
+.opt{display:block;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--rule);border-radius:8px;padding:8px 12px;margin:6px 0;color:var(--ink);font-size:.95rem}
+.opt:hover:not(:disabled){border-color:var(--navy)}
+.opt.right{border-color:var(--green);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--err);background:var(--err-soft)}
+.opt:disabled{cursor:default}
+.score{font-size:1.1rem;font-weight:700}
+
+/* Results */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.stat{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;background:var(--surface)}
+.stat b{display:block;font-size:1.6rem;color:var(--brand-ink);line-height:1.1}
+.stat span{font-size:.88rem;color:var(--muted)}
+
+@media (max-width:960px){
+  .learn-grid,.lab{grid-template-columns:1fr}
+  .tasks{position:static;max-height:none}
+  .screen{height:360px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important}
+}
+@media print{
+  .top,.no-print,.panel:not(#p-results){display:none!important}
+  #p-results{display:block!important}
+  body{background:#fff;color:#000}
+  .card,.stat{border-color:#999}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="title">
+      <h1>Static and RIPv2 routing lab</h1>
+      <p>LAN121 Network Essentials: configure, verify, and test routing on three Cisco routers</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark mode</button>
+    <nav class="tabs" role="tablist" aria-label="Lesson sections">
+      <button class="tab" role="tab" aria-selected="true" data-p="learn">Learn</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="lab">Lab</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="quiz">Quiz</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="results">Results</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ LEARN ============ -->
+<section class="panel on" id="p-learn" role="tabpanel">
+  <p class="lead">Three routers, five networks, and no way for PC1 to reach PC3 until you build the routes. First you will do it by hand with static routes, then let RIPv2 do it for you, and compare the routing tables both times.</p>
+  <div class="learn-grid">
+    <div class="stack">
+      <div class="card topo">
+        <h2>Lab topology</h2>
+        <div id="topoLearn"></div>
+        <p class="topo-cap">Interfaces are pre-addressed and up. Your job is the routing.</p>
+      </div>
+      <div class="card">
+        <h2>Addressing table</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Device</th><th>Interface</th><th>IP address</th><th>Mask</th><th>Connects to</th></tr></thead>
+          <tbody>
+            <tr><td>R1</td><td>G0/0</td><td>192.168.1.1</td><td>255.255.255.0</td><td>LAN 1 (PC1 .10)</td></tr>
+            <tr><td>R1</td><td>S0/0/0</td><td>10.1.1.1</td><td>255.255.255.252</td><td>R2 S0/0/0</td></tr>
+            <tr><td>R2</td><td>G0/0</td><td>192.168.2.1</td><td>255.255.255.0</td><td>LAN 2 (PC2 .10)</td></tr>
+            <tr><td>R2</td><td>S0/0/0</td><td>10.1.1.2</td><td>255.255.255.252</td><td>R1 S0/0/0</td></tr>
+            <tr><td>R2</td><td>S0/0/1</td><td>10.2.2.1</td><td>255.255.255.252</td><td>R3 S0/0/1</td></tr>
+            <tr><td>R3</td><td>G0/0</td><td>192.168.3.1</td><td>255.255.255.0</td><td>LAN 3 (PC3 .10)</td></tr>
+            <tr><td>R3</td><td>S0/0/1</td><td>10.2.2.2</td><td>255.255.255.252</td><td>R2 S0/0/1</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h2>Glossary</h2>
+        <p class="muted" style="margin:0">Select a card to flip it.</p>
+        <div class="flip-grid" id="flips"></div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="card">
+        <h2>What you need to know</h2>
+        <p class="muted" style="margin-top:0">The core knowledge an entry-level network specialist uses when managing static and RIPv2 routing.</p>
+        <details class="acc" open><summary>How a router picks a path</summary><div class="body">
+          <p>A router forwards a packet by looking up the destination IP in its <b>routing table</b>. Three rules decide which route wins:</p>
+          <ul>
+            <li><b>Longest prefix match.</b> A /24 route beats a /16, which beats the default route 0.0.0.0/0.</li>
+            <li><b>Administrative distance (AD)</b> breaks ties between sources for the same prefix. Lower is more trusted: connected 0, static 1, RIP 120.</li>
+            <li><b>Metric</b> breaks ties inside one protocol. RIP's metric is hop count.</li>
+          </ul>
+          <p>If no route matches and there is no default route, the packet is dropped.</p>
+        </div></details>
+        <details class="acc"><summary>Static routing</summary><div class="body">
+          <p>You type each route by hand. Static routes use no bandwidth or CPU, are predictable, and are easy to secure, but they do not adapt when a link fails and become hard to maintain as the network grows.</p>
+          <ul>
+            <li><b>Next-hop route:</b> <code>ip route 192.168.3.0 255.255.255.0 10.1.1.2</code></li>
+            <li><b>Exit-interface route:</b> <code>ip route 192.168.3.0 255.255.255.0 s0/0/0</code> (common on point-to-point serial links)</li>
+            <li><b>Default route:</b> <code>ip route 0.0.0.0 0.0.0.0 10.2.2.1</code>, ideal for a stub router with one way out</li>
+            <li><b>Floating static:</b> add an AD at the end (for example <code>130</code>) so it only takes over if the dynamic route disappears</li>
+          </ul>
+          <p>Every router in the path needs a route both ways. Forgetting the return route is the most common static routing mistake.</p>
+        </div></details>
+        <details class="acc"><summary>RIPv2</summary><div class="body">
+          <ul>
+            <li>Distance-vector protocol; the metric is hop count, max 15 (16 means unreachable).</li>
+            <li>Sends full updates every 30 seconds to multicast 224.0.0.9.</li>
+            <li>Classless: carries the subnet mask, so it supports VLSM. RIPv1 does not.</li>
+            <li>The <code>network</code> command takes a <b>classful</b> network and turns on RIP for every interface inside it. It also advertises those interfaces' subnets.</li>
+            <li><code>no auto-summary</code> stops RIP from summarizing subnets at classful boundaries.</li>
+            <li><code>passive-interface</code> stops updates out an interface (such as a LAN with no routers) while still advertising that network.</li>
+            <li>Split horizon prevents a router from advertising a route back out the interface it learned it on.</li>
+            <li>AD is 120, so a static route to the same network always wins.</li>
+          </ul>
+        </div></details>
+        <details class="acc"><summary>Reading the routing table</summary><div class="body">
+          <p>Example line: <code>R 192.168.3.0/24 [120/2] via 10.1.1.2, 00:00:14, Serial0/0/0</code></p>
+          <ul>
+            <li><b>R</b> is the source code (C connected, L local, S static, S* static default, R RIP).</li>
+            <li><b>[120/2]</b> is [administrative distance / metric].</li>
+            <li><b>via 10.1.1.2</b> is the next-hop router.</li>
+            <li><b>00:00:14</b> is how long since the last RIP update.</li>
+            <li><b>Serial0/0/0</b> is the exit interface.</li>
+          </ul>
+        </div></details>
+        <details class="acc"><summary>Verify and troubleshoot</summary><div class="body">
+          <p>Work from the bottom up:</p>
+          <ul>
+            <li><code>show ip interface brief</code>: are the interfaces up/up with the right IPs?</li>
+            <li><code>show ip route</code>: is the destination network in the table, from the source you expect?</li>
+            <li><code>ping</code>: can you reach it? Dots mean timeouts; <b>U</b> means a router reported it had no route.</li>
+            <li><code>traceroute</code>: where does the path stop?</li>
+            <li><code>show ip protocols</code>: RIP version, networks, passive interfaces, and neighbors.</li>
+            <li><code>show running-config</code>: what did you actually type?</li>
+          </ul>
+        </div></details>
+      </div>
+
+      <div class="card">
+        <h2>Skills you will demonstrate</h2>
+        <ul class="skills">
+          <li>Move between user EXEC, privileged EXEC, global, interface, and router configuration modes</li>
+          <li>Interpret <code>show ip interface brief</code> output</li>
+          <li>Configure next-hop static routes in both directions</li>
+          <li>Configure a default route on a stub router</li>
+          <li>Read codes, AD, and metrics in the routing table</li>
+          <li>Test reachability with ping and traceroute</li>
+          <li>Remove static routes and explain why AD matters</li>
+          <li>Enable RIPv2 with classful network statements and no auto-summary</li>
+          <li>Apply passive interfaces to LAN ports</li>
+          <li>Verify RIP with <code>show ip protocols</code> and <code>show ip route rip</code></li>
+          <li>Save the configuration to NVRAM</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Command reference</h2>
+        <div class="cmd-group"><h3>Modes and saving</h3><div class="tbl-wrap"><table><tbody>
+          <tr><td><code>enable</code></td><td>User EXEC (&gt;) to privileged EXEC (#)</td></tr>
+          <tr><td><code>configure terminal</code></td><td>Enter global configuration</td></tr>
+          <tr><td><code>exit</code> / <code>end</code></td><td>Back one level / straight to privileged EXEC</td></tr>
+          <tr><td><code>do show ip route</code></td><td>Run a show command from any config mode</td></tr>
+          <tr><td><code>copy running-config startup-config</code></td><td>Save to NVRAM</td></tr>
+        </tbody></table></div></div>
+        <div class="cmd-group"><h3>Static routing</h3><div class="tbl-wrap"><table><tbody>
+          <tr><td><code>ip route <i>net mask next-hop</i></code></td><td>Add a static route</td></tr>
+          <tr><td><code>ip route 0.0.0.0 0.0.0.0 <i>next-hop</i></code></td><td>Add a default route</td></tr>
+          <tr><td><code>no ip route <i>net mask next-hop</i></code></td><td>Remove a static route</td></tr>
+          <tr><td><code>show ip route static</code></td><td>Show only static routes</td></tr>
+        </tbody></table></div></div>
+        <div class="cmd-group"><h3>RIPv2</h3><div class="tbl-wrap"><table><tbody>
+          <tr><td><code>router rip</code></td><td>Start RIP and enter router configuration</td></tr>
+          <tr><td><code>version 2</code></td><td>Send and receive only RIPv2</td></tr>
+          <tr><td><code>network <i>classful-net</i></code></td><td>Enable RIP on matching interfaces</td></tr>
+          <tr><td><code>no auto-summary</code></td><td>Advertise subnets as-is</td></tr>
+          <tr><td><code>passive-interface g0/0</code></td><td>Stop sending updates out a LAN port</td></tr>
+          <tr><td><code>show ip protocols</code></td><td>Verify RIP settings and neighbors</td></tr>
+          <tr><td><code>show ip route rip</code></td><td>Show only RIP-learned routes</td></tr>
+        </tbody></table></div></div>
+        <div class="cmd-group"><h3>Testing</h3><div class="tbl-wrap"><table><tbody>
+          <tr><td><code>show ip interface brief</code></td><td>Interface IPs and up/down status</td></tr>
+          <tr><td><code>ping 192.168.3.10</code></td><td>Test reachability</td></tr>
+          <tr><td><code>traceroute 192.168.3.10</code></td><td>List every hop on the path</td></tr>
+        </tbody></table></div></div>
+        <p style="margin:14px 0 0"><button class="btn" type="button" id="goLab">Start the lab</button></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LAB ============ -->
+<section class="panel" id="p-lab" role="tabpanel">
+  <div class="lab">
+    <aside class="card tasks" aria-label="Lab tasks">
+      <div class="tasks-head">
+        <h2 style="margin:0">Lab tasks</h2>
+        <div class="row" style="justify-content:space-between;font-size:.88rem"><span class="muted" id="progTxt">0 of 0 complete</span><button class="btn ghost small no-print" type="button" id="resetBtn">Reset lab</button></div>
+        <div class="bar" aria-hidden="true"><span id="progBar"></span></div>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div id="taskList"></div>
+    </aside>
+
+    <div class="sim">
+      <div class="card topo topo-card">
+        <div id="topoLab"></div>
+        <p class="topo-cap">Select a router to open its console. Green links are exchanging RIPv2 updates. Successful pings animate across the network.</p>
+      </div>
+      <div class="console">
+        <div class="con-bar" role="tablist" aria-label="Router consoles">
+          <button class="con-tab" role="tab" data-r="R1">R1</button>
+          <button class="con-tab" role="tab" data-r="R2">R2</button>
+          <button class="con-tab" role="tab" data-r="R3">R3</button>
+          <span class="sp"></span>
+          <button class="con-key" type="button" id="keyHelp" title="Context help">?</button>
+          <button class="con-key" type="button" id="keyTab" title="Complete the command">Tab</button>
+          <button class="con-key" type="button" id="keyClear" title="Clear this screen">Clear</button>
+        </div>
+        <div class="screen" id="screen">
+          <pre id="out"></pre>
+          <div class="inline"><span class="pr" id="prompt">R1&gt;</span><input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Router command line"></div>
+        </div>
+      </div>
+      <p class="tips">Type <kbd>?</kbd> for help at any point, <kbd>Tab</kbd> to complete a word, and the up/down arrows for command history. Abbreviations like <code>sh ip ro</code> and <code>conf t</code> work. <kbd>Ctrl</kbd>+<kbd>Z</kbd> returns to privileged EXEC.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="panel" id="p-quiz" role="tabpanel">
+  <div class="card quiz">
+    <h2>Knowledge check</h2>
+    <p class="muted" style="margin-top:0">One attempt per question. The explanation appears after you answer.</p>
+    <div id="quiz"></div>
+    <p class="score" id="qScore"></p>
+    <button class="btn ghost small no-print" type="button" id="qReset">Retake quiz</button>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="panel" id="p-results" role="tabpanel">
+  <div class="card">
+    <h2>Lab results</h2>
+    <div class="row no-print" style="margin:8px 0"><label for="stuName">Student name</label><input class="qin" id="stuName" style="max-width:320px"><button class="btn" type="button" id="printBtn">Print or save as PDF</button></div>
+    <p id="stuShow" style="display:none;font-weight:700"></p>
+    <div class="res-grid" id="stats"></div>
+    <div class="tbl-wrap"><table id="resTable"></table></div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+'use strict';
+var IDS=['R1','R2','R3'];
+var STORE='lan121-routing-lab-v1';
+var SEGMENTS=[[['R1','Serial0/0/0'],['R2','Serial0/0/0']],[['R2','Serial0/0/1'],['R3','Serial0/0/1']]];
+var HOSTS={PC1:{ip:'192.168.1.10',gw:['R1','GigabitEthernet0/0']},PC2:{ip:'192.168.2.10',gw:['R2','GigabitEthernet0/0']},PC3:{ip:'192.168.3.10',gw:['R3','GigabitEthernet0/0']}};
+
+/* ---------- IP helpers ---------- */
+function ip2n(s){if(typeof s!=='string')return null;var p=s.split('.');if(p.length!==4)return null;var n=0;for(var i=0;i<4;i++){if(!/^\d{1,3}$/.test(p[i]))return null;var v=+p[i];if(v>255)return null;n=n*256+v;}return n;}
+function n2ip(n){return [Math.floor(n/16777216)%256,Math.floor(n/65536)%256,Math.floor(n/256)%256,n%256].join('.');}
+function maskN(p){return p===0?0:((0xFFFFFFFF<<(32-p))>>>0);}
+function mask2p(s){var n=ip2n(s);if(n===null)return null;var p=0,z=false;for(var i=31;i>=0;i--){var b=(n>>>i)&1;if(b){if(z)return null;p++;}else z=true;}return p;}
+function netOf(n,p){return (n&maskN(p))>>>0;}
+function inNet(n,net,p){return netOf(n,p)===net;}
+function classful(n){var a=Math.floor(n/16777216);var p=a<128?8:(a<192?16:24);return {net:netOf(n,p),p:p};}
+function p2mask(p){return n2ip(maskN(p));}
+function shortIf(f){return f.replace('GigabitEthernet','G').replace('Serial','S');}
+function normIf(s){s=s.replace(/\s+/g,'').toLowerCase();var m=s.match(/^(g|gi|gig|giga|gigab|gigabi|gigabit|gigabite|gigabitethernet)(\d+\/\d+)$/);if(m)return 'GigabitEthernet'+m[2];m=s.match(/^(s|se|ser|seri|seria|serial)(\d+\/\d+\/\d+)$/);if(m)return 'Serial'+m[2];return null;}
+
+/* ---------- state ---------- */
+function freshRouters(){
+  function I(ip,p,extra){var o={ip:ip,p:p,up:true,desc:''};for(var k in extra)o[k]=extra[k];return o;}
+  return {
+    R1:{name:'R1',ifs:{'GigabitEthernet0/0':I('192.168.1.1',24,{desc:'LAN 1'}),'Serial0/0/0':I('10.1.1.1',30,{desc:'Link to R2',clock:64000})},statics:[],rip:null,startup:null},
+    R2:{name:'R2',ifs:{'GigabitEthernet0/0':I('192.168.2.1',24,{desc:'LAN 2'}),'Serial0/0/0':I('10.1.1.2',30,{desc:'Link to R1'}),'Serial0/0/1':I('10.2.2.1',30,{desc:'Link to R3',clock:64000})},statics:[],rip:null,startup:null},
+    R3:{name:'R3',ifs:{'GigabitEthernet0/0':I('192.168.3.1',24,{desc:'LAN 3'}),'Serial0/0/1':I('10.2.2.2',30,{desc:'Link to R2'})},statics:[],rip:null,startup:null}
+  };
+}
+function banner(id){return '\n*** LAN121 routing lab: authorized students only ***\n\n'+id+' con0 is now available\n\nPress RETURN to get started.\n\n';}
+function freshState(){
+  return {r:freshRouters(),ev:[],seq:0,task:0,activeSince:0,done:{},hints:{},sols:{},qTries:{},cur:'R1',
+    modes:{R1:{m:'user',ifn:null},R2:{m:'user',ifn:null},R3:{m:'user',ifn:null}},
+    term:{R1:banner('R1'),R2:banner('R2'),R3:banner('R3')},quiz:{},name:''};
+}
+var S;
+try{var raw=localStorage.getItem(STORE);S=raw?JSON.parse(raw):null;}catch(e){S=null;}
+if(!S||!S.r||!S.modes)S=freshState();
+var hist={R1:[],R2:[],R3:[]},hidx={R1:0,R2:0,R3:0};
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){}}
+
+/* ---------- topology engine ---------- */
+function segOf(id,ifn){for(var i=0;i<SEGMENTS.length;i++){var s=SEGMENTS[i];if(s[0][0]===id&&s[0][1]===ifn)return {me:s[0],other:s[1]};if(s[1][0]===id&&s[1][1]===ifn)return {me:s[1],other:s[0]};}return null;}
+function ifUp(id,ifn){var I=S.r[id].ifs[ifn];if(!I||!I.up||!I.ip)return false;if(ifn.indexOf('Serial')===0){var sg=segOf(id,ifn);if(!sg)return false;var O=S.r[sg.other[0]].ifs[sg.other[1]];return !!(O&&O.up);}return true;}
+function neighborOn(id,ifn){var sg=segOf(id,ifn);if(!sg||!ifUp(id,ifn))return null;var oid=sg.other[0],oif=sg.other[1];if(!ifUp(oid,oif))return null;var A=S.r[id].ifs[ifn],B=S.r[oid].ifs[oif];var same=!!(B.ip&&inNet(ip2n(B.ip),netOf(ip2n(A.ip),A.p),A.p));return {r:oid,ifn:oif,same:same};}
+function ripOn(id,ifn){var R=S.r[id];if(!R.rip||!ifUp(id,ifn))return false;var I=R.ifs[ifn];return R.rip.nets.indexOf(n2ip(classful(ip2n(I.ip)).net))>=0;}
+function computeRip(){
+  var db={},links={};
+  IDS.forEach(function(id){db[id]={};var R=S.r[id];if(!R.rip)return;Object.keys(R.ifs).forEach(function(ifn){if(ripOn(id,ifn)){var I=R.ifs[ifn];var n=netOf(ip2n(I.ip),I.p);db[id][n+'/'+I.p]={net:n,p:I.p,metric:0,nh:null,ifn:ifn,conn:true};}});});
+  var changed=true,guard=0;
+  while(changed&&guard++<25){changed=false;
+    SEGMENTS.forEach(function(seg,si){[[seg[0],seg[1]],[seg[1],seg[0]]].forEach(function(pair){
+      var sid=pair[0][0],sif=pair[0][1],rid=pair[1][0],rif=pair[1][1];var Sr=S.r[sid],Rr=S.r[rid];
+      if(!ripOn(sid,sif)||!ripOn(rid,rif))return;var nb=neighborOn(sid,sif);if(!nb||!nb.same)return;
+      if(Sr.rip.passive.indexOf(sif)>=0)return;
+      var sendV=Sr.rip.version||1;var acc=Rr.rip.version?[Rr.rip.version]:[1,2];if(acc.indexOf(sendV)<0)return;
+      links[si]=true;
+      Object.keys(db[sid]).forEach(function(k){var rt=db[sid][k];if(!rt.conn&&rt.ifn===sif)return;var m=rt.metric+1;if(m>15)return;var ex=db[rid][k];
+        if(!ex||(!ex.conn&&m<ex.metric)){db[rid][k]={net:rt.net,p:rt.p,metric:m,nh:Sr.ifs[sif].ip,ifn:rif,conn:false,from:sid};changed=true;}});
+    });});
+  }
+  return {db:db,links:links};
+}
+function rib(id,db){
+  var R=S.r[id],out=[],conn=[];
+  Object.keys(R.ifs).forEach(function(ifn){var I=R.ifs[ifn];if(ifUp(id,ifn)){var n=netOf(ip2n(I.ip),I.p);var c={code:'C',net:n,p:I.p,ifn:ifn,ad:0};conn.push(c);out.push(c);out.push({code:'L',net:ip2n(I.ip),p:32,ifn:ifn,ad:0});}});
+  var cand=[];
+  R.statics.forEach(function(st){var ifn=null;if(st.nh){var h=ip2n(st.nh);var c=conn.filter(function(x){return inNet(h,x.net,x.p);})[0];if(!c)return;ifn=c.ifn;}else{if(!ifUp(id,st.exit))return;ifn=st.exit;}
+    cand.push({code:st.p===0?'S*':'S',net:ip2n(st.net),p:st.p,ad:st.ad,nh:st.nh,ifn:ifn,exitOnly:!st.nh});});
+  Object.keys(db[id]||{}).forEach(function(k){var rt=db[id][k];if(!rt.conn)cand.push({code:'R',net:rt.net,p:rt.p,ad:120,metric:rt.metric,nh:rt.nh,ifn:rt.ifn});});
+  var best={},order=[];
+  cand.forEach(function(c){var k=c.net+'/'+c.p;if(conn.some(function(x){return x.net===c.net&&x.p===c.p;}))return;if(!best[k]){best[k]=[c];order.push(k);}else if(c.ad<best[k][0].ad)best[k]=[c];else if(c.ad===best[k][0].ad&&c.code!=='R')best[k].push(c);});
+  order.forEach(function(k){best[k].forEach(function(c){out.push(c);});});
+  return out;
+}
+function allRibs(){var rr=computeRip();var o={_links:rr.links};IDS.forEach(function(id){o[id]=rib(id,rr.db);});return o;}
+function lookup(entries,d){var b=null;entries.forEach(function(e){if(e.code==='L')return;if(inNet(d,e.net,e.p)&&(!b||e.p>b.p))b=e;});return b;}
+function routerOwns(id,d){var R=S.r[id];return Object.keys(R.ifs).some(function(f){return ifUp(id,f)&&ip2n(R.ifs[f].ip)===d;})||Object.keys(R.ifs).some(function(f){var I=R.ifs[f];return f.indexOf('Gig')===0&&I.up&&ip2n(I.ip)===d;});}
+function forward(from,d,ribs){
+  var cur=from,path=[{node:from,ip:null}];
+  for(var i=0;i<20;i++){
+    if(routerOwns(cur,d))return {ok:true,path:path,end:{type:'r',id:cur}};
+    var rt=lookup(ribs[cur],d);
+    if(!rt)return {ok:false,path:path,fail:i===0?'noroute':'unreach',at:cur};
+    var ifn=rt.ifn;
+    if(ifn.indexOf('Gig')===0){
+      var hk=Object.keys(HOSTS).filter(function(k){var H=HOSTS[k];return H.gw[0]===cur&&H.gw[1]===ifn&&ip2n(H.ip)===d;})[0];
+      if(hk&&rt.code==='C'){path.push({node:hk,ip:HOSTS[hk].ip});return {ok:true,path:path,end:{type:'h',id:hk}};}
+      return {ok:false,path:path,fail:'timeout',at:cur};
+    }
+    var nb=neighborOn(cur,ifn);if(!nb||!nb.same)return {ok:false,path:path,fail:'timeout',at:cur};
+    var nbIp=S.r[nb.r].ifs[nb.ifn].ip;
+    if(rt.code==='C'&&ip2n(nbIp)!==d)return {ok:false,path:path,fail:'timeout',at:cur};
+    if(rt.nh&&ip2n(rt.nh)!==ip2n(nbIp))return {ok:false,path:path,fail:'timeout',at:cur};
+    path.push({node:nb.r,ip:nbIp});cur=nb.r;
+  }
+  return {ok:false,path:path,fail:'ttl',at:cur};
+}
+function srcFor(id,d,ribs){var rt=lookup(ribs[id],d);return rt?ip2n(S.r[id].ifs[rt.ifn].ip):null;}
+
+/* ---------- events ---------- */
+function ev(id,tag){S.seq++;S.ev.push({d:id,t:tag,seq:S.seq});if(S.ev.length>600)S.ev=S.ev.slice(-400);}
+function evSince(id,prefix){return S.ev.some(function(e){return e.seq>S.activeSince&&e.d===id&&e.t.indexOf(prefix)===0;});}
+function hasRoute(id,net,p,code){var rb=allRibs()[id];var n=ip2n(net);return rb.some(function(e){return e.net===n&&e.p===p&&e.code.indexOf(code)===0;});}
+
+/* ---------- command tree for ? and Tab ---------- */
+function D(d,c){var o={_d:d};if(c)for(var k in c)o[k]=c[k];return o;}
+var SHOW=D('Show running system information',{ip:D('IP information',{route:D('IP routing table',{connected:D('Connected networks'),rip:D('Routing Information Protocol (RIP)'),'static':D('Static routes')}),'interface':D('IP interface status',{brief:D('Brief summary of IP status')}),protocols:D('IP routing protocol process parameters')}),'running-config':D('Current operating configuration'),'startup-config':D('Contents of startup configuration'),history:D('Display the session command history')});
+var EXEC_U={enable:D('Turn on privileged commands'),exit:D('Exit from the EXEC'),ping:D('Send echo messages',{'A.B.C.D':D('Ping destination address')}),show:SHOW,traceroute:D('Trace route to destination',{'A.B.C.D':D('Trace route to destination address')})};
+var EXEC_P={clear:D('Reset functions',{ip:D('IP',{route:D('Delete route table entries')})}),configure:D('Enter configuration mode',{terminal:D('Configure from the terminal')}),copy:D('Copy from one file to another',{'running-config':D('Copy from current system configuration',{'startup-config':D('Copy to startup configuration')})}),disable:D('Turn off privileged commands'),enable:EXEC_U.enable,exit:EXEC_U.exit,ping:EXEC_U.ping,show:SHOW,traceroute:EXEC_U.traceroute,write:D('Write running configuration to memory',{memory:D('Write to NV memory')})};
+var ROUTERP=D('Enable a routing process',{rip:D('Routing Information Protocol (RIP)')});
+var CONF={'do':D('To run exec commands in config mode',EXEC_P),end:D('Exit from configure mode'),exit:D('Exit from configure mode'),hostname:D("Set system's network name"),'interface':D('Select an interface to configure',{GigabitEthernet:D('GigabitEthernet IEEE 802.3z'),Serial:D('Serial')}),ip:D('Global IP configuration subcommands',{route:D('Establish static routes',{'A.B.C.D':D('Destination prefix')})}),no:D('Negate a command or set its defaults',{ip:D('Global IP configuration subcommands',{route:D('Establish static routes')}),router:ROUTERP}),router:ROUTERP};
+var IFC={clock:D('Configure serial interface clock',{rate:D('Configure serial interface clock speed')}),description:D('Interface specific description'),'do':CONF['do'],end:CONF.end,exit:D('Exit from interface configuration mode'),ip:D('Interface Internet Protocol config commands',{address:D('Set the IP address of an interface')}),no:D('Negate a command or set its defaults',{ip:D('Interface Internet Protocol config commands',{address:D('Set the IP address of an interface')}),shutdown:D('Shutdown the selected interface')}),shutdown:D('Shutdown the selected interface')};
+var RTR={'auto-summary':D('Enable automatic network number summarization'),'do':CONF['do'],end:CONF.end,exit:D('Exit from routing protocol configuration mode'),network:D('Enable routing on an IP network',{'A.B.C.D':D('Network number')}),no:D('Negate a command or set its defaults',{'auto-summary':D('Enable automatic network number summarization'),network:D('Enable routing on an IP network'),'passive-interface':D('Suppress routing updates on an interface'),version:D('Set routing protocol version')}),'passive-interface':D('Suppress routing updates on an interface',{GigabitEthernet:D('GigabitEthernet IEEE 802.3z'),Serial:D('Serial')}),version:D('Set routing protocol version',{'1':D('RIP version 1'),'2':D('RIP version 2')})};
+function treeFor(id){var m=S.modes[id].m;return m==='user'?EXEC_U:m==='priv'?EXEC_P:m==='config'?CONF:m==='if'?IFC:RTR;}
+function keys(node){return Object.keys(node).filter(function(k){return k!=='_d';});}
+function words(node){return keys(node).filter(function(k){return !/^[A-Z.]+$/.test(k)&&!/^[A-Z]/.test(k)||/^[A-Z][a-z]/.test(k);});}
+function stepInto(node,w){var lw=w.toLowerCase();var ks=words(node);var ex=ks.filter(function(k){return k.toLowerCase()===lw;});if(ex.length)return node[ex[0]];var ms=ks.filter(function(k){return k.toLowerCase().indexOf(lw)===0;});return ms.length===1?node[ms[0]]:null;}
+
+/* ---------- prompt ---------- */
+function promptOf(id){var m=S.modes[id].m,n=S.r[id].name;return n+(m==='user'?'>':m==='priv'?'#':m==='config'?'(config)#':m==='if'?'(config-if)#':'(config-router)#');}
+
+/* ---------- command handlers ---------- */
+var INC={msg:'% Incomplete command.'};
+function bad(t){throw {caret:t.i};}
+function kw(t,word,min){if(!t)return false;var s=t.t.toLowerCase();return s.length>=(min||1)&&word.indexOf(s)===0;}
+function tokenize(s){var a=[],re=/\S+/g,m;while((m=re.exec(s)))a.push({t:m[0],i:m.index});return a;}
+function joinFrom(toks,i){return toks.slice(i).map(function(x){return x.t;}).join('');}
+
+function run(id,toks){
+  var md=S.modes[id].m;
+  if(md==='user'||md==='priv')return execCmd(id,toks,false);
+  if(kw(toks[0],'do',2)){if(toks.length<2)throw INC;return execCmd(id,toks.slice(1),true);}
+  var r;
+  if(md==='if'){r=ifCmd(id,toks);if(r!==undefined)return r;}
+  if(md==='router'){r=rtrCmd(id,toks);if(r!==undefined)return r;}
+  return confCmd(id,toks);
+}
+
+function execCmd(id,toks,viaDo){
+  var st=S.modes[id],priv=viaDo||st.m==='priv',t=toks[0];
+  if(!viaDo&&kw(t,'enable',2)){st.m='priv';return '';}
+  if(!viaDo&&kw(t,'disable',4)){st.m='user';return '';}
+  if(!viaDo&&(kw(t,'exit',2)||kw(t,'logout',4))){st.m='user';return '\n'+S.r[id].name+' con0 is now available\n\nPress RETURN to get started.\n\n';}
+  if(kw(t,'configure',4)){if(!priv||viaDo)bad(t);if(toks[1]&&!kw(toks[1],'terminal',1))bad(toks[1]);st.m='config';return 'Enter configuration commands, one per line.  End with CNTL/Z.\n';}
+  if(kw(t,'show',2))return showCmd(id,toks,priv);
+  if(kw(t,'ping',2))return pingCmd(id,toks);
+  if(kw(t,'traceroute',2))return traceCmd(id,toks);
+  if(kw(t,'copy',3)){if(!priv)bad(t);if(!toks[1]||!toks[2])throw INC;if(!kw(toks[1],'running-config',3))bad(toks[1]);if(!kw(toks[2],'startup-config',3))bad(toks[2]);doSave(id);return 'Destination filename [startup-config]? \nBuilding configuration...\n[OK]\n';}
+  if(kw(t,'write',2)){if(!priv)bad(t);if(toks[1]&&!kw(toks[1],'memory',1))bad(toks[1]);doSave(id);return 'Building configuration...\n[OK]\n';}
+  if(kw(t,'clear',3)){if(!priv)bad(t);if(!kw(toks[1],'ip',2))toks[1]?bad(toks[1]):(function(){throw INC;})();if(!kw(toks[2],'route',2))toks[2]?bad(toks[2]):(function(){throw INC;})();if(!toks[3])throw INC;return '';}
+  bad(t);
+}
+function doSave(id){S.r[id].startup=runningConfig(id);ev(id,'saved');}
+
+function showCmd(id,toks,priv){
+  var a=toks[1];if(!a)throw INC;
+  if(kw(a,'running-config',3)){if(!priv)bad(a);ev(id,'run');return runningConfig(id);}
+  if(kw(a,'startup-config',3)){if(!priv)bad(a);return S.r[id].startup||'startup-config is not present\n';}
+  if(kw(a,'history',2)){return hist[id].map(function(h){return '  '+h;}).join('\n')+'\n';}
+  if(kw(a,'ip',2)){var b=toks[2];if(!b)throw INC;
+    if(kw(b,'route',2)){var f=null,c=toks[3];if(c){if(kw(c,'static',2))f='S';else if(kw(c,'rip',2))f='R';else if(kw(c,'connected',2))f='C';else bad(c);}return showRoute(id,f);}
+    if(kw(b,'interface',3)){if(toks[3]&&!kw(toks[3],'brief',2))bad(toks[3]);ev(id,'brief');return brief(id);}
+    if(kw(b,'protocols',4)){ev(id,'protocols');return protocols(id);}
+    bad(b);
+  }
+  bad(a);
+}
+function pad(s,n){s=String(s);while(s.length<n)s+=' ';return s;}
+function brief(id){
+  var R=S.r[id],o='Interface                  IP-Address      OK? Method Status                Protocol\n';
+  Object.keys(R.ifs).forEach(function(f){var I=R.ifs[f];var stt=I.up?'up':'administratively down';var pr=ifUp(id,f)?'up':'down';o+=pad(f,27)+pad(I.ip||'unassigned',16)+'YES '+pad('manual',7)+pad(stt,22)+pr+'\n';});
+  return o;
+}
+var CODES='Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area\n       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2\n       E1 - OSPF external type 1, E2 - OSPF external type 2\n       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2\n       * - candidate default, U - per-user static route, o - ODR\n       P - periodic downloaded static route, + - replicated route\n\n';
+function age(){return '00:00:'+('0'+(4+Math.floor(Math.random()*22))).slice(-2);}
+function routeLine(e){
+  var pfx=n2ip(e.net)+'/'+e.p;
+  if(e.code==='C'||e.code==='L')return pfx+' is directly connected, '+e.ifn;
+  if(e.code==='R')return pfx+' ['+e.ad+'/'+e.metric+'] via '+e.nh+', '+age()+', '+e.ifn;
+  if(e.exitOnly)return pfx+' is directly connected, '+e.ifn;
+  return pfx+' ['+e.ad+'/0] via '+e.nh;
+}
+function showRoute(id,filter){
+  var all=allRibs()[id];
+  var ents=all.filter(function(e){if(!filter)return true;if(filter==='S')return e.code.indexOf('S')===0;if(filter==='C')return e.code==='C'||e.code==='L';return e.code===filter;});
+  var def=all.filter(function(e){return e.p===0&&e.net===0;})[0];
+  var o=CODES+(def?'Gateway of last resort is '+(def.nh||def.ifn)+' to network 0.0.0.0\n\n':'Gateway of last resort is not set\n\n');
+  var defs=ents.filter(function(e){return e.p===0;});
+  defs.forEach(function(e){o+=pad(e.code,6)+routeLine(e)+'\n';});
+  var rest=ents.filter(function(e){return e.p!==0;});
+  var groups={},gorder=[];
+  rest.forEach(function(e){var c=classful(e.net);var k=c.net+'/'+c.p;if(!groups[k]){groups[k]={c:c,list:[]};gorder.push(k);}groups[k].list.push(e);});
+  gorder.sort(function(a,b){return groups[a].c.net-groups[b].c.net;});
+  gorder.forEach(function(k){var g=groups[k];g.list.sort(function(a,b){return a.net-b.net||a.p-b.p;});
+    if(g.list.length===1&&g.list[0].p===g.c.p){o+=pad(g.list[0].code,6)+routeLine(g.list[0])+'\n';return;}
+    var full=all.filter(function(e){return e.p!==0&&classful(e.net).net===g.c.net;});var masks={};full.forEach(function(e){masks[e.p]=1;});var mc=Object.keys(masks).length;
+    o+='      '+n2ip(g.c.net)+'/'+g.c.p+(mc>1?' is variably subnetted, '+full.length+' subnets, '+mc+' masks':' is subnetted, '+full.length+' subnets')+'\n';
+    g.list.forEach(function(e){o+=pad(e.code,9)+routeLine(e)+'\n';});
+  });
+  var sc=ents.filter(function(e){return e.code.indexOf('S')===0;}).length,rc=ents.filter(function(e){return e.code==='R';}).length;
+  ev(id,'route');if(sc>=2)ev(id,'route:S');if(rc>=1)ev(id,'route:R');if(rc>=3)ev(id,'route:R3');
+  if(filter&&!ents.length)return '';
+  return o;
+}
+function protocols(id){
+  var R=S.r[id];if(!R.rip)return '*** IP Routing is NSF aware ***\n\n';
+  var rr=computeRip(),v=R.rip.version;
+  var o='*** IP Routing is NSF aware ***\n\nRouting Protocol is "rip"\n  Outgoing update filter list for all interfaces is not set\n  Incoming update filter list for all interfaces is not set\n  Sending updates every 30 seconds, next due in '+(5+Math.floor(Math.random()*24))+' seconds\n  Invalid after 180 seconds, hold down 180, flushed after 240\n  Redistributing: rip\n';
+  o+='  Default version control: '+(v?'send version '+v+', receive version '+v:'send version 1, receive any version')+'\n';
+  o+='    Interface             Send  Recv  Triggered RIP  Key-chain\n';
+  Object.keys(R.ifs).forEach(function(f){if(ripOn(id,f)&&R.rip.passive.indexOf(f)<0)o+='    '+pad(f,22)+pad(v||1,6)+pad(v||'1 2',6)+'\n';});
+  o+='  Automatic network summarization is '+(R.rip.auto?'in effect':'not in effect')+'\n  Maximum path: 4\n  Routing for Networks:\n';
+  R.rip.nets.slice().sort(function(a,b){return ip2n(a)-ip2n(b);}).forEach(function(n){o+='    '+n+'\n';});
+  if(R.rip.passive.length){o+='  Passive Interface(s):\n';R.rip.passive.forEach(function(p){o+='    '+p+'\n';});}
+  o+='  Routing Information Sources:\n    Gateway         Distance      Last Update\n';
+  var srcs={};Object.keys(rr.db[id]).forEach(function(k){var x=rr.db[id][k];if(!x.conn)srcs[x.nh]=1;});
+  Object.keys(srcs).forEach(function(g){o+='    '+pad(g,16)+pad('     120',14)+age()+'\n';});
+  o+='  Distance: (default is 120)\n\n';
+  return o;
+}
+function runningConfig(id){
+  var R=S.r[id],o='Building configuration...\n\nCurrent configuration : '+(900+R.statics.length*48+(R.rip?120:0))+' bytes\n!\nversion 15.4\nservice timestamps debug datetime msec\nservice timestamps log datetime msec\nno service password-encryption\n!\nhostname '+R.name+'\n!\nno ip domain lookup\n!\n';
+  Object.keys(R.ifs).forEach(function(f){var I=R.ifs[f];o+='interface '+f+'\n';if(I.desc)o+=' description '+I.desc+'\n';o+=I.ip?' ip address '+I.ip+' '+p2mask(I.p)+'\n':' no ip address\n';if(f.indexOf('Gig')===0)o+=' duplex auto\n speed auto\n';if(I.clock)o+=' clock rate '+I.clock+'\n';if(!I.up)o+=' shutdown\n';o+='!\n';});
+  if(R.rip){o+='router rip\n';if(R.rip.version)o+=' version '+R.rip.version+'\n';R.rip.passive.forEach(function(p){o+=' passive-interface '+p+'\n';});R.rip.nets.slice().sort(function(a,b){return ip2n(a)-ip2n(b);}).forEach(function(n){o+=' network '+n+'\n';});if(!R.rip.auto)o+=' no auto-summary\n';o+='!\n';}
+  o+='ip forward-protocol nd\nno ip http server\n!\n';
+  R.statics.forEach(function(s){o+='ip route '+s.net+' '+p2mask(s.p)+' '+(s.nh||s.exit)+(s.ad!==1?' '+s.ad:'')+'\n';});
+  o+='!\nline con 0\n logging synchronous\nline vty 0 4\n login\n!\nend\n';
+  return o;
+}
+
+function confCmd(id,toks){
+  var st=S.modes[id],R=S.r[id],t=toks[0],wasSub=st.m!=='config';
+  if(kw(t,'exit',2)){st.m=wasSub?'config':'priv';st.ifn=null;return '';}
+  if(kw(t,'end',2)){st.m='priv';st.ifn=null;return '';}
+  if(kw(t,'hostname',4)){if(!toks[1])throw INC;R.name=toks[1].t;st.m='config';return '';}
+  if(kw(t,'interface',2)){if(!toks[1])throw INC;var f=normIf(joinFrom(toks,1));if(!f||!R.ifs[f])bad(toks[1]);st.m='if';st.ifn=f;return '';}
+  if(kw(t,'router',3)){if(!toks[1])throw INC;if(!kw(toks[1],'rip',1))bad(toks[1]);if(!R.rip)R.rip={version:null,nets:[],auto:true,passive:[]};st.m='router';return '';}
+  if(kw(t,'ip',2)){if(!toks[1])throw INC;if(!kw(toks[1],'route',2))bad(toks[1]);st.m='config';return addRoute(id,toks);}
+  if(kw(t,'no',2)){var a=toks[1];if(!a)throw INC;
+    if(kw(a,'ip',2)){if(!toks[2])throw INC;if(!kw(toks[2],'route',2))bad(toks[2]);st.m='config';return delRoute(id,toks);}
+    if(kw(a,'router',3)){if(!toks[2])throw INC;if(!kw(toks[2],'rip',1))bad(toks[2]);R.rip=null;st.m='config';return '';}
+    bad(a);
+  }
+  bad(t);
+}
+function parseRoute(id,toks,off){
+  var nt=toks[off],mt=toks[off+1],ht=toks[off+2];
+  if(!nt||!mt)throw INC;var n=ip2n(nt.t);if(n===null)bad(nt);var p=mask2p(mt.t);if(p===null)bad(mt);
+  return {n:n,p:p,ht:ht};
+}
+function addRoute(id,toks){
+  var r=parseRoute(id,toks,2),R=S.r[id];if(!r.ht)throw INC;
+  if(netOf(r.n,r.p)!==r.n)return '%Inconsistent address and mask\n';
+  var nh=null,exit=null,h=ip2n(r.ht.t),next=4;
+  if(h!==null){if(Object.keys(R.ifs).some(function(f){return ip2n(R.ifs[f].ip)===h;}))return "%Invalid next hop address (it's this router)\n";nh=r.ht.t;next=5;}
+  else{var cand=r.ht.t;if(toks[5]&&/^\d/.test(toks[5].t)&&!normIf(cand)){cand+=toks[5].t;next=6;}else next=5;var f=normIf(cand);if(!f||!R.ifs[f])bad(r.ht);exit=f;}
+  var ad=1;if(toks[next]){var v=+toks[next].t;if(!/^\d+$/.test(toks[next].t)||v<1||v>255)bad(toks[next]);ad=v;if(toks[next+1])bad(toks[next+1]);}
+  var dup=R.statics.some(function(s){return s.net===n2ip(r.n)&&s.p===r.p&&s.nh===nh&&s.exit===exit;});
+  if(!dup)R.statics.push({net:n2ip(r.n),p:r.p,nh:nh,exit:exit,ad:ad});
+  else R.statics.forEach(function(s){if(s.net===n2ip(r.n)&&s.p===r.p&&s.nh===nh&&s.exit===exit)s.ad=ad;});
+  return '';
+}
+function delRoute(id,toks){
+  var r=parseRoute(id,toks,3),R=S.r[id],via=null;
+  if(r.ht){var h=ip2n(r.ht.t);via=h!==null?r.ht.t:normIf(joinFrom(toks,5));if(!via)bad(r.ht);}
+  var before=R.statics.length;
+  R.statics=R.statics.filter(function(s){return !(s.net===n2ip(r.n)&&s.p===r.p&&(!via||s.nh===via||s.exit===via));});
+  return before===R.statics.length?'%No matching route to delete\n':'';
+}
+function ifCmd(id,toks){
+  var st=S.modes[id],I=S.r[id].ifs[st.ifn],t=toks[0],f=st.ifn;
+  function upMsg(on){var o='\n%LINK-'+(on?'3':'5')+'-UPDOWN: Interface '+f+', changed state to '+(on?'up':'administratively down')+'\n';if(f.indexOf('Gig')===0||on&&ifUp(id,f)||!on)o+='%LINEPROTO-5-UPDOWN: Line protocol on Interface '+f+', changed state to '+(on&&ifUp(id,f)?'up':'down')+'\n';return o;}
+  if(kw(t,'exit',2)){st.m='config';st.ifn=null;return '';}
+  if(kw(t,'end',2)){st.m='priv';st.ifn=null;return '';}
+  if(kw(t,'shutdown',4)){if(!I.up)return '';I.up=false;return upMsg(false);}
+  if(kw(t,'description',2)){I.desc=toks.slice(1).map(function(x){return x.t;}).join(' ');return '';}
+  if(kw(t,'clock',2)){if(f.indexOf('Serial')<0)bad(t);if(!kw(toks[1],'rate',1))toks[1]?bad(toks[1]):(function(){throw INC;})();if(!toks[2])throw INC;I.clock=+toks[2].t||64000;return '';}
+  if(kw(t,'ip',2)&&kw(toks[1],'address',3)){var a=toks[2],m=toks[3];if(!a||!m)throw INC;if(ip2n(a.t)===null)bad(a);var p=mask2p(m.t);if(p===null||p>30)bad(m);I.ip=a.t;I.p=p;return '';}
+  if(kw(t,'no',2)){
+    if(kw(toks[1],'shutdown',4)){if(I.up)return '';I.up=true;return upMsg(true);}
+    if(kw(toks[1],'ip',2)&&kw(toks[2],'address',3)){I.ip=null;return '';}
+    if(kw(toks[1],'description',2)){I.desc='';return '';}
+  }
+  return undefined;
+}
+function rtrCmd(id,toks){
+  var st=S.modes[id],rip=S.r[id].rip,t=toks[0];
+  if(kw(t,'exit',2)){st.m='config';return '';}
+  if(kw(t,'end',2)){st.m='priv';return '';}
+  if(kw(t,'version',1)){if(!toks[1])throw INC;if(toks[1].t!=='1'&&toks[1].t!=='2')bad(toks[1]);rip.version=+toks[1].t;return '';}
+  if(kw(t,'network',3)){if(!toks[1])throw INC;var n=ip2n(toks[1].t);if(n===null)bad(toks[1]);var c=n2ip(classful(n).net);if(rip.nets.indexOf(c)<0)rip.nets.push(c);return '';}
+  if(kw(t,'auto-summary',4)){rip.auto=true;return '';}
+  if(kw(t,'passive-interface',4)){if(!toks[1])throw INC;var f=normIf(joinFrom(toks,1));if(!f||!S.r[id].ifs[f])bad(toks[1]);if(rip.passive.indexOf(f)<0)rip.passive.push(f);return '';}
+  if(kw(t,'no',2)){var a=toks[1];if(!a)throw INC;
+    if(kw(a,'auto-summary',4)){rip.auto=false;return '';}
+    if(kw(a,'version',1)){rip.version=null;return '';}
+    if(kw(a,'network',3)){if(!toks[2])throw INC;var nn=ip2n(toks[2].t);if(nn===null)bad(toks[2]);var cc=n2ip(classful(nn).net);rip.nets=rip.nets.filter(function(x){return x!==cc;});return '';}
+    if(kw(a,'passive-interface',4)){var pf=normIf(joinFrom(toks,2));if(!pf)toks[2]?bad(toks[2]):(function(){throw INC;})();rip.passive=rip.passive.filter(function(x){return x!==pf;});return '';}
+  }
+  return undefined;
+}
+
+/* ---------- ping & traceroute ---------- */
+function parseSrc(id,toks,ribs){
+  if(!toks[2])return null;
+  if(!kw(toks[2],'source',2))bad(toks[2]);
+  var rest=joinFrom(toks,3);if(!rest)throw INC;
+  var ip=ip2n(rest);if(ip!==null){if(!routerOwns(id,ip))bad(toks[3]);return ip;}
+  var f=normIf(rest);if(!f||!S.r[id].ifs[f]||!S.r[id].ifs[f].ip)bad(toks[3]);return ip2n(S.r[id].ifs[f].ip);
+}
+function pingCmd(id,toks){
+  if(!toks[1])throw INC;
+  var d=ip2n(toks[1].t);if(d===null)return '% Unrecognized host or address, or protocol not running.\n\n';
+  var ribs=allRibs(),src=parseSrc(id,toks,ribs);
+  var head='Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to '+toks[1].t+', timeout is 2 seconds:\n';
+  if(src!==null)head+='Packet sent with a source address of '+n2ip(src)+'\n';
+  var res;
+  if(routerOwns(id,d))res={ok:true,path:[{node:id}],back:[]};
+  else{
+    var out=forward(id,d,ribs);
+    if(!out.ok)res={ok:false,chars:out.fail==='unreach'?'U.U.U':'.....',path:out.path};
+    else{
+      if(src===null)src=srcFor(id,d,ribs);
+      var start=out.end.type==='h'?HOSTS[out.end.id].gw[0]:out.end.id;
+      var back=forward(start,src,ribs);
+      res=back.ok?{ok:true,path:out.path,back:back.path}:{ok:false,chars:'.....',path:out.path};
+    }
+  }
+  ev(id,(res.ok?'pingok:':'pingfail:')+toks[1].t);
+  if(res.ok){animate(res.path,res.back);var a=1+Math.floor(Math.random()*3),b=a+2+Math.floor(Math.random()*4);return head+'!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = '+a+'/'+(a+1)+'/'+b+' ms\n';}
+  return head+res.chars+'\nSuccess rate is 0 percent (0/5)\n';
+}
+function traceCmd(id,toks){
+  if(!toks[1])throw INC;
+  var d=ip2n(toks[1].t);if(d===null)return '% Unrecognized host or address, or protocol not running.\n\n';
+  var ribs=allRibs(),src=parseSrc(id,toks,ribs);
+  var o='Type escape sequence to abort.\nTracing the route to '+toks[1].t+'\nVRF info: (vrf in name/id, vrf out name/id)\n';
+  if(routerOwns(id,d)){ev(id,'traceok:'+toks[1].t);return o+'  1 '+toks[1].t+' 0 msec 0 msec 0 msec\n';}
+  if(src===null)src=srcFor(id,d,ribs);
+  var out=forward(id,d,ribs);var hops=out.path.slice(1);var t=0;
+  if(src===null){return o+'  1  *  *  * \n  2  *  *  * \n  3  *  *  * \n(Simulator stopped the trace after 3 timeouts. Press Ctrl+Shift+6 to abort on real gear.)\n';}
+  hops.forEach(function(h,i){
+    var replier=HOSTS[h.node]?HOSTS[h.node].gw[0]:h.node;var bk=forward(replier,src,ribs);t+=4+Math.floor(Math.random()*6);
+    var last=out.ok&&i===hops.length-1;var shown=last?toks[1].t:h.ip;
+    o+=bk.ok?'  '+(i+1)+' '+shown+' '+t+' msec '+(t+1)+' msec '+t+' msec\n':'  '+(i+1)+'  *  *  * \n';
+  });
+  if(out.ok){ev(id,'traceok:'+toks[1].t);animate(out.path,[]);return o;}
+  var n=hops.length;
+  if(out.fail==='unreach'){var at=out.path[out.path.length-1];o+='  '+(n+1)+' '+at.ip+' !H  !H  !H\n';return o;}
+  for(var k=1;k<=3;k++)o+='  '+(n+k)+'  *  *  * \n';
+  return o+'(Simulator stopped the trace after 3 timeouts. Press Ctrl+Shift+6 to abort on real gear.)\n';
+}
+
+/* ---------- help & completion ---------- */
+function help(id,line){
+  var body=line.slice(0,-1),partial=body.length&&!/\s$/.test(body);
+  var toks=tokenize(body).map(function(x){return x.t;});
+  var node=treeFor(id),path=partial?toks.slice(0,-1):toks;
+  for(var i=0;i<path.length;i++){var nx=stepInto(node,path[i]);if(!nx){return node&&keys(node).length===0||!nx&&i>0&&keys(node).some(function(k){return /^[A-Z.]+$/.test(k);})?'  <cr>\n':'% Unrecognized command\n';}node=nx;}
+  if(partial){var w=toks[toks.length-1].toLowerCase();var ms=words(node).filter(function(k){return k.toLowerCase().indexOf(w)===0;});return ms.length?ms.join('  ')+'\n\n':'% Unrecognized command\n';}
+  var ks=keys(node);if(!ks.length)return '  <cr>\n\n';
+  var o='';ks.forEach(function(k){o+='  '+pad(k,18)+' '+(node[k]._d||'')+'\n';});
+  if(path.length>=2)o+='  <cr>\n';
+  return o+'\n';
+}
+function complete(id,line){
+  var toks=tokenize(line).map(function(x){return x.t;});if(!toks.length||/\s$/.test(line))return line;
+  var node=treeFor(id);
+  for(var i=0;i<toks.length-1;i++){node=stepInto(node,toks[i]);if(!node)return line;}
+  var w=toks[toks.length-1].toLowerCase();var ms=words(node).filter(function(k){return k.toLowerCase().indexOf(w)===0;});
+  if(ms.length!==1)return line;
+  return line.replace(/\S+$/,ms[0]+' ');
+}
+
+/* ---------- terminal UI ---------- */
+var outEl=document.getElementById('out'),cmdEl=document.getElementById('cmd'),prEl=document.getElementById('prompt'),scr=document.getElementById('screen');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function print(id,s){S.term[id]+=s;if(S.term[id].length>60000)S.term[id]=S.term[id].slice(-45000);if(id===S.cur)renderTerm();}
+function renderTerm(){
+  outEl.innerHTML=esc(S.term[S.cur]).replace(/^(%.*)$/gm,'<span class="t-err">$1</span>').replace(/!!!!!/g,'<span class="t-ok">!!!!!</span>');
+  prEl.textContent=promptOf(S.cur);scr.scrollTop=scr.scrollHeight;
+  document.querySelectorAll('.con-tab').forEach(function(b){b.setAttribute('aria-selected',b.dataset.r===S.cur?'true':'false');});
+}
+function execLine(id,line){
+  var pr=promptOf(id);print(id,pr+line+'\n');
+  var t=line.trim();if(!t){save();return;}
+  hist[id].push(t);if(hist[id].length>60)hist[id].shift();hidx[id]=hist[id].length;
+  if(/\?$/.test(t)){print(id,help(id,line.replace(/\s+$/,'')));return;}
+  var pipe=null,body=line,pi=line.indexOf('|');
+  if(pi>=0){var pt=line.slice(pi+1).trim().split(/\s+/);body=line.slice(0,pi);
+    if(pt[0]&&'include'.indexOf(pt[0].toLowerCase())===0&&pt[1])pipe={kind:'i',s:pt.slice(1).join(' ').toLowerCase()};
+    else if(pt[0]&&'section'.indexOf(pt[0].toLowerCase())===0&&pt[1])pipe={kind:'s',s:pt.slice(1).join(' ').toLowerCase()};
+    else{print(id,'% Invalid input detected after the | character.\n');return;}}
+  var toks=tokenize(body),out='';
+  if(!toks.length){print(id,'% Incomplete command.\n');return;}
+  try{out=run(id,toks)||'';}
+  catch(e){if(e&&e.caret!==undefined)out=new Array(pr.length+e.caret+1).join(' ')+'^\n% Invalid input detected at \'^\' marker.\n\n';else if(e&&e.msg)out=e.msg+'\n\n';else{out='% Simulator error\n';if(window.console)console.error(e);}}
+  if(pipe&&out){var lines=out.split('\n');
+    if(pipe.kind==='i')out=lines.filter(function(l){return l.toLowerCase().indexOf(pipe.s)>=0;}).join('\n')+'\n';
+    else{var keep=[],on=false;lines.forEach(function(l){if(/^\S/.test(l))on=l.toLowerCase().indexOf(pipe.s)>=0;if(on)keep.push(l);});out=keep.join('\n')+'\n';}}
+  print(id,out);
+  afterChange();
+}
+cmdEl.addEventListener('keydown',function(e){
+  var id=S.cur;
+  if(e.key==='Enter'){var v=cmdEl.value;cmdEl.value='';execLine(id,v);}
+  else if(e.key==='Tab'){e.preventDefault();cmdEl.value=complete(id,cmdEl.value);}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(hidx[id]>0){hidx[id]--;cmdEl.value=hist[id][hidx[id]];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(hidx[id]<hist[id].length-1){hidx[id]++;cmdEl.value=hist[id][hidx[id]];}else{hidx[id]=hist[id].length;cmdEl.value='';}}
+  else if(e.key==='?'){e.preventDefault();var v2=cmdEl.value+'?';print(id,promptOf(id)+v2+'\n'+help(id,v2));cmdEl.value=cmdEl.value;}
+  else if((e.key==='z'||e.key==='Z')&&e.ctrlKey){e.preventDefault();var m=S.modes[id];if(m.m!=='user'&&m.m!=='priv'){m.m='priv';m.ifn=null;print(id,promptOf(id).replace('#','')+'(config)#^Z\n');renderTerm();save();}}
+});
+scr.addEventListener('click',function(){if(!window.getSelection().toString())cmdEl.focus();});
+document.getElementById('keyHelp').addEventListener('click',function(){var v=cmdEl.value+'?';print(S.cur,promptOf(S.cur)+v+'\n'+help(S.cur,v));cmdEl.focus();});
+document.getElementById('keyTab').addEventListener('click',function(){cmdEl.value=complete(S.cur,cmdEl.value);cmdEl.focus();});
+document.getElementById('keyClear').addEventListener('click',function(){S.term[S.cur]='';renderTerm();save();cmdEl.focus();});
+document.querySelectorAll('.con-tab').forEach(function(b){b.addEventListener('click',function(){selectRouter(b.dataset.r);});});
+function selectRouter(id){S.cur=id;renderTerm();drawTopo();save();cmdEl.focus({preventScroll:true});}
+
+/* ---------- topology drawing ---------- */
+var POS={R1:{x:140,y:120},R2:{x:380,y:120},R3:{x:620,y:120},PC1:{x:140,y:245},PC2:{x:380,y:245},PC3:{x:620,y:245}};
+function routerGlyph(id,sel,counts){
+  var p=POS[id];
+  return '<g class="rtr" data-r="'+id+'" tabindex="0" role="button" aria-label="Open '+id+' console">'+
+    (sel?'<circle cx="'+p.x+'" cy="'+p.y+'" r="36" fill="none" stroke="#00a86b" stroke-width="4"/>':'')+
+    '<circle cx="'+p.x+'" cy="'+p.y+'" r="28" fill="#0047AB"/>'+
+    '<g transform="translate('+p.x+','+p.y+')" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round">'+
+    '<path d="M-16 -6H-4M-8 -10L-4 -6L-8 -2"/><path d="M16 -6H4M8 -10L4 -6L8 -2"/><path d="M-4 7H-16M-12 3L-16 7L-12 11"/><path d="M4 7H16M12 3L16 7L12 11"/></g>'+
+    '<text x="'+p.x+'" y="'+(p.y-50)+'" text-anchor="middle" font-weight="700" font-size="17" fill="var(--ink)">'+id+'</text>'+
+    '<text x="'+p.x+'" y="'+(p.y-34)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+counts+'</text></g>';
+}
+function pcGlyph(k){var p=POS[k];return '<g><rect x="'+(p.x-18)+'" y="'+(p.y-14)+'" width="36" height="25" rx="3" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/><path d="M'+(p.x-6)+' '+(p.y+11)+'v5h12v-5" fill="none" stroke="var(--muted)" stroke-width="2"/><text x="'+p.x+'" y="'+(p.y+33)+'" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">'+k+' .10</text></g>';}
+function drawTopo(){
+  var ribs=allRibs(),links=ribs._links;
+  function counts(id){var c={C:0,S:0,R:0};ribs[id].forEach(function(e){if(e.code==='C')c.C++;else if(e.code.indexOf('S')===0)c.S++;else if(e.code==='R')c.R++;});return 'C '+c.C+'   S '+c.S+'   R '+c.R;}
+  function downX(id,ifn,x,y){return S.r[id].ifs[ifn].up?'':'<text x="'+x+'" y="'+y+'" font-size="16" font-weight="700" fill="var(--err)" text-anchor="middle">\u2715</text>';}
+  var s='<svg viewBox="0 0 760 290" xmlns="http://www.w3.org/2000/svg" font-family="Atkinson Hyperlegible, system-ui, sans-serif" role="img" aria-label="Three routers in a row, R1 to R2 to R3, each with one LAN and PC">';
+  [[0,'R1','R2','10.1.1.0/30','S0/0/0 .1','S0/0/0 .2'],[1,'R2','R3','10.2.2.0/30','S0/0/1 .1','S0/0/1 .2']].forEach(function(L){
+    var a=POS[L[1]],b=POS[L[2]],rip=links[L[0]];
+    s+='<line x1="'+(a.x+28)+'" y1="'+a.y+'" x2="'+(b.x-28)+'" y2="'+b.y+'" stroke="'+(rip?'#00a86b':'var(--muted)')+'" stroke-width="'+(rip?5:3)+'"/>';
+    var mx=(a.x+b.x)/2;s+='<path d="M'+(mx-9)+' '+(a.y-7)+'l12 6l-6 2l12 6" fill="none" stroke="'+(rip?'#00a86b':'var(--muted)')+'" stroke-width="2.5"/>';
+    s+='<text x="'+mx+'" y="'+(a.y-16)+'" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">'+L[3]+'</text>';
+    if(rip)s+='<text x="'+mx+'" y="'+(a.y+30)+'" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ok-ink)">RIPv2 updates</text>';
+    s+='<text x="'+(a.x+34)+'" y="'+(a.y+20)+'" font-size="11.5" fill="var(--muted)">'+L[4]+'</text><text x="'+(b.x-34)+'" y="'+(b.y+20)+'" text-anchor="end" font-size="11.5" fill="var(--muted)">'+L[5]+'</text>';
+    s+=downX(L[1],L[0]===0?'Serial0/0/0':'Serial0/0/1',a.x+40,a.y-4)+downX(L[2],L[0]===0?'Serial0/0/0':'Serial0/0/1',b.x-40,b.y-4);
+  });
+  [['R1','PC1','192.168.1.0/24'],['R2','PC2','192.168.2.0/24'],['R3','PC3','192.168.3.0/24']].forEach(function(L){
+    var a=POS[L[0]],b=POS[L[1]];
+    s+='<line x1="'+a.x+'" y1="'+(a.y+28)+'" x2="'+b.x+'" y2="'+(b.y-14)+'" stroke="var(--muted)" stroke-width="3"/>';
+    s+='<text x="'+(a.x+8)+'" y="'+(a.y+52)+'" font-size="11.5" fill="var(--muted)">G0/0 .1</text>';
+    s+='<text x="'+(a.x+8)+'" y="'+(a.y+82)+'" font-size="13" font-weight="700" fill="var(--ink)">'+L[2]+'</text>';
+    s+=downX(L[0],'GigabitEthernet0/0',a.x-12,a.y+56);
+  });
+  IDS.forEach(function(id){s+=routerGlyph(id,id===S.cur,counts(id));});
+  Object.keys(HOSTS).forEach(function(k){s+=pcGlyph(k);});
+  s+='<circle id="pkt" r="8" fill="#00a86b" stroke="#fff" stroke-width="2" opacity="0"/></svg>';
+  document.getElementById('topoLab').innerHTML=s;
+  document.getElementById('topoLearn').innerHTML=s.replace('id="pkt"','id="pkt2"').replace(/ class="rtr"[^>]*>/g,'>');
+  document.querySelectorAll('#topoLab .rtr').forEach(function(g){g.addEventListener('click',function(){selectRouter(g.dataset.r);});g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selectRouter(g.dataset.r);}});});
+}
+var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function animate(out,back){
+  if(reduce)return;
+  var pts=out.map(function(p){return {pos:POS[p.node],c:'#00a86b'};});
+  (back||[]).slice(1).forEach(function(p){pts.push({pos:POS[p.node],c:'#4D8DFF'});});
+  if(pts.length<2)return;
+  setTimeout(function(){
+    var dot=document.getElementById('pkt');if(!dot)return;var seg=0,t0=null,dur=380;
+    function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/dur),a=pts[seg].pos,b=pts[seg+1].pos;
+      dot.setAttribute('cx',a.x+(b.x-a.x)*k);dot.setAttribute('cy',a.y+(b.y-a.y)*k);dot.setAttribute('fill',pts[seg+1].c);dot.setAttribute('opacity','1');
+      if(k>=1){seg++;t0=null;if(seg>=pts.length-1){setTimeout(function(){dot.setAttribute('opacity','0');},250);return;}}
+      requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  },60);
+}
+
+/* ---------- tasks ---------- */
+function ripOK(id,lan){var r=S.r[id].rip;return !!(r&&r.version===2&&r.nets.indexOf(lan)>=0&&r.nets.indexOf('10.0.0.0')>=0&&!r.auto);}
+var TASKS=[
+ {ph:1,id:'s1',dev:'R1',title:'Check the interfaces on R1',goal:'Move to privileged EXEC mode, then confirm every interface on R1 is up/up with the correct IP address.',why:'Routing cannot work over a link that is down. This is always the first check.',hints:['Type <code>enable</code>. The prompt changes from <code>R1&gt;</code> to <code>R1#</code>.','Now run <code>show ip interface brief</code>. The short form <code>sh ip int br</code> works too.'],sol:'enable\nshow ip interface brief',check:function(){return evSince('R1','brief');}},
+ {ph:1,id:'s2',dev:'R1',title:"Read R1's routing table",goal:'Display the routing table on R1 and find out which networks it already knows.',why:'C routes are networks on R1\'s own interfaces. L routes are R1\'s own /32 addresses.',hints:['<code>show ip route</code>'],sol:'show ip route',check:function(){return evSince('R1','route');}},
+ {ph:1,id:'q1',type:'q',title:'Count the routes',q:'There are 5 networks in the topology. How many can R1 reach right now? Enter a number.',ans:['2','two'],explain:'R1 only knows its two directly connected networks, 192.168.1.0/24 and 10.1.1.0/30. A router learns remote networks only from static routes or a routing protocol.'},
+ {ph:1,id:'s3',dev:'R1',title:'Prove there is a problem',goal:'From R1, ping PC3 at 192.168.3.10. It should fail.',why:'Testing before you change anything gives you a baseline to compare against.',hints:['<code>ping 192.168.3.10</code>','Five dots mean five timeouts. R1 has no route to 192.168.3.0/24, so it drops the packets.'],sol:'ping 192.168.3.10',check:function(){return evSince('R1','pingfail:');}},
+ {ph:1,id:'s4',dev:'R1',title:'Add static routes on R1',goal:'Give R1 a route to 192.168.2.0/24 and to 192.168.3.0/24. Both go through R2 at 10.1.1.2.',why:'The next-hop address is the neighbor router\'s IP on the shared link, never R1\'s own IP.',hints:['Enter global configuration first: <code>configure terminal</code>','Syntax: <code>ip route</code> <i>network</i> <i>subnet-mask</i> <i>next-hop</i>','<code>ip route 192.168.2.0 255.255.255.0 10.1.1.2</code>, then do the same for 192.168.3.0'],sol:'configure terminal\nip route 192.168.2.0 255.255.255.0 10.1.1.2\nip route 192.168.3.0 255.255.255.0 10.1.1.2\nend',check:function(){return hasRoute('R1','192.168.2.0',24,'S')&&hasRoute('R1','192.168.3.0',24,'S');}},
+ {ph:1,id:'s5',dev:'R2',title:'Add static routes on R2',goal:'R2 sits in the middle. Give it a route to 192.168.1.0/24 (via R1) and to 192.168.3.0/24 (via R3).',why:'Packets need a path in both directions. Without these, R2 would drop PC3\'s replies to PC1.',hints:['Open the R2 console with the R2 tab or by selecting R2 in the diagram.','R1 is 10.1.1.1 and R3 is 10.2.2.2 from R2\'s point of view.','<code>ip route 192.168.1.0 255.255.255.0 10.1.1.1</code>'],sol:'enable\nconfigure terminal\nip route 192.168.1.0 255.255.255.0 10.1.1.1\nip route 192.168.3.0 255.255.255.0 10.2.2.2\nend',check:function(){return hasRoute('R2','192.168.1.0',24,'S')&&hasRoute('R2','192.168.3.0',24,'S');}},
+ {ph:1,id:'s6',dev:'R3',title:'Add a default route on R3',goal:'R3 is a stub router with only one way out. Instead of one route per network, add a single default route to R2 at 10.2.2.1.',why:'A default route matches any destination that has no more specific route. Ideal for stub networks and Internet edges.',hints:['The default route uses network 0.0.0.0 and mask 0.0.0.0.','<code>ip route 0.0.0.0 0.0.0.0 10.2.2.1</code>'],sol:'enable\nconfigure terminal\nip route 0.0.0.0 0.0.0.0 10.2.2.1\nend',check:function(){return hasRoute('R3','0.0.0.0',0,'S');}},
+ {ph:1,id:'s7',dev:'R1',title:"Verify R1's static routes",goal:'Display R1\'s routing table again and find the two new S routes.',why:'Always confirm the route was installed. A typo in the next hop can keep a route out of the table.',hints:['<code>show ip route</code> or just the static entries: <code>show ip route static</code>','From config mode, put <code>do</code> in front: <code>do show ip route</code>'],sol:'show ip route static',check:function(){return evSince('R1','route:S');}},
+ {ph:1,id:'q2',type:'q',title:'Read the brackets',q:'In <code>S 192.168.3.0/24 [1/0] via 10.1.1.2</code>, what is the first number in the brackets called?',ans:['administrative distance','ad','admin distance','distance','administrative'],explain:'The format is [administrative distance/metric]. Static routes have an AD of 1, so they are trusted over every dynamic routing protocol. Static routes have no metric, so the second number is 0.'},
+ {ph:1,id:'s8',dev:'R1',title:'Test end to end',goal:'From R1, ping 192.168.3.10 and then run a traceroute to it.',why:'A green ping proves the path works in both directions. Traceroute shows each hop the packet takes.',hints:['<code>ping 192.168.3.10</code>','<code>traceroute 192.168.3.10</code> should list 10.1.1.2, 10.2.2.2, then 192.168.3.10.','If the ping still fails, check R2 and R3\'s routing tables. Is a return route missing?'],sol:'ping 192.168.3.10\ntraceroute 192.168.3.10',check:function(){return evSince('R1','pingok:192.168.3.')&&evSince('R1','traceok:192.168.3.')&&hasRoute('R1','192.168.3.0',24,'S');}},
+ {ph:1,id:'s9',dev:'R3',title:'Test the default route',goal:'From R3, ping PC1 at 192.168.1.10 using R3\'s LAN interface as the source address.',why:'A plain ping from R3 is sourced from 10.2.2.2, and R1 has no route back to 10.2.2.0/30. Sourcing from G0/0 tests the path PC3\'s traffic really takes.',hints:['Try a plain <code>ping 192.168.1.10</code> first and notice it fails. Which network would R1 need a route to?','<code>ping 192.168.1.10 source g0/0</code>'],sol:'ping 192.168.1.10 source g0/0',check:function(){return evSince('R3','pingok:192.168.1.');}},
+ {ph:1,id:'s10',dev:'all',title:'Save your work',goal:'Save the running configuration to NVRAM on all three routers.',why:'Unsaved changes vanish when a router reloads.',hints:['From privileged EXEC: <code>copy running-config startup-config</code>','Shortcuts: <code>copy run start</code> or <code>wr</code>. Do it on R1, R2 and R3.'],sol:'copy running-config startup-config\n(repeat on R1, R2 and R3)',check:function(){return IDS.every(function(i){return evSince(i,'saved');});}},
+
+ {ph:2,id:'r1',dev:'all',title:'Remove all static routes',goal:'Delete every static route on R1, R2 and R3, including R3\'s default route.',why:'You are about to let RIPv2 build the same tables automatically.',hints:['Put <code>no</code> in front of the original command: <code>no ip route 192.168.2.0 255.255.255.0 10.1.1.2</code>','Find what you typed with <code>show running-config | include ip route</code>'],sol:'R1(config)# no ip route 192.168.2.0 255.255.255.0 10.1.1.2\nR1(config)# no ip route 192.168.3.0 255.255.255.0 10.1.1.2\nR2(config)# no ip route 192.168.1.0 255.255.255.0 10.1.1.1\nR2(config)# no ip route 192.168.3.0 255.255.255.0 10.2.2.2\nR3(config)# no ip route 0.0.0.0 0.0.0.0 10.2.2.1',check:function(){return IDS.every(function(i){return S.r[i].statics.length===0;});}},
+ {ph:2,id:'q3',type:'q',title:'Why remove them?',q:'If the static routes stayed in place, would the RIP routes for the same networks appear in the routing table? Answer yes or no.',ans:['no','n'],explain:'Static routes have AD 1 and RIP has AD 120. For the same prefix, the router installs only the route with the lowest AD, so the RIP routes would never be used.'},
+ {ph:2,id:'r2',dev:'R1',title:'Enable RIPv2 on R1',goal:'Start RIP, set version 2, advertise R1\'s networks (192.168.1.0 and 10.0.0.0), and turn off auto-summary.',why:'The network command takes the classful network. 10.1.1.0 is inside class A 10.0.0.0, so IOS stores it as 10.0.0.0.',hints:['<code>router rip</code> takes you to <code>R1(config-router)#</code>','Then <code>version 2</code>, <code>network 192.168.1.0</code>, <code>network 10.0.0.0</code>','Finish with <code>no auto-summary</code>'],sol:'configure terminal\nrouter rip\nversion 2\nnetwork 192.168.1.0\nnetwork 10.0.0.0\nno auto-summary\nend',check:function(){return ripOK('R1','192.168.1.0');}},
+ {ph:2,id:'r3',dev:'R2',title:'Enable RIPv2 on R2',goal:'Do the same on R2, advertising 192.168.2.0 and 10.0.0.0.',why:'One network 10.0.0.0 statement covers both of R2\'s serial links.',hints:['Same commands as R1, but the LAN is 192.168.2.0.'],sol:'configure terminal\nrouter rip\nversion 2\nnetwork 192.168.2.0\nnetwork 10.0.0.0\nno auto-summary\nend',check:function(){return ripOK('R2','192.168.2.0');}},
+ {ph:2,id:'r4',dev:'R3',title:'Enable RIPv2 on R3',goal:'Finish the job on R3, advertising 192.168.3.0 and 10.0.0.0. Watch the links in the diagram turn green.',why:'Green links show both neighbors are exchanging RIPv2 updates.',hints:['The LAN on R3 is 192.168.3.0.'],sol:'configure terminal\nrouter rip\nversion 2\nnetwork 192.168.3.0\nnetwork 10.0.0.0\nno auto-summary\nend',check:function(){return ripOK('R3','192.168.3.0');}},
+ {ph:2,id:'r5',dev:'all',chal:true,title:'Stop updates on the LANs',goal:'No routers live on the LANs, so updates sent there are wasted and let anyone on the LAN see your routes. Make G0/0 passive on all three routers.',why:'A passive interface still has its network advertised. It just stops sending RIP updates out that port.',hints:['Inside <code>router rip</code>: <code>passive-interface g0/0</code>','Repeat on R1, R2 and R3.'],sol:'router rip\npassive-interface GigabitEthernet0/0\n(repeat on R1, R2 and R3)',check:function(){return IDS.every(function(i){var r=S.r[i].rip;return r&&r.passive.indexOf('GigabitEthernet0/0')>=0;});}},
+ {ph:2,id:'r6',dev:'R1',title:"Verify R1's RIP routes",goal:'Show the RIP-learned routes on R1. You should see three R routes.',why:'Compare this to the static table: same destinations, but now learned automatically.',hints:['<code>show ip route rip</code> or <code>show ip route</code>','Missing a route? Check the network statements and version on each router with <code>show ip protocols</code>.'],sol:'show ip route rip',check:function(){return evSince('R1','route:R3');}},
+ {ph:2,id:'q4',type:'q',title:'Read the metric',q:'In R1\'s table, what metric (hop count) does RIP show for 192.168.3.0/24? Enter a number.',ans:['2','two'],explain:'The entry reads [120/2]. 120 is RIP\'s administrative distance and 2 is the hop count: R2, then R3. RIP\'s maximum is 15 hops; 16 means unreachable.'},
+ {ph:2,id:'r7',dev:'R2',title:'Check the RIP process on R2',goal:'Display the routing protocol details on R2. Find the version, the networks, the passive interface, and the two neighbors under Routing Information Sources.',why:'show ip protocols is the fastest way to spot a version mismatch or a missing network statement.',hints:['<code>show ip protocols</code>'],sol:'show ip protocols',check:function(){return evSince('R2','protocols');}},
+ {ph:2,id:'r8',dev:'R1',title:'Test end to end with RIP',goal:'From R1, ping 192.168.3.10 and traceroute to it again.',why:'Same result as with static routes, but now the routers found the path on their own.',hints:['<code>ping 192.168.3.10</code>','<code>traceroute 192.168.3.10</code>'],sol:'ping 192.168.3.10\ntraceroute 192.168.3.10',check:function(){return evSince('R1','pingok:192.168.3.')&&evSince('R1','traceok:192.168.3.')&&hasRoute('R1','192.168.3.0',24,'R');}},
+ {ph:2,id:'r9',dev:'all',title:'Save the RIP configuration',goal:'Save the running configuration on all three routers.',why:'A saved config is part of every finished change.',hints:['<code>copy run start</code> on R1, R2 and R3.'],sol:'copy running-config startup-config\n(repeat on R1, R2 and R3)',check:function(){return IDS.every(function(i){return evSince(i,'saved');});}}
+];
+var taskList=document.getElementById('taskList');
+function setActive(){S.activeSince=S.seq;}
+function progress(){
+  var moved=false,lastDone=null;
+  while(S.task<TASKS.length){var T=TASKS[S.task];if(T.type==='q')break;if(T.check()){S.done[T.id]=true;lastDone=T;S.task++;setActive();moved=true;}else break;}
+  if(moved){toast(lastDone);renderTasks();}
+}
+function toast(T){var el=document.getElementById('toast');var msg=S.task>=TASKS.length?'Lab complete. Open the Results tab to see your summary.':(TASKS[S.task-1]&&TASKS[S.task-1].id==='s10'?'Part 1 complete. Static routing works end to end. On to RIPv2.':'Done: '+T.title.replace(/<[^>]+>/g,'')+'.');el.textContent=msg;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove('on');},5000);}
+function renderTasks(){
+  var h='',ph=0;
+  TASKS.forEach(function(T,i){
+    if(T.ph!==ph){ph=T.ph;h+='<div class="part">'+(ph===1?'Part 1: Static routing':'Part 2: RIPv2')+'</div>';}
+    var st=S.done[T.id]?'done':i===S.task?'cur':i>S.task?'locked':'';
+    var chal=T.type==='q'||T.chal;
+    h+='<div class="task '+st+(chal?' chal':'')+'"><div class="n" aria-hidden="true">'+(S.done[T.id]?'\u2713':(i+1))+'</div><div><div class="tt">'+T.title+'</div>';
+    if(i===S.task){
+      h+='<div class="task-body">';
+      if(T.type==='q'){
+        var tries=S.qTries[T.id]||0;
+        h+='<p>'+T.q+'</p><div class="row"><input class="qin" id="qa" aria-label="Your answer"><button class="btn small" type="button" id="qcheck">Check</button></div>';
+        if(tries)h+='<div class="fb no">Not quite. Look at the routing table again and retry. Attempts: '+tries+'</div>';
+        if(tries>=2)h+='<button class="btn ghost small" type="button" id="qreveal" style="margin-top:8px">Show the answer</button>';
+      }else{
+        if(T.dev!=='all')h+='<button class="chip" type="button" data-go="'+T.dev+'">On '+T.dev+'</button>';else h+='<span class="chip">On R1, R2 and R3</span>';
+        h+='<p>'+T.goal+'</p><p class="why">'+T.why+'</p>';
+        var hu=S.hints[T.id]||0;
+        for(var k=0;k<hu;k++)h+='<div class="hintbox">'+T.hints[k]+'</div>';
+        if(S.sols[T.id])h+='<div class="solbox">'+esc(T.sol)+'</div>';
+        h+='<div class="row">';
+        if(hu<T.hints.length)h+='<button class="btn ghost small" type="button" id="hintBtn">Hint '+(hu+1)+' of '+T.hints.length+'</button>';
+        if(!S.sols[T.id])h+='<button class="btn ghost small" type="button" id="solBtn">Show solution</button>';
+        h+='</div>';
+      }
+      h+='</div>';
+    }
+    h+='</div></div>';
+  });
+  taskList.innerHTML=h;
+  var n=Object.keys(S.done).length;document.getElementById('progTxt').textContent=n+' of '+TASKS.length+' complete';document.getElementById('progBar').style.width=(100*n/TASKS.length)+'%';
+  var T=TASKS[S.task];if(!T)return;
+  var hb=document.getElementById('hintBtn');if(hb)hb.onclick=function(){S.hints[T.id]=(S.hints[T.id]||0)+1;save();renderTasks();};
+  var sb=document.getElementById('solBtn');if(sb)sb.onclick=function(){S.sols[T.id]=true;save();renderTasks();};
+  taskList.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){selectRouter(b.dataset.go);};});
+  var qc=document.getElementById('qcheck');
+  if(qc){var qa=document.getElementById('qa');
+    var go=function(){var v=qa.value.trim().toLowerCase().replace(/[.\s]+$/,'');if(!v)return;
+      if(T.ans.indexOf(v)>=0){S.done[T.id]=true;S.qFirst=S.qFirst||{};S.qFirst[T.id]=!(S.qTries[T.id]);finishQ(T,true);}
+      else{S.qTries[T.id]=(S.qTries[T.id]||0)+1;save();renderTasks();}};
+    qc.onclick=go;qa.onkeydown=function(e){if(e.key==='Enter')go();};
+    var qr=document.getElementById('qreveal');if(qr)qr.onclick=function(){S.done[T.id]=true;S.qFirst=S.qFirst||{};S.qFirst[T.id]=false;S.sols[T.id]=true;finishQ(T,false);};
+  }
+}
+function finishQ(T,ok){
+  S.task++;setActive();save();renderTasks();
+  var el=document.getElementById('toast');el.innerHTML=(ok?'<b>Correct.</b> ':'<b>Answer:</b> '+esc(T.ans[0])+'. ')+T.explain;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove('on');},12000);
+  progress();
+}
+function afterChange(){progress();drawTopo();renderTerm();save();}
+document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('Reset all routers and lab progress? Quiz answers are kept.')){var q=S.quiz,nm=S.name;S=freshState();S.quiz=q;S.name=nm;hist={R1:[],R2:[],R3:[]};save();renderTasks();drawTopo();renderTerm();}});
+
+/* ---------- glossary ---------- */
+var GLOSS=[['Routing table','The list of networks a router knows and how to reach each one.'],['Static route','A route an administrator enters by hand with ip route.'],['Default route','0.0.0.0/0. Matches any destination that has no more specific route.'],['Next hop','The IP address of the neighbor router a packet is sent to.'],['Administrative distance','Trust rating for a route source. Lower wins. Static 1, RIP 120.'],['Metric','Cost within one protocol. RIP counts hops; 16 is unreachable.'],['RIPv2','Classless distance-vector protocol. Multicasts updates to 224.0.0.9 every 30 seconds.'],['Passive interface','Advertises the network but sends no routing updates out that port.'],['Split horizon','Never advertise a route back out the interface it was learned on.'],['Stub network','A network with only one way in or out.']];
+document.getElementById('flips').innerHTML=GLOSS.map(function(g){return '<button class="flip" type="button" aria-label="'+g[0]+'. Select to see the definition."><div class="flip-in"><div class="face front">'+g[0]+'</div><div class="face back">'+g[1]+'</div></div></button>';}).join('');
+document.querySelectorAll('.flip').forEach(function(f){f.addEventListener('click',function(){f.classList.toggle('on');});});
+
+/* ---------- quiz ---------- */
+var QUIZ=[
+ ['Which command sends traffic for 192.168.3.0/24 to the neighbor at 10.1.1.2?',['ip route 192.168.3.0 255.255.255.0 10.1.1.2','ip route 10.1.1.2 255.255.255.0 192.168.3.0','route add 192.168.3.0 mask 255.255.255.0 10.1.1.2','network 192.168.3.0 10.1.1.2'],0,'The order is destination network, subnet mask, then next hop. route add is a Windows host command, and network belongs to routing protocols.'],
+ ['Which command creates a default route toward 10.2.2.1?',['ip default-network 10.2.2.1','ip route 0.0.0.0 0.0.0.0 10.2.2.1','ip route 255.255.255.255 0.0.0.0 10.2.2.1','default-route 10.2.2.1'],1,'A default route is network 0.0.0.0 with mask 0.0.0.0, so it matches every destination. It appears as S* in the routing table.'],
+ ['What is the default administrative distance of RIP?',['1','90','110','120'],3,'RIP is 120. Static is 1, EIGRP is 90 and OSPF is 110.'],
+ ['What is the maximum hop count for a reachable RIP route?',['15','16','30','255'],0,'15 is the maximum. A metric of 16 means unreachable, which limits RIP to small networks.'],
+ ['What does RIPv2 add compared with RIPv1?',['It uses bandwidth as the metric','It carries the subnet mask and multicasts updates to 224.0.0.9','It sends updates only when something changes','It has an administrative distance of 1'],1,'RIPv2 is classless, so it supports VLSM, and it multicasts to 224.0.0.9 instead of broadcasting. The metric is still hop count.'],
+ ['You enter network 10.1.1.0 under router rip. What does the running-config show?',['network 10.1.1.0','network 10.1.1.0 0.0.0.3','network 10.0.0.0','Nothing; the command is rejected'],2,'RIP network statements are classful. IOS converts 10.1.1.0 to the class A network 10.0.0.0 and enables RIP on every interface in it.'],
+ ['What does passive-interface g0/0 do under router rip?',['Shuts down G0/0','Stops RIP updates out G0/0 but still advertises its network','Removes the G0/0 network from RIP','Makes G0/0 receive-only for all traffic'],1,'The interface keeps forwarding user traffic and its network is still advertised. Only RIP updates out that port stop.'],
+ ['A router has both a static route and a RIP route to 192.168.3.0/24. Which goes in the routing table?',['The RIP route, because it is dynamic','Both, with load balancing','The static route, because AD 1 is lower than 120','Whichever was configured last'],2,'Lower administrative distance wins. To make a static route a backup instead, give it an AD higher than 120 (a floating static route).'],
+ ['In the routing table, what does an L code mean?',['A route learned from a LAN','The router\'s own interface address as a /32','A low-priority route','A route learned via LLDP'],1,'L (local) routes are the exact /32 addresses of the router\'s own interfaces. They appear next to each C route in IOS 15 and later.'],
+ ['A ping from R1 shows U.U.U. What does that tell you?',['The destination is down','A router along the path reported it has no route to the destination','The link to R2 is shut down','The ping succeeded'],1,'U means a router sent back an ICMP unreachable message. Dots mean a timeout with no reply at all.']
+];
+function renderQuiz(){
+  var h='';QUIZ.forEach(function(q,i){var a=S.quiz[i];h+='<div class="qq"><h3>'+(i+1)+'. '+esc(q[0])+'</h3>';
+    q[1].forEach(function(o,j){var cls='';if(a!==undefined){if(j===q[2])cls=' right';else if(j===a)cls=' wrong';}h+='<button class="opt'+cls+'" type="button" data-q="'+i+'" data-o="'+j+'"'+(a!==undefined?' disabled':'')+'>'+esc(o)+'</button>';});
+    if(a!==undefined)h+='<div class="fb '+(a===q[2]?'ok':'no')+'"><b>'+(a===q[2]?'Correct.':'Not quite.')+'</b> '+esc(q[3])+'</div>';
+    h+='</div>';});
+  document.getElementById('quiz').innerHTML=h;
+  document.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){S.quiz[+b.dataset.q]=+b.dataset.o;save();renderQuiz();};});
+  var n=Object.keys(S.quiz).length,c=quizScore();document.getElementById('qScore').textContent=n?'Score: '+c+' of '+QUIZ.length+(n<QUIZ.length?' ('+(QUIZ.length-n)+' left)':''):'';
+}
+function quizScore(){var c=0;Object.keys(S.quiz).forEach(function(k){if(S.quiz[k]===QUIZ[k][2])c++;});return c;}
+document.getElementById('qReset').onclick=function(){S.quiz={};save();renderQuiz();};
+
+/* ---------- results ---------- */
+function renderResults(){
+  var labTasks=TASKS.filter(function(t){return t.type!=='q';}),qs=TASKS.filter(function(t){return t.type==='q';});
+  var done=labTasks.filter(function(t){return S.done[t.id];}).length;
+  var hints=Object.keys(S.hints).reduce(function(a,k){return a+S.hints[k];},0);
+  var sols=labTasks.filter(function(t){return S.sols[t.id];}).length;
+  var qf=S.qFirst||{},first=qs.filter(function(t){return qf[t.id];}).length;
+  document.getElementById('stats').innerHTML=[[done+' / '+labTasks.length,'Lab tasks completed'],[first+' / '+qs.length,'Challenges correct first try'],[hints,'Hints used'],[sols,'Solutions viewed'],[quizScore()+' / '+QUIZ.length,'Quiz score']].map(function(s){return '<div class="stat"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>';}).join('');
+  var h='<thead><tr><th>#</th><th>Task</th><th>Status</th><th>Hints</th><th>Solution viewed</th></tr></thead><tbody>';
+  TASKS.forEach(function(t,i){h+='<tr><td>'+(i+1)+'</td><td>'+(t.type==='q'||t.chal?'Challenge: ':'')+t.title+'</td><td>'+(S.done[t.id]?(t.type==='q'?(qf[t.id]?'Correct first try':'Completed'):'Complete'):'Not done')+'</td><td>'+(S.hints[t.id]||0)+'</td><td>'+(S.sols[t.id]?'Yes':'No')+'</td></tr>';});
+  document.getElementById('resTable').innerHTML=h+'</tbody>';
+  var sn=document.getElementById('stuName');sn.value=S.name||'';var ss=document.getElementById('stuShow');ss.textContent=S.name?'Student: '+S.name+'   Date: '+new Date().toLocaleDateString():'';ss.style.display=S.name?'block':'none';
+}
+document.getElementById('stuName').addEventListener('input',function(e){S.name=e.target.value;save();var ss=document.getElementById('stuShow');ss.textContent='Student: '+S.name+'   Date: '+new Date().toLocaleDateString();ss.style.display=S.name?'block':'none';});
+document.getElementById('printBtn').onclick=function(){renderResults();window.print();};
+
+/* ---------- tabs & theme ---------- */
+function showPanel(p){document.querySelectorAll('.tab').forEach(function(t){t.setAttribute('aria-selected',t.dataset.p===p?'true':'false');});document.querySelectorAll('.panel').forEach(function(x){x.classList.toggle('on',x.id==='p-'+p);});if(p==='results')renderResults();if(p==='lab')setTimeout(function(){renderTerm();cmdEl.focus({preventScroll:true});},30);}
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){showPanel(t.dataset.p);});});
+document.getElementById('goLab').onclick=function(){showPanel('lab');window.scrollTo(0,0);};
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function isDark(){var t=root.getAttribute('data-theme');if(t)return t==='dark';return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;}
+function syncTheme(){tb.textContent=isDark()?'Light mode':'Dark mode';}
+try{var th=localStorage.getItem(STORE+'-theme');if(th)root.setAttribute('data-theme',th);}catch(e){}
+tb.onclick=function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(STORE+'-theme',n);}catch(e){}syncTheme();};
+syncTheme();
+
+/* ---------- init ---------- */
+renderTasks();drawTopo();renderTerm();renderQuiz();progress();
+})();
+</script>
+</body>
+</html>
