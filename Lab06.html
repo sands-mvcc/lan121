@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wireless Network Configuration Labs: WPA2-Personal and WPA2-Enterprise</title>
+<style>
+:root{
+  --navy:#0047AB; --green:#00a86b;
+  --bg:#f3f6fb; --surface:#ffffff; --sunk:#eef2f8; --ink:#14213d; --muted:#56617a; --line:#d5dcea;
+  --accent:#0047AB; --good:#00875a; --good-bg:#e5f6ef; --bad:#b42318; --bad-bg:#fdecea; --warn:#9a6700;
+  --term-bg:#0f1b2d; --term-ink:#d7f5e6;
+  --mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --sans:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0d1526;--surface:#152038;--sunk:#101a2e;--ink:#e5ebf6;--muted:#9eabc4;--line:#2a3858;--accent:#7aa7f5;--good:#3fd29b;--good-bg:#10362a;--bad:#ff8a80;--bad-bg:#3a1a1c;--warn:#f0c060;--term-bg:#070d18}
+}
+:root[data-theme="dark"]{--bg:#0d1526;--surface:#152038;--sunk:#101a2e;--ink:#e5ebf6;--muted:#9eabc4;--line:#2a3858;--accent:#7aa7f5;--good:#3fd29b;--good-bg:#10362a;--bad:#ff8a80;--bad-bg:#3a1a1c;--warn:#f0c060;--term-bg:#070d18}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans)}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header.top{background:var(--navy);color:#fff}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:18px;padding-bottom:18px;flex-wrap:wrap}
+header.top h1{font-size:1.45rem;line-height:1.2;margin:0;font-weight:650;letter-spacing:-.01em}
+header.top p{margin:4px 0 0;opacity:.85;font-size:.95rem}
+.iconbtn{background:transparent;border:1.5px solid rgba(255,255,255,.6);color:#fff;border-radius:999px;padding:7px 14px;font:inherit;font-size:.9rem;cursor:pointer}
+nav.tabs{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:inherit;font-size:.95rem;padding:13px 14px 11px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--green);font-weight:600}
+nav.tabs .count{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:400;margin-left:4px}
+main{padding:28px 0 60px}
+.tab{display:none}.tab.active{display:block}
+h2{font-size:1.5rem;margin:0 0 6px;letter-spacing:-.01em}
+h3{font-size:1.1rem;margin:0 0 10px}
+.lede{color:var(--muted);max-width:72ch;margin:0 0 22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+/* Competencies */
+details.acc{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+details.acc>summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary::after{content:"+";color:var(--accent);font-size:1.2rem;line-height:1}
+details.acc[open]>summary::after{content:"\2212"}
+details.acc .body{padding:0 20px 16px;max-width:80ch}
+details.acc .body ul{margin:6px 0 10px;padding-left:20px}
+details.acc .body li{margin:4px 0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto}
+table.map{border-collapse:collapse;width:100%;font-size:.93rem}
+table.map th,table.map td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.map th{color:var(--muted);font-weight:600}
+.yes{color:var(--good);font-weight:600}
+/* Lab layout */
+.labhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.meter{min-width:220px}
+.meter .bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.meter .bar i{display:block;height:100%;background:var(--green);transition:width .4s}
+.meter small{color:var(--muted)}
+.topo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:18px;overflow-x:auto}
+.topo svg{display:block;width:100%;min-width:520px;height:auto}
+.node rect{fill:var(--sunk);stroke:var(--line);stroke-width:1.5}
+.node.click{cursor:pointer}
+.node.click:hover rect{stroke:var(--accent)}
+.node.sel rect{stroke:var(--navy);stroke-width:3}
+:root[data-theme="dark"] .node.sel rect{stroke:var(--accent)}
+.node.done rect{fill:var(--good-bg)}
+.node .n1{font:600 13px var(--sans);fill:var(--ink);text-anchor:middle}
+.node .n2{font:12px var(--mono);fill:var(--muted);text-anchor:middle}
+.node .dot{fill:var(--line)}
+.node.done .dot{fill:var(--green)}
+.node:focus{outline:none}.node:focus-visible rect{stroke:var(--green);stroke-width:3}
+.lk{stroke:var(--line);stroke-width:2.5}
+.lk.wl{stroke-dasharray:6 6}
+.lk.on{stroke:var(--green)}
+.lk.on.wl{animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@media (prefers-reduced-motion:reduce){.lk.on.wl{animation:none}.meter .bar i{transition:none}}
+.cloud{fill:none;stroke:var(--line);stroke-width:1.5}
+.lbl{font:12px var(--sans);fill:var(--muted);text-anchor:middle}
+.labgrid{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:20px;align-items:start}
+@media (max-width:900px){.labgrid{grid-template-columns:1fr}}
+.wo h3{margin-bottom:6px}
+.wo p{margin:0 0 10px;font-size:.95rem}
+.wo dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 14px;font-size:.9rem}
+.wo dt{color:var(--muted)}
+.wo dd{margin:0;font-family:var(--mono);font-size:.86rem;word-break:break-word}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps li{counter-increment:s}
+ol.steps button{width:100%;text-align:left;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;background:none;border:0;border-top:1px solid var(--line);padding:10px 0;font:inherit;font-size:.93rem;color:var(--ink);cursor:pointer}
+ol.steps button::before{content:counter(s);width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.8rem;color:var(--muted)}
+ol.steps li.done button::before{content:"\2713";background:var(--green);border-color:var(--green);color:#fff}
+ol.steps button:hover{color:var(--accent)}
+/* Device panels */
+.dev{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.devbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;color:#fff;font-weight:600;font-size:.95rem}
+.devbar small{font-family:var(--mono);font-weight:400;opacity:.85}
+.dev.router .devbar{background:#1d3557}
+.dev.ap .devbar{background:#006d4a}
+.dev.radius .devbar{background:#3b3f58}
+.dev.laptop .devbar{background:#4a5568}
+.devsec{padding:16px 18px;border-top:1px solid var(--line)}
+.devsec:first-of-type{border-top:0}
+.devsec h4{margin:0 0 4px;font-size:1rem}
+.devsec .note{color:var(--muted);font-size:.9rem;margin:0 0 12px;max-width:70ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px 16px}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.fld>span{font-weight:600}
+.fld small{color:var(--muted)}
+.fld input,.fld select{font:15px var(--mono);padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-width:0}
+.fld input:focus,.fld select:focus{border-color:var(--accent);outline:none}
+.chk{display:flex;gap:8px;align-items:center;font-size:.93rem;margin:6px 0}
+.chk input{width:18px;height:18px;accent-color:var(--navy)}
+fieldset.nets{border:1.5px solid var(--line);border-radius:8px;padding:6px 0;margin:0 0 12px}
+fieldset.nets legend{font-weight:600;font-size:.88rem;padding:0 6px;margin-left:8px}
+label.net{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;padding:7px 12px;cursor:pointer}
+label.net:hover{background:var(--sunk)}
+label.net .ssid{font-family:var(--mono);font-size:.92rem}
+label.net .meta{color:var(--muted);font-size:.82rem}
+table.survey{border-collapse:collapse;font-size:.88rem;margin:4px 0 14px;min-width:340px}
+table.survey th,table.survey td{border:1px solid var(--line);padding:5px 10px;text-align:left}
+table.survey th{background:var(--sunk)}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:10px 16px;font:inherit;font-size:.93rem;font-weight:600;cursor:pointer;margin-top:14px}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--line)}
+.btn.green{background:var(--good)}
+.fb{margin-top:12px;border-radius:8px;font-size:.92rem}
+.fb:empty{display:none}
+.fb.good{background:var(--good-bg);color:var(--good);padding:10px 14px;font-weight:600}
+.fb.bad{background:var(--bad-bg);color:var(--bad);padding:10px 14px}
+.fb.bad ul{margin:6px 0 0;padding-left:18px}
+.fb.bad li{margin:3px 0}
+.status{display:flex;gap:12px;align-items:center;background:var(--good-bg);color:var(--good);border-radius:8px;padding:12px 14px;font-weight:600;margin-bottom:12px}
+.status code{font-family:var(--mono);font-weight:400}
+.term{background:var(--term-bg);color:var(--term-ink);border-radius:8px;font:13.5px/1.5 var(--mono);padding:12px 14px}
+.term pre{margin:0;white-space:pre-wrap;max-height:260px;overflow:auto}
+.term .in{display:flex;gap:8px;align-items:center;margin-top:6px}
+.term input{flex:1;background:transparent;border:0;color:var(--term-ink);font:inherit;min-width:0}
+.term input:focus{outline:none}
+.log{font:13px/1.6 var(--mono);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:12px}
+.log div{padding-left:18px;position:relative}
+.log div::before{content:"\2022";position:absolute;left:4px;color:var(--good)}
+.log div.bad{color:var(--bad)}
+.log div.bad::before{content:"\00D7";color:var(--bad)}
+.radnav{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px 0}
+/* Quiz */
+.q{margin-bottom:14px}
+.q p.stem{font-weight:600;margin:0 0 10px}
+.q label{display:flex;gap:10px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;align-items:flex-start}
+.q label:hover{border-color:var(--accent)}
+.q label.right{border-color:var(--good);background:var(--good-bg)}
+.q label.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.q .why{font-size:.93rem;color:var(--muted);margin-top:8px}
+.q .why strong{color:var(--ink)}
+.score{font-size:1.05rem;font-weight:600}
+/* Results */
+ul.prog{list-style:none;padding:0;margin:0}
+ul.prog li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:8px 0;font-size:.95rem}
+ul.prog .ok{color:var(--good);font-weight:600}
+ul.prog .no{color:var(--muted)}
+textarea{width:100%;min-height:90px;font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px solid var(--line)}
+@media print{
+  header.top .iconbtn,nav.tabs,.noprint,footer{display:none!important}
+  body{background:#fff;color:#000}
+  .card,.dev{border-color:#999}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <h1>Wireless Network Configuration Labs</h1>
+      <p>Secure a small-office WLAN with WPA2-Personal, then rebuild it as WPA2-Enterprise with RADIUS.</p>
+    </div>
+    <button class="iconbtn" id="themeBtn" type="button">Dark mode</button>
+  </div>
+</header>
+<nav class="tabs" aria-label="Lab sections">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-tab="comp">Competencies</button>
+    <button role="tab" data-tab="lab1">Lab 1: WPA2-Personal<span class="count" id="c1"></span></button>
+    <button role="tab" data-tab="lab2">Lab 2: WPA2-Enterprise<span class="count" id="c2"></span></button>
+    <button role="tab" data-tab="quiz">Knowledge check<span class="count" id="c3"></span></button>
+    <button role="tab" data-tab="results">Results and instructor notes</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ COMPETENCIES ============ -->
+<section class="tab" id="tab-comp" role="tabpanel">
+  <h2>What a wireless network specialist needs to know and do</h2>
+  <p class="lede">This job-task analysis describes the knowledge and performance skills of an IT specialist who configures and manages enterprise wireless networks. The two labs and the knowledge check practice a focused subset of it. Content aligns with CompTIA Network+ (N10-009) Domains 2.0 Network Implementation, 4.0 Network Security and 5.0 Network Troubleshooting; verify against the current published objectives before mapping to a syllabus.</p>
+
+  <div class="cols">
+  <div>
+  <h3>Knowledge</h3>
+  <details class="acc" open><summary>RF and 802.11 fundamentals</summary><div class="body"><ul>
+    <li>802.11 amendments and generations: a/b/g/n (Wi-Fi 4), ac (Wi-Fi 5), ax (Wi-Fi 6/6E), be (Wi-Fi 7), and their bands, rates and channel widths.</li>
+    <li>2.4, 5 and 6 GHz bands: range versus throughput, and why 1, 6 and 11 are the only non-overlapping 2.4 GHz channels in North America.</li>
+    <li>Co-channel and adjacent-channel interference, channel bonding, DFS channels and transmit power.</li>
+    <li>SSID, BSSID, BSS/ESS, roaming, and signal metrics (RSSI, SNR, noise floor).</li>
+    <li>Antenna types (omni, directional), placement, and attenuation from building materials.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Wireless security protocols and threats</summary><div class="body"><ul>
+    <li>Evolution from WEP and WPA (TKIP) to WPA2 (AES-CCMP) and WPA3 (SAE, GCMP, 192-bit mode).</li>
+    <li>Personal (pre-shared key) versus Enterprise (802.1X) authentication, and when each is appropriate.</li>
+    <li>The WPA2 4-way handshake: PMK, PTK and GTK, and why a weak passphrase allows offline dictionary attacks.</li>
+    <li>Attacks: WPS PIN brute force, evil twin and rogue APs, deauthentication, KRACK, and passphrase sharing after staff leave.</li>
+    <li>Guest networks, client isolation, captive portals and MAC filtering (and its limits).</li>
+  </ul></div></details>
+  <details class="acc"><summary>AAA, 802.1X and RADIUS</summary><div class="body"><ul>
+    <li>802.1X roles: supplicant (client), authenticator (AP or controller), authentication server (RADIUS).</li>
+    <li>EAP methods: PEAP (EAP-MSCHAPv2), EAP-TLS, EAP-TTLS and EAP-FAST, and which need client certificates.</li>
+    <li>RADIUS: UDP 1812 authentication and 1813 accounting (legacy 1645/1646), shared secrets, Access-Request, -Challenge, -Accept and -Reject.</li>
+    <li>Network policies and conditions (group, NAS port type), directory integration (Active Directory, LDAP) and dynamic VLAN assignment.</li>
+    <li>RADIUS versus TACACS+, and the value of accounting records for audit and incident response.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Certificates and PKI</summary><div class="body"><ul>
+    <li>Certificate authorities, trust chains and distributing a root CA to managed clients.</li>
+    <li>Why supplicants must validate the RADIUS server certificate and name to defeat evil-twin credential theft.</li>
+    <li>Certificate lifecycle: expiration, renewal and revocation, and how an expired server certificate takes down Wi-Fi for everyone.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Enterprise WLAN architecture and operations</summary><div class="body"><ul>
+    <li>Autonomous versus controller-based (lightweight) and cloud-managed APs; CAPWAP tunnels.</li>
+    <li>PoE budgets, VLAN-per-SSID design, and segmenting guest, staff and IoT traffic.</li>
+    <li>Site surveys (predictive, passive, active), heat maps and capacity planning.</li>
+    <li>Monitoring with SNMP, syslog and WIPS; firmware management and configuration backups.</li>
+  </ul></div></details>
+  </div>
+
+  <div>
+  <h3>Performance skills</h3>
+  <details class="acc" open><summary>Plan</summary><div class="body"><ul>
+    <li>Interpret a site survey and select bands and channels that avoid interference.</li>
+    <li>Choose the authentication model (PSK or 802.1X) from organizational size, turnover and audit requirements.</li>
+    <li>Define an addressing and DHCP plan for wireless clients.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Configure</summary><div class="body"><ul>
+    <li>Harden a SOHO router: unique admin password, remote management off, WPS off.</li>
+    <li>Configure SSID, security mode, cipher and a strong passphrase.</li>
+    <li>Register an AP as a RADIUS client with a strong shared secret.</li>
+    <li>Build a RADIUS network policy: group condition, NAS port type, EAP method and server certificate.</li>
+    <li>Configure an AP for WPA2-Enterprise with authentication and accounting servers.</li>
+    <li>Configure supplicants for PEAP with server certificate validation.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Verify and troubleshoot</summary><div class="body"><ul>
+    <li>Confirm addressing and reachability with <code>ipconfig</code> and <code>ping</code>.</li>
+    <li>Read the EAP/RADIUS exchange to locate where authentication failed.</li>
+    <li>Diagnose common faults: wrong key, cipher mismatch, APIPA (169.254.x.x) addresses, shared-secret mismatch, untrusted or expired certificate, and policy denial.</li>
+    <li>Use RADIUS accounting logs to confirm who connected, from where and when.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Document and manage</summary><div class="body"><ul>
+    <li>Record configurations in a work order or change ticket, without storing secrets in plain text.</li>
+    <li>Apply least privilege to group membership and remove access when people leave.</li>
+    <li>Explain security trade-offs to a non-technical client.</li>
+  </ul></div></details>
+
+  <h3 style="margin-top:22px">Where each skill is practiced</h3>
+  <div class="tablewrap"><table class="map">
+    <thead><tr><th>Competency</th><th>Lab 1</th><th>Lab 2</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td>Channel selection from a survey</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
+      <tr><td>Device hardening (admin, WPS)</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
+      <tr><td>WPA2-Personal with AES</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
+      <tr><td>DHCP planning and verification</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>RADIUS client and shared secret</td><td></td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>Network policy and least privilege</td><td></td><td class="yes">Yes</td><td></td></tr>
+      <tr><td>PEAP and certificate validation</td><td></td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>Reading the EAP exchange and logs</td><td></td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ LAB 1 ============ -->
+<section class="tab" id="tab-lab1" role="tabpanel">
+  <div class="labhead">
+    <div>
+      <h2>Lab 1: Small office WLAN with WPA2-Personal</h2>
+      <p class="lede" style="margin:0">Click a device in the diagram, or a step, to open its configuration screen. Each screen checks your settings when you save.</p>
+    </div>
+    <div class="meter"><small id="m1t"></small><div class="bar"><i id="m1"></i></div></div>
+  </div>
+  <div class="topo" id="topo1"></div>
+  <div class="labgrid">
+    <aside class="card wo">
+      <h3>Work order: Palos Hills Bookkeeping</h3>
+      <p>Two employees share a one-room suite on a busy second floor. The ISP modem is installed. Set up the new wireless router and both company laptops.</p>
+      <dl>
+        <dt>Router LAN IP</dt><dd>192.168.10.1 /24</dd>
+        <dt>DHCP pool</dt><dd>192.168.10.100 – .150</dd>
+        <dt>SSID</dt><dd>PHB-Office</dd>
+        <dt>Security</dt><dd>WPA2-Personal, AES</dd>
+        <dt>Passphrase</dt><dd>You choose: 12–63 chars, not the admin password</dd>
+        <dt>Radio</dt><dd>2.4 GHz, channel from survey</dd>
+        <dt>Admin access</dt><dd>Local only, strong password, WPS off</dd>
+        <dt>Laptops</dt><dd>LT-01, LT-02 via DHCP</dd>
+      </dl>
+      <h3>Steps</h3>
+      <ol class="steps" id="steps1"></ol>
+    </aside>
+    <div id="panel1"></div>
+  </div>
+</section>
+
+<!-- ============ LAB 2 ============ -->
+<section class="tab" id="tab-lab2" role="tabpanel">
+  <div class="labhead">
+    <div>
+      <h2>Lab 2: Enterprise WLAN with WPA2-Enterprise and RADIUS</h2>
+      <p class="lede" style="margin:0">One shared passphrase no longer works for this client. Every user will sign in with their own account, authorized by a RADIUS server.</p>
+    </div>
+    <div class="meter"><small id="m2t"></small><div class="bar"><i id="m2"></i></div></div>
+  </div>
+  <div class="topo" id="topo2"></div>
+  <div class="labgrid">
+    <aside class="card wo">
+      <h3>Work order: PHB moves to a larger office</h3>
+      <p>The firm now has 25 staff and frequent turnover. The owner wants individual sign-ins, the ability to revoke one person without re-keying everyone, and a record of who connected.</p>
+      <dl>
+        <dt>AP-01 mgmt</dt><dd>10.10.20.5</dd>
+        <dt>RAD-01</dt><dd>10.10.20.10</dd>
+        <dt>SSID</dt><dd>PHB-Corp</dd>
+        <dt>Security</dt><dd>WPA2-Enterprise, AES</dd>
+        <dt>EAP</dt><dd>PEAP with EAP-MSCHAPv2</dd>
+        <dt>Server cert</dt><dd>rad01.phb.local, issued by PHB-Root-CA (root already on laptops)</dd>
+        <dt>Ports</dt><dd>1812 auth, 1813 acct</dd>
+        <dt>Shared secret</dt><dd>You choose: 16+ chars, mixed</dd>
+        <dt>Authorized</dt><dd>Group WiFi-Staff: jdoe (LT-03), asmith (LT-04)</dd>
+        <dt>Not authorized</dt><dd>kwilson (contractor)</dd>
+        <dt>Test passwords</dt><dd>jdoe Faculty#2026!<br>asmith Staff#2026!<br>kwilson Contract#2026!</dd>
+      </dl>
+      <h3>Steps</h3>
+      <ol class="steps" id="steps2"></ol>
+    </aside>
+    <div id="panel2"></div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="tab" id="tab-quiz" role="tabpanel">
+  <h2>Knowledge check</h2>
+  <p class="lede">Choose an answer to see whether it's right and why. You can change answers; your latest choice counts.</p>
+  <div id="quiz"></div>
+  <p class="score" id="qscore"></p>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="tab" id="tab-results" role="tabpanel">
+  <h2>Results</h2>
+  <div class="cols">
+    <div class="card">
+      <label class="fld" style="margin-bottom:14px"><span>Student name</span><input id="sname" type="text" autocomplete="name"></label>
+      <h3>Completion</h3>
+      <ul class="prog" id="prog"></ul>
+      <p class="score" id="rscore" style="margin-top:14px"></p>
+    </div>
+    <div class="card">
+      <h3>Reflection</h3>
+      <label class="fld" style="margin-bottom:12px"><span>1. When would you recommend WPA2-Personal over WPA2-Enterprise to a client? Why?</span><textarea id="ra"></textarea></label>
+      <label class="fld"><span>2. Which failure in Lab 2 would be hardest to diagnose without the EAP/RADIUS log, and why?</span><textarea id="rb"></textarea></label>
+      <div class="row noprint">
+        <button class="btn" type="button" id="printBtn">Print or save as PDF</button>
+        <button class="btn ghost" type="button" id="resetBtn">Reset all labs</button>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:34px">Instructor notes</h2>
+  <details class="acc noprint-not"><summary>Learning objectives</summary><div class="body">
+    <p>After completing the activity, students will be able to:</p>
+    <ul>
+      <li>Configure a SOHO wireless router with WPA2-Personal (AES), a strong passphrase, a survey-based channel, DHCP and hardened administration.</li>
+      <li>Connect and verify two wireless clients using DHCP addressing and ICMP reachability.</li>
+      <li>Configure a RADIUS server with a RADIUS client entry, least-privilege group membership and a PEAP network policy.</li>
+      <li>Configure an access point for WPA2-Enterprise using RADIUS authentication and accounting.</li>
+      <li>Configure 802.1X supplicants with server certificate validation and interpret the EAP exchange to locate faults.</li>
+    </ul>
+  </div></details>
+  <details class="acc"><summary>Logistics</summary><div class="body"><ul>
+    <li>Time: Lab 1 about 40 minutes, Lab 2 about 60 minutes, knowledge check 15 minutes.</li>
+    <li>Prerequisites: IPv4 addressing and DHCP; the CIA triad; basic symmetric encryption.</li>
+    <li>Delivery: individual or pairs (one plays the client, one the technician, swapping for Lab 2). Works in class or asynchronously; progress is saved in the browser.</li>
+    <li>Suggested sequence: brief on PSK versus 802.1X, Lab 1, debrief on why PSK fails at scale, Lab 2, knowledge check, reflection.</li>
+  </ul></div></details>
+  <details class="acc"><summary>Scoring rubric (20 points)</summary><div class="body">
+    <div class="tablewrap"><table class="map">
+      <thead><tr><th>Criterion</th><th>Points</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Lab 1 configuration and verification</td><td>6</td><td>All five Lab 1 steps complete, including the ping test</td></tr>
+        <tr><td>Lab 2 configuration and verification</td><td>8</td><td>All five Lab 2 steps complete, including the accounting log review</td></tr>
+        <tr><td>Knowledge check</td><td>4</td><td>Proportional to score (10 questions)</td></tr>
+        <tr><td>Reflection</td><td>2</td><td>Answers justify choices with specific technical reasons</td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+  <details class="acc"><summary>Debrief prompts and extensions</summary><div class="body"><ul>
+    <li>Ask students to deliberately try kwilson on LT-04 and explain which component rejected the attempt and why that's the right place for the decision.</li>
+    <li>Have students uncheck certificate validation and discuss how an evil-twin AP could harvest MSCHAPv2 credentials.</li>
+    <li>Extension: repeat Lab 1 with WPA3-Personal (SAE) and compare its resistance to offline dictionary attacks.</li>
+    <li>Extension: replace PEAP with EAP-TLS and discuss the client-certificate deployment burden.</li>
+    <li>Hands-on transfer: rebuild Lab 2 in Packet Tracer, or with a physical AP plus Windows NPS or FreeRADIUS.</li>
+  </ul></div></details>
+</section>
+</main>
+
+<footer><div class="wrap">Simulated environment for instruction. Device names, addresses and credentials are fictional.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var KEY="wlan-labs-v1";
+function DEF(){return {f:{},done:{router:false,wifi:false,lt1:false,lt2:false,ping:false,rad:false,ap:false,lt3:false,lt4:false,acct:false},ip:{},quiz:{},name:"",ra:"",rb:"",sel1:"router",sel2:"rad",tab:"comp",theme:"light"};}
+var S=DEF();
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);var d=DEF();S=Object.assign(d,o);S.done=Object.assign(DEF().done,o.done||{});S.f=o.f||{};S.ip=o.ip||{};S.quiz=o.quiz||{};}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+var TERM=[]; var LOG={}; var REJ=[];
+
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function val(id,d){return S.f[id]===undefined?d:S.f[id];}
+
+/* ---------- form helpers ---------- */
+function inp(id,label,def,o){o=o||{};var v=val(id,def||"");return '<label class="fld"><span>'+label+'</span><input id="'+id+'" data-f type="'+(o.type||"text")+'" value="'+esc(v)+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':"")+' autocomplete="off" spellcheck="false">'+(o.hint?"<small>"+o.hint+"</small>":"")+"</label>";}
+function sel(id,label,opts,def,hint){var v=val(id,def||"");return '<label class="fld"><span>'+label+'</span><select id="'+id+'" data-f>'+opts.map(function(x){var a=Array.isArray(x)?x[0]:x,b=Array.isArray(x)?x[1]:x;return '<option value="'+esc(a)+'"'+(a===v?" selected":"")+">"+esc(b)+"</option>";}).join("")+"</select>"+(hint?"<small>"+hint+"</small>":"")+"</label>";}
+function chk(id,label,def){var v=val(id,!!def);return '<label class="chk"><input type="checkbox" id="'+id+'" data-f'+(v?" checked":"")+"><span>"+label+"</span></label>";}
+function nets(name,items){var v=val(name,"");return '<fieldset class="nets"><legend>Available networks</legend>'+items.map(function(it){return '<label class="net"><input type="radio" name="'+name+'" value="'+esc(it[0])+'" data-f'+(it[0]===v?" checked":"")+'><span class="ssid">'+esc(it[0])+'</span><span class="meta">'+esc(it[1])+"</span></label>";}).join("")+"</fieldset>";}
+function collect(root){root.querySelectorAll("[data-f]").forEach(function(el){if(el.type==="checkbox")S.f[el.id]=el.checked;else if(el.type==="radio"){if(el.checked)S.f[el.name]=el.value;}else S.f[el.id]=el.value.trim();});}
+function fb(id,errs,ok,head){var el=document.getElementById(id);if(!el)return;if(errs.length){el.className="fb bad";el.innerHTML="<strong>"+(head||("Fix "+(errs.length===1?"this":"these "+errs.length)+" before saving:"))+"</strong><ul>"+errs.map(function(e){return "<li>"+e+"</li>";}).join("")+"</ul>";}else{el.className="fb good";el.innerHTML=ok;}el.setAttribute("tabindex","-1");el.focus({preventScroll:false});}
+function ip4(s){var p=String(s||"").split(".");if(p.length!==4)return null;var n=p.map(function(x){return /^\d{1,3}$/.test(x)?+x:NaN;});return n.some(function(x){return isNaN(x)||x>255;})?null:n;}
+function strong(p){return p.length>=12&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/\d/.test(p)&&/[^A-Za-z0-9]/.test(p);}
+function classes(p){return [/[A-Z]/,/[a-z]/,/\d/,/[^A-Za-z0-9]/].filter(function(r){return r.test(p);}).length;}
+
+/* ---------- validators: Lab 1 ---------- */
+function vRouter(){var f=S.f,e=[];
+  var pw=f.r_admin||"";
+  if(!strong(pw))e.push("Admin password: use at least 12 characters with uppercase, lowercase, a number and a symbol. Default router passwords are published online.");
+  if(f.r_remote)e.push("Turn off remote (WAN) management. Nobody manages this router from outside the office, so it only adds attack surface.");
+  if(f.r_lanip!=="192.168.10.1")e.push("LAN IP address must be 192.168.10.1, the gateway address in the work order.");
+  if(f.r_mask!=="255.255.255.0")e.push("Subnet mask must be 255.255.255.0 (/24).");
+  if(!f.r_dhcp)e.push("Turn the DHCP server on so the laptops receive addresses automatically.");
+  var s=ip4(f.r_start),en=ip4(f.r_end);
+  if(!s||!en)e.push("Enter valid start and end addresses for the DHCP pool.");
+  else if(s.slice(0,3).join(".")!=="192.168.10"||en.slice(0,3).join(".")!=="192.168.10")e.push("The DHCP pool must be inside 192.168.10.0/24, the router's LAN subnet.");
+  else if(s[3]<2||en[3]>254)e.push("The pool can't include .0 (network), .1 (the router) or .255 (broadcast).");
+  else if(s[3]>=en[3])e.push("The start address must be lower than the end address.");
+  else if(en[3]-s[3]+1<10)e.push("Make the pool at least 10 addresses so phones and new devices fit.");
+  return e;}
+function vWifi(){var f=S.f,e=[];
+  if(f.w_ssid!=="PHB-Office")e.push("SSID must be exactly PHB-Office. SSIDs are case-sensitive.");
+  var ch=f.w_ch;
+  if(ch==="auto")e.push("Pick a channel yourself. The site survey shows which one is clear, and auto-select can land next to a neighbor.");
+  else if(ch==="1"||ch==="11")e.push("Channel "+ch+" is already used by a neighbor at strong signal (co-channel interference). Use the free non-overlapping channel.");
+  else if(ch!=="6")e.push("Channel "+ch+" overlaps channels 1 or 11 (adjacent-channel interference). In 2.4 GHz only 1, 6 and 11 don't overlap.");
+  var m={"open":"An open network sends everything unencrypted. Use WPA2-Personal.","WEP":"WEP can be cracked in minutes. Use WPA2-Personal.","WPA-Personal":"WPA with TKIP is deprecated. Use WPA2-Personal.","WPA2-Enterprise":"WPA2-Enterprise needs a RADIUS server, and this office doesn't have one. Use WPA2-Personal."};
+  if(f.w_sec!=="WPA2-Personal")e.push(m[f.w_sec]||"Choose WPA2-Personal.");
+  if(f.w_enc!=="AES")e.push("Encryption must be AES (CCMP). TKIP is deprecated, and TKIP+AES mixed mode lets one old client weaken the whole network.");
+  var k=f.w_key||"";
+  if(k.length<12||k.length>63)e.push("Passphrase must be 12 to 63 characters. WPA2 allows 8, but short keys fall quickly to offline dictionary attacks on a captured handshake.");
+  else{
+    if(/password|phb|office/i.test(k))e.push("Passphrase contains a predictable word (password, the company name or the SSID). Attackers' wordlists try those first.");
+    if(k===f.r_admin)e.push("Don't reuse the admin password as the Wi-Fi passphrase. Everyone who joins the network would know how to administer the router.");
+    if(classes(k)<3&&k.length<20)e.push("Mix at least three character types (upper, lower, digit, symbol), or use a passphrase of 20+ characters.");
+  }
+  if(f.w_wps)e.push("Turn WPS off. Its 8-digit PIN can be brute-forced, which reveals the passphrase.");
+  return e;}
+function connect1(id){var f=S.f,p=id+"_",e=[];
+  if(!S.done.router||!S.done.wifi){return ["SOHO-RTR isn't ready. Save both router sections first."];}
+  if(f[p+"net"]!==f.w_ssid){e.push(f[p+"net"]?"You selected "+esc(f[p+"net"])+", which belongs to a neighbor. Connect to "+esc(f.w_ssid)+".":"Select a network from the list.");return e;}
+  if(f[p+"sec"]!=="WPA2-Personal")e.push("Security type doesn't match the router. The router uses WPA2-Personal.");
+  if(f[p+"enc"]!=="AES")e.push("Encryption type doesn't match the router (AES).");
+  if(f[p+"key"]!==f.w_key)e.push("The network security key isn't correct. Keys are case-sensitive; check the passphrase you set on the router.");
+  if(f[p+"ip"]!=="dhcp")e.push("Set IP assignment to Automatic (DHCP). The work order doesn't reserve static addresses for laptops.");
+  return e;}
+
+/* ---------- validators: Lab 2 ---------- */
+function vRad(){var f=S.f,e=[];
+  if(!f.rc_name)e.push("RADIUS client: give the entry a friendly name such as AP-01.");
+  if(f.rc_ip!=="10.10.20.5")e.push("RADIUS client: the address must be AP-01's management IP, 10.10.20.5. RAD-01 silently drops requests from devices it doesn't know.");
+  var s=f.rc_secret||"";
+  if(s.length<16||classes(s)<3)e.push("RADIUS client: the shared secret needs at least 16 characters mixing letters, numbers and symbols.");
+  else if(s!==f.rc_secret2)e.push("RADIUS client: the two shared secret entries don't match.");
+  if(!f.g_jdoe||!f.g_asmith)e.push("Group: add both jdoe and asmith to WiFi-Staff.");
+  if(f.g_kwilson)e.push("Group: remove kwilson. The contractor isn't authorized for staff Wi-Fi (least privilege).");
+  if(f.np_group!=="WiFi-Staff")e.push("Network policy: the condition must match the WiFi-Staff group. Domain Users would admit every account, including kwilson.");
+  if(f.np_access!=="grant")e.push("Network policy: set access permission to Grant access for users who match the conditions.");
+  if(f.np_nas!=="wireless")e.push("Network policy: set NAS port type to Wireless - IEEE 802.11 so the policy applies only to Wi-Fi requests.");
+  if(f.np_eap!=="peap")e.push(f.np_eap==="pap"?"Network policy: PAP sends passwords with weak protection. Use PEAP (EAP-MSCHAPv2).":f.np_eap==="tls"?"Network policy: EAP-TLS needs a certificate on every laptop, which the work order doesn't provide. Use PEAP (EAP-MSCHAPv2).":"Network policy: choose PEAP (EAP-MSCHAPv2) as the authentication method.");
+  if(f.np_cert==="selfsigned")e.push("Network policy: the self-signed certificate doesn't chain to PHB-Root-CA, so the laptops won't trust it. Choose rad01.phb.local.");
+  else if(f.np_cert==="expired")e.push("Network policy: that certificate expired in June 2025. Every client would fail the TLS handshake.");
+  else if(f.np_cert!=="rad01")e.push("Network policy: choose the server certificate RAD-01 presents to clients.");
+  if(f.np_auth!=="1812"||f.np_acct!=="1813")e.push("Ports: use the standard RADIUS ports, 1812 for authentication and 1813 for accounting.");
+  return e;}
+function vAP(){var f=S.f,e=[];
+  if(f.a_ssid!=="PHB-Corp")e.push("SSID must be exactly PHB-Corp.");
+  if(f.a_sec!=="WPA2-Enterprise")e.push("Security mode must be WPA2-Enterprise (802.1X). Personal mode would bring back the shared passphrase.");
+  if(f.a_enc!=="AES")e.push("Encryption must be AES (CCMP).");
+  if(f.a_rip!=="10.10.20.10")e.push("RADIUS server IP must be RAD-01, 10.10.20.10.");
+  if(f.a_rport!=="1812")e.push(f.a_rport==="1645"?"1645 is the legacy RADIUS port. RAD-01 listens on 1812.":"Authentication port must be 1812.");
+  if(!S.done.rad)e.push("Configure and save RAD-01 first so the AP's shared secret has something to match.");
+  else if(f.a_secret!==f.rc_secret)e.push("The shared secret doesn't match the RADIUS client entry on RAD-01. With mismatched secrets, RAD-01 discards every request from this AP.");
+  if(!f.a_acct)e.push("Turn on RADIUS accounting so RAD-01 records who connected and when.");
+  else if(f.a_aport!=="1813")e.push("Accounting port must be 1813.");
+  return e;}
+var DIR={jdoe:"Faculty#2026!",asmith:"Staff#2026!",kwilson:"Contract#2026!"};
+var ASSIGN={lt3:"jdoe",lt4:"asmith"};
+function connect2(id){var f=S.f,p=id+"_",pre=[];var host=id==="lt3"?"LT-03":"LT-04";
+  if(!S.done.rad||!S.done.ap)return {pre:["RAD-01 and AP-01 must both be saved before clients can authenticate."]};
+  if(f[p+"net"]!==f.a_ssid)pre.push(f[p+"net"]?"You selected "+esc(f[p+"net"])+". Connect to "+esc(f.a_ssid)+".":"Select a network from the list.");
+  else{
+    if(f[p+"sec"]!=="WPA2-Enterprise")pre.push("Security type doesn't match AP-01 (WPA2-Enterprise).");
+    if(f[p+"enc"]!=="AES")pre.push("Encryption type doesn't match AP-01 (AES).");
+    if(!f[p+"val"])pre.push("Turn on server certificate validation. Without it, an evil-twin AP could pose as PHB-Corp and capture this user's password.");
+    var u=(f[p+"user"]||"").toLowerCase();
+    if(u&&u!=="kwilson"&&DIR[u]&&u!==ASSIGN[id])pre.push(host+" is assigned to "+ASSIGN[id]+" in the work order. Sign in with that account.");
+  }
+  if(pre.length)return {pre:pre};
+  var user=(f[p+"user"]||"").toLowerCase(),pass=f[p+"pass"]||"",L=[];
+  function ok(t){L.push(["ok",t]);}
+  function bad(t){L.push(["bad",t]);return {log:L,fail:true,user:user};}
+  ok(host+" → AP-01   EAPOL-Start");
+  ok("AP-01 → "+host+"   EAP-Request/Identity");
+  ok(host+" → AP-01   EAP-Response/Identity \""+(user||"(blank)")+"\"");
+  ok("AP-01 → RAD-01   RADIUS Access-Request (UDP 1812, signed with shared secret)");
+  if(f[p+"eap"]!=="PEAP")return bad("RAD-01 → AP-01   Access-Reject: the client offered "+f[p+"eap"]+", but the network policy allows only PEAP.");
+  ok("RAD-01 → AP-01   Access-Challenge: begin PEAP");
+  ok("RAD-01 presents certificate rad01.phb.local, issued by PHB-Root-CA");
+  if((f[p+"server"]||"").toLowerCase()!=="rad01.phb.local")return bad(host+": server name \""+(f[p+"server"]||"(blank)")+"\" doesn't match the certificate. Connection stopped to protect credentials.");
+  if(f[p+"ca"]!=="PHB-Root-CA")return bad(host+": certificate not trusted. The selected root CA didn't issue rad01.phb.local.");
+  ok(host+": certificate validated, TLS tunnel established");
+  if(f[p+"inner"]!=="MSCHAPv2")return bad("RAD-01 → AP-01   Access-Reject: inner method "+f[p+"inner"]+" isn't permitted inside PEAP by this policy.");
+  if(!DIR[user]||DIR[user]!==pass)return bad("RAD-01 → AP-01   Access-Reject: authentication failed (unknown user or wrong password).");
+  ok("Inner EAP-MSCHAPv2 completed inside the TLS tunnel");
+  var g={jdoe:f.g_jdoe,asmith:f.g_asmith,kwilson:f.g_kwilson}[user];
+  if(!g)return bad("RAD-01 → AP-01   Access-Reject: no network policy matches "+user+" (not a member of WiFi-Staff).");
+  ok("Network policy \"Staff Wireless\" matched: WiFi-Staff, NAS port type Wireless");
+  ok("RAD-01 → AP-01   Access-Accept with session keying material (PMK)");
+  ok("AP-01 ↔ "+host+"   WPA2 4-way handshake complete, AES-CCMP keys installed");
+  var ip="10.10.20."+(id==="lt3"?101:102);
+  ok(host+"   DHCP lease "+ip+"/24, gateway 10.10.20.1");
+  return {log:L,fail:false,ip:ip,user:user};}
+
+/* ---------- topology ---------- */
+function node(lab,id,x,y,name,sub,done,click){var cur=lab===1?S.sel1:S.sel2;var c="node"+(done?" done":"")+(cur===id&&click?" sel":"")+(click?" click":"");
+  var a=click?' data-act="pick" data-lab="'+lab+'" data-dev="'+id+'" tabindex="0" role="button" aria-label="Configure '+name+'"':"";
+  return '<g class="'+c+'"'+a+' transform="translate('+x+","+y+')"><rect width="110" height="50" rx="8"/><text x="55" y="22" class="n1">'+name+'</text><text x="55" y="39" class="n2">'+sub+"</text>"+(click?'<circle cx="101" cy="9" r="4" class="dot"/>':"")+"</g>";}
+function link(x1,y1,x2,y2,on,wl){return '<line class="lk'+(on?" on":"")+(wl?" wl":"")+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';}
+function topo1(){var d=S.done,ip=S.ip;
+  return '<svg viewBox="0 0 560 250" role="img" aria-label="Lab 1 topology: ISP modem to SOHO-RTR, which serves LT-01 and LT-02 over Wi-Fi">'+
+  link(120,125,200,125,true,false)+link(310,115,410,50,d.lt1,true)+link(310,135,410,200,d.lt2,true)+
+  '<ellipse class="cloud" cx="60" cy="125" rx="55" ry="30"/><text class="lbl" x="60" y="122">ISP modem</text><text class="lbl" x="60" y="138">Internet</text>'+
+  node(1,"router",200,100,"SOHO-RTR",d.router?esc(S.f.r_lanip):"192.168.1.1",d.router&&d.wifi,true)+
+  node(1,"lt1",410,25,"LT-01",d.lt1?ip.lt1:"no address",d.lt1&&d.ping,true)+
+  node(1,"lt2",410,175,"LT-02",d.lt2?ip.lt2:"no address",d.lt2,true)+
+  '<text class="lbl" x="358" y="125">'+(d.wifi?esc(S.f.w_ssid)+" ch "+esc(S.f.w_ch):"Wi-Fi not set")+"</text></svg>";}
+function topo2(){var d=S.done;
+  return '<svg viewBox="0 0 600 250" role="img" aria-label="Lab 2 topology: RAD-01 and AP-01 on switch SW-01; LT-03 and LT-04 join AP-01 over Wi-Fi">'+
+  link(130,125,200,125,d.rad&&d.ap,false)+link(300,125,350,125,d.rad&&d.ap,false)+link(460,115,480,50,d.lt3,true)+link(460,135,480,200,d.lt4,true)+
+  node(2,"rad",20,100,"RAD-01","10.10.20.10",d.rad,true)+
+  '<g class="node" transform="translate(200,105)"><rect width="100" height="40" rx="6"/><text x="50" y="25" class="n1">SW-01</text></g>'+
+  node(2,"ap",350,100,"AP-01","10.10.20.5",d.ap,true)+
+  node(2,"lt3",480,25,"LT-03",d.lt3?"10.10.20.101":"jdoe",d.lt3,true)+
+  node(2,"lt4",480,175,"LT-04",d.lt4?"10.10.20.102":"asmith",d.lt4,true)+
+  '<text class="lbl" x="165" y="115">802.1X / RADIUS</text></svg>';}
+
+/* ---------- steps ---------- */
+var STEPS1=[["router","router","Secure administration and LAN on SOHO-RTR"],["wifi","router","Configure the wireless network on SOHO-RTR"],["lt1","lt1","Join LT-01 to PHB-Office"],["lt2","lt2","Join LT-02 to PHB-Office"],["ping","lt1","Verify: ping LT-02 from LT-01"]];
+var STEPS2=[["rad","rad","Register AP-01 and build the policy on RAD-01"],["ap","ap","Configure WPA2-Enterprise on AP-01"],["lt3","lt3","Sign in on LT-03 as jdoe"],["lt4","lt4","Sign in on LT-04 as asmith"],["acct","rad","Review the accounting log on RAD-01"]];
+function steps(list,lab){return list.map(function(s){return '<li class="'+(S.done[s[0]]?"done":"")+'"><button type="button" data-act="pick" data-lab="'+lab+'" data-dev="'+s[1]+'">'+s[2]+"</button></li>";}).join("");}
+function count(list){return list.filter(function(s){return S.done[s[0]];}).length;}
+
+/* ---------- Lab 1 panels ---------- */
+function pRouter(){
+  return '<div class="dev router"><div class="devbar"><span>SOHO-RTR admin console</span><small>http://'+esc(S.done.router?S.f.r_lanip:"192.168.1.1")+'</small></div>'+
+  '<div class="devsec" id="sec-router"><h4>Administration and LAN</h4><p class="note">You are logged in with the factory default admin/admin. Replace it, lock down management, then set the LAN and DHCP to match the work order.</p><div class="grid2">'+
+  inp("r_admin","New admin password","",{type:"password",hint:"12+ chars, upper, lower, number, symbol"})+
+  inp("r_lanip","LAN IP address","192.168.1.1")+
+  inp("r_mask","Subnet mask","255.255.255.0")+
+  inp("r_start","DHCP start address","192.168.1.2")+
+  inp("r_end","DHCP end address","192.168.1.254")+
+  '</div>'+chk("r_dhcp","DHCP server enabled",true)+chk("r_remote","Remote (WAN) management enabled",true)+
+  '<button class="btn" type="button" data-act="router">Save administration settings</button><div class="fb" id="fb-router"></div></div>'+
+  '<div class="devsec" id="sec-wifi"><h4>Wireless</h4><p class="note">Radio: 2.4 GHz, 802.11n. A site survey from the office shows these neighbors:</p>'+
+  '<div class="tablewrap"><table class="survey"><thead><tr><th>Neighbor SSID</th><th>Channel</th><th>Signal</th></tr></thead><tbody><tr><td>Cafe-Guest</td><td>1</td><td>−48 dBm (strong)</td></tr><tr><td>Suite210-WiFi</td><td>11</td><td>−55 dBm (strong)</td></tr><tr><td>DentalOffice</td><td>1</td><td>−71 dBm (weak)</td></tr></tbody></table></div><div class="grid2">'+
+  inp("w_ssid","SSID (network name)","SOHO-Default")+
+  sel("w_ch","Channel",[["auto","Auto"],"1","2","3","4","5","6","7","8","9","10","11"],"auto")+
+  sel("w_sec","Security mode",[["open","None (open)"],["WEP","WEP"],["WPA-Personal","WPA-Personal (TKIP)"],["WPA2-Personal","WPA2-Personal"],["WPA2-Enterprise","WPA2-Enterprise"]],"open")+
+  sel("w_enc","Encryption",["TKIP","TKIP+AES","AES"],"TKIP+AES")+
+  inp("w_key","Passphrase (pre-shared key)","",{hint:"12–63 characters"})+
+  '</div>'+chk("w_wps","Wi-Fi Protected Setup (WPS) enabled",true)+
+  '<button class="btn" type="button" data-act="wifi">Save wireless settings</button><div class="fb" id="fb-wifi"></div></div></div>';}
+function pLap1(id){var host=id==="lt1"?"LT-01":"LT-02";var p=id+"_";
+  var head='<div class="dev laptop"><div class="devbar"><span>'+host+' Wi-Fi settings</span><small>Windows 11</small></div>';
+  if(S.done[id]){var html=head+'<div class="devsec"><div class="status">Connected to '+esc(S.f.w_ssid)+'. IPv4 <code>'+esc(S.ip[id])+'</code></div>';
+    if(id==="lt1"){html+='<p class="note">Verify the network: run <code>ipconfig</code>, then ping LT-02'+(S.done.lt2?" at "+esc(S.ip.lt2):" (connect it first)")+'. Type <code>help</code> for commands.</p><div class="term"><pre id="termout">'+esc(TERM.join("\n"))+'</pre><div class="in"><span>C:\\&gt;</span><input id="termin" aria-label="Command prompt" autocomplete="off" spellcheck="false"></div></div>';}
+    else html+='<p class="note">Next: '+(S.done.lt1?"open LT-01 and ping this laptop to verify.":"connect LT-01, then ping this laptop from it.")+'</p>';
+    return html+'<button class="btn ghost" type="button" data-act="forget" data-dev="'+id+'">Forget network</button></div></div>';}
+  var list=[[S.done.wifi?S.f.w_ssid:"SOHO-Default",S.done.wifi?"Secured":"Open"],["Cafe-Guest","Open"],["Suite210-WiFi","Secured"]];
+  return head+'<div class="devsec"><p class="note">Select the office network, then enter the connection properties exactly as configured on the router.</p>'+nets(p+"net",list)+'<div class="grid2">'+
+  sel(p+"sec","Security type",["Open","WEP","WPA2-Personal","WPA2-Enterprise"],"WPA2-Personal")+
+  sel(p+"enc","Encryption type",["AES","TKIP"],"AES")+
+  inp(p+"key","Network security key","",{type:"password"})+
+  sel(p+"ip","IP assignment",[["dhcp","Automatic (DHCP)"],["manual","Manual"]],"manual")+
+  '</div><button class="btn" type="button" data-act="conn1" data-dev="'+id+'">Connect</button><div class="fb" id="fb-'+id+'"></div></div></div>';}
+
+/* ---------- Lab 2 panels ---------- */
+function pRad(){
+  if(S.done.lt3&&S.done.lt4&&!S.done.acct){S.done.acct=true;save();setTimeout(refresh2,0);}
+  var acct="";
+  var rows=[];
+  if(S.done.lt3)rows.push("Accounting-Start   user=jdoe     station=LT-03  NAS=10.10.20.5  SSID=PHB-Corp  ip=10.10.20.101");
+  if(S.done.lt4)rows.push("Accounting-Start   user=asmith   station=LT-04  NAS=10.10.20.5  SSID=PHB-Corp  ip=10.10.20.102");
+  REJ.forEach(function(r){rows.push(r);});
+  acct='<div class="devsec"><h4>Accounting and authentication log</h4><p class="note">'+(rows.length?"Confirm each authorized user appears, and that rejected attempts were logged.":"Entries appear here as clients authenticate.")+'</p>'+(rows.length?'<div class="log">'+rows.map(function(r){return '<div class="'+(/Reject/.test(r)?"bad":"")+'">'+esc(r)+"</div>";}).join("")+"</div>":"")+"</div>";
+  return '<div class="dev radius"><div class="devbar"><span>RAD-01 Network Policy Server</span><small>10.10.20.10</small></div>'+
+  '<div class="devsec"><h4>RADIUS client</h4><p class="note">Only devices registered here may send requests. The shared secret signs each packet between AP and server.</p><div class="grid2">'+
+  inp("rc_name","Friendly name","")+inp("rc_ip","Client IP address","")+inp("rc_secret","Shared secret","",{type:"password"})+inp("rc_secret2","Confirm shared secret","",{type:"password"})+
+  '</div></div><div class="devsec"><h4>Group membership: WiFi-Staff</h4><p class="note">Add only the accounts the work order authorizes.</p>'+
+  chk("g_jdoe","jdoe (Jordan Doe, Faculty)",false)+chk("g_asmith","asmith (Ana Smith, Staff)",false)+chk("g_kwilson","kwilson (Kai Wilson, Contractor)",false)+
+  '</div><div class="devsec"><h4>Network policy: Staff Wireless</h4><div class="grid2">'+
+  sel("np_group","Condition: user group",[["Domain Users","Domain Users"],["WiFi-Staff","WiFi-Staff"],["Domain Admins","Domain Admins"]],"Domain Users")+
+  sel("np_access","Access permission",[["deny","Deny access"],["grant","Grant access"]],"deny")+
+  sel("np_nas","Condition: NAS port type",[["ethernet","Ethernet"],["wireless","Wireless - IEEE 802.11"],["virtual","Virtual (VPN)"]],"ethernet")+
+  sel("np_eap","Authentication method",[["pap","PAP"],["peap","PEAP (EAP-MSCHAPv2)"],["tls","EAP-TLS (smart card or certificate)"]],"pap")+
+  sel("np_cert","Server certificate",[["","Select a certificate"],["selfsigned","RAD-01 (self-signed), expires 2031-01-01"],["rad01","rad01.phb.local, PHB-Root-CA, expires 2027-08-31"],["expired","rad01.phb.local, PHB-Root-CA, expired 2025-06-30"]],"")+
+  inp("np_auth","Authentication port","1645")+inp("np_acct","Accounting port","1646")+
+  '</div><button class="btn" type="button" data-act="rad">Save RADIUS configuration</button><div class="fb" id="fb-rad"></div></div>'+acct+"</div>";}
+function pAP(){
+  return '<div class="dev ap"><div class="devbar"><span>AP-01 web interface</span><small>https://10.10.20.5</small></div><div class="devsec"><h4>Wireless security</h4><p class="note">AP-01 is the 802.1X authenticator. It blocks client traffic until RAD-01 sends Access-Accept.</p><div class="grid2">'+
+  inp("a_ssid","SSID","AP-01-setup")+
+  sel("a_sec","Security mode",[["WPA2-Personal","WPA2-Personal"],["WPA2-Enterprise","WPA2-Enterprise (802.1X)"]],"WPA2-Personal")+
+  sel("a_enc","Encryption",["TKIP","TKIP+AES","AES"],"TKIP+AES")+
+  '</div></div><div class="devsec"><h4>RADIUS servers</h4><div class="grid2">'+
+  inp("a_rip","Authentication server IP","")+inp("a_rport","Authentication port","1645")+inp("a_secret","Shared secret","",{type:"password"})+
+  '</div>'+chk("a_acct","RADIUS accounting enabled",false)+'<div class="grid2">'+inp("a_aport","Accounting port","1646")+'</div>'+
+  '<button class="btn" type="button" data-act="ap">Save AP settings</button><div class="fb" id="fb-ap"></div></div></div>';}
+function pLap2(id){var host=id==="lt3"?"LT-03":"LT-04",p=id+"_";
+  var head='<div class="dev laptop"><div class="devbar"><span>'+host+' Wi-Fi settings</span><small>Windows 11, assigned to '+ASSIGN[id]+'</small></div>';
+  var logHtml=LOG[id]?'<div class="log" aria-live="polite">'+LOG[id].map(function(l){return '<div class="'+(l[0]==="bad"?"bad":"")+'">'+esc(l[1])+"</div>";}).join("")+"</div>":"";
+  if(S.done[id])return head+'<div class="devsec"><div class="status">Connected to '+esc(S.f.a_ssid)+' as '+esc(ASSIGN[id])+'. IPv4 <code>'+(id==="lt3"?"10.10.20.101":"10.10.20.102")+'</code></div><p class="note">The exchange below shows each 802.1X step that led to access.</p>'+logHtml+'<button class="btn ghost" type="button" data-act="forget" data-dev="'+id+'">Forget network</button></div></div>';
+  var list=[[S.done.ap?S.f.a_ssid:"AP-01-setup",S.done.ap?"Secured (802.1X)":"Secured"],["Suite210-WiFi","Secured"]];
+  return head+'<div class="devsec"><p class="note">Set up the 802.1X profile, then sign in with this laptop\'s assigned account.</p>'+nets(p+"net",list)+'<div class="grid2">'+
+  sel(p+"sec","Security type",["WPA2-Personal","WPA2-Enterprise"],"WPA2-Personal")+
+  sel(p+"enc","Encryption type",["AES","TKIP"],"AES")+
+  sel(p+"eap","EAP method",["EAP-TLS","PEAP","EAP-TTLS"],"EAP-TLS")+
+  sel(p+"inner","Inner authentication",["PAP","MSCHAPv2"],"PAP")+
+  inp(p+"server","Connect to these servers","",{ph:"server name on certificate"})+
+  sel(p+"ca","Trusted root CA",[["","(none selected)"],["DigiCert Global Root G2","DigiCert Global Root G2"],["PHB-Root-CA","PHB-Root-CA"]],"")+
+  inp(p+"user","Username","")+inp(p+"pass","Password","",{type:"password"})+
+  '</div>'+chk(p+"val","Verify the server's identity by validating the certificate",false)+
+  '<button class="btn" type="button" data-act="conn2" data-dev="'+id+'">Connect</button><div class="fb" id="fb-'+id+'"></div>'+logHtml+"</div></div>";}
+
+/* ---------- render ---------- */
+function refresh1(){$("#topo1").innerHTML=topo1();$("#steps1").innerHTML=steps(STEPS1,1);var c=count(STEPS1);$("#m1").style.width=(c/5*100)+"%";$("#m1t").textContent=c+" of 5 steps complete";$("#c1").textContent="("+c+"/5)";}
+function refresh2(){$("#topo2").innerHTML=topo2();$("#steps2").innerHTML=steps(STEPS2,2);var c=count(STEPS2);$("#m2").style.width=(c/5*100)+"%";$("#m2t").textContent=c+" of 5 steps complete";$("#c2").textContent="("+c+"/5)";}
+function panel1(){var d=S.sel1;$("#panel1").innerHTML=d==="router"?pRouter():pLap1(d);refresh1();}
+function panel2(){var d=S.sel2;$("#panel2").innerHTML=d==="rad"?pRad():d==="ap"?pAP():pLap2(d);refresh2();}
+
+/* ---------- actions ---------- */
+var ACT={
+  pick:function(b){var lab=+b.getAttribute("data-lab"),dev=b.getAttribute("data-dev");if(lab===1){S.sel1=dev;save();panel1();}else{S.sel2=dev;save();panel2();}var pnl=$("#panel"+lab);if(window.innerWidth<900)pnl.scrollIntoView({behavior:"smooth",block:"start"});},
+  router:function(){collect($("#panel1"));var e=vRouter();S.done.router=!e.length;save();panel1();fb("fb-router",e,"Saved. The router is now managed at "+esc(S.f.r_lanip)+" and will lease "+esc(S.f.r_start)+" to "+esc(S.f.r_end)+".");},
+  wifi:function(){var oldK=S.f.w_key,oldS=S.f.w_ssid;collect($("#panel1"));var e=vWifi();S.done.wifi=!e.length;
+    if(S.done.wifi&&(oldK!==S.f.w_key||oldS!==S.f.w_ssid)&&(S.done.lt1||S.done.lt2)){S.done.lt1=S.done.lt2=S.done.ping=false;TERM=[];}
+    if(!S.done.wifi){S.done.lt1=S.done.lt2=S.done.ping=false;}
+    save();panel1();fb("fb-wifi",e,"Saved. PHB-Office is broadcasting on channel 6 with WPA2-Personal (AES). Now join the laptops.");},
+  conn1:function(b){var id=b.getAttribute("data-dev");collect($("#panel1"));var e=connect1(id);
+    if(!e.length){var s=ip4(S.f.r_start)[3];S.ip[id]="192.168.10."+(s+(id==="lt1"?0:1));S.done[id]=true;}
+    save();panel1();if(e.length)fb("fb-"+id,e,"","Can't connect to this network:");},
+  forget:function(b){var id=b.getAttribute("data-dev");S.done[id]=false;if(id==="lt1"||id==="lt2"){S.done.ping=false;TERM=[];save();panel1();}else{LOG[id]=null;S.done.acct=false;save();panel2();}},
+  rad:function(){var old=S.f.rc_secret;collect($("#panel2"));var e=vRad();S.done.rad=!e.length;
+    var msg="Saved. RAD-01 will accept requests from AP-01 and grant WiFi-Staff members access with PEAP.";
+    if(S.done.ap&&S.f.a_secret!==S.f.rc_secret){S.done.ap=false;msg+=" The shared secret changed, so re-enter it on AP-01.";}
+    if(!S.done.rad||!S.done.ap){S.done.lt3=S.done.lt4=S.done.acct=false;}
+    save();panel2();fb("fb-rad",e,msg);},
+  ap:function(){collect($("#panel2"));var e=vAP();S.done.ap=!e.length;if(!S.done.ap){S.done.lt3=S.done.lt4=S.done.acct=false;}save();panel2();fb("fb-ap",e,"Saved. AP-01 now broadcasts PHB-Corp and forwards authentication to RAD-01.");},
+  conn2:function(b){var id=b.getAttribute("data-dev");collect($("#panel2"));var r=connect2(id);
+    if(r.pre){LOG[id]=null;save();panel2();fb("fb-"+id,r.pre,"","Can't connect to this network:");return;}
+    var lines=r.log,host=id==="lt3"?"LT-03":"LT-04";LOG[id]=[];save();panel2();
+    var btn=document.querySelector('[data-act="conn2"]');if(btn)btn.disabled=true;
+    var fbEl=document.getElementById("fb-"+id);var box=document.createElement("div");box.className="log";box.setAttribute("aria-live","polite");fbEl.parentNode.appendChild(box);
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;var i=0;
+    (function next(){if(i<lines.length){var l=lines[i++];LOG[id].push(l);var dv=document.createElement("div");if(l[0]==="bad")dv.className="bad";dv.textContent=l[1];box.appendChild(dv);setTimeout(next,reduce?0:320);}
+      else{if(r.fail){REJ.push("Access-Reject      user="+(r.user||"(blank)")+(r.user&&r.user.length<6?"   ":"  ")+" station="+host+"  NAS=10.10.20.5  "+lines[lines.length-1][1].replace(/^.*?:\s*/,""));if(btn)btn.disabled=false;}
+        else{S.done[id]=true;save();panel2();}}})();},
+};
+document.addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(b&&ACT[b.getAttribute("data-act")])ACT[b.getAttribute("data-act")](b);});
+document.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("g[data-act]")){e.preventDefault();ACT.pick(e.target);}
+  if(e.key==="Enter"&&e.target.id==="termin"){runCmd(e.target.value);}});
+
+/* ---------- terminal ---------- */
+function runCmd(cmd){var c=cmd.trim(),lc=c.toLowerCase(),out="";
+  if(!c)return;
+  if(lc==="cls"){TERM=[];}
+  else{
+    TERM.push("C:\\>"+c);
+    if(lc==="help")out="Commands: ipconfig, ping <address>, cls";
+    else if(lc==="ipconfig")out="Wireless LAN adapter Wi-Fi:\n   SSID . . . . . . . . . . : "+S.f.w_ssid+"\n   IPv4 Address . . . . . . : "+S.ip.lt1+"\n   Subnet Mask  . . . . . . : "+S.f.r_mask+"\n   Default Gateway  . . . . : "+S.f.r_lanip;
+    else if(lc.indexOf("ping ")===0){var t=c.slice(5).trim();
+      if(!ip4(t))out="Ping request could not find host "+t+". Use an IPv4 address.";
+      else{var up=t===S.f.r_lanip||t===S.ip.lt1||(S.done.lt2&&t===S.ip.lt2);
+        if(up){out="Pinging "+t+" with 32 bytes of data:\n"+[1,2,3,4].map(function(n){return "Reply from "+t+": bytes=32 time="+(2+n)+"ms TTL=128";}).join("\n")+"\nPackets: Sent = 4, Received = 4, Lost = 0 (0% loss)";
+          if(S.done.lt2&&t===S.ip.lt2&&!S.done.ping){S.done.ping=true;save();out+="\n\nVerification complete: LT-01 and LT-02 can reach each other over PHB-Office.";}}
+        else out="Pinging "+t+" with 32 bytes of data:\nRequest timed out.\nRequest timed out.\nRequest timed out.\nRequest timed out.\nPackets: Sent = 4, Received = 0, Lost = 4 (100% loss)"+(t.indexOf("192.168.10.")===0&&!S.done.lt2?"\nHint: is LT-02 connected yet?":"");}}
+    else out="'"+c+"' is not recognized. Type help.";
+    TERM.push(out);}
+  panel1();var ti=$("#termin");if(ti)ti.focus();var to=$("#termout");if(to)to.scrollTop=to.scrollHeight;}
+
+/* ---------- quiz ---------- */
+var QUIZ=[
+ ["Which cipher should be paired with WPA2 on a new deployment?",["TKIP","AES-CCMP","RC4","TKIP+AES mixed mode"],1,"WPA2 was designed around AES-CCMP. TKIP (and RC4 underneath it) is deprecated, and mixed mode lets legacy clients weaken the network."],
+ ["A survey shows strong neighbors on 2.4 GHz channels 1 and 11. Which channel should you choose?",["3","6","9","Auto"],1,"Only 1, 6 and 11 don't overlap in 2.4 GHz. With 1 and 11 taken, 6 avoids both co-channel and adjacent-channel interference."],
+ ["Why disable WPS on a SOHO router?",["It reduces range","Its PIN can be brute-forced to recover the passphrase","It forces WEP","It disables DHCP"],1,"The WPS PIN is validated in two halves, so it can be guessed in hours and reveals the WPA2 passphrase."],
+ ["In an 802.1X wireless network, which role does the access point play?",["Supplicant","Authentication server","Authenticator","Certificate authority"],2,"The AP is the authenticator. It relays EAP between the client (supplicant) and the RADIUS server (authentication server)."],
+ ["Which UDP ports does RADIUS use by default for authentication and accounting?",["1812 and 1813","49 and 50","389 and 636","1645 and 1812"],0,"1812 and 1813 are the standard ports. 1645/1646 are legacy; 49 is TACACS+; 389/636 are LDAP/LDAPS."],
+ ["Every client fails to authenticate. RAD-01 logs show requests from AP-01 being discarded as invalid. Most likely cause?",["Wrong client passphrase","Shared secret mismatch between AP and RADIUS server","DHCP pool exhausted","Wrong channel"],1,"RADIUS packets are authenticated with the shared secret. If the AP and server disagree, the server discards every request regardless of user credentials."],
+ ["Why should supplicants validate the RADIUS server's certificate?",["It speeds up roaming","It prevents an evil-twin AP from collecting user credentials","It's required for DHCP","It replaces the user password"],1,"Without validation, a rogue AP with its own RADIUS server can complete PEAP and capture MSCHAPv2 responses that can be cracked offline."],
+ ["A laptop connects to Wi-Fi but shows 169.254.23.7. What failed?",["WPA2 handshake","DHCP","RADIUS accounting","Channel selection"],1,"169.254.x.x is an APIPA address, self-assigned when no DHCP server answers. The wireless association succeeded; addressing did not."],
+ ["Which EAP method requires a certificate on both the server and every client?",["PEAP","EAP-TTLS","EAP-TLS","EAP-MSCHAPv2"],2,"EAP-TLS uses mutual certificate authentication. PEAP and EAP-TTLS need only a server certificate and protect a password exchange inside the TLS tunnel."],
+ ["What is the main advantage of WPA2-Enterprise over WPA2-Personal for a 25-person firm with turnover?",["Faster throughput","No certificates needed","Per-user credentials that can be revoked individually, with accounting","Works without an access point"],2,"With 802.1X each person has their own login. Disabling one account removes that person's access without re-keying every device, and accounting records who connected."]
+];
+function renderQuiz(){var right=0,answered=0;
+  $("#quiz").innerHTML=QUIZ.map(function(q,qi){var a=S.quiz[qi];if(a!==undefined){answered++;if(a===q[2])right++;}
+    return '<div class="card q"><p class="stem">'+(qi+1)+". "+esc(q[0])+"</p>"+q[1].map(function(o,oi){var cls=a===undefined?"":(oi===q[2]&&a===oi?"right":(a===oi?"wrong":""));return '<label class="'+cls+'"><input type="radio" name="q'+qi+'" data-q="'+qi+'" value="'+oi+'"'+(a===oi?" checked":"")+"> <span>"+esc(o)+"</span></label>";}).join("")+(a!==undefined?'<div class="why"><strong>'+(a===q[2]?"Correct.":"Not quite.")+"</strong> "+esc(q[3])+"</div>":"")+"</div>";}).join("");
+  $("#qscore").textContent=answered?("Score: "+right+" of "+QUIZ.length+(answered<QUIZ.length?" ("+(QUIZ.length-answered)+" unanswered)":"")):"";
+  $("#c3").textContent="("+right+"/"+QUIZ.length+")";}
+document.addEventListener("change",function(e){var t=e.target;if(t.matches&&t.matches("input[data-q]")){S.quiz[+t.getAttribute("data-q")]=+t.value;save();var y=window.scrollY;renderQuiz();window.scrollTo(0,y);var el=document.querySelector('input[name="q'+t.getAttribute("data-q")+'"]:checked');if(el)el.focus({preventScroll:true});}});
+
+/* ---------- results ---------- */
+function renderResults(){var items=STEPS1.map(function(s){return ["Lab 1: "+s[2],S.done[s[0]]];}).concat(STEPS2.map(function(s){return ["Lab 2: "+s[2],S.done[s[0]]];}));
+  $("#prog").innerHTML=items.map(function(i){return "<li><span>"+esc(i[0])+'</span><span class="'+(i[1]?"ok":"no")+'">'+(i[1]?"Complete":"Not yet")+"</span></li>";}).join("");
+  var right=QUIZ.filter(function(q,i){return S.quiz[i]===q[2];}).length;
+  var labPts=count(STEPS1)/5*6+count(STEPS2)/5*8,qPts=right/QUIZ.length*4;
+  $("#rscore").textContent="Knowledge check: "+right+" of "+QUIZ.length+". Auto-scored points: "+(Math.round((labPts+qPts)*10)/10)+" of 18 (reflection scored by instructor).";
+  $("#sname").value=S.name||"";$("#ra").value=S.ra||"";$("#rb").value=S.rb||"";}
+["sname","ra","rb"].forEach(function(id){document.getElementById(id).addEventListener("input",function(e){S[id==="sname"?"name":id]=e.target.value;save();});});
+$("#printBtn").addEventListener("click",function(){window.print();});
+var armed=false;$("#resetBtn").addEventListener("click",function(e){if(!armed){armed=true;e.target.textContent="Click again to erase all progress";setTimeout(function(){armed=false;e.target.textContent="Reset all labs";},4000);return;}
+  var th=S.theme;S=DEF();S.theme=th;TERM=[];LOG={};REJ=[];save();armed=false;e.target.textContent="Reset all labs";panel1();panel2();renderQuiz();renderResults();});
+
+/* ---------- tabs and theme ---------- */
+function showTab(t){S.tab=t;save();document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("active",s.id==="tab-"+t);});
+  document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-tab")===t?"true":"false");});
+  if(t==="results")renderResults();if(t==="quiz")renderQuiz();}
+document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){showTab(b.getAttribute("data-tab"));window.scrollTo(0,0);});});
+function applyTheme(){document.documentElement.setAttribute("data-theme",S.theme);$("#themeBtn").textContent=S.theme==="dark"?"Light mode":"Dark mode";}
+$("#themeBtn").addEventListener("click",function(){S.theme=S.theme==="dark"?"light":"dark";save();applyTheme();});
+
+applyTheme();panel1();panel2();renderQuiz();showTab(S.tab||"comp");
+})();
+</script>
+</body>
+</html>
