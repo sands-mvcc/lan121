@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DNS Lab: Build and Test the lakeview.lan Zone</title>
+<style>
+:root{
+  --bg:#F3F6FA;--surface:#FFFFFF;--ink:#13233C;--muted:#55667F;--rule:#D4DDEA;
+  --navy:#0047AB;--navy-ink:#FFFFFF;--green:#00a86b;--green-ink:#00754B;--amber:#9C5B00;--red:#B8301F;
+  --navy-soft:#E6EEF9;--green-soft:#E1F4EB;--red-soft:#FAE8E5;--amber-soft:#FBEFDB;
+  --code:#0F1B2E;--code-ink:#D8E4F5;--code-dim:#7F92B0;--code-green:#55DBA8;--code-blue:#91B7FF;--code-amber:#F3BC63;--code-red:#FF8C80;
+  --serif:"Iowan Old Style","Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+  --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,Menlo,monospace;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1422;--surface:#142039;--ink:#E3EAF5;--muted:#9AABC6;--rule:#27375A;
+  --navy:#7EA8F2;--navy-ink:#0C1422;--green:#34CF97;--green-ink:#56E0AD;--amber:#F0AE4A;--red:#FF7F71;
+  --navy-soft:#1A2C50;--green-soft:#0F3529;--red-soft:#3B1C1B;--amber-soft:#382A12;--code:#070E1A;}}
+:root[data-theme="dark"]{
+  --bg:#0C1422;--surface:#142039;--ink:#E3EAF5;--muted:#9AABC6;--rule:#27375A;
+  --navy:#7EA8F2;--navy-ink:#0C1422;--green:#34CF97;--green-ink:#56E0AD;--amber:#F0AE4A;--red:#FF7F71;
+  --navy-soft:#1A2C50;--green-soft:#0F3529;--red-soft:#3B1C1B;--amber-soft:#382A12;--code:#070E1A;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.55rem,3.4vw,2.2rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.3rem,2.5vw,1.65rem)}
+h3{font-size:1.15rem}
+p{margin:0 0 .9em;max-width:72ch}
+a{color:var(--navy)}
+code,kbd,.mono{font-family:var(--mono);font-size:.92em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.btn{border:1px solid var(--navy);background:var(--navy);color:var(--navy-ink);padding:.55em 1.1em;border-radius:6px;cursor:pointer;font-weight:600}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.btn.sm{padding:.35em .8em;font-size:.88rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+.top{border-top:5px solid var(--navy);background:var(--surface);border-bottom:1px solid var(--rule)}
+.top-in{display:flex;gap:16px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:16px}
+.course{margin:0 0 .25em;color:var(--green-ink);font-weight:600;font-size:.92rem}
+.top h1{margin:0}
+
+/* ticket */
+.ticket{margin-top:22px}
+.ticket-in{display:grid;grid-template-columns:1.5fr 1fr;background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.ticket-main{padding:20px 24px;border-right:2px dashed var(--rule)}
+.ticket-no{font-family:var(--mono);font-size:.85rem;color:var(--muted);margin-bottom:.4em}
+.ticket-main h2{margin-bottom:.4em}
+.ticket-main p{margin:0;color:var(--muted)}
+.ticket dl{margin:0;padding:18px 24px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;background:var(--navy-soft);align-content:center}
+.ticket dt{color:var(--muted);font-size:.9rem}
+.ticket dd{margin:0;font-family:var(--mono);font-size:.9rem}
+
+/* stepper */
+.stepper{margin-top:22px;position:sticky;top:0;z-index:5;background:var(--bg);padding-top:8px;padding-bottom:8px}
+.stepper ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.stepper button{width:100%;text-align:left;border:1px solid var(--rule);background:var(--surface);border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;gap:8px;align-items:center;font-size:.9rem;line-height:1.25}
+.stepper .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--rule);font-size:.8rem;font-weight:700}
+.stepper button[aria-current="step"]{border-color:var(--navy);box-shadow:inset 0 -3px 0 var(--navy)}
+.stepper button[aria-current="step"] .n{border-color:var(--navy);color:var(--navy)}
+.stepper button.done .n{background:var(--green);border-color:var(--green);color:#fff}
+.stepper button.done .n::after{content:"✓"}
+.stepper button.done .n span{display:none}
+
+main{padding-bottom:60px}
+.stage{padding-top:22px}
+.stage-head{margin-bottom:18px}
+.stage-head p{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.nav-row{display:flex;justify-content:space-between;gap:10px;margin-top:8px}
+
+/* accordion */
+details.acc{border-top:1px solid var(--rule)}
+details.acc:last-child{border-bottom:1px solid var(--rule)}
+details.acc summary{cursor:pointer;padding:12px 4px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";color:var(--navy);font-size:1.2rem;line-height:1}
+details.acc[open] summary::after{content:"−"}
+details.acc ul{margin:0 0 14px;padding-left:1.2em}
+details.acc li{margin-bottom:.35em;max-width:75ch}
+
+/* resolution walk */
+.hops{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.hop{border:2px solid var(--rule);border-radius:8px;padding:10px 8px;text-align:center;font-size:.9rem;transition:border-color .2s,background .2s}
+.hop b{display:block;font-family:var(--serif);font-size:1rem}
+.hop small{color:var(--muted)}
+.hop.on{border-color:var(--navy);background:var(--navy-soft)}
+.hop.on2{border-color:var(--green);background:var(--green-soft)}
+.hop-msg{font-family:var(--mono);font-size:.9rem;color:var(--navy);min-height:1.4em;margin:.2em 0}
+.hop-cap{min-height:3.2em}
+
+/* flip cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.card{perspective:900px;border:0;background:none;padding:0;height:178px;cursor:pointer;text-align:left}
+.card-in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.card.flipped .card-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;padding:14px;border:1px solid var(--rule);display:flex;flex-direction:column;gap:6px}
+.front{background:var(--surface)}
+.front .ty{font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--navy)}
+.front p{font-size:.92rem;margin:0}
+.front .seen{margin-top:auto;font-size:.78rem;color:var(--green-ink)}
+.back{background:var(--code);color:var(--code-ink);transform:rotateY(180deg);border-color:var(--code)}
+.back code{color:var(--code-green);font-size:.8rem;white-space:pre-wrap;word-break:break-word}
+.back p{font-size:.84rem;margin:0;color:var(--code-ink)}
+.counter{font-size:.9rem;color:var(--muted)}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--serif);font-weight:600;background:var(--navy-soft)}
+td code{white-space:nowrap}
+
+/* terminal */
+.term{background:var(--code);color:var(--code-ink);border-radius:10px;overflow:hidden;font-family:var(--mono);font-size:.88rem}
+.term-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.06);color:var(--code-dim);font-size:.8rem}
+.term-bar i{width:10px;height:10px;border-radius:50%;background:#3a4a66;display:inline-block}
+.term-out{height:340px;overflow:auto;padding:12px 14px;white-space:pre-wrap;word-break:break-word}
+.term-out .pr{color:var(--code-green)}
+.term-out .o{color:var(--code-ink)}
+.term-out .ok{color:var(--code-green)}
+.term-out .err{color:var(--code-red)}
+.term-out .dim{color:var(--code-dim)}
+.term-out .warn{color:var(--code-amber)}
+.term-out pre{margin:0;font:inherit;white-space:pre;overflow-x:auto}
+.term-out b.st-NOERROR{color:var(--code-green)}
+.term-out b.st-NXDOMAIN,.term-out b.st-REFUSED,.term-out b.st-SERVFAIL{color:var(--code-red)}
+.term-in{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08)}
+.term-in .pr{color:var(--code-green);white-space:nowrap}
+.term-in input{flex:1;min-width:0;background:transparent;border:0;color:var(--code-ink);font-family:var(--mono);font-size:.95rem;outline:none;caret-color:var(--code-green)}
+.term-in:focus-within{box-shadow:inset 0 0 0 2px var(--green)}
+
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;padding:8px 0 8px 36px;position:relative;border-bottom:1px solid var(--rule);font-size:.93rem;color:var(--muted)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:8px;width:24px;height:24px;border-radius:50%;border:2px solid var(--rule);display:grid;place-items:center;font-size:.78rem;font-weight:700}
+.steps li.cur{color:var(--ink);font-weight:600}
+.steps li.cur::before{border-color:var(--navy);color:var(--navy)}
+.steps li.done{color:var(--ink)}
+.steps li.done::before{content:"✓";background:var(--green);border-color:var(--green);color:#fff}
+.term-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* nano editor */
+.editor{background:var(--code);color:var(--code-ink);font-family:var(--mono);font-size:.88rem;border-radius:10px;overflow:hidden;margin-top:12px;border:2px solid var(--code-amber)}
+.ed-bar{background:var(--code-ink);color:var(--code);padding:4px 12px;font-weight:700;text-align:center}
+.ed-body{padding:12px 16px;white-space:pre;overflow-x:auto;line-height:1.9}
+.ed-body .c{color:var(--code-dim)}
+.ed-body input,.ed-body select{background:#1d2c46;border:1px solid var(--code-dim);border-radius:4px;color:var(--code-amber);font-family:var(--mono);font-size:.88rem;padding:1px 6px}
+.ed-body input{width:22ch}
+.ed-foot{padding:10px 16px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-family:var(--sans)}
+.ed-msg{color:var(--code-red);font-size:.9rem;white-space:pre-line}
+
+/* record lab */
+.lab{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:600;font-size:.9rem}
+.field input,.field select{border:1px solid var(--rule);background:var(--bg);border-radius:6px;padding:.5em .65em;font-family:var(--mono);font-size:.95rem;width:100%}
+.field select{font-family:var(--sans)}
+.field .help{font-size:.82rem;color:var(--muted);font-family:var(--mono)}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.type-help{background:var(--navy-soft);border-left:4px solid var(--navy);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:12px}
+.type-help p{margin:0 0 .3em}
+.type-help p:last-child{margin:0;color:var(--muted)}
+.msg{border-radius:6px;padding:10px 12px;font-size:.92rem;margin-top:12px}
+.msg:empty{display:none}
+.msg.ok{background:var(--green-soft);border-left:4px solid var(--green)}
+.msg.err{background:var(--red-soft);border-left:4px solid var(--red)}
+.msg.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}
+.msg ul{margin:.4em 0 0;padding-left:1.2em}
+.msg code{word-break:break-all}
+
+.tasks{list-style:none;margin:0;padding:0}
+.tasks li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule);font-size:.93rem}
+.tasks li:last-child{border-bottom:0}
+.tick{width:20px;height:20px;border-radius:4px;border:2px solid var(--rule);display:grid;place-items:center;font-size:.75rem;margin-top:2px}
+.tasks li.ok .tick{background:var(--green);border-color:var(--green);color:#fff}
+.tasks li.ok .tick::after{content:"✓"}
+.tasks li.ok span.t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green)}
+.tasks details{font-size:.84rem;color:var(--muted)}
+.tasks summary{cursor:pointer;color:var(--navy)}
+.bar{height:8px;background:var(--rule);border-radius:4px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+
+.zf{background:var(--code);border-radius:10px;overflow:hidden;position:sticky;top:76px}
+.zf-tabs{display:flex;gap:2px;background:rgba(255,255,255,.05);padding:6px 6px 0}
+.zf-tabs button{border:0;background:transparent;color:var(--code-dim);font-family:var(--mono);font-size:.85rem;padding:7px 12px;border-radius:6px 6px 0 0;cursor:pointer}
+.zf-tabs button[aria-selected="true"]{background:var(--code);color:var(--code-ink);box-shadow:inset 0 2px 0 var(--code-green)}
+.zf-path{font-family:var(--mono);font-size:.78rem;color:var(--code-dim);padding:8px 14px 0}
+.zf-body{padding:8px 0 14px;overflow-x:auto;max-height:560px;overflow-y:auto}
+.zl{display:flex;align-items:center;font-family:var(--mono);font-size:.84rem;color:var(--code-ink);min-height:1.65em;padding-right:8px}
+.zl .ln{flex:none;width:3em;text-align:right;padding-right:1em;color:#4b5d7c;user-select:none}
+.zl code{white-space:pre;font-size:1em;flex:1}
+.zl .c{color:var(--code-dim)}.zl .k{color:var(--code-blue)}.zl .v{color:var(--code-green)}.zl .d{color:var(--code-amber)}
+.zl .rm{flex:none;border:1px solid transparent;background:transparent;color:var(--code-dim);border-radius:4px;cursor:pointer;font-size:.78rem;padding:0 6px;font-family:var(--sans)}
+.zl .rm:hover,.zl .rm:focus-visible{color:var(--code-red);border-color:var(--code-red)}
+.zl.new{background:rgba(85,219,168,.14);animation:glow 1.6s ease-out forwards}
+.zl.flash code .v{animation:pulse 1.2s ease-out}
+@keyframes glow{from{background:rgba(85,219,168,.35)}to{background:rgba(85,219,168,.08)}}
+@keyframes pulse{from{color:#fff;text-shadow:0 0 8px var(--code-green)}to{text-shadow:none}}
+.zf-foot{font-family:var(--sans);font-size:.82rem;color:var(--code-dim);padding:10px 14px;border-top:1px solid rgba(255,255,255,.08)}
+
+/* quiz */
+.q{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:0 0 14px;background:var(--surface)}
+.q legend{font-weight:600;padding:0 4px;max-width:70ch}
+.q label{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:6px;cursor:pointer}
+.q label:hover{background:var(--navy-soft)}
+.q input{margin-top:.3em;accent-color:var(--navy)}
+.q label.right{background:var(--green-soft)}
+.q label.wrong{background:var(--red-soft)}
+.q .why{margin-top:8px;font-size:.92rem;padding:8px 12px;border-radius:6px;background:var(--bg)}
+.score{font-family:var(--serif);font-size:1.4rem}
+
+/* results */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.res{border:1px solid var(--rule);border-radius:10px;padding:14px;background:var(--surface)}
+.res .big{font-family:var(--serif);font-size:1.8rem;font-weight:600;color:var(--navy)}
+.res small{color:var(--muted)}
+.overall{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.overall .big{font-family:var(--serif);font-size:3rem;font-weight:600;color:var(--green-ink);line-height:1}
+.evidence{background:var(--code);color:var(--code-ink);font-family:var(--mono);font-size:.82rem;padding:14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:0 0 14px}
+.name-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.name-row .field{flex:1;min-width:220px;margin:0}
+
+@media (max-width:960px){
+  .lab{grid-template-columns:1fr}
+  .zf{position:static}
+  .stepper ol{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:720px){
+  .ticket-in,.grid2{grid-template-columns:1fr}
+  .ticket-main{border-right:0;border-bottom:2px dashed var(--rule)}
+  .hops{grid-template-columns:1fr 1fr}
+  .stepper{position:static}
+  .stepper ol{grid-template-columns:1fr 1fr}
+  .top-in{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  body{background:#fff;color:#000}
+  .top button,.ticket,.stepper,.stage,.no-print{display:none!important}
+  #s5{display:block!important}
+  .evidence{background:#f4f4f4;color:#000;border:1px solid #999;white-space:pre-wrap}
+  .res,.panel{border-color:#999}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div>
+      <p class="course">LAN121 Network Essentials</p>
+      <h1>DNS Lab: Build and test an enterprise zone</h1>
+    </div>
+    <button id="themeBtn" class="btn ghost sm" type="button">Dark mode</button>
+  </div>
+</header>
+
+<section class="wrap ticket" aria-label="Lab scenario">
+  <div class="ticket-in">
+    <div class="ticket-main">
+      <div class="ticket-no">Ticket 4471, assigned to you</div>
+      <h2>Stand up internal DNS for Lakeview Logistics</h2>
+      <p>You're the new network specialist. The server ns1 is online but has no DNS software. Install BIND, create the lakeview.lan zones, add the records the team needs, and prove every name resolves before you close the ticket.</p>
+    </div>
+    <dl>
+      <dt>DNS server</dt><dd>ns1, 10.10.1.10</dd>
+      <dt>Operating system</dt><dd>Ubuntu Server 24.04</dd>
+      <dt>Forward zone</dt><dd>lakeview.lan</dd>
+      <dt>Reverse zone</dt><dd>1.10.10.in-addr.arpa</dd>
+      <dt>Subnet</dt><dd>10.10.1.0/24</dd>
+    </dl>
+  </div>
+</section>
+
+<nav class="wrap stepper" aria-label="Lab stages">
+  <ol>
+    <li><button type="button"><span class="n"><span>1</span></span>Learn the basics</button></li>
+    <li><button type="button"><span class="n"><span>2</span></span>Build the server</button></li>
+    <li><button type="button"><span class="n"><span>3</span></span>Add records</button></li>
+    <li><button type="button"><span class="n"><span>4</span></span>Test resolution</button></li>
+    <li><button type="button"><span class="n"><span>5</span></span>Check knowledge</button></li>
+    <li><button type="button"><span class="n"><span>6</span></span>Results</button></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ STAGE 1 ============ -->
+<section class="stage" id="s0">
+  <div class="stage-head">
+    <h2>Stage 1: What a DNS specialist needs to know</h2>
+    <p>Review the knowledge and skills an entry-level specialist uses every day, watch a query travel through the DNS hierarchy, then explore all nine record types. Flip every card to complete this stage.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Core knowledge and skills</h3>
+    <details class="acc" open>
+      <summary>How DNS works</summary>
+      <ul>
+        <li>The namespace is a tree: the root (.), top-level domains (.com, .edu, .lan), second-level domains (lakeview.lan), and hosts (www.lakeview.lan).</li>
+        <li>A fully qualified domain name (FQDN) ends with a dot that represents the root. In zone files, that trailing dot decides whether a name is complete or relative.</li>
+        <li>Clients send recursive queries to a resolver; the resolver sends iterative queries to root, TLD, and authoritative servers.</li>
+        <li>Authoritative servers hold the zone data. Caching (recursive) servers look answers up and remember them for the TTL.</li>
+        <li>Forward lookup zones turn names into addresses; reverse lookup zones (in-addr.arpa, ip6.arpa) turn addresses into names.</li>
+        <li>DNS uses UDP port 53 for most queries and TCP port 53 for zone transfers and large responses.</li>
+      </ul>
+    </details>
+    <details class="acc">
+      <summary>Resource records</summary>
+      <ul>
+        <li>Know the purpose and syntax of A, AAAA, CNAME, MX, NS, PTR, SOA, TXT, and SRV records.</li>
+        <li>Apply the rules that cause most outages: a CNAME must be alone at its name, MX and NS records point to host names (never IPs), and PTR records live in the reverse zone.</li>
+        <li>Choose sensible TTLs: long for stable records, short before a planned change.</li>
+      </ul>
+    </details>
+    <details class="acc">
+      <summary>Server configuration</summary>
+      <ul>
+        <li>Install and enable a DNS service: BIND 9 on Linux or the DNS Server role on Windows Server.</li>
+        <li>Declare zones, create zone files, and increase the SOA serial on every change.</li>
+        <li>Understand primary and secondary servers, zone transfers, and forwarders for outside names.</li>
+        <li>On Windows, know Active Directory–integrated zones, dynamic updates from DHCP clients, and the SRV records domain controllers register.</li>
+      </ul>
+    </details>
+    <details class="acc">
+      <summary>Testing and troubleshooting</summary>
+      <ul>
+        <li>Query with <code>dig</code>, <code>nslookup</code>, <code>host</code>, and PowerShell <code>Resolve-DnsName</code>.</li>
+        <li>Validate before reloading with <code>named-checkconf</code> and <code>named-checkzone</code>.</li>
+        <li>Read response codes: NOERROR, NXDOMAIN (name doesn't exist), SERVFAIL (server couldn't answer), REFUSED (server won't answer).</li>
+        <li>Check the client side: <code>ipconfig /all</code>, <code>resolvectl status</code>, <code>/etc/resolv.conf</code>, and clear caches with <code>ipconfig /flushdns</code>.</li>
+        <li>Read service logs with <code>journalctl -u named</code> or the Windows DNS Server event log.</li>
+      </ul>
+    </details>
+    <details class="acc">
+      <summary>Security and day-to-day operations</summary>
+      <ul>
+        <li>Restrict zone transfers to known secondary servers; an open transfer hands attackers a map of your network.</li>
+        <li>Allow recursion only for internal clients so your server can't be used in amplification attacks.</li>
+        <li>Recognize split-horizon DNS (different answers inside and outside) and the purpose of DNSSEC.</li>
+        <li>Watch query logs for signs of DNS tunneling or malware beaconing.</li>
+        <li>Follow change control: document every record change and back up zone files.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="panel">
+    <h3>Follow a query through the hierarchy</h3>
+    <p>A laptop on the Internet looks up <code>www.example.com</code>. Step through each hop.</p>
+    <div class="hops" id="hops">
+      <div class="hop"><b>Client</b><small>stub resolver</small></div>
+      <div class="hop"><b>Resolver</b><small>recursive DNS</small></div>
+      <div class="hop"><b>Root</b><small>.</small></div>
+      <div class="hop"><b>TLD</b><small>.com</small></div>
+      <div class="hop"><b>Authoritative</b><small>example.com</small></div>
+    </div>
+    <div class="hop-msg" id="hopMsg" aria-live="polite"></div>
+    <p class="hop-cap" id="hopCap"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost sm" id="hopBack" type="button">Previous hop</button>
+      <button class="btn sm" id="hopNext" type="button">Next hop</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Record types</h3>
+    <p class="counter" id="cardCount">Cards explored: 0 of 9</p>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="nav-row"><span></span><button class="btn" data-go="1" type="button">Continue to Build the server</button></div>
+</section>
+
+<!-- ============ STAGE 2 ============ -->
+<section class="stage" id="s1" hidden>
+  <div class="stage-head">
+    <h2>Stage 2: Install and configure BIND on ns1</h2>
+    <p>Type each command at the prompt and press Enter. Linux is case-sensitive, and <code>sudo</code> is optional here. Type <code>hint</code> for a clue, or <code>clear</code> to clear the screen. Use the up arrow to repeat a command.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel" style="margin:0">
+      <h3>Build checklist</h3>
+      <ol class="steps" id="buildSteps"></ol>
+      <div class="term-tools no-print">
+        <button class="btn ghost sm" id="buildHint" type="button">Show a hint</button>
+        <button class="btn ghost sm" id="buildReveal" type="button">Show the command</button>
+      </div>
+      <p class="counter" id="revealNote" style="margin-top:8px"></p>
+    </div>
+    <div>
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>student@ns1: ~</span></div>
+        <div class="term-out" id="buildOut" aria-live="polite"></div>
+        <div class="term-in" id="buildInRow"><label for="buildIn" class="sr">Command</label><span class="pr">student@ns1:~$</span><input id="buildIn" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      </div>
+      <div class="editor" id="editor" hidden>
+        <div class="ed-bar">GNU nano 7.2 &nbsp; /etc/bind/named.conf.local</div>
+        <div class="ed-body"><span class="c">// Forward zone: names to addresses</span>
+zone "<input id="ez1" aria-label="Forward zone name" autocomplete="off" spellcheck="false">" {
+    type <select id="et1" aria-label="Zone type"><option value="">choose</option><option>primary</option><option>secondary</option><option>forward</option><option>hint</option></select>;
+    file "<input id="ef1" aria-label="Forward zone file path" autocomplete="off" spellcheck="false" style="width:26ch">";
+};
+
+<span class="c">// Reverse zone: addresses to names for 10.10.1.0/24</span>
+zone "<input id="ez2" aria-label="Reverse zone name" autocomplete="off" spellcheck="false">" {
+    type primary;
+    file "/etc/bind/db.10.10.1";
+};</div>
+        <div class="ed-foot"><button class="btn sm" id="edSave" type="button">Save and exit</button><span class="ed-msg" id="edMsg" aria-live="polite"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px">
+    <h3>The same job on Windows Server</h3>
+    <p>Many enterprises run DNS on Windows domain controllers. Compare the BIND steps you just practiced with their PowerShell equivalents.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Task</th><th>BIND on Linux</th><th>Windows Server (PowerShell)</th></tr></thead>
+        <tbody>
+          <tr><td>Install the DNS service</td><td><code>apt install bind9</code></td><td><code>Install-WindowsFeature DNS -IncludeManagementTools</code></td></tr>
+          <tr><td>Create a forward zone</td><td>Zone stanza in <code>named.conf.local</code> plus a zone file</td><td><code>Add-DnsServerPrimaryZone -Name "lakeview.lan" -ZoneFile "lakeview.lan.dns"</code></td></tr>
+          <tr><td>Create a reverse zone</td><td>Zone <code>1.10.10.in-addr.arpa</code> plus a zone file</td><td><code>Add-DnsServerPrimaryZone -NetworkID "10.10.1.0/24" -ZoneFile "1.10.10.in-addr.arpa.dns"</code></td></tr>
+          <tr><td>Add an A record (and its PTR)</td><td>Edit the zone files, increase the serial</td><td><code>Add-DnsServerResourceRecordA -ZoneName lakeview.lan -Name www -IPv4Address 10.10.1.20 -CreatePtr</code></td></tr>
+          <tr><td>Add a CNAME</td><td><code>portal IN CNAME www.lakeview.lan.</code></td><td><code>Add-DnsServerResourceRecordCName -ZoneName lakeview.lan -Name portal -HostNameAlias www.lakeview.lan</code></td></tr>
+          <tr><td>Add an MX record</td><td><code>@ IN MX 10 mail.lakeview.lan.</code></td><td><code>Add-DnsServerResourceRecordMX -ZoneName lakeview.lan -Name "." -MailExchange mail.lakeview.lan -Preference 10</code></td></tr>
+          <tr><td>Validate configuration</td><td><code>named-checkconf</code>, <code>named-checkzone</code></td><td><code>Test-DnsServer -IPAddress 10.10.1.10</code></td></tr>
+          <tr><td>Apply changes</td><td><code>systemctl restart named</code> or <code>rndc reload</code></td><td>Changes apply immediately; <code>Restart-Service DNS</code> if needed</td></tr>
+          <tr><td>Test a lookup</td><td><code>dig @10.10.1.10 www.lakeview.lan</code></td><td><code>Resolve-DnsName www.lakeview.lan -Server 10.10.1.10</code></td></tr>
+          <tr><td>Clear a client cache</td><td><code>resolvectl flush-caches</code></td><td><code>Clear-DnsClientCache</code> or <code>ipconfig /flushdns</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn ghost" data-go="0" type="button">Back</button><button class="btn" data-go="2" type="button">Continue to Add records</button></div>
+</section>
+
+<!-- ============ STAGE 3 ============ -->
+<section class="stage" id="s2" hidden>
+  <div class="stage-head">
+    <h2>Stage 3: Add the records Lakeview needs</h2>
+    <p>Enter each record in the form. The zone file on the right updates live, exactly as BIND would store it, and the SOA serial increases with every change. The checklist ticks itself off when a record is correct.</p>
+  </div>
+  <div class="lab">
+    <div>
+      <div class="panel">
+        <h3>Work order</h3>
+        <div class="counter" id="recCount">0 of 8 complete</div>
+        <div class="bar"><i id="recBar"></i></div>
+        <ul class="tasks" id="recTasks"></ul>
+      </div>
+      <div class="panel">
+        <h3>New record</h3>
+        <form id="recForm" novalidate>
+          <div class="row3">
+            <div class="field"><label for="fType">Record type</label>
+              <select id="fType"><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>NS</option><option>PTR</option><option>TXT</option><option>SRV</option></select></div>
+            <div class="field"><label for="fZone">Zone</label>
+              <select id="fZone"><option value="fwd">lakeview.lan</option><option value="rev">1.10.10.in-addr.arpa</option></select></div>
+          </div>
+          <div class="type-help" id="typeHelp"></div>
+          <div class="field"><label for="fName">Name</label>
+            <input id="fName" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <span class="help" id="fqdnPrev" aria-live="polite"></span></div>
+          <div class="field" id="prioField" hidden><label for="fPrio">Preference</label>
+            <input id="fPrio" type="number" min="0" max="65535" value="10"></div>
+          <div class="field"><label for="fVal" id="fValLbl">IPv4 address</label>
+            <input id="fVal" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+          <div class="field"><label for="fTtl">TTL (seconds)</label>
+            <input id="fTtl" type="number" min="60" max="604800" value="3600"></div>
+          <button class="btn" type="submit">Add record</button>
+        </form>
+        <div class="msg" id="recMsg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="zf" aria-label="Zone file viewer">
+      <div class="zf-tabs" role="tablist">
+        <button role="tab" id="tabFwd" aria-selected="true" type="button">db.lakeview.lan</button>
+        <button role="tab" id="tabRev" aria-selected="false" type="button">db.10.10.1</button>
+      </div>
+      <div class="zf-path" id="zfPath"></div>
+      <div class="zf-body" id="zoneView"></div>
+      <div class="zf-foot">Records you add can be removed with the Remove button on their line. Starter SOA and NS records are locked.</div>
+    </div>
+  </div>
+  <div class="nav-row" style="margin-top:18px"><button class="btn ghost" data-go="1" type="button">Back</button><button class="btn" data-go="3" type="button">Continue to Test resolution</button></div>
+</section>
+
+<!-- ============ STAGE 4 ============ -->
+<section class="stage" id="s3" hidden>
+  <div class="stage-head">
+    <h2>Stage 4: Prove that every name resolves</h2>
+    <p>You're now on a client workstation that uses ns1 (10.10.1.10) as its DNS server. Answers come from the records you built in Stage 3, so if a lookup fails, go back, fix the record, and query again.</p>
+  </div>
+  <div class="grid2">
+    <div>
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>student@ws07: ~</span></div>
+        <div class="term-out" id="testOut" aria-live="polite"></div>
+        <div class="term-in"><label for="testIn" class="sr">Query command</label><span class="pr">student@ws07:~$</span><input id="testIn" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Verification checklist</h3>
+        <div class="counter" id="testCount">0 of 6 complete</div>
+        <div class="bar"><i id="testBar"></i></div>
+        <ul class="tasks" id="testTasks"></ul>
+      </div>
+      <div class="panel">
+        <h3>Command reference</h3>
+        <div class="tbl-wrap"><table>
+          <tr><td><code>dig name [type]</code></td><td>Full answer with status and TTL</td></tr>
+          <tr><td><code>dig name +short</code></td><td>Just the answer</td></tr>
+          <tr><td><code>dig -x address</code></td><td>Reverse (PTR) lookup</td></tr>
+          <tr><td><code>dig @server name</code></td><td>Ask a specific server</td></tr>
+          <tr><td><code>nslookup -type=mx name</code></td><td>Windows and Linux lookup</td></tr>
+          <tr><td><code>host -t txt name</code></td><td>Short, readable output</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-row" style="margin-top:18px"><button class="btn ghost" data-go="2" type="button">Back</button><button class="btn" data-go="4" type="button">Continue to Check knowledge</button></div>
+</section>
+
+<!-- ============ STAGE 5 ============ -->
+<section class="stage" id="s4" hidden>
+  <div class="stage-head">
+    <h2>Stage 5: Check your knowledge</h2>
+    <p>Nine troubleshooting and configuration scenarios. Answer each one, then check your answers to see an explanation for every question.</p>
+  </div>
+  <form id="quiz" novalidate></form>
+  <div class="panel" id="quizResult" hidden></div>
+  <div class="nav-row no-print">
+    <button class="btn ghost" data-go="3" type="button">Back</button>
+    <span style="display:flex;gap:8px"><button class="btn ghost" id="quizReset" type="button" hidden>Try again</button><button class="btn" id="quizSubmit" type="button">Check answers</button></span>
+  </div>
+</section>
+
+<!-- ============ STAGE 6 ============ -->
+<section class="stage" id="s5" hidden>
+  <div class="stage-head">
+    <h2>Stage 6: Lab results</h2>
+    <p>Enter your name, then print or save as PDF to submit. Your zone files are included as evidence of your configuration.</p>
+  </div>
+  <div class="panel">
+    <div class="name-row">
+      <div class="field"><label for="stuName">Student name</label><input id="stuName" autocomplete="name" style="font-family:var(--sans)"></div>
+      <button class="btn no-print" id="printBtn" type="button">Print or save as PDF</button>
+    </div>
+  </div>
+  <div id="results"></div>
+</section>
+
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=(s,n)=>{s=String(s);return s.length>=n?s+" ":s+" ".repeat(n-s.length);};
+
+/* ---------- theme ---------- */
+const root=document.documentElement, TKEY="lan121-dns-lab-theme";
+try{const t=localStorage.getItem(TKEY); if(t) root.setAttribute("data-theme",t);}catch(e){}
+const curTheme=()=>root.getAttribute("data-theme")||(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+const syncTheme=()=>{$("#themeBtn").textContent=curTheme()==="dark"?"Light mode":"Dark mode";};
+$("#themeBtn").addEventListener("click",()=>{const n=curTheme()==="dark"?"light":"dark";root.setAttribute("data-theme",n);try{localStorage.setItem(TKEY,n);}catch(e){}syncTheme();});
+syncTheme();
+
+/* ---------- stages ---------- */
+const done=[false,false,false,false,false,false];
+const stepBtns=$$(".stepper button");
+function show(i){
+  $$(".stage").forEach((s,k)=>s.hidden=k!==i);
+  stepBtns.forEach((b,k)=>{b.setAttribute("aria-current",k===i?"step":"false");});
+  if(i===5) renderResults();
+  if(i===2) renderZone();
+  const nav=$(".stepper"); window.scrollTo({top:Math.max(0,nav.offsetTop-8)});
+  if(i===1) setTimeout(()=>{if($("#editor").hidden) $("#buildIn").focus({preventScroll:true});},50);
+  if(i===3) setTimeout(()=>$("#testIn").focus({preventScroll:true}),50);
+}
+function setDone(i,v){done[i]=v;stepBtns[i].classList.toggle("done",v);}
+stepBtns.forEach((b,k)=>b.addEventListener("click",()=>show(k)));
+$$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(+b.dataset.go)));
+
+/* ---------- constants ---------- */
+const ZONE="lakeview.lan", ZF="lakeview.lan.", REV="1.10.10.in-addr.arpa", RF="1.10.10.in-addr.arpa.";
+const isIPv4=s=>/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/.test(s);
+function expand6(s){
+  s=String(s).toLowerCase(); if(!/^[0-9a-f:]+$/.test(s)||!s.includes(":")) return null;
+  const parts=s.split("::"); if(parts.length>2) return null;
+  const head=parts[0]?parts[0].split(":"):[], tail=parts.length===2&&parts[1]?parts[1].split(":"):[];
+  let groups;
+  if(parts.length===1){ if(head.length!==8) return null; groups=head; }
+  else { const fill=8-head.length-tail.length; if(fill<1) return null; groups=[...head,...Array(fill).fill("0"),...tail]; }
+  if(groups.some(g=>!/^[0-9a-f]{1,4}$/.test(g))) return null;
+  return groups.map(g=>g.padStart(4,"0")).join(":");
+}
+const labelsOk=s=>s.split(".").every(l=>/^[a-z0-9_]([a-z0-9_-]{0,61}[a-z0-9])?$/.test(l));
+const revName=ip=>ip.split(".").reverse().join(".")+".in-addr.arpa.";
+
+/* ---------- Stage 1: hops ---------- */
+const HOPS=[
+  {a:[0,1],m:"Client  >  Resolver   query: www.example.com A",c:"The laptop checks its own cache and hosts file first. No luck, so it sends a recursive query to its configured resolver: \"Find me the full answer.\""},
+  {a:[1,2],m:"Resolver  >  Root   referral to .com servers",c:"The resolver's cache is empty, so it asks a root server. Root servers don't know the answer, but they refer the resolver to the .com TLD servers. This is an iterative query."},
+  {a:[1,3],m:"Resolver  >  .com TLD   referral to ns1.example.com",c:"The .com servers don't hold host records either. They return the NS records for example.com: the servers that are authoritative for that zone."},
+  {a:[1,4],m:"Resolver  >  Authoritative   answer: 203.0.113.80, TTL 3600",c:"The authoritative server owns the zone file and returns the A record with the aa (authoritative answer) flag set. This is the kind of server you'll build for lakeview.lan."},
+  {a:[1,0],m:"Resolver  >  Client   answer: 203.0.113.80",c:"The resolver hands the answer back and caches it for the TTL, 3600 seconds. Anyone else asking within the hour gets an instant answer from cache. That's also why a changed record can look \"stuck\" until the TTL expires."}
+];
+let hop=-1;
+function renderHop(){
+  const nodes=$$("#hops .hop");
+  nodes.forEach(n=>n.classList.remove("on","on2"));
+  if(hop<0){$("#hopMsg").textContent="";$("#hopCap").textContent="Select Next hop to start the lookup.";}
+  else{const h=HOPS[hop]; nodes[h.a[0]].classList.add("on"); nodes[h.a[1]].classList.add("on2"); $("#hopMsg").textContent=h.m; $("#hopCap").textContent=h.c;}
+  $("#hopBack").disabled=hop<0;
+  $("#hopNext").textContent=hop>=HOPS.length-1?"Start over":"Next hop";
+}
+$("#hopNext").addEventListener("click",()=>{hop=hop>=HOPS.length-1?-1:hop+1;renderHop();});
+$("#hopBack").addEventListener("click",()=>{hop=Math.max(-1,hop-1);renderHop();});
+renderHop();
+
+/* ---------- record type info ---------- */
+const RT={
+  A:{p:"Maps a host name to an IPv4 address.",ex:"www   IN  A     10.10.1.20",tip:"The most common record. Several A records on one name give round-robin load sharing.",nm:"www",val:"10.10.1.20",lbl:"IPv4 address"},
+  AAAA:{p:"Maps a host name to an IPv6 address.",ex:"www   IN  AAAA  2001:db8:10::20",tip:"Called quad-A because an IPv6 address is four times the size of an IPv4 address.",nm:"www",val:"2001:db8:10::20",lbl:"IPv6 address"},
+  CNAME:{p:"Makes one name an alias for another name.",ex:"portal IN CNAME www.lakeview.lan.",tip:"A CNAME must be the only record at its name, so it can never sit at the zone apex (@).",nm:"portal",val:"www.lakeview.lan.",lbl:"Alias target (host name)"},
+  MX:{p:"Names the mail server for a domain, with a preference number.",ex:"@     IN  MX  10 mail.lakeview.lan.",tip:"Lower preference is tried first. The value must be a host name with its own A record, never an IP.",nm:"@",val:"mail.lakeview.lan.",lbl:"Mail server (host name)"},
+  NS:{p:"Lists an authoritative name server for the zone.",ex:"@     IN  NS    ns1.lakeview.lan.",tip:"Every zone needs at least one NS record. Enterprises run two or more for redundancy.",nm:"@",val:"ns2.lakeview.lan.",lbl:"Name server (host name)"},
+  PTR:{p:"Maps an IP address back to a host name.",ex:"20    IN  PTR   www.lakeview.lan.",tip:"Lives in the reverse zone. Mail servers and log tools depend on PTR records.",nm:"20",val:"www.lakeview.lan.",lbl:"Host name"},
+  SOA:{p:"Start of Authority: the zone's administrative settings.",ex:"@ IN SOA ns1.lakeview.lan. admin.lakeview.lan. (2026100901 ...)",tip:"Increase the serial every time you edit the zone, or secondary servers won't pull your changes."},
+  TXT:{p:"Holds free-form text, mostly for email security and domain verification.",ex:"@     IN  TXT   \"v=spf1 mx -all\"",tip:"SPF, DKIM, and DMARC email policies are all published as TXT records.",nm:"@",val:"v=spf1 mx -all",lbl:"Text value"},
+  SRV:{p:"Advertises the host and port that provide a service.",ex:"_ldap._tcp IN SRV 0 100 389 dc1.lakeview.lan.",tip:"Active Directory clients find domain controllers with SRV records. Value format: priority weight port target.",nm:"_ldap._tcp",val:"0 100 389 dc1.lakeview.lan.",lbl:"Priority weight port target"}
+};
+const seen=new Set();
+const cardsEl=$("#cards");
+Object.keys(RT).forEach(t=>{
+  const b=document.createElement("button"); b.type="button"; b.className="card";
+  b.setAttribute("aria-label",t+" record. Select to flip.");
+  b.innerHTML=`<div class="card-in"><div class="face front"><span class="ty">${t}</span><p>${esc(RT[t].p)}</p><span class="seen"></span></div><div class="face back"><code>${esc(RT[t].ex)}</code><p>${esc(RT[t].tip)}</p></div></div>`;
+  b.addEventListener("click",()=>{b.classList.toggle("flipped");seen.add(t);b.querySelector(".seen").textContent="Explored";
+    $("#cardCount").textContent=`Cards explored: ${seen.size} of 9`; if(seen.size===9) setDone(0,true);});
+  cardsEl.appendChild(b);
+});
+
+/* ---------- generic terminal ---------- */
+function makeTerm(out,inp,prompt,handler){
+  const hist=[];let hi=0;
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){const raw=inp.value;inp.value="";if(raw.trim())hist.push(raw);hi=hist.length;
+      line(out,`<span class="pr">${esc(prompt)}</span> ${esc(raw)}`);handler(raw.trim().replace(/\s+/g," "));out.scrollTop=out.scrollHeight;}
+    else if(e.key==="ArrowUp"){if(hi>0){hi--;inp.value=hist[hi];}e.preventDefault();}
+    else if(e.key==="ArrowDown"){if(hi<hist.length-1){hi++;inp.value=hist[hi];}else{hi=hist.length;inp.value="";}e.preventDefault();}
+  });
+}
+function line(out,html,cls){const d=document.createElement("div");if(cls)d.className=cls;d.innerHTML=html;out.appendChild(d);out.scrollTop=out.scrollHeight;}
+
+/* ---------- Stage 2: build ---------- */
+const BUILD=[
+  {goal:"Install the BIND 9 server and its tools.",hint:"Ubuntu installs software with apt install. The server package is bind9; add bind9utils and dnsutils for the checking and query tools.",ans:"sudo apt install bind9 bind9utils dnsutils",
+   ok:c=>/^(sudo )?apt(-get)? (-y )?install( -y)?\b/.test(c)&&c.split(" ").includes("bind9"),
+   near:c=>/^(sudo )?apt/.test(c)?"Close. Make sure the package name bind9 is in the install command.":null,
+   out:["Reading package lists... Done","Building dependency tree... Done","The following NEW packages will be installed:","  bind9 bind9-utils bind9utils dnsutils","Setting up bind9 (1:9.18.28-0ubuntu0.24.04.1) ...","Created symlink /etc/systemd/system/multi-user.target.wants/named.service."],
+   why:"BIND (Berkeley Internet Name Domain) is the most widely deployed DNS server. Its configuration lives in /etc/bind and its daemon is called named."},
+  {goal:"Open the zone declaration file in a text editor.",hint:"Zones are declared in /etc/bind/named.conf.local. Open it with nano (sudo nano ...).",ans:"sudo nano /etc/bind/named.conf.local",
+   ok:c=>/^(sudo )?(nano|vi|vim) \/etc\/bind\/named\.conf\.local$/.test(c),
+   near:c=>/named\.conf\b(?!\.local)|named\.conf\.options/.test(c)?"Zones you create go in named.conf.local. named.conf.options holds server-wide settings.":null,
+   out:[],edit:true,why:"named.conf.local is where you tell BIND which zones it is authoritative for and where each zone file lives."},
+  {goal:"Create the forward zone file by copying the db.local template.",hint:"Use cp source destination. The source is /etc/bind/db.local; the destination is the file path you entered in named.conf.local.",ans:"sudo cp /etc/bind/db.local /etc/bind/db.lakeview.lan",
+   ok:c=>/^(sudo )?cp \/etc\/bind\/db\.local \/etc\/bind\/db\.lakeview\.lan$/.test(c),
+   near:c=>/^(sudo )?cp /.test(c)?"Check both paths: source /etc/bind/db.local, destination /etc/bind/db.lakeview.lan.":null,
+   out:[],why:"BIND ships template zone files. db.local gives you a correct SOA and NS layout to edit instead of typing one from scratch."},
+  {goal:"Create the reverse zone file by copying the db.127 template.",hint:"db.127 is the reverse-zone template. Copy it to /etc/bind/db.10.10.1.",ans:"sudo cp /etc/bind/db.127 /etc/bind/db.10.10.1",
+   ok:c=>/^(sudo )?cp \/etc\/bind\/db\.127 \/etc\/bind\/db\.10\.10\.1$/.test(c),
+   near:c=>/^(sudo )?cp /.test(c)?"Check both paths: source /etc/bind/db.127, destination /etc/bind/db.10.10.1.":null,
+   out:[],why:"The destination matches the file path declared for the reverse zone. A mismatch here means BIND can't find the zone at startup."},
+  {goal:"Check the BIND configuration files for syntax errors.",hint:"BIND includes a checker for named.conf. Its name starts with named-check.",ans:"sudo named-checkconf",
+   ok:c=>/^(sudo )?named-checkconf( \/etc\/bind\/named\.conf(\.local)?)?$/.test(c),
+   near:c=>/named-checkzone/.test(c)?"That checks a zone file. This step checks the configuration files.":null,
+   out:[],why:"No output means the syntax is valid. A missing semicolon or brace would be reported here with its file and line number."},
+  {goal:"Validate the forward zone file. (The lab pre-filled its SOA and NS lines for you.)",hint:"named-checkzone takes two arguments: the zone name, then the zone file path.",ans:"sudo named-checkzone lakeview.lan /etc/bind/db.lakeview.lan",
+   ok:c=>/^(sudo )?named-checkzone lakeview\.lan\.? \/etc\/bind\/db\.lakeview\.lan$/.test(c),
+   near:c=>/named-checkzone/.test(c)?"Use the format: named-checkzone zone-name file-path.":null,
+   out:["zone lakeview.lan/IN: loaded serial 2026100901","OK"],why:"Always validate before reloading. If a zone file has an error, BIND refuses to load that zone and every name in it stops resolving."},
+  {goal:"Restart BIND so it loads the new zones.",hint:"Services are managed with systemctl. On Ubuntu the service is named (bind9 also works).",ans:"sudo systemctl restart named",
+   ok:c=>/^(sudo )?(systemctl (restart|reload) (bind9|named)(\.service)?|service (bind9|named) (restart|reload)|rndc reload)$/.test(c),
+   near:c=>/systemctl (start|status)/.test(c)?"BIND is already running from the install. Use restart so it rereads the configuration.":null,
+   out:[],why:"Restarting (or running rndc reload) makes BIND reread named.conf and load the zone files."},
+  {goal:"Confirm the DNS service is running.",hint:"Ask systemctl for the status of the named service.",ans:"sudo systemctl status named",
+   ok:c=>/^(sudo )?systemctl status (bind9|named)(\.service)?( --no-pager)?$/.test(c),
+   out:["\u25CF named.service - BIND Domain Name Server","     Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; preset: enabled)","     Active: active (running) since Fri 2026-10-09 09:14:02 CDT; 6s ago","   Main PID: 2214 (named)","Oct 09 09:14:02 ns1 named[2214]: zone lakeview.lan/IN: loaded serial 2026100901","Oct 09 09:14:02 ns1 named[2214]: zone 1.10.10.in-addr.arpa/IN: loaded serial 2026100901","Oct 09 09:14:02 ns1 named[2214]: all zones loaded"],
+   why:"\"active (running)\" and \"all zones loaded\" confirm success. If the service failed, journalctl -u named shows the reason."},
+  {goal:"Allow DNS traffic through the firewall.",hint:"Ubuntu's firewall is ufw. Allow port 53 (or the Bind9 application profile).",ans:"sudo ufw allow 53",
+   ok:c=>/^(sudo )?ufw allow (53|bind9|dns|domain)$/i.test(c),
+   near:c=>/53\/(udp|tcp)/.test(c)?"DNS needs both UDP 53 (normal queries) and TCP 53 (zone transfers and large replies). Allow 53 without a protocol to cover both.":null,
+   out:["Rule added","Rule added (v6)"],why:"Port 53 is now open for UDP and TCP. Without this rule, clients would get \"connection timed out\" even though BIND is running."}
+];
+const B={step:0,reveals:0,hints:0};
+const bOut=$("#buildOut"),bIn=$("#buildIn");
+function renderBuild(){
+  $("#buildSteps").innerHTML=BUILD.map((s,i)=>`<li class="${i<B.step?"done":i===B.step?"cur":""}">${esc(s.goal)}</li>`).join("");
+  const fin=B.step>=BUILD.length;
+  $("#buildHint").disabled=fin;$("#buildReveal").disabled=fin;
+  $("#revealNote").textContent=B.reveals||B.hints?`Hints used: ${B.hints}. Commands revealed: ${B.reveals}.`:"";
+}
+function advance(){
+  B.step++;renderBuild();
+  if(B.step>=BUILD.length){setDone(1,true);line(bOut,"Build complete. ns1 is serving lakeview.lan and 1.10.10.in-addr.arpa. Continue to Stage 3 to add records.","ok");}
+  else line(bOut,`Next: ${esc(BUILD[B.step].goal)}`,"dim");
+}
+function buildHandle(c){
+  if(!c) return;
+  if(c==="clear"){bOut.innerHTML="";return;}
+  if(B.step>=BUILD.length){line(bOut,"All build steps are complete. Move on to Stage 3.","dim");return;}
+  const st=BUILD[B.step];
+  if(c==="hint"||c==="help"){B.hints++;line(bOut,"Hint: "+esc(st.hint),"warn");renderBuild();return;}
+  if(st.ok(c)){
+    st.out.forEach(l=>line(bOut,esc(l),"o"));
+    if(!st.out.length&&!st.edit) line(bOut,"(no output; on Linux, silence usually means success)","dim");
+    line(bOut,"\u2714 "+esc(st.why),"ok");
+    if(st.edit) openEditor(); else advance();
+  } else {
+    const n=st.near&&st.near(c);
+    const base=c.split(" ")[c.startsWith("sudo ")?1:0];
+    const known=["apt","apt-get","nano","vi","vim","cp","named-checkconf","named-checkzone","systemctl","service","ufw","rndc","ls","cat"].includes(base);
+    line(bOut,esc(n||(known?"That command runs, but it doesn't complete this step. ":`${base}: command not found. `)+(n?"":"Current goal: "+st.goal+" Type hint for a clue.")),"err");
+  }
+}
+makeTerm(bOut,bIn,"student@ns1:~$",buildHandle);
+line(bOut,"Ubuntu 24.04 LTS  ns1.lakeview.lan  10.10.1.10","dim");
+line(bOut,`Next: ${esc(BUILD[0].goal)}`,"dim");
+$("#buildHint").addEventListener("click",()=>{if(B.step<BUILD.length){B.hints++;line(bOut,"Hint: "+esc(BUILD[B.step].hint),"warn");renderBuild();}});
+$("#buildReveal").addEventListener("click",()=>{if(B.step<BUILD.length){B.reveals++;bIn.value=BUILD[B.step].ans;line(bOut,"Command placed at the prompt. Read it, then press Enter.","warn");renderBuild();if(!$("#editor").hidden){$("#ez1").focus();}else bIn.focus();}});
+function openEditor(){
+  $("#editor").hidden=false;$("#buildInRow").style.display="none";
+  line(bOut,"Opened /etc/bind/named.conf.local in nano. Fill in the blanks below the terminal, then save.","warn");
+  $("#ez1").focus();
+}
+$("#edSave").addEventListener("click",()=>{
+  const z1=$("#ez1").value.trim().toLowerCase().replace(/\.$/,""),t1=$("#et1").value,f1=$("#ef1").value.trim(),z2=$("#ez2").value.trim().toLowerCase().replace(/\.$/,"");
+  const errs=[];
+  if(z1!==ZONE) errs.push(z1?`Forward zone "${z1}" doesn't match the ticket. The zone is lakeview.lan.`:"Enter the forward zone name.");
+  if(t1!=="primary") errs.push(t1?`"${t1}" is wrong for this server. ns1 holds the original copy of the zone, so it's the primary (older guides say master).`:"Choose the zone type.");
+  if(f1!=="/etc/bind/db.lakeview.lan") errs.push(f1&&!f1.startsWith("/")?"Use the full path to the zone file, starting with /etc/bind/.":"The forward zone file should be /etc/bind/db.lakeview.lan (you'll create it in the next step).");
+  if(z2!==REV) errs.push(z2==="10.10.1.in-addr.arpa"?"Reverse zones list the network octets backwards: 10.10.1 becomes 1.10.10.in-addr.arpa.":"Enter the reverse zone for 10.10.1.0/24. Hint: reverse the network octets and add .in-addr.arpa.");
+  if(errs.length){$("#edMsg").textContent=errs.join("\n");return;}
+  $("#edMsg").textContent="";$("#editor").hidden=true;$("#buildInRow").style.display="";
+  line(bOut,'[ Wrote 12 lines ]  Saved /etc/bind/named.conf.local with 2 zones declared.',"ok");
+  advance();bIn.focus();
+});
+renderBuild();
+
+/* ---------- Stage 3: records ---------- */
+let rid=0,lastId=null,zoneTab="fwd",serialFlash=false;
+const S={serial:2026100901,records:[]};
+const seed=(zone,name,type,value)=>S.records.push({id:++rid,zone,name,type,ttl:3600,prio:null,value,seed:true});
+seed("fwd","@","NS","ns1.lakeview.lan."); seed("fwd","ns1","A","10.10.1.10");
+seed("rev","@","NS","ns1.lakeview.lan."); seed("rev","10","PTR","ns1.lakeview.lan.");
+const fq=(name,zone)=>{const o=zone==="fwd"?ZF:RF;return name==="@"?o:name+"."+o;};
+const recData=r=>r.type==="MX"?r.prio+" "+r.value:r.type==="TXT"?'"'+r.value+'"':r.value;
+const lineText=r=>`${r.name} ${r.ttl} IN ${r.type} ${recData(r)}`;
+const has=(z,n,t,v)=>S.records.some(r=>r.zone===z&&r.name===n&&r.type===t&&r.value===v);
+function hasAddr(fqdn){const rel=fqdn===ZF?"@":fqdn.slice(0,-(ZF.length+1));return S.records.some(r=>r.zone==="fwd"&&r.name===rel&&["A","AAAA","CNAME"].includes(r.type));}
+
+const RTASKS=[
+  {t:"Point www to the web server at 10.10.1.20.",h:"Type A, name www, value 10.10.1.20.",ok:()=>has("fwd","www","A","10.10.1.20")},
+  {t:"Point mail to the mail server at 10.10.1.25.",h:"Another A record. The MX record later needs this host to exist.",ok:()=>has("fwd","mail","A","10.10.1.25")},
+  {t:"Point dc1 to the domain controller at 10.10.1.5.",h:"Type A, name dc1.",ok:()=>has("fwd","dc1","A","10.10.1.5")},
+  {t:"Give www the IPv6 address 2001:db8:10::20.",h:"IPv6 addresses go in AAAA records.",ok:()=>S.records.some(r=>r.zone==="fwd"&&r.name==="www"&&r.type==="AAAA"&&expand6(r.value)===expand6("2001:db8:10::20"))},
+  {t:"Make portal an alias for www.",h:"Type CNAME, name portal. The target is a name, not an IP.",ok:()=>has("fwd","portal","CNAME","www.lakeview.lan.")},
+  {t:"Route email for lakeview.lan to mail, preference 10.",h:"Type MX, name @ (the zone itself), preference 10, value mail.lakeview.lan. with a trailing dot.",ok:()=>S.records.some(r=>r.zone==="fwd"&&r.name==="@"&&r.type==="MX"&&r.prio===10&&r.value==="mail.lakeview.lan.")},
+  {t:"Publish the SPF policy v=spf1 mx -all for the domain.",h:"Type TXT at name @. Quotation marks are optional; the zone file adds them.",ok:()=>S.records.some(r=>r.zone==="fwd"&&r.name==="@"&&r.type==="TXT"&&r.value.trim()==="v=spf1 mx -all")},
+  {t:"Let 10.10.1.20 resolve back to www.lakeview.lan.",h:"Type PTR in the reverse zone. The name is the last octet (20); the value is the full host name with a trailing dot.",ok:()=>has("rev","20","PTR","www.lakeview.lan.")}
+];
+const CHALLENGE={t:"Optional challenge: advertise LDAP on dc1 with an SRV record (priority 0, weight 100, port 389).",h:"Type SRV, name _ldap._tcp, value 0 100 389 dc1.lakeview.lan.",ok:()=>S.records.some(r=>r.type==="SRV"&&r.name==="_ldap._tcp"&&r.value==="0 100 389 dc1.lakeview.lan.")};
+function taskHTML(list,opt){
+  return list.map(x=>{const ok=x.ok();return `<li class="${ok?"ok":""}"><span class="tick" aria-hidden="true"></span><div><span class="t">${esc(x.t)}</span>${ok?'<span class="sr"> Complete.</span>':""}${x.h&&!ok?`<details><summary>Hint</summary>${esc(x.h)}</details>`:""}</div></li>`;}).join("");
+}
+function renderRecTasks(){
+  const n=RTASKS.filter(x=>x.ok()).length;
+  $("#recTasks").innerHTML=taskHTML(RTASKS)+taskHTML([CHALLENGE]);
+  $("#recCount").textContent=`${n} of ${RTASKS.length} complete`;
+  $("#recBar").style.width=(n/RTASKS.length*100)+"%";
+  setDone(2,n===RTASKS.length);
+}
+function renderZone(){
+  const z=zoneTab,origin=z==="fwd"?ZF:RF;
+  $("#tabFwd").setAttribute("aria-selected",z==="fwd");$("#tabRev").setAttribute("aria-selected",z==="rev");
+  $("#zfPath").textContent=z==="fwd"?"/etc/bind/db.lakeview.lan":"/etc/bind/db.10.10.1";
+  const c=t=>`<span class="c">${esc(t)}</span>`, I=" ".repeat(22);
+  const L=[
+    {h:`<span class="d">$TTL</span> 86400`},
+    {h:`<span class="d">$ORIGIN</span> ${esc(origin)}`},
+    {h:`${pad("@",21)}<span class="k">IN  SOA</span>  ns1.lakeview.lan. admin.lakeview.lan. (`},
+    {h:`${I}<span class="v">${S.serial}</span>  ${c("; serial (increase on every change)")}`,cls:serialFlash?"flash":""},
+    {h:`${I}3600        ${c("; refresh")}`},{h:`${I}900         ${c("; retry")}`},
+    {h:`${I}604800      ${c("; expire")}`},{h:`${I}86400 )    ${c("; negative cache TTL")}`},{h:""}
+  ];
+  const order={NS:0,MX:1,TXT:2};
+  S.records.filter(r=>r.zone===z).sort((a,b)=>((order[a.type]??5)-(order[b.type]??5))||(a.id-b.id)).forEach(r=>{
+    L.push({h:`${esc(pad(r.name,14))}${esc(pad(r.ttl,7))}<span class="k">IN  ${esc(pad(r.type,6))}</span><span class="v">${esc(recData(r))}</span>`,id:r.id,seed:r.seed,label:r.name+" "+r.type,cls:r.id===lastId?"new":""});
+  });
+  $("#zoneView").innerHTML=L.map((l,i)=>`<div class="zl ${l.cls||""}"><span class="ln">${i+1}</span><code>${l.h}</code>${l.id&&!l.seed?`<button class="rm" type="button" data-id="${l.id}" aria-label="Remove ${esc(l.label)} record">Remove</button>`:""}</div>`).join("");
+  serialFlash=false;lastId=null;
+}
+$("#zoneView").addEventListener("click",e=>{
+  const b=e.target.closest(".rm");if(!b)return;
+  const id=+b.dataset.id,r=S.records.find(x=>x.id===id);
+  S.records=S.records.filter(x=>x.id!==id);S.serial++;serialFlash=true;
+  renderZone();renderRecTasks();fb("warn",`Removed: ${esc(lineText(r))}. Serial increased to ${S.serial}.`);
+});
+$("#tabFwd").addEventListener("click",()=>{zoneTab="fwd";renderZone();});
+$("#tabRev").addEventListener("click",()=>{zoneTab="rev";renderZone();});
+
+function fb(kind,html,notes){
+  const m=$("#recMsg");m.className="msg "+kind;
+  m.innerHTML=html+(notes&&notes.length?"<ul>"+notes.map(n=>"<li>"+esc(n)+"</li>").join("")+"</ul>":"");
+}
+function normName(raw,zone){
+  let n=raw.trim().toLowerCase();const origin=zone==="fwd"?ZONE:REV,of=origin+".";
+  if(!n) return {err:"Enter a name. Use @ for the zone itself."};
+  if(n==="@"||n===of) return {v:"@"};
+  if(n.endsWith("."+of)) n=n.slice(0,-(of.length+1));
+  else if(n.endsWith(".")) return {err:`${raw} is outside the ${origin} zone. Enter just the host part, like www.`};
+  else if(n===origin) return {err:"For the zone itself, enter @."};
+  else if(n.endsWith("."+origin)) return {err:`Missing trailing dot: BIND would read "${n}" as ${n}.${of} Enter just "${n.slice(0,-(origin.length+1))}", or add a dot at the end.`};
+  if(zone==="rev"){
+    if(!/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/.test(n)) return {err:"In the reverse zone 1.10.10.in-addr.arpa, the name is only the last octet of the address. For 10.10.1.20, enter 20."};
+    return {v:n};
+  }
+  if(!labelsOk(n)) return {err:"Host names use letters, numbers, and hyphens, and can't start or end with a hyphen."};
+  return {v:n};
+}
+const TARGET_IP={CNAME:"A CNAME points to another name, not an IP address. To map a name to an IP, use an A record.",
+  MX:"An MX record must point to the mail server's host name (like mail.lakeview.lan.), never an IP address. That host then needs its own A record.",
+  NS:"NS records name the server by host name, not by IP address.",
+  PTR:"A PTR record points to a host name. The IP address is already expressed by the record's name.",
+  SRV:"The SRV target must be a host name, not an IP address."};
+function normTarget(raw,zone,type){
+  const v=raw.trim().toLowerCase();
+  if(!v) return {err:"Enter the target host name."};
+  if(isIPv4(v)||expand6(v)) return {err:TARGET_IP[type]};
+  if(v.endsWith(".")){ if(!labelsOk(v.slice(0,-1))) return {err:"That host name contains invalid characters."}; return {v}; }
+  const o=zone==="fwd"?ZF:RF;
+  if(v===ZONE||v.endsWith("."+ZONE)||v===REV||v.endsWith("."+REV)) return {err:`Missing trailing dot: BIND would read this as ${v}.${o} Add a dot at the end (${v}.) or enter just the short name.`};
+  if(!labelsOk(v)) return {err:"That host name contains invalid characters."};
+  if(zone==="rev") return {err:`In the reverse zone, a short name gets the reverse origin appended (${v}.${o}). Enter the full host name with a trailing dot, like www.lakeview.lan.`};
+  return {v:v+"."+ZF,note:`Short name "${v}" was expanded to ${v}.${ZF} (BIND appends the zone origin to names without a trailing dot).`};
+}
+function addRecord(){
+  const zone=$("#fZone").value,type=$("#fType").value;
+  if(type==="PTR"&&zone!=="rev") return fb("err","PTR records belong in the reverse zone. Switch the zone to 1.10.10.in-addr.arpa.");
+  if(!["PTR","NS"].includes(type)&&zone==="rev") return fb("err",`${type} records belong in the forward zone lakeview.lan. The reverse zone holds PTR, NS, and SOA records.`);
+  const nm=normName($("#fName").value,zone); if(nm.err) return fb("err",esc(nm.err));
+  const name=nm.v, ttl=Number($("#fTtl").value);
+  if(!Number.isInteger(ttl)||ttl<60||ttl>604800) return fb("err","TTL must be a whole number from 60 to 604800 seconds. 3600 (one hour) is a common default.");
+  const raw=$("#fVal").value.trim(); let value,prio=null; const notes=[];
+  const tgt=(s)=>{const t=normTarget(s,zone,type); if(t.note) notes.push(t.note); return t;};
+  switch(type){
+    case "A": if(!isIPv4(raw)) return fb("err",expand6(raw)?"That's an IPv6 address. IPv6 addresses go in AAAA records.":"An A record needs an IPv4 address in dotted-decimal form, like 10.10.1.20. Each octet must be 0 to 255."); value=raw; break;
+    case "AAAA": if(isIPv4(raw)) return fb("err","That's an IPv4 address. Use an A record for IPv4."); if(!expand6(raw)) return fb("err","Enter a valid IPv6 address, like 2001:db8:10::20. Use :: only once."); value=raw.toLowerCase(); break;
+    case "CNAME": { if(name==="@") return fb("err","A CNAME can't go at the zone apex (@). The apex must hold the SOA and NS records, and a CNAME must be the only record at its name.");
+      const t=tgt(raw); if(t.err) return fb("err",esc(t.err)); value=t.v; if(value===fq(name,zone)) return fb("err","A CNAME can't point to itself."); break; }
+    case "MX": { prio=Number($("#fPrio").value); if(!Number.isInteger(prio)||prio<0||prio>65535) return fb("err","Enter an MX preference from 0 to 65535. Lower numbers are tried first; 10 is typical.");
+      const t=tgt(raw); if(t.err) return fb("err",esc(t.err)); value=t.v; break; }
+    case "NS": case "PTR": { const t=tgt(raw); if(t.err) return fb("err",esc(t.err)); value=t.v; break; }
+    case "TXT": { const v=raw.replace(/^"(.*)"$/,"$1"); if(!v) return fb("err","Enter the text value, like v=spf1 mx -all."); if(v.length>255) return fb("err","A single TXT string is limited to 255 characters."); value=v; break; }
+    case "SRV": { if(!/^_[a-z0-9-]+\._(tcp|udp)$/.test(name)) return fb("err","SRV names follow the pattern _service._protocol, like _ldap._tcp.");
+      const p=raw.split(/\s+/); if(p.length!==4||![0,1,2].every(i=>/^\d+$/.test(p[i])&&+p[i]<=65535)) return fb("err","Enter four parts separated by spaces: priority weight port target. Example: 0 100 389 dc1.lakeview.lan.");
+      const t=tgt(p[3]); if(t.err) return fb("err",esc(t.err)); value=`${+p[0]} ${+p[1]} ${+p[2]} ${t.v}`; break; }
+  }
+  const same=S.records.filter(r=>r.zone===zone&&r.name===name);
+  if(type!=="CNAME"&&same.some(r=>r.type==="CNAME")) return fb("err",`${esc(fq(name,zone))} already has a CNAME. A CNAME must be the only record at its name, so remove it or choose another name.`);
+  if(type==="CNAME"&&same.length) return fb("err",`${esc(fq(name,zone))} already has ${esc(same.map(r=>r.type).join(", "))} record(s). A CNAME must be the only record at its name.`);
+  if(same.some(r=>r.type===type&&r.value===value&&r.prio===prio)) return fb("err","That exact record already exists in the zone.");
+  let warn=false;
+  if(["MX","CNAME","SRV","NS"].includes(type)){const t=type==="SRV"?value.split(" ")[3]:value;
+    if((t===ZF||t.endsWith("."+ZF))&&!hasAddr(t)){warn=true;notes.push(`${t} has no A or AAAA record yet. Lookups that follow this record will fail until you add one.`);}}
+  if(type==="A"&&same.some(r=>r.type==="A")){warn=true;notes.push(`${fq(name,zone)} now has more than one A record, so DNS will rotate between them (round-robin). Remove one if that wasn't intended.`);}
+  const rec={id:++rid,zone,name,type,ttl,prio,value};
+  S.records.push(rec);S.serial++;lastId=rec.id;serialFlash=true;zoneTab=zone;
+  renderZone();renderRecTasks();
+  fb(warn?"warn":"ok",`Added <code>${esc(lineText(rec))}</code> (serial is now ${S.serial})`,notes);
+  $("#fName").value="";$("#fVal").value="";updatePreview();$("#fName").focus();
+}
+$("#recForm").addEventListener("submit",e=>{e.preventDefault();addRecord();});
+function setType(){
+  const t=$("#fType").value,info=RT[t];
+  if(t==="PTR") $("#fZone").value="rev"; else if(t!=="NS") $("#fZone").value="fwd";
+  $("#prioField").hidden=t!=="MX";
+  $("#fValLbl").textContent=info.lbl;
+  $("#fName").placeholder=info.nm;$("#fVal").placeholder=info.val;
+  $("#typeHelp").innerHTML=`<p><strong>${t}</strong>: ${esc(info.p)}</p><p>${esc(info.tip)}</p>`;
+  updatePreview();
+}
+function updatePreview(){
+  const v=$("#fName").value.trim(),z=$("#fZone").value;
+  if(!v){$("#fqdnPrev").textContent="Use @ for the zone itself.";return;}
+  const n=normName(v,z); $("#fqdnPrev").textContent=n.err?"":"Full name: "+fq(n.v,z);
+}
+$("#fType").addEventListener("change",setType);
+$("#fZone").addEventListener("change",()=>{updatePreview();zoneTab=$("#fZone").value;renderZone();});
+$("#fName").addEventListener("input",updatePreview);
+setType();renderZone();renderRecTasks();
+
+/* ---------- Stage 4: test console ---------- */
+const TYPES=["A","AAAA","CNAME","MX","NS","PTR","SOA","TXT","SRV","ANY"];
+const SERVERS=["10.10.1.10","ns1.lakeview.lan","ns1.lakeview.lan."];
+function parseQuery(c){
+  const t=c.split(" "),tool=t[0];let name=null,type=null,server=null,short=false;
+  const badType=x=>x&&!TYPES.includes(x)?{err:`Unknown record type "${x}". Try A, AAAA, CNAME, MX, NS, PTR, SOA, TXT, or SRV.`}:null;
+  if(tool==="dig"){
+    for(let i=1;i<t.length;i++){const a=t[i];
+      if(a[0]==="@") server=a.slice(1);
+      else if(a==="+short") short=true;
+      else if(a[0]==="+") continue;
+      else if(a==="-x"){const ip=t[++i];if(!ip||!isIPv4(ip)) return {err:"dig -x needs an IPv4 address, like: dig -x 10.10.1.20"};name=revName(ip);type="PTR";}
+      else if(a==="-t"){type=(t[++i]||"").toUpperCase();}
+      else if(TYPES.includes(a.toUpperCase())) type=a.toUpperCase();
+      else if(!name) name=a;}
+    if(!name) return {err:"Usage: dig [@server] name [type]    Example: dig www.lakeview.lan A"};
+    return badType(type)||{tool,name,type:type||"A",server,short};
+  }
+  if(tool==="nslookup"){
+    for(let i=1;i<t.length;i++){const a=t[i],m=a.match(/^-(?:type|query|q|querytype)=(\w+)$/i);
+      if(m) type=m[1].toUpperCase(); else if(a[0]==="-") continue; else if(!name) name=a; else server=a;}
+    if(!name) return {err:"Usage: nslookup [-type=TYPE] name [server]    Example: nslookup -type=mx lakeview.lan"};
+    if(isIPv4(name)){name=revName(name);type="PTR";}
+    return badType(type)||{tool,name,type:type||"A",server};
+  }
+  if(tool==="host"){
+    for(let i=1;i<t.length;i++){const a=t[i];
+      if(a==="-t") type=(t[++i]||"").toUpperCase(); else if(a[0]==="-") continue; else if(!name) name=a; else server=a;}
+    if(!name) return {err:"Usage: host [-t type] name [server]    Example: host -t mx lakeview.lan"};
+    if(isIPv4(name)){name=revName(name);type="PTR";}
+    return badType(type)||{tool,name,type:type||"A",server};
+  }
+  if(["ping","tracert","traceroute"].includes(tool)) return {err:`${tool} tests reachability, not DNS records. Use dig, nslookup, or host for this checklist.`};
+  return {err:`${tool}: command not found. This workstation has dig, nslookup, and host.`};
+}
+function zoneOf(q){if(q===RF||q.endsWith("."+RF))return ["rev",RF];if(q===ZF||q.endsWith("."+ZF))return ["fwd",ZF];return [null,null];}
+function resolve(qname,qtype){
+  qname=qname.toLowerCase();if(!qname.endsWith("."))qname+=".";
+  let [zone,origin]=zoneOf(qname);
+  const res={qname,qtype,answers:[],status:"NOERROR",aa:true,zone,origin};
+  if(!zone){res.status="REFUSED";res.aa=false;return res;}
+  let name=qname;
+  for(let g=0;g<6;g++){
+    const rel=name===origin?"@":name.slice(0,-(origin.length+1));
+    const recs=S.records.filter(r=>r.zone===zone&&r.name===rel);
+    if(!recs.length&&rel!=="@"){res.status="NXDOMAIN";break;}
+    if(qtype==="SOA"&&rel==="@"){res.answers.push({owner:name,ttl:86400,type:"SOA",data:`ns1.lakeview.lan. admin.lakeview.lan. ${S.serial} 3600 900 604800 86400`});break;}
+    const m=recs.filter(r=>qtype==="ANY"||r.type===qtype);
+    if(m.length){m.forEach(r=>res.answers.push({owner:name,ttl:r.ttl,type:r.type,data:recData(r)}));break;}
+    const cn=recs.find(r=>r.type==="CNAME");
+    if(cn&&qtype!=="CNAME"){res.answers.push({owner:name,ttl:cn.ttl,type:"CNAME",data:cn.value});name=cn.value;
+      [zone,origin]=zoneOf(name);if(!zone)break;continue;}
+    break;
+  }
+  return res;
+}
+const noDot=s=>s.replace(/\.$/,"");
+function fmtDig(raw,r,short){
+  if(short) return r.answers.map(a=>a.data);
+  const L=[`; <<>> DiG 9.18.28 <<>> ${raw.replace(/^dig ?/,"")}`,";; global options: +cmd",";; Got answer:",
+    `;; ->>HEADER<<- opcode: QUERY, status: ${r.status}, id: ${1000+Math.floor(Math.random()*60000)}`,
+    `;; flags: qr${r.aa?" aa":""} rd; QUERY: 1, ANSWER: ${r.answers.length}, AUTHORITY: ${r.answers.length||!r.zone?0:1}, ADDITIONAL: 1`];
+  if(!r.aa) L.push(";; WARNING: recursion requested but not available");
+  L.push("",";; QUESTION SECTION:",`;${pad(r.qname,31)}IN  ${r.qtype}`);
+  if(r.answers.length){L.push("",";; ANSWER SECTION:");r.answers.forEach(a=>L.push(`${pad(a.owner,32)}${pad(a.ttl,7)}IN  ${pad(a.type,6)}${a.data}`));}
+  else if(r.zone){L.push("",";; AUTHORITY SECTION:",`${pad(r.origin,32)}${pad(86400,7)}IN  SOA   ns1.lakeview.lan. admin.lakeview.lan. ${S.serial} 3600 900 604800 86400`);}
+  L.push("",";; Query time: 1 msec",";; SERVER: 10.10.1.10#53(10.10.1.10) (UDP)",";; WHEN: Fri Oct 09 09:20:11 CDT 2026");
+  return L;
+}
+function fmtNs(r){
+  const L=["Server:\t\t10.10.1.10","Address:\t10.10.1.10#53",""];
+  if(r.status==="NXDOMAIN"&&!r.answers.length){L.push(`** server can't find ${noDot(r.qname)}: NXDOMAIN`);return L;}
+  if(r.status==="REFUSED"){L.push(`** server can't find ${noDot(r.qname)}: REFUSED`);return L;}
+  if(!r.answers.length){L.push(`*** Can't find ${noDot(r.qname)}: No answer`);return L;}
+  r.answers.forEach(a=>{const o=noDot(a.owner);
+    switch(a.type){case "A":case "AAAA":L.push(`Name:\t${o}`,`Address: ${a.data}`);break;
+      case "CNAME":L.push(`${o}\tcanonical name = ${a.data}`);break;
+      case "MX":L.push(`${o}\tmail exchanger = ${a.data}`);break;
+      case "TXT":L.push(`${o}\ttext = ${a.data}`);break;
+      case "PTR":L.push(`${o}\tname = ${a.data}`);break;
+      case "NS":L.push(`${o}\tnameserver = ${a.data}`);break;
+      case "SRV":L.push(`${o}\tservice = ${a.data}`);break;
+      default:L.push(`${o}\t${a.type} ${a.data}`);}});
+  if(r.status==="NXDOMAIN") L.push(`** server can't find ${noDot(r.answers[r.answers.length-1].data)}: NXDOMAIN`);
+  return L;
+}
+function fmtHost(r){
+  if(r.status==="REFUSED") return [`Host ${noDot(r.qname)} not found: 5(REFUSED)`];
+  if(!r.answers.length) return r.status==="NXDOMAIN"?[`Host ${noDot(r.qname)} not found: 3(NXDOMAIN)`]:[`${noDot(r.qname)} has no ${r.qtype} record`];
+  const L=r.answers.map(a=>{const o=noDot(a.owner);
+    return {A:`${o} has address ${a.data}`,AAAA:`${o} has IPv6 address ${a.data}`,CNAME:`${o} is an alias for ${a.data}`,MX:`${o} mail is handled by ${a.data}`,
+      TXT:`${o} descriptive text ${a.data}`,PTR:`${o} domain name pointer ${a.data}`,NS:`${o} name server ${a.data}`,SRV:`${o} has SRV record ${a.data}`}[a.type]||`${o} has ${a.type} record ${a.data}`;});
+  if(r.status==="NXDOMAIN") L.push(`Host ${noDot(r.answers[r.answers.length-1].data)} not found: 3(NXDOMAIN)`);
+  return L;
+}
+const TESTS=[
+  {t:"Look up the IPv4 address of www.lakeview.lan.",ok:r=>r.qname==="www.lakeview.lan."&&r.qtype==="A"&&r.answers.some(a=>a.type==="A")},
+  {t:"Find the mail server for lakeview.lan.",ok:r=>r.qtype==="MX"&&r.answers.some(a=>a.type==="MX")},
+  {t:"Resolve portal.lakeview.lan and watch the alias get followed.",ok:r=>r.qname==="portal.lakeview.lan."&&r.answers.some(a=>a.type==="CNAME")&&r.answers.some(a=>a.type==="A"||a.type==="AAAA")},
+  {t:"Run a reverse lookup on 10.10.1.20.",ok:r=>r.qtype==="PTR"&&r.qname==="20.1.10.10.in-addr.arpa."&&r.answers.length>0},
+  {t:"Read the SPF policy stored in a TXT record.",ok:r=>r.qtype==="TXT"&&r.answers.some(a=>a.type==="TXT")},
+  {t:"Look up a name that doesn't exist and identify the status code.",ok:r=>r.status==="NXDOMAIN"}
+];
+const passed=new Set();
+function renderTests(){
+  $("#testTasks").innerHTML=TESTS.map((x,i)=>`<li class="${passed.has(i)?"ok":""}"><span class="tick" aria-hidden="true"></span><div><span class="t">${esc(x.t)}</span>${passed.has(i)?'<span class="sr"> Complete.</span>':""}</div></li>`).join("");
+  $("#testCount").textContent=`${passed.size} of ${TESTS.length} complete`;
+  $("#testBar").style.width=(passed.size/TESTS.length*100)+"%";
+  setDone(3,passed.size===TESTS.length);
+}
+const tOut=$("#testOut");
+function testHandle(c){
+  if(!c) return;
+  if(c==="clear"){tOut.innerHTML="";return;}
+  const q=parseQuery(c);
+  if(q.err){line(tOut,esc(q.err),"err");return;}
+  q.name=q.name.toLowerCase();
+  if(q.server&&!SERVERS.includes(q.server.toLowerCase())){
+    line(tOut,`<pre>${esc(q.tool==="dig"?";; communications error to "+q.server+"#53: timed out\n;; no servers could be reached":";; connection timed out; no servers could be reached")}</pre>`,"o");
+    line(tOut,`Nothing answered at ${esc(q.server)}. The DNS server for this lab is 10.10.1.10.`,"dim");return;
+  }
+  const r=resolve(q.name,q.type);
+  const lines=q.tool==="dig"?fmtDig(c,r,q.short):q.tool==="nslookup"?fmtNs(r):fmtHost(r);
+  const html=lines.map(l=>esc(l)).join("\n").replace(/status: (\w+)/,(m,s)=>`status: <b class="st-${s}">${s}</b>`);
+  line(tOut,`<pre>${html||esc("(empty answer)")}</pre>`,"o");
+  if(r.status==="NXDOMAIN") line(tOut,r.answers.length?"NXDOMAIN after a CNAME: the alias exists, but its target name doesn't. Add a record for the target in Stage 3.":"NXDOMAIN: no records exist at that name. That's what you want for this checklist item; for a real name, check the spelling or add the record in Stage 3.","warn");
+  else if(r.status==="REFUSED") line(tOut,"REFUSED: ns1 is authoritative only for lakeview.lan and 1.10.10.in-addr.arpa. It has no forwarders or recursion for outside names.","warn");
+  else if(!r.answers.length) line(tOut,`NOERROR with no answer: the name exists, but it has no ${r.qtype} record. Check the record type, or add the record in Stage 3.`,"warn");
+  TESTS.forEach((x,i)=>{if(!passed.has(i)&&x.ok(r)){passed.add(i);line(tOut,"\u2714 Checklist: "+esc(x.t),"ok");}});
+  renderTests();
+}
+makeTerm(tOut,$("#testIn"),"student@ws07:~$",testHandle);
+line(tOut,"Workstation ws07.lakeview.lan  DNS server: 10.10.1.10","dim");
+line(tOut,"Try: dig www.lakeview.lan","dim");
+renderTests();
+
+/* ---------- Stage 5: quiz ---------- */
+const QUIZ=[
+  {q:"Users can reach the intranet server by typing 10.10.1.20, but not by typing www.lakeview.lan. What should you do first?",
+   o:["Replace the server's network card","Query the name with dig or nslookup to see what DNS returns","Reboot the core switch","Turn off the client's firewall"],a:1,
+   w:"The IP address works, so the network path is fine. The failure is name resolution. dig or nslookup shows whether the record exists, what it returns, and which server answered."},
+  {q:"You added a record on the primary DNS server, but the secondary server still doesn't have it hours later. What is the most likely cause?",
+   o:["The record's TTL is too long","The SOA serial number wasn't increased","The MX preference is too high","The reverse zone is missing a PTR record"],a:1,
+   w:"Secondary servers compare the SOA serial number to decide whether to transfer the zone. If the serial doesn't go up, the secondary assumes nothing changed."},
+  {q:"In the lakeview.lan zone file, you enter: mail IN CNAME mailhost.lakeview.lan (no trailing dot). What name does the alias actually point to?",
+   o:["mailhost.lakeview.lan.","mailhost.","mailhost.lakeview.lan.lakeview.lan.","The record is rejected"],a:2,
+   w:"Without a trailing dot, BIND treats a name as relative and appends the zone origin. This is one of the most common zone file mistakes."},
+  {q:"Which record type must be the only record at its name?",o:["MX","A","TXT","CNAME"],a:3,
+   w:"A CNAME says \"this name is really another name,\" so no other data can live beside it. That's also why a CNAME can't sit at the zone apex, where SOA and NS records must exist."},
+  {q:"What belongs in the value of an MX record?",o:["The mail server's IP address","A host name that has its own A or AAAA record","A CNAME alias","An administrator's email address"],a:1,
+   w:"MX records point to host names. Pointing an MX at an IP or at a CNAME breaks the standard and causes mail delivery failures."},
+  {q:"Which ports must be open on a DNS server's firewall?",o:["UDP 53 only","TCP 443","UDP 53 and TCP 53","UDP 67 and 68"],a:2,
+   w:"Ordinary queries use UDP 53. Zone transfers and responses too large for UDP use TCP 53. UDP 67 and 68 are DHCP."},
+  {q:"You changed www's A record, but one client still reaches the old address. What is the most likely reason?",
+   o:["The client or its resolver cached the old answer and is waiting for the TTL to expire","The zone file was deleted","The PTR record is wrong","The client's DHCP lease expired"],a:0,
+   w:"Answers are cached for the record's TTL. Clear the client cache with ipconfig /flushdns (Windows) or resolvectl flush-caches (Linux). Lowering the TTL before a planned change avoids this."},
+  {q:"What does named-checkzone do?",o:["Restarts the BIND service","Copies the zone to secondary servers","Checks a zone file for syntax and data errors before BIND loads it","Tests whether a client can resolve names"],a:2,
+   w:"named-checkzone validates a zone file and reports the serial it would load. Running it before a reload prevents an outage caused by a typo."},
+  {q:"Why should zone transfers be limited to your own secondary servers?",
+   o:["Zone transfers use too much bandwidth","An open transfer gives an attacker a complete map of your internal hosts","Secondaries can't receive transfers otherwise","It speeds up recursive queries"],a:1,
+   w:"A zone transfer (AXFR) returns every record in the zone. Restricting it with allow-transfer in BIND, or the Zone Transfers tab in Windows DNS, prevents easy reconnaissance."}
+];
+let quizScore=null;
+function renderQuiz(){
+  $("#quiz").innerHTML=QUIZ.map((x,i)=>`<fieldset class="q"><legend>${i+1}. ${esc(x.q)}</legend>${x.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> <span>${esc(o)}</span></label>`).join("")}<div class="why" hidden></div></fieldset>`).join("");
+  $("#quizResult").hidden=true;$("#quizSubmit").hidden=false;$("#quizReset").hidden=true;
+}
+$("#quizSubmit").addEventListener("click",()=>{
+  let s=0;
+  QUIZ.forEach((x,i)=>{
+    const fs=$$("#quiz fieldset")[i],sel=fs.querySelector("input:checked"),pick=sel?+sel.value:-1;
+    fs.querySelectorAll("label").forEach((l,j)=>{l.classList.toggle("right",j===x.a);l.classList.toggle("wrong",j===pick&&pick!==x.a);});
+    fs.querySelectorAll("input").forEach(inp=>inp.disabled=true);
+    if(pick===x.a) s++;
+    const w=fs.querySelector(".why");w.hidden=false;w.innerHTML=`<strong>${pick===x.a?"Correct.":pick<0?"Not answered.":"Not quite."}</strong> ${esc(x.w)}`;
+  });
+  quizScore=s;setDone(4,true);
+  const r=$("#quizResult");r.hidden=false;r.innerHTML=`<p class="score">You scored ${s} of ${QUIZ.length}.</p><p>${s>=8?"Strong work. You're ready to support DNS on a production network.":s>=6?"Good foundation. Review the explanations for the questions you missed.":"Review the Stage 1 material and the explanations above, then try again."}</p>`;
+  $("#quizSubmit").hidden=true;$("#quizReset").hidden=false;r.scrollIntoView({block:"nearest"});
+});
+$("#quizReset").addEventListener("click",()=>{renderQuiz();window.scrollTo({top:$("#s4").offsetTop-80});});
+renderQuiz();
+
+/* ---------- Stage 6: results ---------- */
+function zoneText(z){
+  const origin=z==="fwd"?ZF:RF;
+  const L=[`; ${z==="fwd"?"/etc/bind/db.lakeview.lan":"/etc/bind/db.10.10.1"}`,"$TTL 86400",`$ORIGIN ${origin}`,`@  IN SOA ns1.lakeview.lan. admin.lakeview.lan. ( ${S.serial} 3600 900 604800 86400 )`];
+  S.records.filter(r=>r.zone===z).forEach(r=>L.push(`${pad(r.name,14)}${pad(r.ttl,7)}IN  ${pad(r.type,6)}${recData(r)}`));
+  return L.join("\n");
+}
+function renderResults(){
+  const recN=RTASKS.filter(x=>x.ok()).length,buildN=Math.min(B.step,BUILD.length);
+  const buildPts=Math.max(0,buildN/BUILD.length*20-B.reveals*1);
+  const overall=Math.round(buildPts+recN/RTASKS.length*30+passed.size/TESTS.length*25+(quizScore||0)/QUIZ.length*25);
+  const d=new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  const nm=$("#stuName").value.trim();
+  $("#results").innerHTML=`
+  <div class="panel">
+    <div class="overall"><span class="big">${overall}%</span><span>Overall lab score${nm?" for "+esc(nm):""}, ${esc(d)}</span></div>
+    <div class="res-grid">
+      <div class="res"><div class="big">${seen.size}/9</div><small>Record type cards explored</small></div>
+      <div class="res"><div class="big">${buildN}/${BUILD.length}</div><small>Build steps completed. Hints: ${B.hints}, commands revealed: ${B.reveals} (1 point each)</small></div>
+      <div class="res"><div class="big">${recN}/${RTASKS.length}</div><small>Required records correct${CHALLENGE.ok()?", plus the SRV challenge":""}</small></div>
+      <div class="res"><div class="big">${passed.size}/${TESTS.length}</div><small>Resolution tests passed</small></div>
+      <div class="res"><div class="big">${quizScore===null?"\u2013":quizScore+"/"+QUIZ.length}</div><small>${quizScore===null?"Knowledge check not submitted":"Knowledge check"}</small></div>
+    </div>
+    <p class="counter">Weighting: build 20%, records 30%, testing 25%, knowledge check 25%.</p>
+  </div>
+  <div class="panel">
+    <h3>Configuration evidence</h3>
+    <p>Final zone files as configured on ns1 (serial ${S.serial}).</p>
+    <pre class="evidence">${esc(zoneText("fwd"))}</pre>
+    <pre class="evidence">${esc(zoneText("rev"))}</pre>
+  </div>`;
+}
+$("#stuName").addEventListener("input",renderResults);
+$("#printBtn").addEventListener("click",()=>{renderResults();window.print();});
+
+show(0);
+})();
+</script>
+</body>
+</html>
