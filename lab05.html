@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capture Lab: Reading the Wire | LAN121</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f6fa; --surface:#ffffff; --surface2:#eef2f7; --ink:#12223a; --muted:#4d6177; --line:#cdd8e4;
+  --navy:#0047AB; --navy-ink:#ffffff; --green:#00865a; --green-soft:#d9f3e8; --red:#c42b3b; --red-soft:#fbe1e4; --amber:#9a6a00; --amber-soft:#fdf0cf;
+  --k-tcp:#e7e6ff; --k-syn:#dcdcdc; --k-rst:#a40000; --k-rst-t:#fffc9c; --k-http:#e4ffc7; --k-udp:#daeeff; --k-arp:#faf0d7; --k-icmp:#fce0ff; --k-icmperr:#12272e; --k-icmperr-t:#f78787; --k-snmp:#d4f2e2; --k-bad:#2b0e12; --k-bad-t:#ffb4b4;
+  --f-addr:#d6e4fb; --f-port:#d9f3e8; --f-ctl:#fdf0cf; --f-len:#ece3fb; --f-chk:#e7ebf0; --f-id:#dff1fb; --f-data:#f4f6f9; --f-risk:#fbe1e4;
+  --mono:'Space Mono',ui-monospace,Menlo,Consolas,monospace; --sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --disp:'Syne','DM Sans',system-ui,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0c1524; --surface:#132037; --surface2:#1a2a45; --ink:#e4ecf6; --muted:#9db0c6; --line:#2b3d5c;
+  --navy:#5b9bff; --navy-ink:#071223; --green:#3fd29b; --green-soft:#103629; --red:#ff7a87; --red-soft:#3a1720; --amber:#f2c14e; --amber-soft:#3a2e10;
+  --k-tcp:#2a2950; --k-syn:#3a3f47; --k-rst:#7a0b0b; --k-rst-t:#fffc9c; --k-http:#24401a; --k-udp:#173450; --k-arp:#463a1a; --k-icmp:#4a2350; --k-icmperr:#050c10; --k-icmperr-t:#ff9b9b; --k-snmp:#14402c; --k-bad:#3b0a12; --k-bad-t:#ffc2c2;
+  --f-addr:#1d3360; --f-port:#123d2d; --f-ctl:#3d3112; --f-len:#2e2350; --f-chk:#26303d; --f-id:#173a4d; --f-data:#1a2436; --f-risk:#4a1a22;
+}}
+:root[data-theme="dark"]{
+  --bg:#0c1524; --surface:#132037; --surface2:#1a2a45; --ink:#e4ecf6; --muted:#9db0c6; --line:#2b3d5c;
+  --navy:#5b9bff; --navy-ink:#071223; --green:#3fd29b; --green-soft:#103629; --red:#ff7a87; --red-soft:#3a1720; --amber:#f2c14e; --amber-soft:#3a2e10;
+  --k-tcp:#2a2950; --k-syn:#3a3f47; --k-rst:#7a0b0b; --k-rst-t:#fffc9c; --k-http:#24401a; --k-udp:#173450; --k-arp:#463a1a; --k-icmp:#4a2350; --k-icmperr:#050c10; --k-icmperr-t:#ff9b9b; --k-snmp:#14402c; --k-bad:#3b0a12; --k-bad-t:#ffc2c2;
+  --f-addr:#1d3360; --f-port:#123d2d; --f-ctl:#3d3112; --f-len:#2e2350; --f-chk:#26303d; --f-id:#173a4d; --f-data:#1a2436; --f-risk:#4a1a22;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--disp);line-height:1.15;margin:0}
+h2{font-size:1.55rem;font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.08rem;font-weight:600}
+p{margin:.5em 0}
+code,.mono{font-family:var(--mono);font-size:.86em}
+a{color:var(--navy)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1320px;margin:0 auto;padding:0 20px}
+
+/* top bar */
+.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top .wrap{display:flex;align-items:center;gap:18px;min-height:60px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;line-height:1.2;margin-right:auto}
+.brand b{font-family:var(--sans);font-size:1.12rem;font-weight:700}
+.brand span{font-size:.8rem;color:var(--muted)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:0;background:transparent;color:var(--muted);padding:8px 12px;border-radius:8px;font-weight:500}
+.tab:hover{background:var(--surface2);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--navy);color:var(--navy-ink)}
+.meter{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
+.meter .bar{width:110px;height:8px;border-radius:8px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.meter .bar i{display:block;height:100%;width:0;background:var(--green);transition:width .4s}
+.meter b{color:var(--ink);font-variant-numeric:tabular-nums}
+.ghost{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.85rem}
+.ghost:hover{border-color:var(--navy)}
+.btn{border:0;background:var(--navy);color:var(--navy-ink);border-radius:8px;padding:9px 16px;font-weight:700}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--surface2);color:var(--ink);border:1px solid var(--line);font-weight:500}
+.panel{display:none;padding:28px 0 60px}
+.panel.on{display:block}
+
+/* overview */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:center;padding:20px 0 34px}
+.hero h1{font-family:var(--sans);font-size:clamp(2.6rem,6.2vw,4.8rem);font-weight:700;letter-spacing:-.02em}
+.wire{text-overflow:ellipsis;font-family:var(--mono);font-size:.82rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--navy);padding:10px 12px;border-radius:6px;margin:18px 0 0;white-space:pre;overflow:hidden;min-height:2.6em}
+.wire .cur{display:inline-block;width:.6em;background:var(--navy);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lede{font-size:1.1rem;max-width:60ch;color:var(--ink)}
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:18px;max-width:62ch}
+.ticket h3{margin-bottom:6px}
+.ticket small{color:var(--muted)}
+.map{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.map svg{width:100%;height:auto;display:block}
+.map text{font-family:var(--sans);fill:var(--ink)}
+.map .m{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.map .nb{fill:var(--surface2);stroke:var(--line);stroke-width:1.5}
+.map .hot{fill:var(--surface);stroke:var(--navy);stroke-width:2}
+.map .ln{stroke:var(--muted);stroke-width:2}
+.map .span{stroke:var(--navy);stroke-width:2.5;stroke-dasharray:6 5}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h3{margin-bottom:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em}
+.card li{margin:.35em 0}
+.rubric{width:100%;border-collapse:collapse;font-size:.92rem}
+.rubric td{padding:6px 0;border-bottom:1px solid var(--line)}
+.rubric td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.cta{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+
+/* field guide */
+.ksa{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:18px 0 30px}
+.ksa li b{display:block}
+.ksa li span{color:var(--muted);font-size:.93rem}
+.ksa ol{counter-reset:none}
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:30px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 18px}
+.chip{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:500;font-size:.92rem}
+.chip[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+.hdr-grid{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:.8rem}
+.ruler{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));font-family:var(--mono);font-size:.66rem;color:var(--muted);margin-bottom:3px}
+.ruler span:nth-child(8n+1){color:var(--ink);font-weight:700}
+.fld{border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 4px;text-align:center;color:var(--ink);min-height:44px;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
+.fld:hover,.fld.sel{box-shadow:inset 0 0 0 2px var(--navy)}
+.c-addr{background:var(--f-addr)}.c-port{background:var(--f-port)}.c-ctl{background:var(--f-ctl)}.c-len{background:var(--f-len)}.c-chk{background:var(--f-chk)}.c-id{background:var(--f-id)}.c-data{background:var(--f-data)}.c-risk{background:var(--f-risk)}
+.fdesc{margin-top:14px;padding:14px 16px;border-radius:8px;background:var(--surface2);min-height:58px}
+.fdesc b{font-family:var(--disp)}
+.proto-meta{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px}
+.proto-meta ul{margin:6px 0 0;padding-left:1.2em}
+.note{font-size:.88rem;color:var(--muted)}
+.fl-table{width:100%;border-collapse:collapse;font-size:.92rem}
+.fl-table th{text-align:left;color:var(--muted);font-weight:500;padding:8px 10px;border-bottom:2px solid var(--line)}
+.fl-table td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.try{border:1px solid var(--navy);background:transparent;color:var(--navy);border-radius:6px;padding:3px 10px;font-size:.82rem;white-space:nowrap}
+.try:hover{background:var(--navy);color:var(--navy-ink)}
+.tscroll{overflow-x:auto}
+
+/* console */
+.console{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;align-items:start}
+.pane{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fbar{display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.fbar label{font-weight:700;font-size:.85rem}
+.fin{flex:1;min-width:200px;font-family:var(--mono);font-size:.85rem;padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.fin.ok{background:#d7f7d4;color:#0e2a10;border-color:#7cc47a}
+.fin.bad{background:#ffd6d6;color:#3a0b0b;border-color:#e08a8a}
+.qf{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.qf button{font-family:var(--mono);font-size:.74rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:5px;padding:3px 8px}
+.qf button:hover{border-color:var(--navy)}
+.ferr{font-size:.82rem;color:var(--red);padding:0 10px 8px;display:none}
+.plist{height:330px;overflow:auto;outline:none}
+table.pk{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:.76rem;white-space:nowrap}
+table.pk th{position:sticky;top:0;background:var(--surface2);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-family:var(--sans);font-size:.8rem;z-index:1}
+table.pk td{padding:3px 8px;color:#10202e}
+table.pk tr{cursor:pointer}
+table.pk td.info{white-space:nowrap}
+tr.k-tcp{background:var(--k-tcp)} tr.k-syn{background:var(--k-syn)} tr.k-http{background:var(--k-http)} tr.k-udp{background:var(--k-udp)} tr.k-arp{background:var(--k-arp)} tr.k-icmp{background:var(--k-icmp)} tr.k-snmp{background:var(--k-snmp)}
+tr.k-rst{background:var(--k-rst)} tr.k-rst td{color:var(--k-rst-t)}
+tr.k-icmperr{background:var(--k-icmperr)} tr.k-icmperr td{color:var(--k-icmperr-t)}
+tr.k-bad{background:var(--k-bad)} tr.k-bad td{color:var(--k-bad-t)}
+:root[data-theme="dark"] table.pk td{color:#e8eef6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) table.pk td{color:#e8eef6}}
+tr.sel,tr.sel td{background:var(--navy)!important;color:var(--navy-ink)!important}
+tr.flag td:first-child{box-shadow:inset 4px 0 0 var(--green)}
+tr.stream{animation:rowin .35s ease both}
+@keyframes rowin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.sbar{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);background:var(--surface2);flex-wrap:wrap}
+.detail{min-height:250px;max-height:430px;overflow:auto;padding:10px 12px;font-family:var(--mono);font-size:.78rem}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dhead h3{font-size:.98rem}
+.detail details{margin:1px 0}
+.detail summary{cursor:pointer;padding:3px 4px;border-radius:4px;list-style:none}
+.detail summary::-webkit-details-marker{display:none}
+.detail summary::before{content:'▸';display:inline-block;width:1.1em;color:var(--muted);transition:transform .15s}
+.detail details[open]>summary::before{transform:rotate(90deg)}
+.detail summary:hover{background:var(--surface2)}
+.detail .row{padding:2px 4px 2px 1.6em;white-space:pre-wrap;word-break:break-word}
+.detail .kids{margin-left:1.1em;border-left:1px dotted var(--line)}
+.detail .warn>summary{color:var(--red);font-weight:700}
+.empty{color:var(--muted);font-family:var(--sans);font-size:.95rem;padding:24px 8px;text-align:center}
+.flagbtn{border:0;background:var(--green);color:#fff;border-radius:7px;padding:7px 12px;font-weight:700;font-size:.85rem}
+.flagbtn.on{background:var(--surface2);color:var(--ink);border:1px solid var(--line);font-weight:500}
+:root[data-theme="dark"] .flagbtn:not(.on){color:#06251a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .flagbtn:not(.on){color:#06251a}}
+
+/* case panel */
+.cases{position:sticky;top:84px}
+.cnav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+.cbtn{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:7px 6px;font-size:.8rem;text-align:left;display:flex;gap:6px;align-items:center}
+.cbtn .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--muted);flex:none}
+.cbtn.part .dot{border-color:var(--amber);background:linear-gradient(90deg,var(--amber) 50%,transparent 50%)}
+.cbtn.done .dot{border-color:var(--green);background:var(--green)}
+.cbtn[aria-pressed="true"]{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.cbody{padding:16px;max-height:calc(100vh - 220px);overflow:auto}
+.cbody h3{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.cbody .proto{font-size:.82rem;color:var(--muted);margin-bottom:10px}
+.hint{background:var(--amber-soft);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:.9rem}
+.q{border-top:1px solid var(--line);padding:12px 0}
+.q p{margin:0 0 8px;font-weight:500}
+.q .in{display:flex;gap:6px}
+.q input[type=text]{flex:1;min-width:0;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.opts{display:grid;gap:5px;margin-bottom:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-size:.9rem;cursor:pointer;background:var(--surface)}
+.opt:has(input:checked){border-color:var(--navy);background:var(--surface2)}
+.opt input{margin-top:4px}
+.chk{border:0;background:var(--navy);color:var(--navy-ink);border-radius:6px;padding:7px 12px;font-weight:700;font-size:.85rem}
+.chk:disabled{opacity:.45;cursor:default}
+.fb{font-size:.88rem;margin-top:8px;padding:8px 10px;border-radius:6px;display:none}
+.fb.ok{display:block;background:var(--green-soft);color:var(--ink);border-left:4px solid var(--green)}
+.fb.no{display:block;background:var(--red-soft);color:var(--ink);border-left:4px solid var(--red)}
+.fb.rev{display:block;background:var(--amber-soft);color:var(--ink);border-left:4px solid var(--amber)}
+.ev{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.evchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.evchip{font-family:var(--mono);font-size:.76rem;border-radius:6px;padding:3px 8px;border:1px solid var(--line);background:var(--surface2);color:var(--ink)}
+.evchip.good{border-color:var(--green);background:var(--green-soft)}
+.evchip.miss{border-color:var(--red);background:var(--red-soft)}
+.debrief{margin-top:14px;background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:.9rem;border-left:4px solid var(--green)}
+.debrief b{font-family:var(--disp)}
+
+/* stats */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.hbar{display:grid;grid-template-columns:70px 1fr 44px;gap:10px;align-items:center;margin:7px 0;font-size:.9rem}
+.hbar .t{height:14px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.hbar .t i{display:block;height:100%;background:var(--navy)}
+.hbar .n{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:.8rem}
+.io svg{width:100%;height:auto}
+.io rect.b{fill:var(--navy);cursor:pointer}
+.io rect.b:hover{fill:var(--green)}
+.io text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.conv tr{cursor:pointer}
+.conv tr:hover td{background:var(--surface2)}
+.conv td{font-family:var(--mono);font-size:.8rem}
+
+/* report */
+.rep{display:grid;gap:18px}
+.rep .fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.rep label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.rep input,.rep select,.rep textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
+.rep textarea{min-height:70px;resize:vertical}
+.finding{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.finding header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.finding .meta{font-size:.85rem;color:var(--muted)}
+.indic{width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:12px}
+.indic td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.indic td:first-child{color:var(--muted);width:55%}
+.indic td:last-child{font-family:var(--mono);font-size:.82rem}
+.okm{color:var(--green);font-weight:700}.nom{color:var(--red);font-weight:700}
+.two{display:grid;grid-template-columns:200px 1fr;gap:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.toast.on{opacity:1}
+.foot{border-top:1px solid var(--line);color:var(--muted);font-size:.82rem;padding:18px 0 28px}
+
+@media (max-width:1020px){
+  .console{grid-template-columns:minmax(0,1fr)}
+  .cases{position:static}
+  .cbody{max-height:none}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .sgrid,.ksa,.proto-meta{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:700px){
+  .top{position:static}
+  .cases{top:0}
+  .rep .fields,.two{grid-template-columns:minmax(0,1fr)}
+  .hdr-grid{font-size:.62rem}
+  .fld{padding:7px 1px}
+  .meter .bar{width:70px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  .top,.panel:not(#p-report),.actions,.foot,.toast{display:none!important}
+  #p-report{display:block!important}
+  body{background:#fff;color:#000}
+  .finding{break-inside:avoid;border-color:#999}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><b>Capture Lab: Reading the Wire</b><span>LAN121 Network Essentials, Moraine Valley Community College</span></div>
+    <nav class="tabs" role="tablist" aria-label="Lab sections">
+      <button class="tab" role="tab" data-p="brief" aria-selected="true">Briefing</button>
+      <button class="tab" role="tab" data-p="guide" aria-selected="false">Field guide</button>
+      <button class="tab" role="tab" data-p="lab" aria-selected="false">Capture</button>
+      <button class="tab" role="tab" data-p="stats" aria-selected="false">Statistics</button>
+      <button class="tab" role="tab" data-p="report" aria-selected="false">Report</button>
+    </nav>
+    <div class="meter" title="Points earned"><div class="bar"><i id="mbar"></i></div><span><b id="mscore">0</b> / <span id="mtotal">0</span> pts</span></div>
+    <button class="ghost" id="theme">Dark mode</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ BRIEFING ============ -->
+<section class="panel on" id="p-brief">
+  <div class="hero">
+    <div>
+      <h1>Reading the wire</h1>
+      <div class="wire" id="wire" aria-hidden="true"></div>
+      <p class="lede" style="margin-top:18px">You have 21 seconds of traffic from the campus core switch. Somewhere in it are five attacks hiding among ordinary web, DNS and time traffic. Your job is to find each one, prove it with packet evidence, and write it up the way a network administrator would.</p>
+      <div class="ticket">
+        <h3>Help desk ticket 4471</h3>
+        <p>Staff on VLAN 10 report web pages that hang, then load. The network management server logged several SNMP authentication failures from the edge router, and the server team saw a short spike of inbound traffic. A capture was taken from the core switch SPAN port, which mirrors both VLANs.</p>
+        <small id="capmeta">Capture file: mvcc-core-span.pcapng</small>
+      </div>
+      <div class="cta">
+        <button class="btn" data-go="lab">Open the capture</button>
+        <button class="btn sec" data-go="guide">Review the field guide first</button>
+      </div>
+    </div>
+    <div class="map" aria-label="Network diagram of the capture environment">
+      <svg viewBox="0 0 760 400" role="img">
+        <title>Lab network: Internet, edge router, core switch with SPAN to analyst, VLAN 10 users, VLAN 20 servers</title>
+        <line class="ln" x1="210" y1="65" x2="290" y2="65"/>
+        <line class="ln" x1="380" y1="100" x2="380" y2="170"/>
+        <line class="ln" x1="330" y1="226" x2="190" y2="268"/>
+        <line class="ln" x1="430" y1="226" x2="570" y2="268"/>
+        <line class="span" x1="470" y1="198" x2="560" y2="198"/>
+        <rect class="nb" x="20" y="25" width="190" height="80" rx="40"/>
+        <text x="115" y="58" text-anchor="middle" font-weight="700">Internet</text>
+        <text class="m" x="115" y="78" text-anchor="middle">203.0.113.80 web portal</text>
+        <rect class="nb" x="290" y="30" width="180" height="70" rx="10"/>
+        <text x="380" y="56" text-anchor="middle" font-weight="700">Edge router</text>
+        <text class="m" x="380" y="74" text-anchor="middle">MVCC-EDGE-RTR1</text>
+        <text class="m" x="380" y="90" text-anchor="middle">.10.1 and .20.1</text>
+        <rect class="nb" x="290" y="170" width="180" height="56" rx="10"/>
+        <text x="380" y="194" text-anchor="middle" font-weight="700">Core switch</text>
+        <text class="m" x="380" y="213" text-anchor="middle">SPAN: VLAN 10 + 20</text>
+        <rect class="hot" x="560" y="170" width="180" height="56" rx="10"/>
+        <text x="650" y="194" text-anchor="middle" font-weight="700">You are here</text>
+        <text class="m" x="650" y="213" text-anchor="middle">Wireshark capture</text>
+        <rect class="nb" x="20" y="268" width="340" height="118" rx="10"/>
+        <text x="36" y="292" font-weight="700">VLAN 10 users, 192.168.10.0/24</text>
+        <text class="m" x="36" y="314">.5   DNS server</text>
+        <text class="m" x="36" y="332">.6   Network mgmt server (NMS)</text>
+        <text class="m" x="36" y="350">.50  Staff workstation</text>
+        <text class="m" x="36" y="368">.77  Unassigned DHCP lease</text>
+        <rect class="nb" x="400" y="268" width="340" height="118" rx="10"/>
+        <text x="416" y="292" font-weight="700">VLAN 20 servers, 192.168.20.0/24</text>
+        <text class="m" x="416" y="314">Web, SSH and file servers</text>
+        <text class="m" x="416" y="332">Host inventory is out of date.</text>
+        <text class="m" x="416" y="350">Find out what is really live.</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h3>By the end of this lab you can</h3>
+      <ul>
+        <li>Navigate a packet capture using display filters, the packet list and the packet details tree.</li>
+        <li>Interpret header fields of IP, TCP, UDP, ICMP, ARP and SNMP and explain what normal looks like.</li>
+        <li>Recognize five attack signatures: ping sweep, SYN scan, SNMP community-string guessing, ARP cache poisoning and UDP flood.</li>
+        <li>Correlate evidence across layers, such as a MAC address to an IP address.</li>
+        <li>Document findings with frame numbers, indicators, severity and a recommended fix.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Procedure</h3>
+      <ol>
+        <li>Skim the field guide, especially the header explorer.</li>
+        <li>Open the capture and complete the warm-up to learn the tools.</li>
+        <li>Work signatures 1 to 5. Answer each question from the capture, not from memory.</li>
+        <li>Select a packet that proves each signature and flag it as evidence.</li>
+        <li>Use Statistics to confirm volume and conversations.</li>
+        <li>Complete the report, rate severity, recommend a fix, then print or save it as PDF.</li>
+      </ol>
+      <p class="note">Estimated time: 75 to 90 minutes. Each question allows three attempts before the answer is shown for zero points.</p>
+    </div>
+    <div class="card">
+      <h3>Scoring</h3>
+      <table class="rubric" id="rubric"></table>
+      <p class="note" style="margin-top:10px">The report narrative (severity, recommendations, summary) is graded by your instructor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FIELD GUIDE ============ -->
+<section class="panel" id="p-guide">
+  <h2>What a network administrator needs to know</h2>
+  <p class="lede" style="max-width:72ch">Traffic analysis is part knowledge (what each header field means and what normal looks like) and part skill (finding, correlating and documenting the abnormal). Use this guide while you work.</p>
+  <div class="ksa">
+    <div class="card">
+      <h3>Knowledge</h3>
+      <ul>
+        <li><b>Encapsulation</b><span>How Ethernet, IP, TCP or UDP, and the application nest, and which layer each header belongs to.</span></li>
+        <li><b>Header fields and normal values</b><span>TTL, flags, ports, ARP opcodes, ICMP type and code, SNMP version and PDU types.</span></li>
+        <li><b>Well-known ports</b><span>21 FTP, 22 SSH, 23 Telnet, 25 SMTP, 53 DNS, 67/68 DHCP, 80 HTTP, 123 NTP, 161/162 SNMP, 443 HTTPS, 445 SMB, 3389 RDP.</span></li>
+        <li><b>Connection state</b><span>The TCP three-way handshake, teardown, sequence and acknowledgment numbers, and what a reset means.</span></li>
+        <li><b>Layer 2 trust</b><span>ARP has no authentication, so any host can claim any IP-to-MAC mapping.</span></li>
+        <li><b>Baselines and signatures</b><span>How sweeps, scans, spoofing, floods and protocol abuse differ from everyday traffic.</span></li>
+        <li><b>Capture placement and ethics</b><span>SPAN versus TAP, why switches hide traffic, written authorization, privacy and chain of custody.</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Skills</h3>
+      <ul>
+        <li><b>Capture with intent</b><span>Choose the capture point and use capture filters (BPF, as in tcpdump) to limit scope.</span></li>
+        <li><b>Filter fast</b><span>Write display filters that isolate a host, port, flag combination or protocol.</span></li>
+        <li><b>Read the details tree</b><span>Expand each layer and map what you see to the header diagram.</span></li>
+        <li><b>Correlate</b><span>Tie MAC to IP, request to response, and a DNS answer to the session that follows.</span></li>
+        <li><b>Use statistics</b><span>Protocol hierarchy, conversations and I/O graphs reveal volume anomalies quickly.</span></li>
+        <li><b>Reconstruct sessions</b><span>Follow a TCP or UDP stream to see the conversation in order.</span></li>
+        <li><b>Document</b><span>Record frame numbers, timestamps, indicators, severity and a recommended control.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="explorer">
+    <h2>Header explorer</h2>
+    <p class="note">Pick a protocol, then select any field to see what it means and what to watch for. The ruler counts bits, 32 per row.</p>
+    <div class="chips" id="hchips" role="group" aria-label="Protocol"></div>
+    <div class="ruler" id="ruler" aria-hidden="true"></div>
+    <div class="hdr-grid" id="hgrid"></div>
+    <div class="fdesc" id="fdesc"><span class="note">Select a field above.</span></div>
+    <div class="proto-meta">
+      <div><h3>Analyst look-fors</h3><ul id="hlook"></ul></div>
+      <div><h3>Useful display filters</h3><div id="hfilt"></div></div>
+    </div>
+    <p class="note" id="hnote" style="margin-top:12px"></p>
+  </div>
+
+  <div class="card">
+    <h3>Display filter quick reference</h3>
+    <p class="note">Display filters (Wireshark) hide packets after capture. Capture filters (BPF, used by tcpdump and Wireshark's capture options) decide what is recorded at all. Select Try it to run a filter in the capture.</p>
+    <div class="tscroll">
+    <table class="fl-table" id="ftable">
+      <thead><tr><th>Display filter</th><th>Capture filter equivalent</th><th>Shows</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPTURE LAB ============ -->
+<section class="panel" id="p-lab">
+  <div class="console">
+    <div>
+      <div class="pane">
+        <div class="fbar">
+          <label for="filter">Filter</label>
+          <input id="filter" class="fin" placeholder="Try: icmp, tcp.flags.syn == 1, ip.addr == 192.168.10.77" autocomplete="off" spellcheck="false">
+          <button class="btn" id="fapply">Apply</button>
+          <button class="ghost" id="fclear">Clear</button>
+        </div>
+        <div class="ferr" id="ferr"></div>
+        <div class="qf" id="qf" aria-label="Quick filters"></div>
+        <div class="plist" id="plist" tabindex="0" aria-label="Packet list, use arrow keys to move">
+          <table class="pk"><thead><tr><th>No.</th><th>Time</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Length</th><th>Info</th></tr></thead><tbody id="ptb"></tbody></table>
+        </div>
+        <div class="sbar"><span id="scount"></span><span>Arrow keys move through packets. Row colors follow Wireshark's default coloring rules.</span></div>
+      </div>
+      <div class="pane" style="margin-top:14px">
+        <div class="dhead"><h3 id="dtitle">Packet details</h3><div id="dact"></div></div>
+        <div class="detail" id="detail"><div class="empty">Select a packet to inspect its layers.</div></div>
+      </div>
+    </div>
+    <aside class="pane cases">
+      <div class="cnav" id="cnav" role="group" aria-label="Investigations"></div>
+      <div class="cbody" id="cbody"></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ STATISTICS ============ -->
+<section class="panel" id="p-stats">
+  <h2>Statistics</h2>
+  <p class="note">Statistics summarize the whole capture. Select a bar in the I/O graph or a conversation row to jump to those packets.</p>
+  <div class="sgrid" style="margin-top:16px">
+    <div class="card"><h3>Protocol hierarchy</h3><div id="phier"></div></div>
+    <div class="card io"><h3>I/O graph, packets per second</h3><div id="iog"></div></div>
+  </div>
+  <div class="card" style="margin-top:22px">
+    <h3>IPv4 conversations</h3>
+    <div class="tscroll"><table class="fl-table conv" id="conv"><thead><tr><th>Address A</th><th>Address B</th><th>Packets</th><th>Bytes</th><th>Start</th><th>Duration</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ REPORT ============ -->
+<section class="panel" id="p-report">
+  <div class="rep">
+    <div>
+      <h2>Incident analysis report</h2>
+      <p class="note">Indicators fill in automatically from your answers. Add a severity rating and a recommended control for each finding, then write a short executive summary.</p>
+    </div>
+    <div class="fields">
+      <div><label for="sname">Analyst name</label><input id="sname" autocomplete="name"></div>
+      <div><label for="ssec">Course section</label><input id="ssec" placeholder="LAN121-"></div>
+      <div><label>Capture file</label><input value="mvcc-core-span.pcapng" readonly></div>
+    </div>
+    <div id="findings" class="rep"></div>
+    <div class="finding">
+      <label for="esum" style="font-size:1rem;color:var(--ink);font-family:var(--disp);font-weight:600">Executive summary</label>
+      <p class="note">In four to six sentences: what happened, which host is responsible, what was exposed, and the top two fixes.</p>
+      <textarea id="esum" style="min-height:120px"></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn" id="bprint">Print or save as PDF</button>
+      <button class="btn sec" id="bcopy">Copy report as text</button>
+      <button class="btn sec" id="breset">Reset lab</button>
+    </div>
+  </div>
+</section>
+</main>
+<div class="wrap foot">Built for LAN121 alongside the Protocol Analysis reference page. All addresses use private and documentation ranges; the capture is simulated for training.</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------------- storage ---------------- */
+const KEY='lan121-capture-lab-v1';
+let S={ans:{},ev:{},rep:{},stu:{name:'',sec:''},sum:''};
+try{const raw=localStorage.getItem(KEY); if(raw){S=Object.assign(S,JSON.parse(raw));}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),2200);}
+
+/* ---------------- theme ---------------- */
+function applyTheme(th){ if(th) document.documentElement.setAttribute('data-theme',th); const dark=th?th==='dark':matchMedia('(prefers-color-scheme: dark)').matches; $('#theme').textContent=dark?'Light mode':'Dark mode'; }
+let theme=null; try{theme=localStorage.getItem(KEY+'-theme');}catch(e){}
+applyTheme(theme);
+$('#theme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nx=cur==='dark'?'light':'dark';applyTheme(nx);try{localStorage.setItem(KEY+'-theme',nx);}catch(e){}};
+
+/* ================= CAPTURE GENERATION ================= */
+const M={gw:'00:1a:2b:3c:4d:01',dns:'00:50:56:a1:00:05',nms:'00:50:56:a1:00:06',ws:'3c:52:82:11:22:50',att:'00:0c:29:ab:cd:77',srv:'00:50:56:a1:00:20',bc:'ff:ff:ff:ff:ff:ff',zero:'00:00:00:00:00:00'};
+const IP={gw:'192.168.10.1',dns:'192.168.10.5',nms:'192.168.10.6',ws:'192.168.10.50',att:'192.168.10.77',web:'203.0.113.80',fl:'198.51.100.23',srv:'192.168.20.20'};
+const P=[]; let T=0, IPID=0x3a10;
+let seed=7; const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+const hx=(n,w)=>'0x'+n.toString(16).padStart(w||4,'0');
+
+function ethNode(s,d,type){return {h:`Ethernet II, Src: ${s}, Dst: ${d}${d===M.bc?' (Broadcast)':''}`,rows:[`Destination: ${d}${d===M.bc?' (Broadcast)':''}`,`Source: ${s}`,`Type: ${type}`]};}
+function ipNode(src,dst,proto,ttl,tl,id){
+  const pn={1:'ICMP',6:'TCP',17:'UDP'}[proto];
+  return {h:`Internet Protocol Version 4, Src: ${src}, Dst: ${dst}`,rows:['0100 .... = Version: 4','.... 0101 = Header Length: 20 bytes (5)','Differentiated Services Field: 0x00 (DSCP: CS0, ECN: Not-ECT)',`Total Length: ${tl}`,`Identification: ${hx(id)} (${id})`,proto===1?'Flags: 0x0':'Flags: 0x2, Don\'t fragment','Fragment Offset: 0',`Time to Live: ${ttl}`,`Protocol: ${pn} (${proto})`,'Header Checksum: [validation disabled]',`Source Address: ${src}`,`Destination Address: ${dst}`]};
+}
+function baseF(o,len){return {'frame.len':len,'eth.src':o.sm,'eth.dst':o.dm,protos:new Set(['frame','eth'])};}
+function ipF(f,o,proto,ttl){f['ip.src']=o.src;f['ip.dst']=o.dst;f['ip.ttl']=ttl;f['ip.proto']=proto;f.protos.add('ip');}
+function push(p){
+  p.no=P.length+1; p.t=T; p.f['frame.number']=p.no; p.f['frame.time_relative']=T;
+  p.tree.unshift({h:`Frame ${p.no}: ${p.len} bytes on wire (${p.len*8} bits), ${p.len} bytes captured`,rows:[`Time since first frame: ${T.toFixed(6)} seconds`,`Frame Number: ${p.no}`,`Frame Length: ${p.len} bytes`,`[Protocols in frame: ${p.stack}]`]});
+  P.push(p); return p;
+}
+
+function TCP(o){
+  const fl=o.fl.split(','); const bits={FIN:1,SYN:2,RST:4,PSH:8,ACK:16}; let b=0; fl.forEach(x=>b|=bits[x]);
+  const ttl=o.ttl||64, opt=o.opt||0, pl=o.len||0, thl=20+opt, tl=20+thl+pl, len=14+tl, id=o.id!=null?o.id:IPID++;
+  const ackS=(b&16)?` Ack=${o.ack}`:'';
+  const info=o.appInfo||`${o.sp} → ${o.dp} [${fl.join(', ')}] Seq=${o.seq}${ackS} Win=${o.win} Len=${pl}${o.mss?` MSS=${o.mss}`:''}`;
+  const flagRows=[['Urgent',32],['Acknowledgment',16],['Push',8],['Reset',4],['Syn',2],['Fin',1]].map(([n,v])=>`${n}: ${(b&v)?'Set':'Not set'}`);
+  const tcpRows=[`Source Port: ${o.sp}`,`Destination Port: ${o.dp}`,`Sequence Number: ${o.seq}    (relative sequence number)`,(b&16)?`Acknowledgment Number: ${o.ack}    (relative ack number)`:'Acknowledgment Number: 0',`${(thl/4).toString(2).padStart(4,'0')} .... = Header Length: ${thl} bytes (${thl/4})`,{h:`Flags: ${hx(b,3)} (${fl.join(', ')})`,rows:flagRows},`Window: ${o.win}`,'Checksum: [unverified]','Urgent Pointer: 0'];
+  if(o.mss) tcpRows.push({h:`Options: (${opt} bytes)`,rows:[`Maximum segment size: ${o.mss} bytes`].concat(opt>4?['No-Operation (NOP)','Window scale: 8 (multiply by 256)','SACK permitted']:[])});
+  if(pl) tcpRows.push(`TCP payload (${pl} bytes)`);
+  const tree=[ethNode(o.sm,o.dm,'IPv4 (0x0800)'),ipNode(o.src,o.dst,6,ttl,tl,id),{h:`Transmission Control Protocol, Src Port: ${o.sp}, Dst Port: ${o.dp}, Seq: ${o.seq}${(b&16)?`, Ack: ${o.ack}`:''}, Len: ${pl}`,rows:tcpRows}];
+  if(o.app) tree.push(o.app);
+  const f=baseF(o,len); ipF(f,o,6,ttl); f.protos.add('tcp');
+  Object.assign(f,{'tcp.srcport':o.sp,'tcp.dstport':o.dp,'tcp.seq':o.seq,'tcp.ack':(b&16)?o.ack:0,'tcp.len':pl,'tcp.window_size':o.win,'tcp.flags.syn':(b&2)?1:0,'tcp.flags.ack':(b&16)?1:0,'tcp.flags.reset':(b&4)?1:0,'tcp.flags.fin':(b&1)?1:0,'tcp.flags.push':(b&8)?1:0});
+  if(o.appProto) f.protos.add(o.appProto.toLowerCase());
+  const cls=(b&4)?'k-rst':o.appProto==='HTTP'?'k-http':(b&3)?'k-syn':'k-tcp';
+  return push({src:o.src,dst:o.dst,proto:o.appProto||'TCP',len,info,tag:o.tag,cls,tree,f,stack:'eth:ethertype:ip:tcp'+(o.appProto?':'+o.appProto.toLowerCase():'')});
+}
+function UDP(o){
+  const ttl=o.ttl||64, pl=o.plen, tl=20+8+pl, len=14+tl, id=IPID++;
+  const info=o.appInfo||`${o.sp} → ${o.dp} Len=${pl}`;
+  const tree=[ethNode(o.sm,o.dm,'IPv4 (0x0800)'),ipNode(o.src,o.dst,17,ttl,tl,id),{h:`User Datagram Protocol, Src Port: ${o.sp}, Dst Port: ${o.dp}`,rows:[`Source Port: ${o.sp}`,`Destination Port: ${o.dp}`,`Length: ${8+pl}`,'Checksum: [unverified]',`UDP payload (${pl} bytes)`]}];
+  const f=baseF(o,len); ipF(f,o,17,ttl); f.protos.add('udp');
+  Object.assign(f,{'udp.srcport':o.sp,'udp.dstport':o.dp,'udp.length':8+pl});
+  if(o.app){tree.push(o.app); f.protos.add(o.appProto.toLowerCase());}
+  else{let h='';for(let i=0;i<16;i++)h+=Math.floor(rnd()*256).toString(16).padStart(2,'0');tree.push({h:`Data (${pl} bytes)`,rows:[`Data: ${h}…`,`[Length: ${pl}]`]});f.protos.add('data');}
+  if(o.extraF) Object.assign(f,o.extraF);
+  const cls=o.appProto==='SNMP'?'k-snmp':'k-udp';
+  return push({src:o.src,dst:o.dst,proto:o.appProto||'UDP',len,info,tag:o.tag,cls,tree,f,stack:'eth:ethertype:ip:udp:'+(o.appProto?o.appProto.toLowerCase():'data')});
+}
+const ICMPT={0:'Echo (ping) reply',3:'Destination unreachable',8:'Echo (ping) request',11:'Time-to-live exceeded'};
+function ICMP(o){
+  const ttl=o.ttl||64, id=IPID++;
+  let pl, info, rows=[`Type: ${o.type} (${ICMPT[o.type]})`];
+  if(o.type===3){
+    pl=8+548; rows.push(`Code: ${o.code} (Port unreachable)`,'Checksum: [correct]','Unused: 00000000',
+      {h:`Internet Protocol Version 4, Src: ${o.inner.src}, Dst: ${o.inner.dst}`,rows:[`Source Address: ${o.inner.src}`,`Destination Address: ${o.inner.dst}`,'Protocol: UDP (17)']},
+      {h:`User Datagram Protocol, Src Port: ${o.inner.sp}, Dst Port: ${o.inner.dp}`,rows:[`Source Port: ${o.inner.sp}`,`Destination Port: ${o.inner.dp}`,'Length: 1032']});
+    info='Destination unreachable (Port unreachable)';
+  } else {
+    pl=8+32; rows.push(`Code: ${o.code}`,'Checksum: [correct]',`Identifier (BE): ${o.id} (${hx(o.id)})`,`Sequence Number (BE): ${o.seq} (${hx(o.seq)})`, o.type===8?`[Response frame: ${o.resp||'none, no reply seen'}]`:`[Request frame: ${o.req}]`,{h:'Data (32 bytes)',rows:['Data: 6162636465666768696a6b6c6d6e6f7071727374757677616263646566676869','[Length: 32]']});
+    info=`${ICMPT[o.type]}  id=${hx(o.id)}, seq=${o.seq}/${o.seq*256}, ttl=${ttl}${o.type===0?` (request in ${o.req})`:''}`;
+  }
+  const tl=20+pl, len=14+tl;
+  const tree=[ethNode(o.sm,o.dm,'IPv4 (0x0800)'),ipNode(o.src,o.dst,1,ttl,tl,id),{h:'Internet Control Message Protocol',rows}];
+  const f=baseF(o,len); ipF(f,o,1,ttl); f.protos.add('icmp');
+  Object.assign(f,{'icmp.type':o.type,'icmp.code':o.code});
+  if(o.type!==3){f['icmp.ident']=o.id;f['icmp.seq']=o.seq;}
+  return push({src:o.src,dst:o.dst,proto:'ICMP',len,info,tag:o.tag,cls:o.type===3?'k-icmperr':'k-icmp',tree,f,stack:'eth:ethertype:ip:icmp'+(o.type===3?':ip:udp':':data')});
+}
+function ARP(o){
+  const info=o.op===1?`Who has ${o.tpa}? Tell ${o.spa}`:`${o.spa} is at ${o.sha}${o.dup?` (duplicate use of ${o.spa} detected!)`:''}`;
+  const rows=['Hardware type: Ethernet (1)','Protocol type: IPv4 (0x0800)','Hardware size: 6','Protocol size: 4',`Opcode: ${o.op===1?'request (1)':'reply (2)'}`,`Sender MAC address: ${o.sha}`,`Sender IP address: ${o.spa}`,`Target MAC address: ${o.tha}`,`Target IP address: ${o.tpa}`];
+  const tree=[ethNode(o.sm,o.dm,'ARP (0x0806)'),{h:`Address Resolution Protocol (${o.op===1?'request':'reply'})`,rows}];
+  if(o.dup) tree.push({h:`[Duplicate IP address detected for ${o.spa} (${o.sha}) - also in use by ${o.dup.mac} (frame ${o.dup.frame})]`,warn:true,rows:[`[Frame showing earlier use of IP address: ${o.dup.frame}]`,'[Expert Info (Warning/Sequence): Duplicate IP address configured]','[Severity level: Warning]','[Group: Sequence]']});
+  const f=baseF(o,42); f.protos.add('arp');
+  Object.assign(f,{'arp.opcode':o.op,'arp.src.hw_mac':o.sha,'arp.src.proto_ipv4':o.spa,'arp.dst.hw_mac':o.tha,'arp.dst.proto_ipv4':o.tpa});
+  if(o.dup) f['arp.duplicate-address-detected']=1;
+  return push({src:o.sm,dst:o.dm===M.bc?'Broadcast':o.dm,proto:'ARP',len:42,info,tag:o.tag,cls:o.dup?'k-bad':'k-arp',tree,f,stack:'eth:ethertype:arp'});
+}
+function snmpNode(comm,pdu,rid,vbs,err){
+  return {h:'Simple Network Management Protocol',rows:['version: v2c (1)',`community: ${comm}`,{h:`data: ${pdu}`,rows:[`request-id: ${rid}`,`error-status: ${err||'noError (0)'}`,'error-index: 0',{h:`variable-bindings: ${vbs.length} item${vbs.length>1?'s':''}`,rows:vbs}]}]};
+}
+function SNMP(o){
+  return UDP({src:o.src,dst:o.dst,sm:o.sm,dm:o.dm,sp:o.sp,dp:o.dp,ttl:o.ttl,plen:o.plen,tag:o.tag,appProto:'SNMP',appInfo:o.info,app:snmpNode(o.comm,o.pdu,o.rid,o.vbs),extraF:{'snmp.community':o.comm}});
+}
+const dnsQ=(tid,name)=>({h:'Domain Name System (query)',rows:[`Transaction ID: ${hx(tid)}`,'Flags: 0x0100 Standard query','Questions: 1','Answer RRs: 0',{h:'Queries',rows:[`${name}: type A, class IN`]}]});
+const dnsR=(tid,name,a,req)=>({h:'Domain Name System (response)',rows:[`Transaction ID: ${hx(tid)}`,'Flags: 0x8180 Standard query response, No error','Questions: 1','Answer RRs: 1',{h:'Queries',rows:[`${name}: type A, class IN`]},{h:'Answers',rows:[`${name}: type A, class IN, addr ${a}`,'Time to live: 300 (5 minutes)']},`[Request In: ${req}]`]});
+const ntpNode=(mode)=>({h:`Network Time Protocol (NTP Version 4, ${mode})`,rows:['Leap Indicator: no warning (0)','Version number: NTP Version 4 (4)',`Mode: ${mode} (${mode==='client'?3:4})`,`Peer Clock Stratum: ${mode==='client'?'unspecified (0)':'secondary reference (3)'}`]});
+
+/* ---- Baseline: normal traffic ---- */
+T=0;        ARP({op:1,sm:M.ws,dm:M.bc,sha:M.ws,spa:IP.ws,tha:M.zero,tpa:IP.gw,tag:'base'});
+T=0.000412; ARP({op:2,sm:M.gw,dm:M.ws,sha:M.gw,spa:IP.gw,tha:M.ws,tpa:IP.ws,tag:'base'});
+T=0.001203; UDP({src:IP.ws,dst:IP.dns,sm:M.ws,dm:M.dns,sp:53211,dp:53,ttl:128,plen:36,appProto:'DNS',appInfo:'Standard query 0x1a2b A portal.example.edu',app:dnsQ(0x1a2b,'portal.example.edu'),tag:'base',extraF:{'dns.qry.name':'portal.example.edu'}});
+T=0.002871; UDP({src:IP.dns,dst:IP.ws,sm:M.dns,dm:M.ws,sp:53,dp:53211,ttl:64,plen:52,appProto:'DNS',appInfo:'Standard query response 0x1a2b A portal.example.edu A 203.0.113.80',app:dnsR(0x1a2b,'portal.example.edu','203.0.113.80',3),tag:'base',extraF:{'dns.qry.name':'portal.example.edu','dns.a':'203.0.113.80'}});
+const C={src:IP.ws,dst:IP.web,sm:M.ws,dm:M.gw,sp:51514,dp:80,ttl:128,tag:'base'};
+const Sv={src:IP.web,dst:IP.ws,sm:M.gw,dm:M.ws,sp:80,dp:51514,ttl:52,tag:'base'};
+T=0.003310; TCP(Object.assign({},C,{fl:'SYN',seq:0,win:64240,mss:1460,opt:12}));
+T=0.027644; TCP(Object.assign({},Sv,{fl:'SYN,ACK',seq:0,ack:1,win:65160,mss:1460,opt:12}));
+T=0.027801; TCP(Object.assign({},C,{fl:'ACK',seq:1,ack:1,win:64240}));
+T=0.028102; TCP(Object.assign({},C,{fl:'PSH,ACK',seq:1,ack:1,win:64240,len:412,appProto:'HTTP',appInfo:'GET /index.html HTTP/1.1',app:{h:'Hypertext Transfer Protocol',rows:['GET /index.html HTTP/1.1\\r\\n','Host: portal.example.edu\\r\\n','User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\\r\\n','Accept: text/html\\r\\n']}}));
+T=0.061930; TCP(Object.assign({},Sv,{fl:'PSH,ACK',seq:1,ack:413,win:64128,len:1380,appProto:'HTTP',appInfo:'HTTP/1.1 200 OK  (text/html)',app:{h:'Hypertext Transfer Protocol',rows:['HTTP/1.1 200 OK\\r\\n','Server: nginx\\r\\n','Content-Type: text/html; charset=UTF-8\\r\\n','Content-Length: 1121\\r\\n']}}));
+T=0.062240; TCP(Object.assign({},C,{fl:'ACK',seq:413,ack:1381,win:64240}));
+T=0.410556; TCP(Object.assign({},C,{fl:'FIN,ACK',seq:413,ack:1381,win:64240}));
+T=0.434718; TCP(Object.assign({},Sv,{fl:'FIN,ACK',seq:1381,ack:414,win:64128}));
+T=0.434901; TCP(Object.assign({},C,{fl:'ACK',seq:414,ack:1382,win:64240}));
+T=0.902114; UDP({src:IP.ws,dst:IP.gw,sm:M.ws,dm:M.gw,sp:123,dp:123,ttl:128,plen:48,appProto:'NTP',appInfo:'NTP Version 4, client',app:ntpNode('client'),tag:'base'});
+T=0.903020; UDP({src:IP.gw,dst:IP.ws,sm:M.gw,dm:M.ws,sp:123,dp:123,ttl:255,plen:48,appProto:'NTP',appInfo:'NTP Version 4, server',app:ntpNode('server'),tag:'base'});
+
+/* ---- Signature 1: ICMP ping sweep of 192.168.20.0/24 ---- */
+const alive={1:255,10:127,15:63,20:63};
+T=2.000118;
+for(let i=1;i<=20;i++){
+  const dst='192.168.20.'+i;
+  const req=ICMP({src:IP.att,dst,sm:M.att,dm:M.gw,type:8,code:0,id:0x0b0e,seq:i,ttl:64,tag:'s1'});
+  if(alive[i]){T+=0.000611+rnd()*0.0003; const rp=ICMP({src:dst,dst:IP.att,sm:M.gw,dm:M.att,type:0,code:0,id:0x0b0e,seq:i,ttl:alive[i],req:req.no,tag:'s1'}); req.tree[3].rows[5]=`[Response frame: ${rp.no}]`;}
+  T+=0.0098+rnd()*0.0006;
+}
+
+/* ---- Signature 2: TCP SYN (half-open) scan of 192.168.20.20 ---- */
+const ports=[445,80,23,3389,22,110,53,443,21,135,25,139,143], open=new Set([22,80,443]);
+T=4.010533;
+for(const pt of ports){
+  TCP({src:IP.att,dst:IP.srv,sm:M.att,dm:M.gw,sp:45123,dp:pt,fl:'SYN',seq:0,win:1024,mss:1460,opt:4,ttl:41,tag:'s2'});
+  T+=0.000280+rnd()*0.0001;
+  if(open.has(pt)){
+    TCP({src:IP.srv,dst:IP.att,sm:M.gw,dm:M.att,sp:pt,dp:45123,fl:'SYN,ACK',seq:0,ack:1,win:64240,mss:1460,opt:4,ttl:63,tag:'s2'});
+    T+=0.000071; TCP({src:IP.att,dst:IP.srv,sm:M.att,dm:M.gw,sp:45123,dp:pt,fl:'RST',seq:1,win:0,ttl:64,tag:'s2'});
+  } else {
+    TCP({src:IP.srv,dst:IP.att,sm:M.gw,dm:M.att,sp:pt,dp:45123,fl:'RST,ACK',seq:1,ack:1,win:0,ttl:63,tag:'s2'});
+  }
+  T+=0.000390+rnd()*0.0002;
+}
+
+/* ---- Signature 3: SNMP community-string guessing against the router ---- */
+const OID_DESCR='1.3.6.1.2.1.1.1.0', OID_NAME='1.3.6.1.2.1.1.5.0', OID_CONTACT='1.3.6.1.2.1.1.4.0';
+const AQ={src:IP.att,dst:IP.gw,sm:M.att,dm:M.gw,sp:50111,dp:161,ttl:64,tag:'s3'};
+const AR={src:IP.gw,dst:IP.att,sm:M.gw,dm:M.att,sp:161,dp:50111,ttl:255,tag:'s3'};
+const trap=()=>SNMP({src:IP.gw,dst:IP.nms,sm:M.gw,dm:M.nms,sp:58642,dp:162,ttl:255,plen:76,tag:'s3',comm:'nms-alerts',pdu:'snmpV2-trap (7)',rid:Math.floor(rnd()*90000)+10000,info:'snmpV2-trap 1.3.6.1.2.1.1.3.0 1.3.6.1.6.3.1.1.4.1.0',vbs:['1.3.6.1.2.1.1.3.0 (sysUpTime.0): 48213977 (Timeticks)','1.3.6.1.6.3.1.1.4.1.0 (snmpTrapOID.0): 1.3.6.1.6.3.1.1.5.5 (authenticationFailure)']});
+let rid=1001;
+T=8.002210;
+for(const c of ['admin','cisco','manager']){
+  SNMP(Object.assign({},AQ,{plen:30+c.length,comm:c,pdu:'get-request (0)',rid:rid,info:`get-request ${OID_DESCR}`,vbs:[`${OID_DESCR} (sysDescr.0): Value (Null)`]})); rid++;
+  T+=0.001804; trap(); T+=0.4987+rnd()*0.002;
+}
+SNMP(Object.assign({},AQ,{plen:36,comm:'public',pdu:'get-request (0)',rid:rid,info:`get-request ${OID_DESCR}`,vbs:[`${OID_DESCR} (sysDescr.0): Value (Null)`]}));
+T+=0.002388; SNMP(Object.assign({},AR,{plen:142,comm:'public',pdu:'get-response (2)',rid:rid,info:`get-response ${OID_DESCR}`,vbs:[`${OID_DESCR} (sysDescr.0): "Cisco IOS Software, C2900 Software (C2900-UNIVERSALK9-M), Version 15.7(3)M5, RELEASE SOFTWARE (fc1)"`]})); rid++;
+T+=0.098105; SNMP(Object.assign({},AQ,{plen:36,comm:'public',pdu:'get-request (0)',rid:rid,info:`get-request ${OID_NAME}`,vbs:[`${OID_NAME} (sysName.0): Value (Null)`]}));
+T+=0.001977; SNMP(Object.assign({},AR,{plen:50,comm:'public',pdu:'get-response (2)',rid:rid,info:`get-response ${OID_NAME}`,vbs:[`${OID_NAME} (sysName.0): "MVCC-EDGE-RTR1"`]})); rid++;
+T+=0.601332; SNMP(Object.assign({},AQ,{plen:43,comm:'private',pdu:'set-request (3)',rid:rid,info:`set-request ${OID_CONTACT}`,vbs:[`${OID_CONTACT} (sysContact.0): "pwned-by-77"`]}));
+T+=0.002650; SNMP(Object.assign({},AR,{plen:43,comm:'private',pdu:'get-response (2)',rid:rid,info:`get-response ${OID_CONTACT}`,vbs:[`${OID_CONTACT} (sysContact.0): "pwned-by-77"`]}));
+
+/* ---- Signature 4: ARP cache poisoning (MITM between .50 and gateway) ---- */
+const ROUNDS=[12.000304,14.000611,16.000731,17.500903]; let MITM1=0;
+for(let k=0;k<4;k++){
+  if(k===2){
+    T=15.517320; const q=UDP({src:IP.ws,dst:IP.dns,sm:M.ws,dm:M.dns,sp:60412,dp:53,ttl:128,plen:33,appProto:'DNS',appInfo:'Standard query 0x7c11 A www.example.com',app:dnsQ(0x7c11,'www.example.com'),tag:'base',extraF:{'dns.qry.name':'www.example.com'}});
+    T=15.519004; UDP({src:IP.dns,dst:IP.ws,sm:M.dns,dm:M.ws,sp:53,dp:60412,ttl:64,plen:49,appProto:'DNS',appInfo:'Standard query response 0x7c11 A www.example.com A 93.184.215.14',app:dnsR(0x7c11,'www.example.com','93.184.215.14',q.no),tag:'base',extraF:{'dns.qry.name':'www.example.com','dns.a':'93.184.215.14'}});
+  }
+  T=ROUNDS[k];
+  ARP({op:2,sm:M.att,dm:M.ws,sha:M.att,spa:IP.gw,tha:M.ws,tpa:IP.ws,dup:{mac:M.gw,frame:2},tag:'s4'});
+  T+=0.000150; ARP({op:2,sm:M.att,dm:M.gw,sha:M.att,spa:IP.ws,tha:M.gw,tpa:IP.gw,dup:{mac:M.ws,frame:1},tag:'s4'});
+  if(k===0){
+    T=13.104772; MITM1=TCP({src:IP.ws,dst:IP.web,sm:M.ws,dm:M.att,sp:51530,dp:443,fl:'SYN',seq:0,win:64240,mss:1460,opt:12,ttl:128,id:0x51c2,tag:'s4'}).no;
+    T+=0.000233; TCP({src:IP.ws,dst:IP.web,sm:M.att,dm:M.gw,sp:51530,dp:443,fl:'SYN',seq:0,win:64240,mss:1460,opt:12,ttl:127,id:0x51c2,tag:'s4'});
+  }
+}
+
+/* ---- Signature 5: UDP flood against 192.168.20.20 ---- */
+T=18.000097; const icmpAfter=new Set([1,2,3,5,8]);
+for(let i=1;i<=25;i++){
+  const sp=1024+Math.floor(rnd()*60000), dp=1+Math.floor(rnd()*65000);
+  UDP({src:IP.fl,dst:IP.srv,sm:M.gw,dm:M.srv,sp,dp,ttl:49,plen:1024,tag:'s5'});
+  if(icmpAfter.has(i)){T+=0.000210; ICMP({src:IP.srv,dst:IP.fl,sm:M.srv,dm:M.gw,type:3,code:3,ttl:64,inner:{src:IP.fl,dst:IP.srv,sp,dp},tag:'s5'}); T+=0.001790;}
+  else T+=0.002;
+}
+T=20.905818; UDP({src:IP.ws,dst:IP.gw,sm:M.ws,dm:M.gw,sp:123,dp:123,ttl:128,plen:48,appProto:'NTP',appInfo:'NTP Version 4, client',app:ntpNode('client'),tag:'base'});
+T=20.906702; UDP({src:IP.gw,dst:IP.ws,sm:M.gw,dm:M.ws,sp:123,dp:123,ttl:255,plen:48,appProto:'NTP',appInfo:'NTP Version 4, server',app:ntpNode('server'),tag:'base'});
+
+/* ================= INVESTIGATIONS ================= */
+const CASES=[
+ {id:'w',short:'Warm-up',name:'Warm-up: what normal looks like',tag:'base',protos:'ARP, DNS, TCP, HTTP, NTP',
+  brief:'Before hunting attacks, learn the baseline. The staff workstation (192.168.10.50) resolves a name, opens a web session and closes it cleanly. Every later finding is judged against this.',
+  hint:'Filter for the workstation\'s DNS and web traffic, then expand the TCP layer of frames 5 to 7.',filter:'dns || tcp.port == 80',
+  evText:'Flag any frame from the normal TCP three-way handshake.',
+  qs:[
+   {id:'w1',type:'ip',p:'What IP address did portal.example.edu resolve to?',a:'203.0.113.80',nudge:'Expand the DNS layer of the response in frame 4 and look under Answers.',ex:'Frame 4 answers with 203.0.113.80, and frame 5 opens a TCP session to that same address. Linking a DNS answer to the session that follows is a core correlation habit.'},
+   {id:'w2',type:'choice',p:'Which flag sequence opens the TCP session?',opts:['SYN, then ACK, then FIN','SYN, then SYN/ACK, then ACK','ACK, then SYN, then SYN/ACK','PSH, then ACK, then RST'],a:1,nudge:'Read the flags in the Info column of frames 5, 6 and 7.',ex:'Frames 5 to 7: the client sends SYN, the server answers SYN/ACK, the client confirms with ACK. Only then does HTTP data flow (frame 8).'},
+   {id:'w3',type:'num',p:'What ephemeral (client) source port does the workstation use for the web session?',a:51514,nudge:'Look at the Source Port in the TCP layer of frame 5.',ex:'Port 51514. Clients pick a high, temporary port; the server listens on the well-known port 80.'},
+   {id:'w4',type:'choice',p:'Which side starts the graceful close?',opts:['The workstation, 192.168.10.50','The web server, 203.0.113.80','Neither; the session is reset'],a:0,nudge:'Find the first FIN flag in the session.',ex:'Frame 11: the workstation sends FIN/ACK, the server replies FIN/ACK (frame 12) and the client sends the last ACK (frame 13). No RST means a clean close.'}
+  ],
+  debrief:'Baseline traits to remember: one DNS query, one handshake, data, a FIN-based close, TTLs of 128 (Windows client) and 52 (remote server several hops away).'},
+ {id:'s1',short:'1 Sweep',name:'Signature 1: ICMP ping sweep',tag:'s1',protos:'ICMP, IP',
+  brief:'A ping sweep sends echo requests to a range of addresses to learn which hosts are alive. Look for one source pinging many sequential destinations within a fraction of a second.',
+  hint:'Isolate echo requests and replies. Compare the destination column of requests with the sources of replies.',filter:'icmp.type == 8 || icmp.type == 0',
+  evText:'Flag an echo request that is part of the sweep.',
+  qs:[
+   {id:'s1a',type:'ip',p:'Which host sends the echo requests?',a:'192.168.10.77',nudge:'Filter on icmp.type == 8 and read the Source column.',ex:'192.168.10.77, the unassigned DHCP lease, pings 192.168.20.1 through .20 in about 0.2 seconds. No person types that fast; this is a tool.'},
+   {id:'s1b',type:'choice',p:'What ICMP type and code identify an echo request?',opts:['Type 0, Code 0','Type 8, Code 0','Type 3, Code 3','Type 11, Code 0'],a:1,nudge:'Expand the ICMP layer of any request.',ex:'Echo request is Type 8, Code 0. The reply is Type 0, Code 0.'},
+   {id:'s1c',type:'num',p:'How many hosts in 192.168.20.0/24 answered?',a:4,nudge:'Filter on icmp.type == 0 and count the frames in the status bar.',ex:'Four echo replies came back, so four hosts are live even though the sweep covered twenty addresses.'},
+   {id:'s1d',type:'set',p:'List the last octet of each live host, separated by commas (for example 2, 9).',a:[1,10,15,20],nudge:'Read the Source column of the echo replies.',ex:'.1, .10, .15 and .20. Bonus look: reply TTLs are 255 (the router itself), 127 (Windows, one hop) and 63 (Linux, one hop). TTL hints at operating system and distance.'}
+  ],
+  debrief:'Why it matters: a sweep is reconnaissance, usually the first step before a port scan. Controls: block or rate-limit ICMP echo from user VLANs to the server VLAN with an ACL, and alert on one source contacting many hosts in a short window.'},
+ {id:'s2',short:'2 Scan',name:'Signature 2: TCP SYN port scan',tag:'s2',protos:'TCP, IP',
+  brief:'A SYN (half-open) scan sends SYN to many ports. Open ports answer SYN/ACK, closed ports answer RST/ACK, and the scanner never completes the handshake.',
+  hint:'Show only connection attempts, then add the replies from the target.',filter:'ip.addr == 192.168.20.20 && tcp',
+  evText:'Flag a SYN/ACK from an open port, or a scanner SYN.',
+  qs:[
+   {id:'s2a',type:'ip',p:'Which host is being scanned?',a:'192.168.20.20',nudge:'Filter on tcp.flags.syn == 1 && tcp.flags.ack == 0 and read the Destination column.',ex:'192.168.20.20, one of the live hosts found by the sweep. Sweep first, scan second: the attacker is working through a plan.'},
+   {id:'s2b',type:'set',p:'Which ports are open? List them separated by commas.',a:[22,80,443],nudge:'Open ports answer with SYN/ACK. Try tcp.flags.syn == 1 && tcp.flags.ack == 1 && ip.src == 192.168.20.20.',ex:'22 (SSH), 80 (HTTP) and 443 (HTTPS) replied SYN/ACK. Every other probed port replied RST/ACK.'},
+   {id:'s2c',type:'choice',p:'How does a closed port respond?',opts:['SYN/ACK','RST/ACK','ICMP port unreachable','It never answers'],a:1,nudge:'Look at the red rows.',ex:'A closed TCP port answers RST/ACK. ICMP port unreachable is the closed-port answer for UDP, which you will meet in signature 5.'},
+   {id:'s2d',type:'choice',p:'What makes this a half-open SYN scan rather than a full connect scan?',opts:['The scanner answers each SYN/ACK with RST instead of ACK','The scanner uses UDP instead of TCP','The target sends FIN to every probe','Every SYN carries application data'],a:0,nudge:'Look at what 192.168.10.77 sends right after each SYN/ACK.',ex:'The scanner tears down with RST instead of completing the handshake, so many services never log a connection. That is why it is called stealth or half-open.'},
+   {id:'s2e',type:'num',p:'What TCP window size do the scanner\'s SYN packets advertise?',a:1024,nudge:'Expand the TCP layer of any SYN from 192.168.10.77.',ex:'Window 1024 with only an MSS option (and an odd TTL of 41) is a well-known Nmap fingerprint. Real clients, like frame 5, advertise 64240 with several options.'}
+  ],
+  debrief:'Why it matters: the attacker now knows SSH and web services are exposed. Controls: firewall ACLs that allow only required ports from user VLANs, IDS rules for SYN-scan patterns, and closing unneeded services.'},
+ {id:'s3',short:'3 SNMP',name:'Signature 3: SNMP community-string guessing',tag:'s3',protos:'SNMP, UDP',
+  brief:'SNMP v1 and v2c authenticate with a community string sent in cleartext. Guessing looks like repeated requests with different community strings, wrong guesses getting no reply, and the device sending authenticationFailure traps to its manager.',
+  hint:'Show SNMP polls and traps, then expand the SNMP layer of each request.',filter:'udp.port == 161 || udp.port == 162',
+  evText:'Flag the request whose community string worked, or the set-request.',
+  qs:[
+   {id:'s3a',type:'num',p:'Which UDP port does the router listen on for SNMP requests?',a:161,nudge:'Check the destination port of the requests from 192.168.10.77.',ex:'Agents listen on UDP 161. Traps go to the manager on UDP 162.'},
+   {id:'s3b',type:'choice',p:'Which SNMP version is in use?',opts:['SNMPv1','SNMPv2c','SNMPv3 with authPriv'],a:1,nudge:'Read the version line in the SNMP layer.',ex:'v2c, which is why every community string is readable in the capture. SNMPv3 with authPriv would authenticate and encrypt.'},
+   {id:'s3c',type:'text',p:'Which community string got the router to return its sysDescr?',a:['public'],nudge:'Find the get-response, then look at the request just before it.',ex:'"public", the factory default. The response leaks the exact IOS version, which tells an attacker which vulnerabilities to try.'},
+   {id:'s3d',type:'text',p:'Which community string allowed a write (set-request)?',a:['private'],nudge:'Look for set-request in the Info column.',ex:'"private", another default, granted write access: the attacker changed sysContact. With write access an attacker can alter configuration.'},
+   {id:'s3e',type:'ip',p:'Where did the router send its authenticationFailure traps?',a:'192.168.10.6',nudge:'Filter on udp.port == 162.',ex:'192.168.10.6, the network management server. That matches the alert in the help desk ticket. Note the trap community "nms-alerts" is also visible in cleartext.'}
+  ],
+  debrief:'Why it matters: default read and write communities hand over device details and control. Controls: move to SNMPv3 authPriv, remove public/private, restrict SNMP with an ACL to the NMS only, and use read-only views.'},
+ {id:'s4',short:'4 ARP',name:'Signature 4: ARP cache poisoning',tag:'s4',protos:'ARP, Ethernet',
+  brief:'ARP poisoning sends unsolicited ARP replies so victims map someone else\'s IP to the attacker\'s MAC. Traffic then flows through the attacker (man in the middle). Wireshark flags the conflict as a duplicate IP address.',
+  hint:'Show ARP replies, then compare who claims to be 192.168.10.1 with frame 2.',filter:'arp',
+  evText:'Flag a forged ARP reply.',
+  qs:[
+   {id:'s4a',type:'ip',p:'Which IP address is impersonated in the replies sent to the workstation?',a:'192.168.10.1',nudge:'Read the Info column of the dark rows: "x.x.x.x is at ..."',ex:'192.168.10.1, the default gateway. Poisoning the gateway entry captures everything the workstation sends off-subnet.'},
+   {id:'s4b',type:'mac',p:'Which MAC address is falsely claiming that IP?',a:'00:0c:29:ab:cd:77',nudge:'Expand the ARP layer and read the Sender MAC address.',ex:'00:0c:29:ab:cd:77. The 00:0c:29 prefix belongs to a VMware virtual machine, which is common for attack tools.'},
+   {id:'s4c',type:'mac',p:'What is the real gateway MAC address? (Hint: the baseline)',a:'00:1a:2b:3c:4d:01',nudge:'Frame 2 is a legitimate ARP reply from the gateway.',ex:'00:1a:2b:3c:4d:01, learned in frame 2. Wireshark compares against it and raises the duplicate-address warning.'},
+   {id:'s4d',type:'ip',p:'Correlate that MAC with other frames. Which IP address does the attacking machine use?',a:'192.168.10.77',nudge:'Try the filter eth.src == 00:0c:29:ab:cd:77 && ip.',ex:'192.168.10.77. The same MAC sourced the ping sweep, the port scan and the SNMP guessing. One host is behind all four signatures so far.'},
+   {id:'s4e',type:'ip',p:'Which second IP is spoofed toward the gateway to complete the man in the middle?',a:'192.168.10.50',nudge:'Look at the ARP replies sent to the gateway\'s MAC.',ex:`192.168.10.50. Poisoning both directions puts the attacker between workstation and gateway. Frames ${MITM1} and ${MITM1+1} prove it: the same SYN (same IP ID) appears twice, first to the attacker's MAC, then forwarded to the gateway with TTL lowered by one. That is the "pages hang, then load" symptom.`}
+  ],
+  debrief:'Why it matters: a man in the middle can read or alter unencrypted traffic and attempt to downgrade encrypted sessions. Controls: Dynamic ARP Inspection with DHCP snooping, port security, and alerting on duplicate-IP events.'},
+ {id:'s5',short:'5 Flood',name:'Signature 5: UDP flood',tag:'s5',protos:'UDP, ICMP',
+  brief:'A UDP flood fires datagrams at random ports as fast as possible. The victim wastes resources answering closed ports with ICMP port unreachable, until the kernel rate-limits those replies.',
+  hint:'Use Statistics, I/O graph, to find the spike, then filter on the source.',filter:'ip.addr == 198.51.100.23',
+  evText:'Flag one of the flood datagrams.',
+  qs:[
+   {id:'s5a',type:'ip',p:'Which source address sends the flood?',a:'198.51.100.23',nudge:'Look around 18 seconds, or check Statistics, Conversations.',ex:'198.51.100.23, an outside address. Unlike the other signatures, this one does not come from .77. Source addresses in floods are often spoofed, so treat it as an indicator rather than an identity.'},
+   {id:'s5b',type:'num',p:'How many UDP datagrams did that source send?',a:25,nudge:'Filter on ip.src == 198.51.100.23 && udp and read the status bar.',ex:'25 datagrams, each to a different random port.'},
+   {id:'s5c',type:'num',p:'What is the data payload size of each datagram, in bytes?',a:1024,nudge:'Expand the Data layer, or subtract the 8-byte UDP header from the UDP length.',ex:'1024 bytes of data (UDP length 1032). Identical sizes at a high rate are typical of a flood tool.'},
+   {id:'s5d',type:'choice',p:'How does the victim respond to the datagrams?',opts:['Type 0, Code 0 (echo reply)','Type 3, Code 3 (port unreachable)','Type 5, Code 1 (redirect)','Type 11, Code 0 (time exceeded)'],a:1,nudge:'Look at the dark rows from 192.168.20.20.',ex:'ICMP Type 3, Code 3. Only five appear for 25 datagrams because the server rate-limits ICMP errors.'},
+   {id:'s5e',type:'choice',p:'Roughly what rate is the burst? Compare the times of the first and last datagram.',opts:['About 5 packets per second','About 50 packets per second','About 500 packets per second','About 5,000 packets per second'],a:2,nudge:'25 packets divided by the elapsed time.',ex:'25 datagrams in about 0.05 seconds is roughly 500 per second. Compare that with a handful per second in the baseline.'}
+  ],
+  debrief:'Why it matters: a sustained flood exhausts bandwidth and CPU. Controls: upstream filtering or a DDoS scrubbing service, edge ACLs that drop traffic to unused ports, and rate limits on ICMP error generation.'}
+];
+const ALLQ=[].concat(...CASES.map(c=>c.qs));
+const TOTAL=ALLQ.length+CASES.length;
+
+/* ---------------- grading ---------------- */
+const hex12=s=>String(s).toLowerCase().replace(/[^0-9a-f]/g,'');
+function grade(q,v){
+  v=String(v).trim();
+  switch(q.type){
+    case 'ip': return v.replace(/\s/g,'')===q.a;
+    case 'mac': return hex12(v)===hex12(q.a);
+    case 'num': return Number(v.replace(/[^0-9.]/g,''))===q.a && /\d/.test(v);
+    case 'text': return q.a.includes(v.toLowerCase().replace(/^["']|["']$/g,''));
+    case 'set': {const got=v.split(/[^0-9]+/).filter(Boolean).map(Number).sort((a,b)=>a-b);return got.join(',')===q.a.slice().sort((a,b)=>a-b).join(',');}
+    case 'choice': return Number(v)===q.a;
+  }
+  return false;
+}
+const shown=q=>q.type==='choice'?q.opts[q.a]:q.type==='set'?q.a.join(', '):String(q.type==='text'?q.a[0]:q.a);
+function evOK(c){return (S.ev[c.id]||[]).some(n=>P[n-1]&&P[n-1].tag===c.tag);}
+function score(){let s=0;ALLQ.forEach(q=>{const a=S.ans[q.id];if(a&&a.ok)s++;});CASES.forEach(c=>{if(evOK(c))s++;});return s;}
+function caseState(c){const n=c.qs.filter(q=>{const a=S.ans[q.id];return a&&(a.ok||a.rev);}).length;const e=evOK(c);if(n===c.qs.length&&e)return 'done';if(n||(S.ev[c.id]||[]).length)return 'part';return '';}
+function updMeter(){const s=score();$('#mscore').textContent=s;$('#mtotal').textContent=TOTAL;$('#mbar').style.width=(s/TOTAL*100)+'%';}
+
+/* ================= DISPLAY FILTER ENGINE ================= */
+const PROTOS=new Set(['frame','eth','ip','arp','tcp','udp','icmp','dns','http','snmp','ntp','data']);
+const FIELDS=new Set(['frame.number','frame.len','frame.time_relative','eth.src','eth.dst','eth.addr','ip.src','ip.dst','ip.addr','ip.ttl','ip.proto','tcp.srcport','tcp.dstport','tcp.port','tcp.seq','tcp.ack','tcp.len','tcp.window_size','tcp.flags.syn','tcp.flags.ack','tcp.flags.reset','tcp.flags.fin','tcp.flags.push','udp.srcport','udp.dstport','udp.port','udp.length','icmp.type','icmp.code','icmp.ident','icmp.seq','arp.opcode','arp.src.hw_mac','arp.src.proto_ipv4','arp.dst.hw_mac','arp.dst.proto_ipv4','arp.duplicate-address-detected','snmp.community','dns.qry.name','dns.a']);
+const OPS={'==':'==','eq':'==','!=':'!=','ne':'!=','>':'>','gt':'>','<':'<','lt':'<','>=':'>=','ge':'>=','<=':'<=','le':'<=','contains':'contains'};
+function tokenize(s){const re=/\s*(\|\||&&|==|!=|>=|<=|>|<|!|\(|\)|"[^"]*"|[A-Za-z0-9_.:\/-]+)\s*/y;const out=[];re.lastIndex=0;s=s.trim();while(re.lastIndex<s.length){const m=re.exec(s);if(!m)throw `I can't read "${s.slice(re.lastIndex)}"`;out.push(m[1]);}return out;}
+function getVals(p,fld){const f=p.f;
+  if(fld.endsWith('.addr')){const b=fld.slice(0,-5);return [f[b+'.src'],f[b+'.dst']].filter(v=>v!=null);}
+  if(fld==='tcp.port'||fld==='udp.port'){const b=fld.slice(0,3);return [f[b+'.srcport'],f[b+'.dstport']].filter(v=>v!=null);}
+  return f[fld]==null?[]:[f[fld]];}
+function cmp(vals,op,v){
+  const lv=String(v).toLowerCase().replace(/-/g,':');
+  const one=x=>{const nx=Number(x),nv=Number(v);const num=!isNaN(nx)&&!isNaN(nv)&&v!=='';
+    if(op==='contains')return String(x).toLowerCase().includes(String(v).toLowerCase());
+    if(op==='=='||op==='!='){return num?nx===nv:String(x).toLowerCase()===lv||String(x).toLowerCase()===String(v).toLowerCase();}
+    if(!num)return false; return op==='>'?nx>nv:op==='<'?nx<nv:op==='>='?nx>=nv:nx<=nv;};
+  if(op==='!=')return vals.length>0&&!vals.some(x=>one(x));
+  return vals.some(one);
+}
+function compile(src){
+  const toks=tokenize(src);let i=0;const peek=()=>toks[i];
+  const isOr=t=>t==='||'||t==='or', isAnd=t=>t==='&&'||t==='and';
+  function expr(){let a=term();while(isOr(peek())){i++;const b=term(),x=a;a=p=>x(p)||b(p);}return a;}
+  function term(){let a=fac();while(isAnd(peek())){i++;const b=fac(),x=a;a=p=>x(p)&&b(p);}return a;}
+  function fac(){const t=peek();if(t==='!'||t==='not'){i++;const f=fac();return p=>!f(p);}
+    if(t==='('){i++;const e=expr();if(toks[i++]!==')')throw 'A closing parenthesis is missing.';return e;}return atom();}
+  function atom(){const fld=toks[i++];if(fld==null)throw 'The filter ends too early.';const lf=fld.toLowerCase();
+    if(!PROTOS.has(lf)&&!FIELDS.has(lf))throw `"${fld}" isn't a protocol or field this lab supports. See the quick reference in the field guide.`;
+    const op=OPS[(peek()||'').toLowerCase()];
+    if(op){i++;let v=toks[i++];if(v==null)throw `"${fld} ${toks[i-2]}" needs a value.`;v=v.replace(/^"|"$/g,'');
+      if(PROTOS.has(lf))throw `"${fld}" is a protocol; compare one of its fields instead, such as ${lf}.port.`;
+      return p=>cmp(getVals(p,lf),op,v);}
+    if(PROTOS.has(lf))return p=>p.f.protos.has(lf);
+    return p=>getVals(p,lf).length>0;}
+  const f=expr();if(i<toks.length)throw `Unexpected "${toks[i]}". Join conditions with && or ||.`;return f;
+}
+
+/* ================= PACKET LIST UI ================= */
+let view=P.slice(), sel=null, curCase='w', streamed=false;
+function renderList(){
+  const tb=$('#ptb'); const flagged=new Set([].concat(...Object.values(S.ev)));
+  const anim=!streamed&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+  tb.innerHTML=view.map((p,ix)=>`<tr data-n="${p.no}" class="${p.cls}${sel===p.no?' sel':''}${flagged.has(p.no)?' flag':''}${anim&&ix<60?' stream':''}" ${anim&&ix<60?`style="animation-delay:${ix*14}ms"`:''}><td>${p.no}</td><td>${p.t.toFixed(6)}</td><td>${esc(p.src)}</td><td>${esc(p.dst)}</td><td>${p.proto}</td><td>${p.len}</td><td class="info">${esc(p.info)}</td></tr>`).join('');
+  streamed=true;
+  $('#scount').textContent=`Displayed ${view.length} of ${P.length} packets`+(sel?`, selected frame ${sel}`:'');
+}
+function applyFilter(txt){
+  const fi=$('#filter'),er=$('#ferr');txt=txt!=null?txt:fi.value;fi.value=txt;
+  if(!txt.trim()){view=P.slice();fi.className='fin';er.style.display='none';renderList();return true;}
+  try{const fn=compile(txt);view=P.filter(fn);fi.className='fin ok';er.style.display='none';er.textContent='';renderList();return true;}
+  catch(e){fi.className='fin bad';er.textContent=e;er.style.display='block';return false;}
+}
+$('#filter').addEventListener('input',e=>{const v=e.target.value;if(!v.trim()){e.target.className='fin';$('#ferr').style.display='none';return;}try{compile(v);e.target.className='fin ok';$('#ferr').style.display='none';}catch(err){e.target.className='fin bad';}});
+$('#filter').addEventListener('keydown',e=>{if(e.key==='Enter')applyFilter();});
+$('#fapply').onclick=()=>applyFilter();
+$('#fclear').onclick=()=>applyFilter('');
+const QF=['tcp','udp','arp','icmp','snmp','dns','tcp.flags.syn == 1 && tcp.flags.ack == 0','tcp.flags.reset == 1','arp.duplicate-address-detected','!(arp || dns || ntp)'];
+$('#qf').innerHTML=QF.map(q=>`<button data-f="${esc(q)}">${esc(q)}</button>`).join('');
+$('#qf').onclick=e=>{const b=e.target.closest('button');if(b)applyFilter(b.dataset.f);};
+$('#ptb').onclick=e=>{const tr=e.target.closest('tr');if(tr)select(+tr.dataset.n);};
+$('#plist').addEventListener('keydown',e=>{if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;e.preventDefault();if(!view.length)return;let ix=view.findIndex(p=>p.no===sel);ix=ix<0?0:Math.max(0,Math.min(view.length-1,ix+(e.key==='ArrowDown'?1:-1)));select(view[ix].no,true);});
+
+function treeHTML(node,open){
+  if(typeof node==='string')return `<div class="row">${esc(node)}</div>`;
+  return `<details${open?' open':''}${node.warn?' class="warn"':''}><summary>${esc(node.h)}</summary><div class="kids">${node.rows.map(r=>treeHTML(r,false)).join('')}</div></details>`;
+}
+function select(n,scroll){
+  sel=n;const p=P[n-1];
+  $$('#ptb tr.sel').forEach(r=>r.classList.remove('sel'));
+  const tr=$(`#ptb tr[data-n="${n}"]`);if(tr){tr.classList.add('sel');if(scroll)tr.scrollIntoView({block:'nearest'});}
+  $('#scount').textContent=`Displayed ${view.length} of ${P.length} packets, selected frame ${n}`;
+  $('#dtitle').textContent=`Frame ${n}: ${p.proto}, ${p.src} to ${p.dst}`;
+  let main=p.tree.length-1;while(main>0&&p.tree[main].warn)main--;
+  $('#detail').innerHTML=p.tree.map((nd,i)=>treeHTML(nd,i===main||nd.warn)).join('');
+  renderFlag();
+}
+function renderFlag(){
+  const d=$('#dact');if(!sel){d.innerHTML='';return;}
+  const c=CASES.find(x=>x.id===curCase);const list=S.ev[c.id]||[];const on=list.includes(sel);
+  d.innerHTML=`<button class="flagbtn${on?' on':''}" id="flagb">${on?`Remove frame ${sel} from ${esc(c.short)} evidence`:`Flag frame ${sel} as ${esc(c.short)} evidence`}</button>`;
+  $('#flagb').onclick=()=>{const L=S.ev[c.id]||(S.ev[c.id]=[]);const ix=L.indexOf(sel);if(ix>=0)L.splice(ix,1);else{L.push(sel);L.sort((a,b)=>a-b);}
+    save();renderFlag();renderCase();updMeter();const tr=$(`#ptb tr[data-n="${sel}"]`);if(tr)tr.classList.toggle('flag',ix<0);
+    toast(ix>=0?`Frame ${sel} removed`:(P[sel-1].tag===c.tag?`Frame ${sel} flagged as evidence`:`Frame ${sel} flagged. Check that it belongs to this signature.`));};
+}
+function jump(n){if(!view.some(p=>p.no===n))applyFilter('');select(n,true);$('#plist').focus({preventScroll:true});}
+
+/* ================= CASE PANEL ================= */
+function renderNav(){
+  $('#cnav').innerHTML=CASES.map(c=>`<button class="cbtn ${caseState(c)}" data-c="${c.id}" aria-pressed="${c.id===curCase}"><span class="dot"></span>${esc(c.short)}</button>`).join('');
+}
+$('#cnav').onclick=e=>{const b=e.target.closest('button');if(!b)return;curCase=b.dataset.c;renderCase();renderFlag();};
+function qHTML(q){
+  const a=S.ans[q.id]||{};const done=a.ok||a.rev;const left=3-(a.tries||0);
+  let input;
+  if(q.type==='choice')input=`<div class="opts">${q.opts.map((o,i)=>`<label class="opt"><input type="radio" name="r-${q.id}" value="${i}" ${String(a.val)===String(i)?'checked':''} ${done?'disabled':''}><span>${esc(o)}</span></label>`).join('')}</div><button class="chk" data-q="${q.id}" ${done?'disabled':''}>Check answer</button>`;
+  else input=`<div class="in"><input type="text" id="in-${q.id}" value="${esc(a.val||'')}" ${done?'disabled':''} spellcheck="false" aria-label="Answer"><button class="chk" data-q="${q.id}" ${done?'disabled':''}>Check</button></div>`;
+  let fb='';
+  if(a.ok)fb=`<div class="fb ok"><b>Correct.</b> ${esc(q.ex)}</div>`;
+  else if(a.rev)fb=`<div class="fb rev"><b>Answer: ${esc(shown(q))}.</b> ${esc(q.ex)}</div>`;
+  else if(a.tries)fb=`<div class="fb no"><b>Not yet.</b> ${esc(q.nudge)} ${left} attempt${left===1?'':'s'} left.</div>`;
+  return `<div class="q"><p>${esc(q.p)}</p>${input}${fb}</div>`;
+}
+function renderCase(){
+  renderNav();
+  const c=CASES.find(x=>x.id===curCase);const ev=S.ev[c.id]||[];
+  const allDone=c.qs.every(q=>{const a=S.ans[q.id];return a&&(a.ok||a.rev);});
+  $('#cbody').innerHTML=`<h3>${esc(c.name)}</h3><div class="proto">Protocols: ${esc(c.protos)}</div><p>${esc(c.brief)}</p>
+   <button class="ghost" id="hintb">Show a hint</button><div class="hint" id="hint" hidden>${esc(c.hint)}<br><button class="try" style="margin-top:8px" data-f="${esc(c.filter)}">Apply ${esc(c.filter)}</button></div>
+   ${c.qs.map(qHTML).join('')}
+   <div class="ev"><b>Evidence</b><p class="note" style="margin:4px 0 0">${esc(c.evText)} Select a packet, then use the flag button above the packet details.</p>
+   <div class="evchips">${ev.length?ev.map(n=>`<button class="evchip ${P[n-1].tag===c.tag?'good':'miss'}" data-j="${n}" title="${P[n-1].tag===c.tag?'Supports this finding':'Does not show this signature'}">#${n} ${P[n-1].tag===c.tag?'✓':'✗'}</button>`).join(''):'<span class="note">No frames flagged yet.</span>'}</div></div>
+   ${allDone&&evOK(c)?`<div class="debrief"><b>Debrief.</b> ${esc(c.debrief)}</div>`:''}`;
+  $('#hintb').onclick=()=>{const h=$('#hint');h.hidden=!h.hidden;$('#hintb').textContent=h.hidden?'Show a hint':'Hide hint';};
+}
+$('#cbody').addEventListener('click',e=>{
+  const t=e.target.closest('[data-f]');if(t){applyFilter(t.dataset.f);return;}
+  const j=e.target.closest('[data-j]');if(j){jump(+j.dataset.j);return;}
+  const b=e.target.closest('.chk');if(!b)return;
+  const q=ALLQ.find(x=>x.id===b.dataset.q);const a=S.ans[q.id]||(S.ans[q.id]={tries:0});if(a.ok||a.rev)return;
+  let v;if(q.type==='choice'){const r=document.querySelector(`input[name="r-${q.id}"]:checked`);v=r?r.value:'';}else v=$(`#in-${q.id}`).value;
+  if(String(v).trim()===''){toast('Enter an answer first.');return;}
+  a.val=v;a.tries=(a.tries||0)+1;if(grade(q,v))a.ok=true;else if(a.tries>=3)a.rev=true;
+  save();renderCase();updMeter();
+  const nb=document.querySelector(`[data-q="${q.id}"]`);if(nb)nb.closest('.q').scrollIntoView({block:'nearest'});
+});
+$('#cbody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input[type=text]')){const b=e.target.parentElement.querySelector('.chk');if(b)b.click();}});
+
+/* ================= FIELD GUIDE ================= */
+const HDR={
+ IP:{f:[['Version',4,'id'],['IHL',4,'len'],['DSCP / ECN',8,'ctl'],['Total length',16,'len'],['Identification',16,'id'],['Flags',3,'ctl'],['Fragment offset',13,'ctl'],['TTL',8,'ctl'],['Protocol',8,'id'],['Header checksum',16,'chk'],['Source address',32,'addr'],['Destination address',32,'addr']],
+  d:{'Version':'4 for IPv4.','IHL':'Header length in 32-bit words. 5 means 20 bytes, no options.','DSCP / ECN':'Quality-of-service marking and congestion notification.','Total length':'Header plus data, in bytes.','Identification':'Groups the fragments of one datagram. The same ID seen twice with different MACs can reveal a forwarding man in the middle.','Flags':'DF (don\'t fragment) and MF (more fragments).','Fragment offset':'Where this fragment sits in the original datagram. Overlapping offsets are an evasion technique.','TTL':'Each router subtracts one. Typical starting values: 64 Linux, 128 Windows, 255 network gear. Odd values can indicate crafted packets.','Protocol':'What is inside: 1 ICMP, 6 TCP, 17 UDP.','Header checksum':'Error check on the header only. Often shown as unverified because NICs offload it.','Source address':'Sender. Can be spoofed, especially in floods.','Destination address':'Intended receiver.'},
+  look:['One source contacting many destinations quickly (sweeps)','Private or bogon sources arriving from the Internet','TTL values that do not fit the host or hop count','Unexpected protocols, such as heavy ICMP'],
+  flt:['ip.addr == 192.168.10.77','ip.src == 198.51.100.23','ip.ttl < 50']},
+ TCP:{f:[['Source port',16,'port'],['Destination port',16,'port'],['Sequence number',32,'id'],['Acknowledgment number',32,'id'],['Data offset',4,'len'],['Reserved',4,'chk'],['Flags',8,'ctl'],['Window',16,'ctl'],['Checksum',16,'chk'],['Urgent pointer',16,'ctl'],['Options (variable)',32,'data']],
+  d:{'Source port':'Sending application. Clients use high ephemeral ports.','Destination port':'Receiving service, such as 22 SSH, 80 HTTP, 443 HTTPS.','Sequence number':'Byte position of this segment\'s data. Wireshark shows it relative, starting at 0.','Acknowledgment number':'Next byte expected from the other side. Valid only when ACK is set.','Data offset':'TCP header length in 32-bit words.','Reserved':'Unused bits, should be zero.','Flags':'CWR, ECE, URG, ACK, PSH, RST, SYN, FIN. SYN opens, FIN closes politely, RST aborts. Odd combinations (FIN+PSH+URG, or none at all) are scan tricks.','Window':'How many bytes the receiver will accept. A SYN with window 1024 is a classic Nmap fingerprint.','Checksum':'Covers header, data and a pseudo-header.','Urgent pointer':'Rarely used; meaningful only with URG.','Options (variable)':'MSS, window scale, SACK, timestamps. Real clients send several; scanners often send only MSS.'},
+  look:['Many SYNs with no completed handshake (scan or SYN flood)','SYN/ACK answered by RST (half-open scan)','Bursts of RST from one host','Impossible flag combinations'],
+  flt:['tcp.flags.syn == 1 && tcp.flags.ack == 0','tcp.flags.reset == 1','tcp.port == 80']},
+ UDP:{f:[['Source port',16,'port'],['Destination port',16,'port'],['Length',16,'len'],['Checksum',16,'chk'],['Data',32,'data']],
+  d:{'Source port':'Sending application. Random high ports in a flood suggest a tool.','Destination port':'Receiving service: 53 DNS, 67/68 DHCP, 123 NTP, 161/162 SNMP, 514 Syslog.','Length':'UDP header (8 bytes) plus data.','Checksum':'Optional in IPv4, required in IPv6.','Data':'Application payload. UDP has no handshake, so payload is all you get.'},
+  look:['High rate of same-size datagrams (flood)','Many destination ports from one source','Small requests producing huge responses on 53, 123, 161 or 1900 (amplification)','ICMP port unreachable replies, which mean closed UDP ports'],
+  flt:['udp && !dns && !ntp','udp.port == 161','ip.src == 198.51.100.23 && udp']},
+ ICMP:{f:[['Type',8,'ctl'],['Code',8,'ctl'],['Checksum',16,'chk'],['Identifier',16,'id'],['Sequence number',16,'id'],['Data',32,'data']],
+  d:{'Type':'Message class. 0 echo reply, 3 destination unreachable, 5 redirect, 8 echo request, 11 time exceeded.','Code':'Detail within the type. With type 3: 0 net, 1 host, 3 port unreachable, 13 administratively prohibited.','Checksum':'Covers the ICMP message.','Identifier':'Ties replies to the program that sent the requests.','Sequence number':'Increments per echo. Incrementing sequence across many destinations is a sweep.','Data':'Echo payload. Unusually large or structured data can mean ICMP tunneling.'},
+  look:['Echo requests to many hosts in sequence (sweep)','Port unreachable bursts (UDP scan or flood)','Redirects from unexpected sources','Large or unusual echo payloads (tunneling)'],
+  flt:['icmp.type == 8','icmp.type == 3 && icmp.code == 3','icmp']},
+ ARP:{f:[['Hardware type',16,'id'],['Protocol type',16,'id'],['HW length',8,'len'],['Proto length',8,'len'],['Opcode',16,'ctl'],['Sender MAC',32,'addr'],['Sender MAC (cont.)',16,'addr'],['Sender IP',16,'addr'],['Sender IP (cont.)',16,'addr'],['Target MAC',16,'addr'],['Target MAC (cont.)',32,'addr'],['Target IP',32,'addr']],
+  d:{'Hardware type':'1 for Ethernet.','Protocol type':'0x0800 for IPv4.','HW length':'6 bytes for a MAC address.','Proto length':'4 bytes for an IPv4 address.','Opcode':'1 request ("who has?"), 2 reply ("is at"). Replies nobody asked for are suspicious.','Sender MAC':'The MAC the sender claims. ARP never verifies it.','Sender IP':'The IP the sender claims to own. If it changes MAC, someone is lying.','Target MAC':'All zeros in a request; the requester\'s MAC in a reply.','Target IP':'The address being resolved.'},
+  look:['Unsolicited replies repeated every few seconds','One MAC claiming several IPs, especially the gateway','Wireshark\'s duplicate IP address warning','ARP storms from a single host'],
+  flt:['arp.opcode == 2','arp.duplicate-address-detected','eth.src == 00:0c:29:ab:cd:77'],
+  note:'ARP sits directly on Ethernet, with no IP header, so ip.addr filters never match it. MAC and IP fields straddle row boundaries, as in the RFC 826 layout.'},
+ SNMP:{f:[['Version',32,'id'],['Community string',32,'risk'],['PDU type',8,'ctl'],['Request ID',24,'id'],['Error status',16,'ctl'],['Error index',16,'ctl'],['Variable bindings (OID = value)',32,'data']],
+  d:{'Version':'0 = v1, 1 = v2c, 3 = v3. Only v3 can authenticate and encrypt.','Community string':'A shared password sent in cleartext in v1 and v2c. Defaults "public" (read) and "private" (write) are the first things attackers try.','PDU type':'get-request, get-next-request, get-response, set-request, getBulk, snmpV2-trap. A set-request from anything but the NMS is a red flag.','Request ID':'Matches a response to its request.','Error status':'noError, noSuchName, readOnly and others. Wrong community strings in v2c usually get no reply at all.','Error index':'Which binding caused the error.','Variable bindings (OID = value)':'The data: an OID such as 1.3.6.1.2.1.1.1.0 (sysDescr) and its value. sysDescr often reveals exact OS versions.'},
+  look:['Cleartext community strings, especially defaults','Requests from hosts other than the NMS','authenticationFailure traps (OID 1.3.6.1.6.3.1.1.5.5)','set-requests, or large walks of the MIB'],
+  flt:['udp.port == 161 || udp.port == 162','snmp.community == "public"','snmp'],
+  note:'SNMP is ASN.1 BER encoded, so its fields vary in length. This layout shows field order, not exact bit widths. Agents listen on UDP 161; traps go to UDP 162.'}
+};
+let curH='IP';
+function renderHdr(){
+  $('#hchips').innerHTML=Object.keys(HDR).map(k=>`<button class="chip" aria-pressed="${k===curH}" data-h="${k}">${k}</button>`).join('');
+  $('#ruler').innerHTML=Array.from({length:32},(_,i)=>`<span>${i%8===0||i===31?i:''}</span>`).join('');
+  const H=HDR[curH];
+  $('#hgrid').innerHTML=H.f.map(([n,b,c])=>`<button class="fld c-${c}" style="grid-column:span ${b}" data-fd="${esc(n)}" title="${esc(n)}">${esc(n)}${curH!=='SNMP'?`<br><span class="note" style="font-size:.85em">${b} bits</span>`:''}</button>`).join('');
+  $('#fdesc').innerHTML='<span class="note">Select a field above.</span>';
+  $('#hlook').innerHTML=H.look.map(l=>`<li>${esc(l)}</li>`).join('');
+  $('#hfilt').innerHTML=H.flt.map(f=>`<div style="display:flex;gap:8px;align-items:center;margin:6px 0"><button class="try" data-try="${esc(f)}">Try it</button><code>${esc(f)}</code></div>`).join('');
+  $('#hnote').textContent=H.note||'';
+}
+$('#hchips').onclick=e=>{const b=e.target.closest('[data-h]');if(b){curH=b.dataset.h;renderHdr();}};
+$('#hgrid').onclick=e=>{const b=e.target.closest('.fld');if(!b)return;$$('.fld.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');const n=b.dataset.fd;const key=n.replace(' (cont.)','');$('#fdesc').innerHTML=`<b>${esc(key)}.</b> ${esc(HDR[curH].d[key]||'')}`;};
+const FT=[
+ ['ip.addr == 192.168.10.50','host 192.168.10.50','All traffic to or from one host'],
+ ['tcp.flags.syn == 1 && tcp.flags.ack == 0','tcp[tcpflags] & (tcp-syn|tcp-ack) == tcp-syn','Connection attempts only'],
+ ['tcp.flags.reset == 1','tcp[tcpflags] & tcp-rst != 0','Resets'],
+ ['icmp.type == 8','icmp[icmptype] == icmp-echo','Ping requests'],
+ ['arp.opcode == 2','arp[6:2] == 2','ARP replies'],
+ ['arp.duplicate-address-detected','none, display only','Wireshark\'s ARP spoofing warning'],
+ ['udp.port == 161 || udp.port == 162','udp port 161 or udp port 162','SNMP polls and traps'],
+ ['snmp.community == "public"','none, display only','Default community string in use'],
+ ['frame.time_relative >= 18 && frame.time_relative < 19','none, display only','One second of the capture'],
+ ['!(arp || dns || ntp)','not arp and not port 53 and not port 123','Hide routine noise']
+];
+$('#ftable tbody').innerHTML=FT.map(([d,c,s])=>`<tr><td><code>${esc(d)}</code></td><td><code>${esc(c)}</code></td><td>${esc(s)}</td><td><button class="try" data-try="${esc(d)}">Try it</button></td></tr>`).join('');
+document.addEventListener('click',e=>{const b=e.target.closest('[data-try]');if(!b)return;show('lab');applyFilter(b.dataset.try);toast('Filter applied in the capture');});
+
+/* ================= STATISTICS ================= */
+function renderStats(){
+  const cnt={};P.forEach(p=>cnt[p.proto]=(cnt[p.proto]||0)+1);
+  const ent=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const mx=ent[0][1];
+  $('#phier').innerHTML=ent.map(([k,v])=>`<div class="hbar"><span>${k}</span><span class="t"><i style="width:${v/mx*100}%"></i></span><span class="n">${v}</span></div>`).join('')+`<p class="note">Counts use the top protocol in each frame. ${P.length} frames total.</p>`;
+  const B=Math.ceil(P[P.length-1].t)+1, bk=Array(B).fill(0);P.forEach(p=>bk[Math.floor(p.t)]++);const bm=Math.max(...bk);
+  const W=520,Hh=200,pad=28,bw=(W-pad)/B;
+  let s=`<svg viewBox="0 0 ${W} ${Hh+24}" role="img" aria-label="Packets per second"><line x1="${pad}" y1="${Hh}" x2="${W}" y2="${Hh}" stroke="var(--line)"/>`;
+  [0,Math.round(bm/2),bm].forEach(v=>{const y=Hh-(v/bm)*(Hh-10);s+=`<text x="${pad-6}" y="${y+3}" text-anchor="end">${v}</text><line x1="${pad}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 4"/>`;});
+  bk.forEach((v,i)=>{const h=(v/bm)*(Hh-10);s+=`<rect class="b" x="${pad+i*bw+2}" y="${Hh-h}" width="${bw-4}" height="${h}" data-sec="${i}"><title>${i} to ${i+1} s: ${v} packets</title></rect>`;if(i%2===0)s+=`<text x="${pad+i*bw+bw/2}" y="${Hh+14}" text-anchor="middle">${i}</text>`;});
+  $('#iog').innerHTML=s+'</svg><p class="note">Seconds since capture start. Select a bar to filter that second.</p>';
+  const cv={};P.forEach(p=>{if(!p.f['ip.src'])return;const a=[p.f['ip.src'],p.f['ip.dst']].sort();const k=a.join('|');const c=cv[k]||(cv[k]={a:a[0],b:a[1],n:0,by:0,s:p.t,e:p.t});c.n++;c.by+=p.len;c.e=p.t;});
+  $('#conv tbody').innerHTML=Object.values(cv).sort((x,y)=>y.n-x.n).map(c=>`<tr data-a="${c.a}" data-b="${c.b}"><td>${c.a}</td><td>${c.b}</td><td>${c.n}</td><td>${c.by.toLocaleString()}</td><td>${c.s.toFixed(3)}</td><td>${(c.e-c.s).toFixed(3)}</td></tr>`).join('');
+}
+$('#iog').addEventListener('click',e=>{const r=e.target.closest('rect.b');if(!r)return;const s=+r.dataset.sec;show('lab');applyFilter(`frame.time_relative >= ${s} && frame.time_relative < ${s+1}`);});
+$('#conv').addEventListener('click',e=>{const r=e.target.closest('tr[data-a]');if(!r)return;show('lab');applyFilter(`ip.addr == ${r.dataset.a} && ip.addr == ${r.dataset.b}`);});
+
+/* ================= REPORT ================= */
+function renderReport(){
+  $('#sname').value=S.stu.name||'';$('#ssec').value=S.stu.sec||'';$('#esum').value=S.sum||'';
+  $('#findings').innerHTML=CASES.filter(c=>c.id!=='w').map(c=>{const r=S.rep[c.id]||{};const ev=(S.ev[c.id]||[]).filter(n=>P[n-1].tag===c.tag);
+    return `<article class="finding"><header><h3>${esc(c.name.replace('Signature ','Finding '))}</h3><span class="meta">Evidence frames: ${ev.length?ev.join(', '):'none flagged'}</span></header>
+    <table class="indic">${c.qs.map(q=>{const a=S.ans[q.id];const val=a?(a.ok?shown(q):a.rev?`${shown(q)} (revealed)`:'not answered'):'not answered';return `<tr><td>${esc(q.p)}</td><td>${a&&a.ok?'<span class="okm">✓</span> ':a&&a.rev?'<span class="nom">!</span> ':''}${esc(val)}</td></tr>`;}).join('')}</table>
+    <div class="two"><div><label for="sev-${c.id}">Severity</label><select id="sev-${c.id}" data-rep="${c.id}" data-k="sev">${['','Low','Medium','High','Critical'].map(o=>`<option ${r.sev===o?'selected':''} value="${o}">${o||'Choose'}</option>`).join('')}</select></div>
+    <div><label for="act-${c.id}">Recommended control</label><textarea id="act-${c.id}" data-rep="${c.id}" data-k="act" placeholder="What should the network team change to stop this?">${esc(r.act||'')}</textarea></div></div></article>`;}).join('');
+}
+$('#p-report').addEventListener('input',e=>{const t=e.target;
+  if(t.dataset.rep){(S.rep[t.dataset.rep]||(S.rep[t.dataset.rep]={}))[t.dataset.k]=t.value;}
+  else if(t.id==='sname')S.stu.name=t.value;else if(t.id==='ssec')S.stu.sec=t.value;else if(t.id==='esum')S.sum=t.value;save();});
+$('#p-report').addEventListener('change',e=>{const t=e.target;if(t.dataset.rep){(S.rep[t.dataset.rep]||(S.rep[t.dataset.rep]={}))[t.dataset.k]=t.value;save();}});
+function reportText(){
+  let o=`INCIDENT ANALYSIS REPORT\nAnalyst: ${S.stu.name||'(not set)'}   Section: ${S.stu.sec||'(not set)'}\nCapture: mvcc-core-span.pcapng (${P.length} frames)\nScore: ${score()} / ${TOTAL}\n\n`;
+  CASES.filter(c=>c.id!=='w').forEach(c=>{const r=S.rep[c.id]||{};const ev=(S.ev[c.id]||[]).filter(n=>P[n-1].tag===c.tag);
+    o+=`${c.name.replace('Signature ','FINDING ')}\nEvidence frames: ${ev.join(', ')||'none'}\n`;
+    c.qs.forEach(q=>{const a=S.ans[q.id];o+=`  - ${q.p} ${a&&a.ok?shown(q):a&&a.rev?shown(q)+' (revealed)':'not answered'}\n`;});
+    o+=`Severity: ${r.sev||'not set'}\nRecommended control: ${r.act||'not written'}\n\n`;});
+  return o+`EXECUTIVE SUMMARY\n${S.sum||'not written'}\n`;
+}
+$('#bprint').onclick=()=>{try{window.print();}catch(e){toast('Printing is blocked here. Use Copy report as text instead.');}};
+$('#bcopy').onclick=()=>{const t=reportText();const done=()=>toast('Report copied to the clipboard');
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?'Report copied to the clipboard':'Copy is blocked here. Print or save as PDF instead.');};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();};
+let armed=false;
+$('#breset').onclick=()=>{const b=$('#breset');if(!armed){armed=true;b.textContent='Select again to erase all answers';setTimeout(()=>{armed=false;b.textContent='Reset lab';},4000);return;}
+  S={ans:{},ev:{},rep:{},stu:{name:'',sec:''},sum:''};save();armed=false;b.textContent='Reset lab';sel=null;renderReport();renderCase();updMeter();applyFilter('');$('#detail').innerHTML='<div class="empty">Select a packet to inspect its layers.</div>';$('#dact').innerHTML='';toast('Lab reset');};
+
+/* ================= TABS & INIT ================= */
+function show(id){
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.p===id)));
+  $$('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));
+  if(id==='report')renderReport();
+  if(id==='lab'&&!show.lab){show.lab=true;renderList();}
+  window.scrollTo(0,0);
+}
+$$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.p));
+$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+const nQ=c=>c.qs.length;
+$('#rubric').innerHTML=CASES.map(c=>`<tr><td>${esc(c.name.split(':')[0])}${c.id==='w'?'':': '+esc(c.name.split(': ')[1])}</td><td>${nQ(c)+1} pts</td></tr>`).join('')+`<tr><td><b>Total auto-graded</b></td><td>${TOTAL} pts</td></tr>`;
+
+// one-time typing line in the hero
+(function(){const w=$('#wire');const pk=P.find(p=>p.tag==='s2'&&p.f['tcp.dstport']===22);const line=`${pk.no}  ${pk.t.toFixed(4)}  ${pk.src} → ${pk.dst}  TCP  [SYN] Win=1024`;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){w.textContent=line;return;}
+  let i=0;const tick=()=>{w.innerHTML=esc(line.slice(0,i))+'<span class="cur">&nbsp;</span>';if(i++<line.length)setTimeout(tick,28);};setTimeout(tick,500);})();
+
+$('#capmeta').textContent=`Capture file: mvcc-core-span.pcapng, ${P.length} frames, ${P[P.length-1].t.toFixed(1)} seconds`;
+renderHdr();renderStats();renderCase();updMeter();
+})();
+</script>
+</body>
+</html>
