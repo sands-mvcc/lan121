@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LAN121 Lab: VLANs and Inter-VLAN Routing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f8; --panel:#ffffff; --panel2:#f6f8fc; --ink:#14213d; --muted:#56627a; --line:#d3dbea;
+  --navy:#0047AB; --navy-ink:#ffffff; --green:#00a86b; --warn:#b86e00; --bad:#c43d3d;
+  --term:#0f1b2d; --term-ink:#d6e4ff; --term-dim:#7f93b8; --term-ok:#5fe0a8; --term-err:#ff8a8a; --term-coach:#ffd27a;
+  --v1:#8a94a6; --v10:#e07a1f; --v20:#7b4fd1; --v30:#c2337a;
+  --shadow:0 1px 2px rgba(20,33,61,.06),0 6px 18px rgba(20,33,61,.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1322; --panel:#121e35; --panel2:#0f1a2e; --ink:#e4ebf7; --muted:#9aa8c2; --line:#25385c;
+    --navy:#5b95f2; --navy-ink:#07142a; --green:#2fcf8f; --warn:#f0a43a; --bad:#ff7b7b;
+    --term:#070e1b; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1322; --panel:#121e35; --panel2:#0f1a2e; --ink:#e4ebf7; --muted:#9aa8c2; --line:#25385c;
+  --navy:#5b95f2; --navy-ink:#07142a; --green:#2fcf8f; --warn:#f0a43a; --bad:#ff7b7b;
+  --term:#070e1b; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+code,pre,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+img,svg{max-width:100%}
+a{color:var(--navy)}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:4px}
+button{font:inherit;cursor:pointer}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--navy);color:#fff}
+:root[data-theme="dark"] .top{background:#0d2a5c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .top{background:#0d2a5c}}
+.top-in{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;line-height:1.2;margin-right:auto}
+.brand b{font-size:1.15rem}
+.brand span{font-size:.85rem;opacity:.85}
+.meter{display:flex;align-items:center;gap:10px;font-size:.9rem}
+.meter-bar{width:150px;height:10px;border-radius:6px;background:rgba(255,255,255,.22);overflow:hidden}
+.meter-bar i{display:block;height:100%;width:0;background:#3be3a0;transition:width .4s}
+.theme-btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 12px;font-size:.9rem}
+.steps{background:var(--panel);border-bottom:1px solid var(--line)}
+.steps-in{max-width:1240px;margin:0 auto;padding:0 12px;display:flex;overflow-x:auto}
+.step{background:none;border:0;border-bottom:3px solid transparent;padding:14px 14px 11px;color:var(--muted);white-space:nowrap;font-size:.98rem}
+.step b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:2px solid currentColor;margin-right:8px;font-size:.8rem}
+.step[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
+
+main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.view{display:none}
+.view.on{display:block}
+h1{font-size:2rem;line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}
+h2{font-size:1.35rem;margin:0 0 10px}
+h3{font-size:1.05rem;margin:0 0 6px}
+p{margin:0 0 12px;max-width:72ch}
+.lede{font-size:1.1rem;color:var(--muted);max-width:68ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.stack>*+*{margin-top:18px}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+ul.clean{margin:0;padding-left:20px}
+ul.clean li{margin:4px 0}
+.next-row{display:flex;justify-content:flex-end;margin-top:22px}
+.btn{background:var(--navy);color:var(--navy-ink);border:0;border-radius:8px;padding:10px 18px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn.small{padding:6px 12px;font-size:.88rem}
+.btn.go{background:var(--green);color:#fff}
+
+/* Address table */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:700;font-size:.85rem}
+td.mono{font-size:.88rem}
+.vtag{display:inline-block;padding:1px 8px;border-radius:20px;color:#fff;font-size:.8rem;font-weight:700}
+
+/* Flip cards */
+.flips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.flip{perspective:900px;height:160px;border:0;padding:0;background:none;text-align:left}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.flip-f,.flip-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:center}
+.flip-f{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--navy)}
+.flip-f b{font-size:1.15rem}
+.flip-f small{color:var(--muted);margin-top:6px}
+.flip-b{background:var(--navy);color:var(--navy-ink);transform:rotateY(180deg);font-size:.92rem;line-height:1.45}
+@media (prefers-reduced-motion:reduce){.flip-in{transition:none}}
+
+/* Command guide */
+details.acc{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;box-shadow:var(--shadow)}
+details.acc summary{list-style:none;padding:16px 20px;cursor:pointer;display:flex;gap:14px;align-items:baseline}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";margin-left:auto;font-size:1.4rem;line-height:1;color:var(--navy)}
+details.acc[open] summary::after{content:"\2212"}
+details.acc summary .sn{font-weight:700;color:var(--navy);min-width:1.5em}
+details.acc summary b{font-size:1.05rem}
+details.acc summary small{color:var(--muted);display:block}
+.acc-body{padding:0 20px 18px 54px}
+@media (max-width:600px){.acc-body{padding-left:20px}}
+.cmd{background:var(--term);color:var(--term-ink);border-radius:10px;padding:14px 16px;font-size:.86rem;line-height:1.6;overflow-x:auto;margin:8px 0 12px;white-space:pre}
+.cmd .c{color:var(--term-dim)}
+.cmd .p{color:var(--term-ok)}
+.cmd .o{color:#a9bce0}
+.note{border-left:4px solid var(--warn);background:var(--panel2);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.95rem;margin:8px 0}
+.modes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.mode-chip{font-family:"JetBrains Mono",monospace;font-size:.82rem;padding:5px 10px;border-radius:6px;background:var(--panel2);border:1px solid var(--line)}
+.mode-arrow{color:var(--muted);font-size:.85rem}
+
+/* Lab */
+.lab{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:980px){.lab{grid-template-columns:1fr}}
+.topo-card{padding:12px 12px 6px}
+.topo-head{display:flex;align-items:center;gap:10px;padding:4px 8px 6px;flex-wrap:wrap}
+.topo-head h2{margin:0;font-size:1.1rem;margin-right:auto}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#topo{width:100%;height:auto;display:block}
+#topo .lnk{stroke:var(--line);stroke-width:4;stroke-dasharray:7 7;fill:none;transition:stroke .3s}
+#topo .lnk.trunk{stroke:var(--navy);stroke-width:7;stroke-dasharray:none}
+#topo .lnk.half{stroke:var(--warn);stroke-width:5;stroke-dasharray:10 6}
+#topo .lnk.down{stroke:var(--bad);stroke-dasharray:3 6}
+#topo .acc{stroke-width:4;fill:none;transition:stroke .3s}
+#topo .plabel{font:600 11px "JetBrains Mono",monospace;fill:var(--muted)}
+#topo .dev{cursor:pointer}
+#topo .dev .body{fill:var(--panel);stroke:var(--navy);stroke-width:2.5;transition:stroke .2s}
+#topo .dev:hover .body,#topo .dev.sel .body{stroke:var(--green);stroke-width:3.5}
+#topo .dev .ico{stroke:var(--navy);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#topo .dname{font:700 14px "Atkinson Hyperlegible",sans-serif;fill:var(--ink)}
+#topo .dsub{font:500 11px "JetBrains Mono",monospace;fill:var(--muted)}
+#topo .pc .scr{fill:var(--panel);stroke-width:2.5}
+#topo .chip{stroke:var(--panel);stroke-width:1.5}
+#topo .pkt{filter:drop-shadow(0 0 4px rgba(0,0,0,.35))}
+.topo-foot{font-size:.82rem;color:var(--muted);padding:0 8px 6px}
+
+/* Terminal */
+.term-card{padding:0;overflow:hidden}
+.term-tabs{display:flex;background:var(--panel2);border-bottom:1px solid var(--line);overflow-x:auto}
+.ttab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px;color:var(--muted);font-weight:700;font-size:.92rem;white-space:nowrap}
+.ttab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--navy);background:var(--panel)}
+.ttab .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--line);margin-left:8px;vertical-align:1px}
+.ttab .dot.ok{background:var(--green)}
+.term{background:var(--term);color:var(--term-ink);font:13.5px/1.5 "JetBrains Mono",monospace;height:440px;overflow:auto;padding:12px 14px;cursor:text}
+.term pre{margin:0;white-space:pre-wrap;word-break:break-word;font:inherit}
+.term .e{color:var(--term-err)}
+.term .k{color:var(--term-coach)}
+.term .s{color:var(--term-dim)}
+.term .g{color:var(--term-ok)}
+.term .u{color:#ffffff}
+.term-line{display:flex;align-items:baseline;gap:0}
+.term-line label{white-space:pre;color:#fff}
+.term-line input{flex:1;min-width:40px;background:transparent;border:0;color:#fff;font:inherit;padding:0;outline:none;caret-color:var(--term-ok)}
+.term-bar{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--line);flex-wrap:wrap;align-items:center;font-size:.82rem;color:var(--muted)}
+.term-bar .sp{margin-left:auto}
+.qbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 9px;font-size:.8rem;font-family:"JetBrains Mono",monospace}
+
+/* PC test panel */
+.pcpanel h2{font-size:1.1rem}
+.pc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
+.pc-row label{display:flex;flex-direction:column;font-size:.82rem;color:var(--muted);gap:4px}
+select,input[type=text]{font:inherit;font-size:.95rem;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+.pcout{background:#10151d;color:#e6e6e6;font:12.5px/1.5 "JetBrains Mono",monospace;border-radius:8px;padding:10px 12px;min-height:120px;max-height:260px;overflow:auto;white-space:pre-wrap;margin:0}
+.pcout .g{color:#6fe3ad}.pcout .e{color:#ff9090}.pcout .k{color:#ffd27a}
+
+/* Tasks */
+.tasks h2{font-size:1.1rem}
+.part{margin:14px 0 4px;font-weight:700;color:var(--navy);font-size:.95rem}
+.task{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.tick{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:#fff;font-size:.8rem;transition:all .25s}
+.task.done .tick{background:var(--green);border-color:var(--green)}
+.task.done .ttl{color:var(--muted)}
+.ttl{font-weight:700;font-size:.97rem}
+.tdesc{font-size:.88rem;color:var(--muted);margin-top:2px}
+.pts{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.hint{margin-top:6px}
+.hint summary{font-size:.82rem;color:var(--navy);cursor:pointer}
+.hint pre{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:.8rem;margin:6px 0 0;overflow-x:auto}
+
+/* Quiz */
+.q{margin-bottom:16px}
+.q h3{font-size:1.02rem;line-height:1.4}
+.q pre{background:var(--term);color:var(--term-ink);border-radius:8px;padding:10px 12px;font-size:.8rem;overflow-x:auto;margin:6px 0 10px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:8px;margin:6px 0;cursor:pointer;background:var(--panel)}
+.opt input{margin-top:5px}
+.opt.right{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--panel))}
+.fb{font-size:.92rem;padding:8px 12px;border-radius:8px;margin-top:6px;display:none}
+.fb.on{display:block}
+.fb.ok{background:color-mix(in srgb,var(--green) 14%,var(--panel));border:1px solid var(--green)}
+.fb.no{background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
+
+/* Report */
+.score-big{display:flex;gap:24px;flex-wrap:wrap;margin:10px 0 18px}
+.score-big div{min-width:140px}
+.score-big strong{display:block;font-size:2.2rem;line-height:1;color:var(--navy)}
+.score-big span{font-size:.85rem;color:var(--muted)}
+.cfgs pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.78rem;overflow-x:auto;max-height:340px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(40px);opacity:0;background:var(--green);color:#fff;padding:10px 18px;border-radius:30px;font-weight:700;transition:all .35s;z-index:50;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media print{
+  .top,.steps,.no-print,.view:not(#v-report){display:none!important}
+  #v-report{display:block!important}
+  body{background:#fff;color:#000;font-size:12px}
+  .card{box-shadow:none;border:1px solid #bbb}
+  .cfgs details{display:block}.cfgs pre{max-height:none;white-space:pre-wrap}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><b>Lab: VLANs and inter-VLAN routing</b><span>LAN121 Network Essentials &middot; Moraine Valley Community College</span></div>
+    <div class="meter" aria-live="polite"><span id="meterTxt">0 / 100 lab points</span><div class="meter-bar"><i id="meterBar"></i></div></div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark mode</button>
+  </div>
+</header>
+<nav class="steps" aria-label="Lab sections">
+  <div class="steps-in" role="tablist">
+    <button class="step" role="tab" data-v="prep" aria-selected="true"><b>1</b>Prepare</button>
+    <button class="step" role="tab" data-v="cmds" aria-selected="false"><b>2</b>Command guide</button>
+    <button class="step" role="tab" data-v="lab" aria-selected="false"><b>3</b>Build the network</button>
+    <button class="step" role="tab" data-v="quiz" aria-selected="false"><b>4</b>Read the output</button>
+    <button class="step" role="tab" data-v="report" aria-selected="false"><b>5</b>Lab report</button>
+  </div>
+</nav>
+
+<main>
+<!-- ============ 1 PREPARE ============ -->
+<section class="view on" id="v-prep">
+  <h1>Split one network into three, then route between them</h1>
+  <p class="lede">Ridgeview Supply's office runs on one flat network. You'll segment it into Sales, Engineering, and HR VLANs across three Cisco 2960 switches, then configure a Cisco 4321 router so the departments can still reach each other. Every command runs in a simulated IOS console, and every result shows up live on the network map.</p>
+
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h2>What you should know</h2>
+      <ul class="clean">
+        <li>A VLAN is a separate broadcast domain on shared switch hardware, and each VLAN normally gets its own IP subnet.</li>
+        <li>Access ports carry one VLAN to an end device; trunk ports carry many VLANs between switches and routers using 802.1Q tags.</li>
+        <li>Devices in different VLANs can't talk without a Layer 3 device. A router (or multilayer switch) must route between them.</li>
+        <li>Router-on-a-stick uses one physical router link split into subinterfaces, one per VLAN, each acting as that VLAN's default gateway.</li>
+        <li>Connected routes appear in the routing table automatically when an interface with an IP address is up.</li>
+        <li>Every switch along the path must know the VLAN, and every trunk must allow it.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>What you'll be able to do</h2>
+      <ul class="clean">
+        <li>Move between IOS modes: user EXEC, privileged EXEC, global config, interface, and VLAN.</li>
+        <li>Create and name VLANs and assign switch ports to them in access mode.</li>
+        <li>Configure static 802.1Q trunks between switches and to a router.</li>
+        <li>Enable a router interface and build dot1Q subinterfaces with gateway addresses.</li>
+        <li>Verify with <code>show vlan brief</code>, <code>show interfaces trunk</code>, <code>show ip interface brief</code>, and <code>show ip route</code>.</li>
+        <li>Test reachability within and between VLANs and troubleshoot what fails.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2>Addressing and port plan</h2>
+    <p>The PCs are already addressed. Your job is everything between them.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Device</th><th>Interface</th><th>VLAN</th><th>IP address / mask</th><th>Default gateway</th></tr></thead>
+      <tbody>
+        <tr><td>R1</td><td class="mono">G0/0/0.10</td><td><span class="vtag" style="background:var(--v10)">10 SALES</span></td><td class="mono">192.168.10.1 /24</td><td>n/a</td></tr>
+        <tr><td>R1</td><td class="mono">G0/0/0.20</td><td><span class="vtag" style="background:var(--v20)">20 ENGINEERING</span></td><td class="mono">192.168.20.1 /24</td><td>n/a</td></tr>
+        <tr><td>R1</td><td class="mono">G0/0/0.30</td><td><span class="vtag" style="background:var(--v30)">30 HR</span></td><td class="mono">192.168.30.1 /24</td><td>n/a</td></tr>
+        <tr><td>SW1</td><td class="mono">G0/1, F0/23, F0/24</td><td>Trunks</td><td>n/a</td><td>n/a</td></tr>
+        <tr><td>SW2</td><td class="mono">F0/24</td><td>Trunk to SW1</td><td>n/a</td><td>n/a</td></tr>
+        <tr><td>SW3</td><td class="mono">F0/24</td><td>Trunk to SW1</td><td>n/a</td><td>n/a</td></tr>
+        <tr><td>PC1</td><td class="mono">SW2 F0/1</td><td><span class="vtag" style="background:var(--v10)">10</span></td><td class="mono">192.168.10.11 /24</td><td class="mono">192.168.10.1</td></tr>
+        <tr><td>PC2</td><td class="mono">SW2 F0/2</td><td><span class="vtag" style="background:var(--v20)">20</span></td><td class="mono">192.168.20.11 /24</td><td class="mono">192.168.20.1</td></tr>
+        <tr><td>PC3</td><td class="mono">SW3 F0/1</td><td><span class="vtag" style="background:var(--v10)">10</span></td><td class="mono">192.168.10.12 /24</td><td class="mono">192.168.10.1</td></tr>
+        <tr><td>PC4</td><td class="mono">SW3 F0/2</td><td><span class="vtag" style="background:var(--v30)">30</span></td><td class="mono">192.168.30.11 /24</td><td class="mono">192.168.30.1</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2 style="margin-top:28px">Key terms</h2>
+  <p>Select a card to see the definition.</p>
+  <div class="flips" id="flips"></div>
+  <div class="next-row"><button class="btn" data-goto="cmds">Continue to the command guide</button></div>
+</section>
+
+<!-- ============ 2 COMMANDS ============ -->
+<section class="view" id="v-cmds">
+  <h1>The commands you'll use</h1>
+  <p class="lede">Work through these in order. They follow the same sequence as the lab. IOS accepts abbreviations, so <code>conf t</code>, <code>int f0/1</code>, and <code>sh vl br</code> all work in the console.</p>
+
+  <details class="acc" open><summary><span class="sn">1</span><span><b>Move between IOS modes</b><small>Where you are determines what you can type</small></span></summary>
+  <div class="acc-body">
+    <div class="modes"><span class="mode-chip">Switch&gt;</span><span class="mode-arrow">enable</span><span class="mode-chip">Switch#</span><span class="mode-arrow">configure terminal</span><span class="mode-chip">Switch(config)#</span><span class="mode-arrow">interface f0/1</span><span class="mode-chip">Switch(config-if)#</span></div>
+<div class="cmd"><span class="p">Switch&gt;</span> enable                 <span class="c">! user EXEC to privileged EXEC</span>
+<span class="p">Switch#</span> configure terminal     <span class="c">! enter global configuration</span>
+<span class="p">Switch(config)#</span> hostname SW1
+<span class="p">SW1(config)#</span> exit                 <span class="c">! back one level</span>
+<span class="p">SW1#</span>                               <span class="c">! end or Ctrl+Z jumps straight here</span></div>
+    <p>Show commands run from privileged EXEC. Inside configuration modes, put <code>do</code> in front: <code>do show vlan brief</code>.</p>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">2</span><span><b>Create and name VLANs</b><small>Run on every switch that will carry the VLAN</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">SW1(config)#</span> vlan 10
+<span class="p">SW1(config-vlan)#</span> name SALES
+<span class="p">SW1(config-vlan)#</span> vlan 20
+<span class="p">SW1(config-vlan)#</span> name ENGINEERING
+<span class="p">SW1(config-vlan)#</span> vlan 30
+<span class="p">SW1(config-vlan)#</span> name HR
+<span class="p">SW1(config-vlan)#</span> end</div>
+    <div class="note">SW1 has no PCs, but it still needs all three VLANs. A switch drops frames for any VLAN missing from its VLAN database, even when they arrive on a trunk. Without VTP, you create VLANs on each switch by hand.</div>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">3</span><span><b>Assign access ports</b><small>One VLAN per end-device port</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">SW2(config)#</span> interface fastethernet0/1
+<span class="p">SW2(config-if)#</span> switchport mode access      <span class="c">! never negotiate a trunk</span>
+<span class="p">SW2(config-if)#</span> switchport access vlan 10
+<span class="p">SW2(config-if)#</span> interface f0/2
+<span class="p">SW2(config-if)#</span> switchport mode access
+<span class="p">SW2(config-if)#</span> switchport access vlan 20</div>
+    <p>For several ports at once, use <code>interface range f0/1 - 2</code>. If you assign a VLAN that doesn't exist yet, the switch creates it with a placeholder name like <code>VLAN0010</code>, so you still need to name it.</p>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">4</span><span><b>Configure trunks</b><small>Switch-to-switch and switch-to-router links</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">SW1(config)#</span> interface range g0/1, f0/23 - 24
+<span class="p">SW1(config-if-range)#</span> switchport mode trunk
+<span class="p">SW1(config-if-range)#</span> switchport trunk allowed vlan 10,20,30   <span class="c">! optional hardening</span></div>
+    <p>Configure the other end too (<code>F0/24</code> on SW2 and SW3). A 2960 port defaults to <em>dynamic auto</em>, and two auto ports never form a trunk. Setting both ends to <code>trunk</code> removes the guesswork.</p>
+    <div class="note">The link to the router must be a static trunk on the switch side. Routers don't negotiate trunks with DTP.</div>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">5</span><span><b>Build router-on-a-stick</b><small>One physical link, one subinterface per VLAN</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">R1(config)#</span> interface g0/0/0
+<span class="p">R1(config-if)#</span> no shutdown                  <span class="c">! router ports start shut down</span>
+<span class="p">R1(config-if)#</span> interface g0/0/0.10
+<span class="p">R1(config-subif)#</span> encapsulation dot1Q 10        <span class="c">! must come before the IP</span>
+<span class="p">R1(config-subif)#</span> ip address 192.168.10.1 255.255.255.0
+<span class="p">R1(config-subif)#</span> interface g0/0/0.20
+<span class="p">R1(config-subif)#</span> encapsulation dot1Q 20
+<span class="p">R1(config-subif)#</span> ip address 192.168.20.1 255.255.255.0</div>
+    <p>The subinterface number (<code>.10</code>) is just a label. The <code>encapsulation dot1Q 10</code> line is what ties it to VLAN 10. Matching them keeps the config readable.</p>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">6</span><span><b>Verify</b><small>Prove the configuration before you test traffic</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">SW2#</span> show vlan brief                 <span class="c">! VLAN names and access port membership</span>
+<span class="p">SW1#</span> show interfaces trunk           <span class="c">! which ports trunk and which VLANs they carry</span>
+<span class="p">SW2#</span> show interfaces f0/1 switchport <span class="c">! one port's mode and VLAN</span>
+<span class="p">R1#</span>  show ip interface brief         <span class="c">! interface status and addresses</span>
+<span class="p">R1#</span>  show ip route                   <span class="c">! connected (C) and local (L) routes</span>
+<span class="p">R1#</span>  ping 192.168.10.11</div>
+    <p>Trunk ports never appear in <code>show vlan brief</code>. If a port you expect to see is missing, it's probably trunking.</p>
+  </div></details>
+
+  <details class="acc"><summary><span class="sn">7</span><span><b>Save your work</b><small>Running config disappears on reload</small></span></summary>
+  <div class="acc-body">
+<div class="cmd"><span class="p">SW1#</span> copy running-config startup-config
+Destination filename [startup-config]?
+Building configuration...
+[OK]</div>
+    <p><code>write memory</code> (or <code>wr</code>) does the same thing.</p>
+  </div></details>
+  <div class="next-row"><button class="btn" data-goto="lab">Start the lab</button></div>
+</section>
+
+<!-- ============ 3 LAB ============ -->
+<section class="view" id="v-lab">
+  <div class="lab">
+    <div class="stack">
+      <div class="card topo-card">
+        <div class="topo-head">
+          <h2>Network map</h2>
+          <div class="legend"><span><i style="background:var(--v10)"></i>VLAN 10</span><span><i style="background:var(--v20)"></i>VLAN 20</span><span><i style="background:var(--v30)"></i>VLAN 30</span><span><i style="background:var(--navy)"></i>Trunk</span></div>
+        </div>
+        <svg id="topo" viewBox="0 0 760 440" role="img" aria-label="Topology: R1 trunked to SW1, which trunks to SW2 and SW3. PC1 and PC2 on SW2, PC3 and PC4 on SW3."></svg>
+        <div class="topo-foot">Select a router or switch to open its console. Select a PC to make it the ping source. Dots on a trunk show which VLANs it actually carries.</div>
+      </div>
+      <div class="card tasks" id="tasks"></div>
+    </div>
+    <div class="stack">
+      <div class="card term-card">
+        <div class="term-tabs" role="tablist" id="ttabs"></div>
+        <div class="term" id="term" aria-label="Device console"><pre id="tout"></pre><div class="term-line"><label id="tprompt" for="tin"></label><input id="tin" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Console command"></div></div>
+        <div class="term-bar">
+          <button class="qbtn" data-ins="show vlan brief">show vlan brief</button>
+          <button class="qbtn" data-ins="show interfaces trunk">show interfaces trunk</button>
+          <button class="qbtn" data-ins="show ip interface brief">show ip int brief</button>
+          <button class="qbtn" data-ins="show ip route">show ip route</button>
+          <span class="sp">&uarr;&darr; history &middot; ? help</span>
+        </div>
+      </div>
+      <div class="card pcpanel">
+        <h2>Test from a PC</h2>
+        <div class="pc-row">
+          <label>Source<select id="pcSrc"></select></label>
+          <label>Destination<select id="pcDst"></select></label>
+          <button class="btn small" id="pingBtn" type="button">Run ping</button>
+          <button class="btn small ghost" id="ipcBtn" type="button">ipconfig</button>
+        </div>
+        <pre class="pcout" id="pcout">C:\&gt; Choose a source and destination, then run ping.</pre>
+      </div>
+      <div class="no-print" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn small ghost" id="resetDev" type="button">Reset this device</button>
+        <button class="btn small ghost" id="resetAll" type="button">Reset entire lab</button>
+      </div>
+    </div>
+  </div>
+  <div class="next-row"><button class="btn" data-goto="quiz">Continue to output questions</button></div>
+</section>
+
+<!-- ============ 4 QUIZ ============ -->
+<section class="view" id="v-quiz">
+  <h1>Read the output like a technician</h1>
+  <p class="lede">Each question uses output you'll see on the job. Pick an answer to get feedback; you can change it.</p>
+  <div id="quiz"></div>
+  <div class="next-row"><button class="btn" data-goto="report">See your lab report</button></div>
+</section>
+
+<!-- ============ 5 REPORT ============ -->
+<section class="view" id="v-report">
+  <div class="card">
+    <h1>Lab report</h1>
+    <div class="pc-row no-print">
+      <label>Student name<input type="text" id="stuName" placeholder="Your name"></label>
+      <button class="btn" id="printBtn" type="button">Print or save as PDF</button>
+    </div>
+    <p id="repWho" class="lede"></p>
+    <div class="score-big" id="scores"></div>
+    <div class="tbl-wrap"><table id="repTbl"></table></div>
+  </div>
+  <div class="card cfgs" style="margin-top:18px">
+    <h2>Running configurations</h2>
+    <p>Captured from the console at the time of the report.</p>
+    <div id="cfgs"></div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------------- Constants ---------------- */
+const KEY='lan121-vlan-lab-v1';
+const WANT={10:'SALES',20:'ENGINEERING',30:'HR'};
+const VCOL={1:'var(--v1)',10:'var(--v10)',20:'var(--v20)',30:'var(--v30)'};
+const PCS={
+  PC1:{ip:'192.168.10.11',gw:'192.168.10.1',sw:'SW2',port:'Fa0/1',vlan:10},
+  PC2:{ip:'192.168.20.11',gw:'192.168.20.1',sw:'SW2',port:'Fa0/2',vlan:20},
+  PC3:{ip:'192.168.10.12',gw:'192.168.10.1',sw:'SW3',port:'Fa0/1',vlan:10},
+  PC4:{ip:'192.168.30.11',gw:'192.168.30.1',sw:'SW3',port:'Fa0/2',vlan:30}
+};
+const LINKS=[
+  {a:['R1','Gi0/0/0'],b:['SW1','Gi0/1']},
+  {a:['SW1','Fa0/23'],b:['SW2','Fa0/24']},
+  {a:['SW1','Fa0/24'],b:['SW3','Fa0/24']}
+];
+const DEVS=['R1','SW1','SW2','SW3'];
+const POS={R1:[380,58],SW1:[380,180],SW2:[200,300],SW3:[560,300],PC1:[115,398],PC2:[285,398],PC3:[475,398],PC4:[645,398]};
+
+/* ---------------- State ---------------- */
+function newPort(){return{mode:'auto',access:1,allowed:null,native:1,shut:false,desc:''};}
+function newSwitch(){const ifs={};for(let i=1;i<=24;i++)ifs['Fa0/'+i]=newPort();ifs['Gi0/1']=newPort();ifs['Gi0/2']=newPort();
+  return{type:'switch',hostname:'Switch',vlans:{1:'default'},ifs,extra:[],saved:false,startup:null};}
+function newRouter(){const ifs={};['Gi0/0/0','Gi0/0/1','Gi0/0/2'].forEach(n=>ifs[n]={shut:true,ip:null,mask:null,desc:''});
+  return{type:'router',hostname:'Router',ifs,subs:{},extra:[],saved:false,startup:null};}
+function freshState(){return{D:{R1:newRouter(),SW1:newSwitch(),SW2:newSwitch(),SW3:newSwitch()},ev:{vb:false,tr:false,rt:false,pings:{}},quiz:{},name:'',arp:{}};}
+let S=freshState();
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&o.D&&o.D.R1)S=Object.assign(freshState(),o);}}catch(e){}
+function D(id){return S.D[id];}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+const SESS={};
+DEVS.forEach(id=>SESS[id]={mode:'user',ctx:null,hist:[],hi:0,buf:[]});
+let cur='R1';
+
+/* ---------------- Helpers ---------------- */
+const T=(tok,full,min)=>!!tok&&tok.length>=(min||1)&&full.startsWith(tok.toLowerCase());
+const host=id=>PCS[id]?id:D(id).hostname;
+const longIf=n=>n.replace(/^Fa/,'FastEthernet').replace(/^Gi/,'GigabitEthernet');
+function ip2n(s){const p=String(s).split('.');if(p.length!==4)return null;let n=0;for(const x of p){if(!/^\d{1,3}$/.test(x)||+x>255)return null;n=n*256+(+x);}return n;}
+function n2ip(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+function maskLen(m){const n=ip2n(m);if(n===null)return null;const b=n.toString(2).padStart(32,'0');if(!/^1*0*$/.test(b))return null;return b.indexOf('0')<0?32:b.indexOf('0');}
+function netOf(ip,len){len=len==null?24:len;const n=ip2n(ip);const mask=len===0?0:(0xFFFFFFFF<<(32-len))>>>0;return(n&mask)>>>0;}
+function sameNet(a,b,len){return netOf(a,len)===netOf(b,len);}
+function vlanList(str){const out=[];for(const part of str.split(',')){const m=part.match(/^(\d+)(?:-(\d+))?$/);if(!m)return null;const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b>4094||b<a)return null;if(b-a>4000)return'ALL';for(let i=a;i<=b;i++)out.push(i);}return out;}
+function fmtList(arr){if(arr===null)return'1-4094';const s=[...arr].sort((a,b)=>a-b);const r=[];let i=0;while(i<s.length){let j=i;while(j+1<s.length&&s[j+1]===s[j]+1)j++;r.push(j>i?s[i]+'-'+s[j]:''+s[i]);i=j+1;}return r.join(',')||'none';}
+function pad(s,n){s=String(s);return s.length>=n?s+' ':s+' '.repeat(n-s.length);}
+
+function parseIf(str,dev){
+  const s=str.replace(/\s+/g,'').toLowerCase();
+  const m=s.match(/^([a-z]+)(\d+(?:\/\d+){1,2})(?:\.(\d+))?$/);if(!m)return null;
+  let t=null;if(m[1][0]==='f'&&'fastethernet'.startsWith(m[1]))t='Fa';else if(m[1][0]==='g'&&'gigabitethernet'.startsWith(m[1]))t='Gi';else return null;
+  const base=t+m[2];if(!dev.ifs[base])return null;
+  return{base,sub:m[3]!==undefined?base+'.'+m[3]:null,subn:m[3]};
+}
+function parseRange(str,dev){
+  const out=[];
+  for(let part of str.split(',')){
+    part=part.replace(/\s+/g,'').toLowerCase();if(!part)continue;
+    const m=part.match(/^([a-z]+)(\d+\/(?:\d+\/)?)(\d+)(?:-(?:[a-z]+\d+\/(?:\d+\/)?)?(\d+))?$/);if(!m)return null;
+    const a=+m[3],b=m[4]?+m[4]:a;if(b<a)return null;
+    for(let i=a;i<=b;i++){const r=parseIf(m[1]+m[2]+i,dev);if(!r)return null;out.push(r.base);}
+  }
+  return out.length?out:null;
+}
+
+/* ---------------- Network model ---------------- */
+function linkOf(dev,port){for(const L of LINKS){if(L.a[0]===dev&&L.a[1]===port)return{dev:L.b[0],port:L.b[1]};if(L.b[0]===dev&&L.b[1]===port)return{dev:L.a[0],port:L.a[1]};}return null;}
+function pcOn(sw,port){return Object.keys(PCS).find(k=>PCS[k].sw===sw&&PCS[k].port===port);}
+function linkUp(dev,port){const d=D(dev);if(!d.ifs[port]||d.ifs[port].shut)return false;const p=linkOf(dev,port);if(p)return!D(p.dev).ifs[p.port].shut;if(d.type==='switch'&&pcOn(dev,port))return true;return false;}
+function operTrunk(sw,port){
+  const p=D(sw).ifs[port];if(!linkUp(sw,port))return false;
+  if(p.mode==='trunk')return true;if(p.mode==='access')return false;
+  const peer=linkOf(sw,port);if(!peer||D(peer.dev).type!=='switch')return false;
+  const m=D(peer.dev).ifs[peer.port].mode;
+  if(p.mode==='auto')return m==='trunk'||m==='desirable';
+  if(p.mode==='desirable')return m!=='access';return false;
+}
+const allowedHas=(a,v)=>a===null||a.includes(+v);
+const vlanOn=(sw,v)=>D(sw).vlans[v]!==undefined;
+const carries=(sw,port,v)=>operTrunk(sw,port)&&allowedHas(D(sw).ifs[port].allowed,v)&&vlanOn(sw,v);
+const routerPhysUp=()=>linkUp('R1','Gi0/0/0');
+function subFor(v){for(const n in D('R1').subs){if(D('R1').subs[n].encap==v)return n;}return null;}
+const subUp=n=>routerPhysUp()&&D('R1').subs[n]&&D('R1').subs[n].encap!=null;
+function domain(v,start){
+  const sw=new Set();let router=false;if(!vlanOn(start,v))return{sw,router};
+  const q=[start];sw.add(start);
+  while(q.length){const c=q.shift();
+    for(const port of Object.keys(D(c).ifs)){const peer=linkOf(c,port);if(!peer||!carries(c,port,v))continue;
+      if(peer.dev==='R1'){if(routerPhysUp()&&subFor(v))router=true;}
+      else if(!sw.has(peer.dev)&&carries(peer.dev,peer.port,v)){sw.add(peer.dev);q.push(peer.dev);}}}
+  return{sw,router};
+}
+function domainR(v){if(routerPhysUp()&&subFor(v)&&carries('SW1','Gi0/1',v)){const d=domain(v,'SW1');d.router=true;return d;}return{sw:new Set(),router:false};}
+function pcAttach(id){
+  const pc=PCS[id],p=D(pc.sw).ifs[pc.port];
+  if(p.shut)return{ok:false,reason:`${pc.port} on ${host(pc.sw)} is shut down.`};
+  const v=p.mode==='trunk'?p.native:p.access;
+  if(!vlanOn(pc.sw,v))return{ok:false,vlan:v,reason:`${pc.port} on ${host(pc.sw)} is assigned to VLAN ${v}, which doesn't exist on that switch, so the port is inactive.`};
+  return{ok:true,vlan:v};
+}
+function findIp(ip,v,dom){
+  for(const k in PCS){if(PCS[k].ip!==ip)continue;const a=pcAttach(k);if(a.ok&&a.vlan==v&&dom.sw.has(PCS[k].sw))return{kind:'pc',id:k};}
+  if(dom.router){const n=subFor(v);if(n&&subUp(n)&&D('R1').subs[n].ip===ip)return{kind:'router',sub:n};}
+  return null;
+}
+function swPath(a,b){if(a===b)return[a];if(a==='SW1'||b==='SW1')return[a,b];return[a,'SW1',b];}
+function upPort(sw){return sw==='SW2'?['SW1','Fa0/23','SW2','Fa0/24']:['SW1','Fa0/24','SW3','Fa0/24'];}
+function portProblem(sw,port,v){
+  const p=D(sw).ifs[port],h=host(sw);
+  if(p.shut)return`${h} ${port} is shut down.`;
+  if(!linkUp(sw,port))return`The link on ${h} ${port} is down because the device at the other end has its port shut down.`;
+  if(!operTrunk(sw,port))return`${h} ${port} isn't trunking (mode: ${p.mode==='auto'?'dynamic auto':p.mode}). Set it with switchport mode trunk.`;
+  if(!allowedHas(p.allowed,v))return`VLAN ${v} isn't in the allowed list on ${h} ${port} (allowed: ${fmtList(p.allowed)}).`;
+  return null;
+}
+function diagPath(v,switches,toRouter){
+  for(const sw of switches){if(!vlanOn(sw,v))return`VLAN ${v} doesn't exist on ${host(sw)}. A switch drops frames for VLANs missing from its database, even on a trunk.`;}
+  for(const sw of switches){if(sw!=='SW1'){const [a,ap,b,bp]=upPort(sw);const x=portProblem(a,ap,v)||portProblem(b,bp,v);if(x)return x;}}
+  if(toRouter){
+    const x=portProblem('SW1','Gi0/1',v);if(x)return x;
+    if(D('R1').ifs['Gi0/0/0'].shut)return`R1 GigabitEthernet0/0/0 is administratively down. Router interfaces need no shutdown.`;
+    const n=subFor(v);if(!n)return`R1 has no subinterface with encapsulation dot1Q ${v}, so it ignores frames tagged for VLAN ${v}.`;
+  }
+  return null;
+}
+
+/* PC ping */
+function pcPing(src,dstIp){
+  const s=PCS[src],a=pcAttach(src);
+  if(!a.ok)return{ok:false,path:[src],why:a.reason};
+  const dom=domain(a.vlan,s.sw);
+  if(a.vlan!=s.vlan){/* wrong vlan */}
+  if(sameNet(s.ip,dstIp)){
+    const t=findIp(dstIp,a.vlan,dom);
+    if(!t){
+      let why=null;const dpc=Object.keys(PCS).find(k=>PCS[k].ip===dstIp);
+      if(a.vlan!=s.vlan)why=`${src} sits on ${host(s.sw)} ${s.port}, which is in VLAN ${a.vlan} instead of VLAN ${s.vlan}.`;
+      else if(dpc){const da=pcAttach(dpc);if(!da.ok)why=da.reason;else if(da.vlan!=PCS[dpc].vlan)why=`${dpc}'s port ${PCS[dpc].port} on ${host(PCS[dpc].sw)} is in VLAN ${da.vlan}, not VLAN ${PCS[dpc].vlan}.`;else why=diagPath(a.vlan,swPath(s.sw,PCS[dpc].sw),false);}
+      else{why=diagPath(a.vlan,swPath(s.sw,'SW1'),true);if(!why){const n=subFor(a.vlan);const sb=D('R1').subs[n];why=sb&&!sb.ip?`R1 ${longIf(n)} has no IP address yet.`:`No device answered ARP for ${dstIp} in VLAN ${a.vlan}. Check the address on R1's subinterface.`;}}
+      return{ok:false,path:[src,s.sw],why:`No ARP reply for ${dstIp}. `+(why||`Nothing in VLAN ${a.vlan} owns that address.`)};
+    }
+    if(t.kind==='router')return{ok:true,path:[src,...swPath(s.sw,'SW1'),'R1'],ttl:255};
+    return{ok:true,path:[src,...swPath(s.sw,PCS[t.id].sw),t.id],ttl:128};
+  }
+  const g=findIp(s.gw,a.vlan,dom);
+  if(!g||g.kind!=='router'){
+    let why=a.vlan!=s.vlan?`${src}'s switch port is in VLAN ${a.vlan} instead of VLAN ${s.vlan}.`:diagPath(a.vlan,swPath(s.sw,'SW1'),true);
+    if(!why){const n=subFor(a.vlan);const sb=D('R1').subs[n];why=sb&&sb.ip!==s.gw?`R1 ${longIf(n)} is ${sb.ip||'unaddressed'}, but ${src} expects its gateway at ${s.gw}.`:`The gateway didn't answer.`;}
+    return{ok:false,path:[src,s.sw],why:`${src} can't reach its default gateway ${s.gw}. `+why};
+  }
+  const up=[src,...swPath(s.sw,'SW1'),'R1'];
+  let rsub=null;for(const n in D('R1').subs){const sb=D('R1').subs[n];if(subUp(n)&&sb.ip&&sameNet(sb.ip,dstIp,maskLen(sb.mask)))rsub=n;}
+  if(!rsub)return{ok:false,path:up,why:`R1 has no route to ${n2ip(netOf(dstIp))}/24. Its routing table has no connected route for that VLAN yet.`};
+  const sb=D('R1').subs[rsub];
+  if(sb.ip===dstIp)return{ok:true,path:up,ttl:255};
+  const v2=sb.encap,dom2=domainR(v2),t=findIp(dstIp,v2,dom2);
+  const dpc=Object.keys(PCS).find(k=>PCS[k].ip===dstIp);
+  if(!t){
+    let why='';if(dpc){const da=pcAttach(dpc);why=!da.ok?da.reason:(da.vlan!=v2?`${dpc}'s port is in VLAN ${da.vlan}, but R1 forwards that subnet out VLAN ${v2}.`:(diagPath(v2,swPath('SW1',PCS[dpc].sw),true)||''));}
+    return{ok:false,path:[...up,'SW1'],why:`R1 routed the packet into VLAN ${v2}, but ${dstIp} never answered ARP. `+why};
+  }
+  const d=PCS[t.id],da=pcAttach(t.id),dd=domain(da.vlan,d.sw),dg=findIp(d.gw,da.vlan,dd);
+  const full=[...up,...swPath('SW1',d.sw),t.id];
+  if(!dg)return{ok:false,path:full,why:`The request arrived, but ${t.id} can't reach its own gateway ${d.gw}, so the reply never returns.`};
+  return{ok:true,path:full,ttl:127};
+}
+
+/* ---------------- Terminal output ---------------- */
+function out(id,text,cls){const b=SESS[id].buf;String(text).split('\n').forEach(l=>b.push([l,cls||'']));if(b.length>600)b.splice(0,b.length-600);if(id===cur)renderTerm();}
+function coach(id,text){out(id,'\u25B8 '+text,'k');}
+function err(id,text){out(id,text,'e');}
+function prompt(id){const s=SESS[id],h=D(id).hostname;
+  return{user:h+'>',priv:h+'#',config:h+'(config)#',if:h+'(config-if)#',range:h+'(config-if-range)#',subif:h+'(config-subif)#',vlan:h+'(config-vlan)#'}[s.mode];}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+const tout=document.getElementById('tout'),tin=document.getElementById('tin'),tprompt=document.getElementById('tprompt'),termEl=document.getElementById('term');
+function renderTerm(){
+  tout.innerHTML=SESS[cur].buf.map(([l,c])=>c?`<span class="${c}">${esc(l)}</span>`:esc(l)).join('\n')+(SESS[cur].buf.length?'\n':'');
+  tprompt.textContent=prompt(cur)+' ';termEl.scrollTop=termEl.scrollHeight;
+}
+function changed(id){D(id).saved=false;}
+function invalid(id){err(id,"% Invalid input detected at '^' marker.");}
+function incomplete(id){err(id,'% Incomplete command.');}
+
+/* ---------------- Show commands ---------------- */
+function showVlan(id){
+  const d=D(id),L=['','VLAN Name                             Status    Ports','---- -------------------------------- --------- -------------------------------'];
+  const nums=Object.keys(d.vlans).map(Number).sort((a,b)=>a-b);
+  const ports=Object.keys(d.ifs);
+  for(const v of nums){
+    const mem=ports.filter(p=>{const x=d.ifs[p];return!operTrunk(id,p)&&x.mode!=='trunk'&&x.access==v;});
+    const lines=[];for(let i=0;i<mem.length;i+=4)lines.push(mem.slice(i,i+4).join(', '));
+    L.push(pad(v,4)+' '+pad(d.vlans[v],32)+' '+pad('active',9)+' '+(lines[0]||''));
+    for(let i=1;i<lines.length;i++)L.push(' '.repeat(48)+lines[i]);
+  }
+  ['1002 fddi-default                     act/unsup','1003 token-ring-default               act/unsup','1004 fddinet-default                  act/unsup','1005 trnet-default                    act/unsup'].forEach(x=>L.push(x));
+  return L.join('\n');
+}
+function showTrunk(id){
+  const d=D(id),tp=Object.keys(d.ifs).filter(p=>operTrunk(id,p));
+  if(!tp.length)return'';
+  const L=['','Port        Mode             Encapsulation  Status        Native vlan'];
+  tp.forEach(p=>L.push(pad(p,12)+pad(d.ifs[p].mode==='trunk'?'on':d.ifs[p].mode,17)+pad('802.1q',15)+pad('trunking',14)+d.ifs[p].native));
+  L.push('','Port        Vlans allowed on trunk');tp.forEach(p=>L.push(pad(p,12)+fmtList(d.ifs[p].allowed)));
+  const act=p=>{const a=Object.keys(d.vlans).map(Number).filter(v=>allowedHas(d.ifs[p].allowed,v));return fmtList(a);};
+  L.push('','Port        Vlans allowed and active in management domain');tp.forEach(p=>L.push(pad(p,12)+act(p)));
+  L.push('','Port        Vlans in spanning tree forwarding state and not pruned');tp.forEach(p=>L.push(pad(p,12)+act(p)));
+  return L.join('\n');
+}
+function showSwitchport(id,port){
+  const d=D(id),p=d.ifs[port],ot=operTrunk(id,port);
+  const adm=p.mode==='trunk'?'trunk':p.mode==='access'?'static access':'dynamic '+p.mode;
+  const op=!linkUp(id,port)?'down':ot?'trunk':'static access';
+  const vn=v=>`${v} (${d.vlans[v]||'Inactive'})`;
+  return['Name: '+port,'Switchport: Enabled','Administrative Mode: '+adm,'Operational Mode: '+op,'Administrative Trunking Encapsulation: dot1q',
+    'Negotiation of Trunking: '+(p.mode==='access'?'Off':'On'),'Access Mode VLAN: '+vn(p.access),'Trunking Native Mode VLAN: '+vn(p.native),
+    'Trunking VLANs Enabled: '+(p.allowed===null?'ALL':fmtList(p.allowed))].join('\n');
+}
+function ifStatus(id,port){const d=D(id),x=d.ifs[port];if(x.shut)return['administratively down','down'];return linkUp(id,port)?['up','up']:['down','down'];}
+function showIpBrief(id){
+  const d=D(id),L=['Interface              IP-Address      OK? Method Status                Protocol'];
+  const row=(n,ip,st)=>L.push(pad(longIf(n),23)+pad(ip||'unassigned',16)+'YES '+pad(ip?'manual':'unset',7)+pad(st[0],22)+st[1]);
+  if(d.type==='router'){
+    Object.keys(d.ifs).forEach(n=>{row(n,d.ifs[n].ip,ifStatus(id,n));
+      Object.keys(d.subs).filter(s=>s.startsWith(n+'.')).sort((a,b)=>+a.split('.')[1]-+b.split('.')[1]).forEach(s=>{const st=ifStatus(id,n);row(s,d.subs[s].ip,d.subs[s].encap==null&&st[0]==='up'?['up','down']:st);});});
+  }else{Object.keys(d.ifs).forEach(n=>row(n,null,ifStatus(id,n)));L.push(pad('Vlan1',23)+pad('unassigned',16)+'YES unset  '+pad('administratively down',22)+'down');}
+  return L.join('\n');
+}
+function routes(){const d=D('R1'),r=[];
+  const add=(n,ip,mask)=>{const len=maskLen(mask);r.push({net:n2ip(netOf(ip,len)),len,ip,n});};
+  for(const n in d.ifs){if(d.ifs[n].ip&&linkUp('R1',n))add(n,d.ifs[n].ip,d.ifs[n].mask);}
+  for(const n in d.subs){if(d.subs[n].ip&&subUp(n))add(n,d.subs[n].ip,d.subs[n].mask);}
+  return r.sort((a,b)=>ip2n(a.net)-ip2n(b.net));}
+function showRoute(){
+  const L=['Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP','       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area','       * - candidate default, U - per-user static route','','Gateway of last resort is not set',''];
+  const r=routes();
+  r.forEach(x=>{L.push(`      ${x.net}/${x.len} is variably subnetted, 2 subnets, 2 masks`);
+    L.push(`C        ${x.net}/${x.len} is directly connected, ${longIf(x.n)}`);
+    L.push(`L        ${x.ip}/32 is directly connected, ${longIf(x.n)}`);});
+  return L.join('\n');
+}
+function runConfig(id){
+  const d=D(id),L=['Building configuration...','','Current configuration:','!','version '+(d.type==='router'?'16.9':'15.0'),'no service timestamps log datetime msec','!','hostname '+d.hostname,'!'];
+  d.extra.forEach(x=>L.push(x));if(d.extra.length)L.push('!');
+  if(d.type==='switch'){
+    Object.keys(d.vlans).map(Number).filter(v=>v!==1).sort((a,b)=>a-b).forEach(v=>{L.push('vlan '+v,' name '+d.vlans[v],'!');});
+    for(const n in d.ifs){const x=d.ifs[n];L.push('interface '+longIf(n));if(x.desc)L.push(' description '+x.desc);
+      if(x.access!==1)L.push(' switchport access vlan '+x.access);
+      if(x.native!==1)L.push(' switchport trunk native vlan '+x.native);
+      if(x.allowed!==null)L.push(' switchport trunk allowed vlan '+fmtList(x.allowed));
+      if(x.mode==='access'||x.mode==='trunk')L.push(' switchport mode '+x.mode);if(x.mode==='desirable')L.push(' switchport mode dynamic desirable');
+      if(x.shut)L.push(' shutdown');L.push('!');}
+    L.push('interface Vlan1',' no ip address',' shutdown','!');
+  }else{
+    for(const n in d.ifs){const x=d.ifs[n];L.push('interface '+longIf(n));if(x.desc)L.push(' description '+x.desc);L.push(x.ip?` ip address ${x.ip} ${x.mask}`:' no ip address');if(x.shut)L.push(' shutdown');L.push('!');
+      Object.keys(d.subs).filter(s=>s.startsWith(n+'.')).sort((a,b)=>+a.split('.')[1]-+b.split('.')[1]).forEach(s=>{const y=d.subs[s];L.push('interface '+longIf(s));if(y.encap!=null)L.push(' encapsulation dot1Q '+y.encap);L.push(y.ip?` ip address ${y.ip} ${y.mask}`:' no ip address');L.push('!');});}
+    L.push('ip classless','!');
+  }
+  L.push('line con 0','!','line vty 0 4',' login','!','end');return L.join('\n');
+}
+
+/* ---------------- Evidence + exec ---------------- */
+function doShow(id,lk,tk,userMode){
+  const d=D(id),a=lk[1];
+  if(!a){incomplete(id);return;}
+  if(T(a,'vlan',2)){if(d.type!=='switch'){invalid(id);coach(id,'Routers don\'t keep a VLAN database. Run show vlan brief on a switch.');return;}
+    if(lk[2]&&!T(lk[2],'brief',1)){invalid(id);return;}
+    out(id,showVlan(id));if((id==='SW2'||id==='SW3')&&taskDone('A3')&&taskDone('A4')&&!S.ev.vb){S.ev.vb=true;coach(id,'Verified: SALES, ENGINEERING and HR are present and the PC ports sit in the right VLANs. Trunk ports are missing from this list on purpose.');}return;}
+  if(T(a,'interfaces',2)){
+    if(T(lk[2],'trunk',1)){if(d.type!=='switch'){invalid(id);return;}const t=showTrunk(id);out(id,t);
+      if(!t)coach(id,'No ports are trunking on this switch yet.');
+      else if(id==='SW1'&&taskDone('B1')&&taskDone('B2')&&!S.ev.tr){S.ev.tr=true;coach(id,'Verified: all three SW1 uplinks are trunking and carry VLANs 10, 20 and 30.');}return;}
+    if(lk.length>=3){let last=lk[lk.length-1];const sw=T(last,'switchport',2);const ifStr=tk.slice(2,sw?-1:undefined).join('');const p=parseIf(ifStr,d);
+      if(!p){invalid(id);return;}
+      if(sw){if(d.type!=='switch'){invalid(id);return;}out(id,showSwitchport(id,p.base));return;}
+      const st=ifStatus(id,p.base);out(id,`${longIf(p.base)} is ${st[0]}, line protocol is ${st[1]}`);coach(id,'Add switchport at the end on a switch for VLAN details, for example: show interfaces f0/1 switchport');return;}
+    incomplete(id);return;}
+  if(T(a,'ip',2)){
+    if(T(lk[2],'interface',2)&&T(lk[3]||'brief','brief',1)){out(id,showIpBrief(id));return;}
+    if(T(lk[2],'route',1)){if(d.type!=='router'){out(id,'Default gateway is not set');coach(id,'A 2960 is a Layer 2 switch. It forwards frames within a VLAN but never routes between VLANs. Run show ip route on R1.');return;}
+      out(id,showRoute());const r=routes();if(r.length===0)coach(id,'The table is empty. Routes appear once an interface or subinterface has an IP address and is up.');
+      if(taskDone('C2')&&!S.ev.rt){S.ev.rt=true;coach(id,'Verified: three connected (C) networks and three local (L) host routes, one pair per VLAN. No routing protocol needed.');}return;}
+    invalid(id);return;}
+  if(T(a,'running-config',2)){if(userMode){invalid(id);return;}out(id,runConfig(id));return;}
+  if(T(a,'startup-config',2)){if(userMode){invalid(id);return;}if(!d.startup)err(id,'startup-config is not present');else out(id,d.startup);return;}
+  if(T(a,'history',2)){out(id,SESS[id].hist.slice(-20).map(x=>'  '+x).join('\n'));return;}
+  invalid(id);
+}
+function routerPing(id,ipStr){
+  const d=D(id);
+  if(ip2n(ipStr)===null){err(id,`% Unrecognized host or address, or protocol not running.`);return;}
+  out(id,'Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to '+ipStr+', timeout is 2 seconds:');
+  if(d.type==='switch'){out(id,'.....\nSuccess rate is 0 percent (0/5)');coach(id,'This switch has no IP address in the lab, so it can\'t send pings. Test from R1 or from the PC panel.');return false;}
+  let own=false,rs=null;
+  for(const n in d.subs){const s=d.subs[n];if(s.ip===ipStr&&subUp(n))own=true;if(s.ip&&subUp(n)&&sameNet(s.ip,ipStr,maskLen(s.mask)))rs=n;}
+  if(own){out(id,'!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 0/0/1 ms');return true;}
+  if(!rs){out(id,'.....\nSuccess rate is 0 percent (0/5)');coach(id,`R1 has no connected route to ${ipStr}. Check show ip route.`);return false;}
+  const v=d.subs[rs].encap,t=findIp(ipStr,v,domainR(v));
+  if(!t||t.kind!=='pc'){out(id,'.....\nSuccess rate is 0 percent (0/5)');const pc=Object.keys(PCS).find(k=>PCS[k].ip===ipStr);
+    const w=pc?(pcAttach(pc).ok?(pcAttach(pc).vlan!=v?`${pc}'s port is in VLAN ${pcAttach(pc).vlan}.`:diagPath(v,swPath('SW1',PCS[pc].sw),true)):pcAttach(pc).reason):'No host uses that address.';coach(id,'No reply. '+(w||''));return false;}
+  const first=!S.arp[ipStr];S.arp[ipStr]=true;
+  out(id,first?'.!!!!\nSuccess rate is 80 percent (4/5), round-trip min/avg/max = 0/0/1 ms':'!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 0/0/1 ms');
+  if(first)coach(id,'The first dot is normal: R1 had to ARP for the host before it could send.');
+  animate(['R1','SW1',...swPath('SW1',PCS[t.id].sw).slice(1),t.id],true);
+  return true;
+}
+function save(id){const d=D(id);d.startup=runConfig(id).replace('Current configuration:','Using startup configuration:');d.saved=true;}
+
+/* ---------------- Command interpreter ---------------- */
+function run(id,raw){
+  const s=SESS[id],d=D(id);
+  out(id,prompt(id)+' '+raw,'u');
+  let line=raw.trim();if(!line)return;
+  s.hist.push(line);s.hi=s.hist.length;
+  if(/\?$/.test(line)){help(id);return;}
+  const tk=line.split(/\s+/),lk=tk.map(x=>x.toLowerCase());
+  if(s.mode==='user')return execUser(id,tk,lk);
+  if(s.mode==='priv')return execPriv(id,tk,lk);
+  if(T(lk[0],'do',2)&&lk.length>1){return execPriv(id,tk.slice(1),lk.slice(1),true);}
+  if(T(lk[0],'end',2)){s.mode='priv';s.ctx=null;out(id,'%SYS-5-CONFIG_I: Configured from console by console','s');return;}
+  if(T(lk[0],'exit',3)){s.mode=s.mode==='config'?'priv':'config';s.ctx=null;if(s.mode==='priv')out(id,'%SYS-5-CONFIG_I: Configured from console by console','s');return;}
+  if(T(lk[0],'show',2)){invalid(id);coach(id,'In configuration mode, add do in front: do '+line);return;}
+  if(s.mode==='vlan'&&vlanMode(id,tk,lk))return;
+  if((s.mode==='if'||s.mode==='range')&&d.type==='switch'&&swIfMode(id,tk,lk))return;
+  if((s.mode==='if'||s.mode==='subif')&&d.type==='router'&&rIfMode(id,tk,lk))return;
+  if(globalCfg(id,tk,lk))return;
+  invalid(id);
+  if(T(lk[0],'switchport',2))coach(id,s.mode==='config'?'switchport commands are interface commands. Enter an interface first, for example: interface f0/1':'switchport commands only exist on switches.');
+  else if(T(lk[0],'name',2))coach(id,'name only works in VLAN mode. Type vlan 10 first, then name SALES.');
+  else if(T(lk[0],'encapsulation',3))coach(id,d.type==='router'?'encapsulation belongs on a subinterface such as interface g0/0/0.10, not the physical port or global config.':'Cisco 2960 switches use 802.1Q only, so no trunk encapsulation command is needed.');
+  else if(T(lk[0],'ip',2)&&s.mode==='config')coach(id,'ip address is an interface command. Enter the interface or subinterface first.');
+  else if(T(lk[0],'no',2)&&T(lk[1],'shutdown',4)&&s.mode==='config')coach(id,'no shutdown is an interface command. Enter the interface first.');
+  else if(T(lk[0],'enable',2))coach(id,'You are already past enable. Use end to return to privileged EXEC.');
+  else if(T(lk[0],'configure',4))coach(id,'You are already in configuration mode.');
+}
+function execUser(id,tk,lk){
+  const s=SESS[id];
+  if(T(lk[0],'enable',2)){s.mode='priv';return;}
+  if(T(lk[0],'show',2))return doShow(id,lk,tk,true);
+  if(T(lk[0],'ping',2)){if(!tk[1]){incomplete(id);return;}routerPing(id,tk[1]);return;}
+  if(T(lk[0],'exit',3)||T(lk[0],'logout',2)){out(id,'\n'+host(id)+' con0 is now available\n\nPress RETURN to get started.','s');return;}
+  invalid(id);
+  if(T(lk[0],'configure',4)||T(lk[0],'conf',4))coach(id,'Configuration requires privileged EXEC. Type enable first.');
+  else coach(id,'You are in user EXEC mode (the > prompt). Type enable to reach privileged EXEC.');
+}
+function execPriv(id,tk,lk,viaDo){
+  const s=SESS[id];
+  if(!lk[0]){incomplete(id);return;}
+  if(T(lk[0],'enable',2))return;
+  if(T(lk[0],'disable',4)&&!viaDo){s.mode='user';return;}
+  if(T(lk[0],'configure',4)&&!viaDo){if(lk[1]&&!T(lk[1],'terminal',1)){invalid(id);return;}s.mode='config';out(id,'Enter configuration commands, one per line.  End with CNTL/Z.');return;}
+  if(T(lk[0],'show',2))return doShow(id,lk,tk,false);
+  if(T(lk[0],'ping',2)){if(!tk[1]){incomplete(id);return;}routerPing(id,tk[1]);refresh();return;}
+  if(T(lk[0],'copy',2)){if(T(lk[1],'running-config',3)&&T(lk[2],'startup-config',3)){out(id,'Destination filename [startup-config]? \nBuilding configuration...\n[OK]');save(id);refresh();return;}invalid(id);return;}
+  if(T(lk[0],'write',2)&&(!lk[1]||T(lk[1],'memory',1))){out(id,'Building configuration...\n[OK]');save(id);refresh();return;}
+  if((T(lk[0],'exit',3)||T(lk[0],'logout',2))&&!viaDo){s.mode='user';out(id,'\n'+host(id)+' con0 is now available\n\nPress RETURN to get started.','s');return;}
+  if(lk.length===1&&!viaDo){out(id,`Translating "${tk[0]}"...domain server (255.255.255.255)\n% Unknown command or computer name, or unable to find computer address`);coach(id,'IOS treated the unknown word as a hostname to Telnet to. Check spelling. In production, no ip domain-lookup prevents the delay.');return;}
+  invalid(id);
+  if(T(lk[0],'vlan',2)||T(lk[0],'interface',2)||T(lk[0],'hostname',2))coach(id,'That is a configuration command. Enter configure terminal first.');
+}
+function globalCfg(id,tk,lk){
+  const s=SESS[id],d=D(id);
+  if(T(lk[0],'hostname',2)){if(!tk[1]){incomplete(id);return true;}if(!/^[A-Za-z][A-Za-z0-9-]{0,62}$/.test(tk[1])){err(id,'% Hostname contains one or more illegal characters.');return true;}d.hostname=tk[1];changed(id);s.mode='config';s.ctx=null;refresh();return true;}
+  if(T(lk[0],'vlan',2)&&d.type==='switch'){
+    if(!tk[1]){incomplete(id);return true;}const list=vlanList(tk[1]);if(!list||list==='ALL'){err(id,'Command rejected: Bad VLAN list');return true;}
+    for(const v of list){if(v>=1002&&v<=1005){err(id,`Default VLAN ${v} may not have its name changed.`);continue;}if(d.vlans[v]===undefined){d.vlans[v]='VLAN'+String(v).padStart(4,'0');changed(id);}}
+    s.mode='vlan';s.ctx={vlans:list};refresh();return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'vlan',2)&&d.type==='switch'){const list=vlanList(tk[2]||'');if(!list||list==='ALL'){incomplete(id);return true;}
+    for(const v of list){if(v===1){err(id,'%Default VLAN 1 may not be deleted.');continue;}delete d.vlans[v];changed(id);}
+    if(list.some(v=>Object.values(d.ifs).some(p=>p.access==v)))coach(id,'Ports assigned to a deleted VLAN become inactive. They stay assigned, so traffic on them stops.');refresh();return true;}
+  if(T(lk[0],'interface',2)){
+    if(!tk[1]){incomplete(id);return true;}
+    if(T(lk[1],'range',1)&&lk[1].length>=1&&!/\d/.test(lk[1])){
+      const list=parseRange(tk.slice(2).join(' '),d);if(!list){invalid(id);return true;}
+      if(d.type!=='switch'){s.mode='range';s.ctx={ifs:list};return true;}
+      s.mode='range';s.ctx={ifs:list};return true;}
+    const p=parseIf(tk.slice(1).join(''),d);if(!p){invalid(id);return true;}
+    if(p.sub){if(d.type!=='router'){invalid(id);coach(id,'Subinterfaces are a router feature here. On the switch, configure the physical port as a trunk.');return true;}
+      if(!d.subs[p.sub]){d.subs[p.sub]={encap:null,ip:null,mask:null};changed(id);}
+      s.mode='subif';s.ctx={ifs:[p.sub]};refresh();return true;}
+    s.mode='if';s.ctx={ifs:[p.base]};return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'interface',2)&&d.type==='router'){const p=parseIf(tk.slice(2).join(''),d);if(p&&p.sub&&d.subs[p.sub]){delete d.subs[p.sub];changed(id);refresh();return true;}invalid(id);return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'ip',2)&&T(lk[2],'domain-lookup',8)){if(!d.extra.includes('no ip domain-lookup'))d.extra.push('no ip domain-lookup');changed(id);return true;}
+  if(T(lk[0],'enable',2)&&T(lk[1],'secret',2)&&tk[2]){d.extra=d.extra.filter(x=>!x.startsWith('enable secret'));d.extra.push('enable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0');changed(id);return true;}
+  if(T(lk[0],'service',3)&&T(lk[1],'password-encryption',3)){if(!d.extra.includes('service password-encryption'))d.extra.push('service password-encryption');changed(id);return true;}
+  if(T(lk[0],'ip',2)&&T(lk[1],'routing',3)&&d.type==='router')return true;
+  return false;
+}
+function vlanMode(id,tk,lk){
+  const s=SESS[id],d=D(id);
+  if(T(lk[0],'name',2)){if(!tk[1]){incomplete(id);return true;}const nm=tk.slice(1).join('_').slice(0,32);s.ctx.vlans.forEach(v=>{if(d.vlans[v]!==undefined)d.vlans[v]=nm;});changed(id);refresh();return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'name',2)){s.ctx.vlans.forEach(v=>d.vlans[v]='VLAN'+String(v).padStart(4,'0'));changed(id);refresh();return true;}
+  return false;
+}
+function swIfMode(id,tk,lk){
+  const s=SESS[id],d=D(id),ifs=s.ctx.ifs,each=f=>{ifs.forEach(n=>f(d.ifs[n],n));changed(id);refresh();return true;};
+  if(T(lk[0],'shutdown',4))return each((p,n)=>{p.shut=true;out(id,`%LINK-5-CHANGED: Interface ${longIf(n)}, changed state to administratively down`,'s');});
+  if(T(lk[0],'no',2)&&T(lk[1],'shutdown',4))return each((p,n)=>{if(p.shut){p.shut=false;out(id,`%LINK-5-CHANGED: Interface ${longIf(n)}, changed state to up`,'s');}});
+  if(T(lk[0],'description',2)){const t=tk.slice(1).join(' ');return each(p=>p.desc=t);}
+  if(T(lk[0],'switchport',2)){
+    if(T(lk[1],'mode',2)){
+      if(T(lk[2],'access',1))return each(p=>p.mode='access');
+      if(T(lk[2],'trunk',1))return each(p=>p.mode='trunk');
+      if(T(lk[2],'dynamic',2)){if(T(lk[3],'auto',1))return each(p=>p.mode='auto');if(T(lk[3],'desirable',1))return each(p=>p.mode='desirable');incomplete(id);return true;}
+      incomplete(id);return true;}
+    if(T(lk[1],'access',2)&&T(lk[2],'vlan',1)){const v=+tk[3];if(!(v>=1&&v<=4094)){invalid(id);return true;}
+      if(d.vlans[v]===undefined){out(id,`% Access VLAN does not exist. Creating vlan ${v}`);d.vlans[v]='VLAN'+String(v).padStart(4,'0');}
+      return each(p=>p.access=v);}
+    if(T(lk[1],'trunk',2)){
+      if(T(lk[2],'encapsulation',2)){invalid(id);coach(id,'A 2960 supports only 802.1Q, so this command doesn\'t exist here. You\'ll need it on some multilayer switches such as the 3560.');return true;}
+      if(T(lk[2],'native',2)&&T(lk[3],'vlan',1)){const v=+tk[4];if(!(v>=1&&v<=4094)){invalid(id);return true;}return each(p=>p.native=v);}
+      if(T(lk[2],'allowed',2)&&T(lk[3],'vlan',1)){
+        const op=lk[4];if(!op){incomplete(id);return true;}
+        if(T(op,'all',2))return each(p=>p.allowed=null);
+        if(T(op,'none',2))return each(p=>p.allowed=[]);
+        if(T(op,'add',2)||T(op,'remove',2)||T(op,'except',2)){const l=vlanList(tk[5]||'');if(!l||l==='ALL'){invalid(id);return true;}
+          return each(p=>{let cur=p.allowed===null?null:[...p.allowed];
+            if(T(op,'add',2)){if(cur!==null)cur=[...new Set([...cur,...l])];}
+            else if(T(op,'remove',2)){if(cur===null){cur=[];for(let i=1;i<=4094;i++)if(!l.includes(i))cur.push(i);}else cur=cur.filter(v=>!l.includes(v));}
+            else{cur=[];for(let i=1;i<=4094;i++)if(!l.includes(i))cur.push(i);}
+            p.allowed=cur;});}
+        const l=vlanList(tk[4]);if(!l){invalid(id);return true;}return each(p=>p.allowed=l==='ALL'?null:l);}
+      incomplete(id);return true;}
+    if(T(lk[1],'nonegotiate',2))return true;
+    incomplete(id);return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'switchport',2)){if(T(lk[2],'access',2))return each(p=>p.access=1);if(T(lk[2],'mode',2))return each(p=>p.mode='auto');if(T(lk[2],'trunk',2)&&T(lk[3],'allowed',2))return each(p=>p.allowed=null);if(T(lk[2],'trunk',2)&&T(lk[3],'native',2))return each(p=>p.native=1);}
+  return false;
+}
+function rIfMode(id,tk,lk){
+  const s=SESS[id],d=D(id),n=s.ctx.ifs[0],isSub=s.mode==='subif',x=isSub?d.subs[n]:d.ifs[n];
+  if(T(lk[0],'shutdown',4)){if(isSub){coach(id,'Shut down the physical interface to take all subinterfaces down.');return true;}x.shut=true;changed(id);out(id,`%LINK-5-CHANGED: Interface ${longIf(n)}, changed state to administratively down`,'s');refresh();return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'shutdown',4)){if(isSub){coach(id,'Subinterfaces follow the physical interface. Run no shutdown on g0/0/0.');return true;}
+    if(x.shut){x.shut=false;changed(id);out(id,`%LINK-5-CHANGED: Interface ${longIf(n)}, changed state to ${linkUp('R1',n)?'up':'down'}`,'s');
+      if(linkUp('R1',n)){out(id,`%LINEPROTO-5-UPDOWN: Line protocol on Interface ${longIf(n)}, changed state to up`,'s');Object.keys(d.subs).filter(q=>q.startsWith(n+'.')).forEach(q=>out(id,`%LINK-5-CHANGED: Interface ${longIf(q)}, changed state to up`,'s'));}
+      else coach(id,'Nothing is cabled to this port in the lab topology.');}
+    refresh();return true;}
+  if(T(lk[0],'description',2)){x.desc=tk.slice(1).join(' ');changed(id);return true;}
+  if(T(lk[0],'encapsulation',3)){
+    if(!isSub){invalid(id);coach(id,'Encapsulation goes on a subinterface. Try interface g0/0/0.10');return true;}
+    if(!T(lk[1],'dot1q',4)){invalid(id);return true;}const v=+tk[2];if(!(v>=1&&v<=4094)){incomplete(id);return true;}
+    const other=subFor(v);if(other&&other!==n){err(id,`%Configuration of multiple subinterfaces of the same main interface with the same VID (${v}) is not permitted. This VID is already configured on ${longIf(other)}.`);return true;}
+    x.encap=v;changed(id);if(lk[3]&&T(lk[3],'native',2))x.native=true;
+    if(n.split('.')[1]!=String(v))coach(id,`This works, but subinterface .${n.split('.')[1]} now serves VLAN ${v}. Matching the numbers keeps configs readable.`);
+    refresh();return true;}
+  if(T(lk[0],'ip',2)&&T(lk[1],'address',3)){
+    if(!tk[2]||!tk[3]){incomplete(id);return true;}
+    if(ip2n(tk[2])===null||maskLen(tk[3])===null){invalid(id);return true;}
+    if(isSub&&x.encap==null){err(id,'% Configuring IP routing on a LAN subinterface is only allowed if that\nsubinterface is already configured as part of an IEEE 802.10, IEEE 802.1Q,\nor ISL vLAN.');coach(id,'Run encapsulation dot1Q <vlan> first, then the ip address.');return true;}
+    const len=maskLen(tk[3]);
+    if(netOf(tk[2],len)===ip2n(tk[2])){err(id,'Bad mask /'+len+' for address '+tk[2]);return true;}
+    const all=[...Object.entries(d.ifs),...Object.entries(d.subs)];
+    for(const [m,y] of all){if(m!==n&&y.ip&&(sameNet(y.ip,tk[2],len)||sameNet(y.ip,tk[2],maskLen(y.mask)))){err(id,`% ${n2ip(netOf(tk[2],len))} overlaps with ${longIf(m)}`);return true;}}
+    x.ip=tk[2];x.mask=tk[3];changed(id);refresh();return true;}
+  if(T(lk[0],'no',2)&&T(lk[1],'ip',2)&&T(lk[2],'address',3)){x.ip=null;x.mask=null;changed(id);refresh();return true;}
+  return false;
+}
+function help(id){
+  const m=SESS[id].mode,d=D(id),sw=d.type==='switch';
+  const H={user:['enable    Turn on privileged commands','ping      Send echo messages','show      Show running system information','exit      Exit from the EXEC'],
+    priv:['configure  Enter configuration mode','copy       Copy from one file to another (copy running-config startup-config)','disable    Turn off privileged commands','ping       Send echo messages','show       Show running system information','write      Write running configuration to memory'],
+    config:['hostname   Set system\'s network name','interface  Select an interface to configure'].concat(sw?['vlan       VLAN commands','no vlan    Delete a VLAN']:[]).concat(['do         Run an exec command','end        Exit to privileged EXEC','exit       Exit from configure mode']),
+    vlan:['name   Ascii name of the VLAN','exit   Apply changes, bump revision number, and exit mode','end    Exit to privileged EXEC'],
+    if:sw?['switchport mode access|trunk','switchport access vlan <id>','switchport trunk allowed vlan <list>','switchport trunk native vlan <id>','shutdown / no shutdown','description <text>','exit / end']:['ip address <ip> <mask>','no shutdown','description <text>','exit / end'],
+    subif:['encapsulation dot1Q <vlan-id>','ip address <ip> <mask>','description <text>','exit / end']};
+  H.range=H.if;out(id,H[m].map(x=>'  '+x).join('\n'));
+}
+
+/* ---------------- Tasks ---------------- */
+const vlansOk=sw=>Object.entries(WANT).every(([n,nm])=>(D(sw).vlans[n]||'').toUpperCase()===nm);
+const accessOk=(sw,port,v)=>{const p=D(sw).ifs[port];return p.mode==='access'&&p.access==v&&!p.shut;};
+const trunkOk=(sw,port)=>{const p=D(sw).ifs[port];return p.mode==='trunk'&&!p.shut&&[10,20,30].every(v=>allowedHas(p.allowed,v));};
+function subOk(v){const n=subFor(v);if(!n)return false;const s=D('R1').subs[n];return s.ip===`192.168.${v}.1`&&s.mask==='255.255.255.0';}
+const pinged=(a,b)=>S.ev.pings[a+'>'+b]||S.ev.pings[b+'>'+a];
+const TASKS=[
+  {id:'A1',part:'Part A: Switch VLAN setup',t:'Name all four devices',d:'Set hostnames R1, SW1, SW2 and SW3.',p:5,ok:()=>DEVS.every(x=>D(x).hostname.toUpperCase()===x),h:'Router> enable\nRouter# configure terminal\nRouter(config)# hostname R1'},
+  {id:'A2a',t:'Create VLANs on SW1',d:'10 SALES, 20 ENGINEERING, 30 HR. SW1 needs them even with no PCs attached.',p:5,ok:()=>vlansOk('SW1'),h:'SW1(config)# vlan 10\nSW1(config-vlan)# name SALES\nSW1(config-vlan)# vlan 20\nSW1(config-vlan)# name ENGINEERING\nSW1(config-vlan)# vlan 30\nSW1(config-vlan)# name HR'},
+  {id:'A2b',t:'Create VLANs on SW2',d:'Same three VLANs and names.',p:5,ok:()=>vlansOk('SW2'),h:'Same commands as SW1, run on SW2.'},
+  {id:'A2c',t:'Create VLANs on SW3',d:'Same three VLANs and names.',p:5,ok:()=>vlansOk('SW3'),h:'Same commands as SW1, run on SW3.'},
+  {id:'A3',t:'Assign SW2 access ports',d:'F0/1 to VLAN 10 (PC1) and F0/2 to VLAN 20 (PC2), both in access mode.',p:10,ok:()=>accessOk('SW2','Fa0/1',10)&&accessOk('SW2','Fa0/2',20),h:'SW2(config)# interface f0/1\nSW2(config-if)# switchport mode access\nSW2(config-if)# switchport access vlan 10\nSW2(config-if)# interface f0/2\nSW2(config-if)# switchport mode access\nSW2(config-if)# switchport access vlan 20'},
+  {id:'A4',t:'Assign SW3 access ports',d:'F0/1 to VLAN 10 (PC3) and F0/2 to VLAN 30 (PC4), both in access mode.',p:10,ok:()=>accessOk('SW3','Fa0/1',10)&&accessOk('SW3','Fa0/2',30),h:'Follow the SW2 pattern. PC4 belongs in VLAN 30.'},
+  {id:'B1',part:'Part B: Trunks',t:'Trunk SW1 uplinks',d:'G0/1 (to R1), F0/23 (to SW2) and F0/24 (to SW3) set to switchport mode trunk.',p:10,ok:()=>['Gi0/1','Fa0/23','Fa0/24'].every(p=>trunkOk('SW1',p)),h:'SW1(config)# interface range g0/1, f0/23 - 24\nSW1(config-if-range)# switchport mode trunk'},
+  {id:'B2',t:'Trunk the access switch uplinks',d:'F0/24 on SW2 and on SW3 set to trunk.',p:5,ok:()=>trunkOk('SW2','Fa0/24')&&trunkOk('SW3','Fa0/24'),h:'SW2(config)# interface f0/24\nSW2(config-if)# switchport mode trunk\n(repeat on SW3)'},
+  {id:'C1',part:'Part C: Router-on-a-stick',t:'Enable R1 G0/0/0',d:'Router interfaces start administratively down.',p:5,ok:()=>!D('R1').ifs['Gi0/0/0'].shut,h:'R1(config)# interface g0/0/0\nR1(config-if)# no shutdown'},
+  {id:'C2',t:'Build three subinterfaces',d:'G0/0/0.10, .20, .30 with encapsulation dot1Q and gateway IPs 192.168.x.1 /24.',p:10,ok:()=>[10,20,30].every(subOk),h:'R1(config)# interface g0/0/0.10\nR1(config-subif)# encapsulation dot1Q 10\nR1(config-subif)# ip address 192.168.10.1 255.255.255.0\n(repeat for .20 and .30)'},
+  {id:'D1',part:'Part D: Verify',t:'Check VLAN membership',d:'Run show vlan brief on SW2 or SW3 after Part A is complete.',p:3,ok:()=>S.ev.vb,h:'SW2# show vlan brief'},
+  {id:'D2',t:'Check trunk status',d:'Run show interfaces trunk on SW1 after Part B is complete.',p:3,ok:()=>S.ev.tr,h:'SW1# show interfaces trunk'},
+  {id:'D3',t:'Check the routing table',d:'Run show ip route on R1 once all three subinterfaces are up.',p:4,ok:()=>S.ev.rt,h:'R1# show ip route'},
+  {id:'E1',part:'Part E: Test',t:'Same VLAN, different switches',d:'Ping PC1 to PC3. This tests the trunks without the router.',p:5,ok:()=>pinged('PC1','PC3'),h:'Use the Test from a PC panel: PC1 to PC3.'},
+  {id:'E2',t:'Inter-VLAN on one switch',d:'Ping PC1 to PC2. Traffic must hairpin through R1.',p:5,ok:()=>pinged('PC1','PC2'),h:'PC1 to PC2. Watch the packet travel up to R1 and back.'},
+  {id:'E3',t:'Inter-VLAN across switches',d:'Ping PC4 (HR) to PC1 or PC2.',p:5,ok:()=>pinged('PC4','PC1')||pinged('PC4','PC2'),h:'PC4 to PC1.'},
+  {id:'F1',part:'Part F: Save',t:'Save all four configurations',d:'copy running-config startup-config on every device after your last change.',p:5,ok:()=>DEVS.every(x=>D(x).saved&&D(x).hostname.toUpperCase()===x),h:'R1# copy running-config startup-config'}
+];
+const taskDone=id=>{const t=TASKS.find(x=>x.id===id);return t&&t.ok();};
+function buildTasks(){
+  const el=document.getElementById('tasks');let h='<h2>Lab tasks</h2>';
+  TASKS.forEach(t=>{if(t.part)h+=`<div class="part">${t.part}</div>`;
+    h+=`<div class="task" id="t-${t.id}"><div class="tick" aria-hidden="true"></div><div><div class="ttl">${t.t}</div><div class="tdesc">${t.d}</div><details class="hint"><summary>Show hint</summary><pre>${esc(t.h)}</pre></details></div><div class="pts">${t.p} pts</div></div>`;});
+  el.innerHTML=h;
+}
+let lastScore=-1;
+function refresh(){
+  let pts=0;
+  TASKS.forEach(t=>{const ok=t.ok();if(ok)pts+=t.p;const el=document.getElementById('t-'+t.id);if(el){el.classList.toggle('done',ok);el.querySelector('.tick').textContent=ok?'\u2713':'';}});
+  document.getElementById('meterTxt').textContent=pts+' / 100 lab points';document.getElementById('meterBar').style.width=pts+'%';
+  if(lastScore>=0&&pts>lastScore){const n=TASKS.filter(t=>t.ok()).length;toast(pts===100?'All tasks complete. Nice work.':`Task complete \u2013 ${n} of ${TASKS.length}`);}
+  lastScore=pts;
+  drawState();renderTabs();renderReport();persist();
+}
+let toastT;function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200);}
+
+/* ---------------- Topology SVG ---------------- */
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('topo');
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||svg).appendChild(e);return e;}
+function mid(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
+let LNK={},ACC={},CHIPS,SUBLBL,NAMES={};
+function buildTopo(){
+  svg.innerHTML='';const gl=el('g',{});CHIPS=el('g',{});
+  LINKS.forEach((L,i)=>{const a=POS[L.a[0]],b=POS[L.b[0]];LNK[i]=el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:'lnk'},gl);
+    const pa=mid(a,b,.24),pb=mid(a,b,.76);
+    el('text',{x:pa[0]+(a[0]<b[0]?8:a[0]>b[0]?-8:8),y:pa[1]+4,class:'plabel','text-anchor':a[0]>b[0]?'end':'start'},gl).textContent=L.a[1].replace('Gi','G').replace('Fa','F');
+    el('text',{x:pb[0]+(a[0]<b[0]?-8:a[0]>b[0]?8:8),y:pb[1]+4,class:'plabel','text-anchor':a[0]<b[0]?'end':'start'},gl).textContent=L.b[1].replace('Gi','G').replace('Fa','F');});
+  Object.keys(PCS).forEach(k=>{const pc=PCS[k],a=POS[pc.sw],b=POS[k];ACC[k]=el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1]-20,class:'acc',stroke:'var(--line)'},gl);
+    const pm=mid(a,[b[0],b[1]-20],.42);el('text',{x:pm[0]+(b[0]<a[0]?-6:6),y:pm[1],class:'plabel','text-anchor':b[0]<a[0]?'end':'start'},gl).textContent=pc.port.replace('Fa','F');});
+  // Router
+  const r=POS.R1,gr=el('g',{class:'dev',tabindex:0,role:'button','aria-label':'Open R1 console','data-dev':'R1'});
+  el('circle',{cx:r[0],cy:r[1],r:30,class:'body'},gr);
+  el('path',{class:'ico',d:`M${r[0]-14} ${r[1]-6}h28m-6 -6l6 6l-6 6M${r[0]+14} ${r[1]+7}h-28m6 -6l-6 6l6 6`},gr);
+  NAMES.R1=el('text',{x:r[0]+42,y:r[1]-2,class:'dname'},gr);el('text',{x:r[0]+42,y:r[1]+14,class:'dsub'},gr).textContent='ISR 4321';
+  SUBLBL=el('g',{},gr);
+  ['SW1','SW2','SW3'].forEach(id=>{const p=POS[id],g=el('g',{class:'dev',tabindex:0,role:'button','aria-label':'Open '+id+' console','data-dev':id});
+    el('rect',{x:p[0]-38,y:p[1]-20,width:76,height:40,rx:8,class:'body'},g);
+    el('path',{class:'ico',d:`M${p[0]-20} ${p[1]-6}h40m-6 -5l6 5l-6 5M${p[0]+20} ${p[1]+7}h-40m6 -5l-6 5l6 5`},g);
+    const right=id!=='SW2';NAMES[id]=el('text',{x:right?p[0]+48:p[0]-48,y:p[1]-2,class:'dname','text-anchor':right?'start':'end'},g);
+    el('text',{x:right?p[0]+48:p[0]-48,y:p[1]+14,class:'dsub','text-anchor':right?'start':'end'},g).textContent='Catalyst 2960';});
+  Object.keys(PCS).forEach(k=>{const p=POS[k],g=el('g',{class:'dev pc',tabindex:0,role:'button','aria-label':'Use '+k+' as ping source','data-pc':k});
+    PCS[k].scr=el('rect',{x:p[0]-22,y:p[1]-20,width:44,height:30,rx:4,class:'scr',stroke:'var(--v'+PCS[k].vlan+')'},g);
+    el('path',{d:`M${p[0]-10} ${p[1]+16}h20M${p[0]} ${p[1]+10}v6`,stroke:'var(--muted)','stroke-width':2.5,'stroke-linecap':'round'},g);
+    el('text',{x:p[0],y:p[1]-1,'text-anchor':'middle',class:'dname',style:'font-size:12px'},g).textContent=k;
+    el('text',{x:p[0],y:p[1]+32,'text-anchor':'middle',class:'dsub'},g).textContent='.'+PCS[k].ip.split('.').slice(2).join('.');});
+  svg.querySelectorAll('[data-dev]').forEach(g=>{const go=()=>{selectDev(g.dataset.dev);tin.focus();};g.addEventListener('click',go);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});});
+  svg.querySelectorAll('[data-pc]').forEach(g=>{const go=()=>{document.getElementById('pcSrc').value=g.dataset.pc;fillDst();};g.addEventListener('click',go);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});});
+  window.PKT=el('g',{});
+}
+function drawState(){
+  if(!CHIPS)return;
+  CHIPS.innerHTML='';
+  LINKS.forEach((L,i)=>{
+    const [da,pa]=L.a,[db,pb]=L.b;let cls='lnk';
+    const swEnds=[[da,pa],[db,pb]].filter(([d])=>D(d).type==='switch');
+    const up=linkUp(da,pa)&&linkUp(db,pb);
+    let trunkCount=swEnds.filter(([d,p])=>operTrunk(d,p)).length;
+    if(!up)cls+=' down';else if(trunkCount===swEnds.length&&(da!=='R1'||Object.keys(D('R1').subs).length))cls+=' trunk';else if(swEnds.some(([d,p])=>D(d).ifs[p].mode==='trunk'))cls+=' half';
+    LNK[i].setAttribute('class',cls);
+    const carried=[10,20,30].filter(v=>{if(da==='R1')return carries(db,pb,v)&&routerPhysUp()&&subFor(v);return carries(da,pa,v)&&carries(db,pb,v);});
+    const a=POS[da],b=POS[db],m=mid(a,b,.5);
+    const vert=Math.abs(a[0]-b[0])<10;
+    carried.forEach((v,j)=>{const off=(j-(carried.length-1)/2)*15;el('circle',{cx:vert?m[0]+14:m[0]+off,cy:vert?m[1]+off:m[1]-14,r:6,fill:VCOL[v],class:'chip'},CHIPS);});
+  });
+  Object.keys(PCS).forEach(k=>{const a=pcAttach(k);ACC[k].setAttribute('stroke',a.ok?VCOL[a.vlan]||'var(--v1)':'var(--bad)');ACC[k].setAttribute('stroke-dasharray',a.ok&&a.vlan!=1?'':'6 5');});
+  DEVS.forEach(id=>NAMES[id].textContent=D(id).hostname);
+  SUBLBL.innerHTML='';const r=POS.R1;let x=r[0]+42;
+  Object.keys(D('R1').subs).sort((a,b)=>+a.split('.')[1]-+b.split('.')[1]).forEach(n=>{const s=D('R1').subs[n];const ok=subUp(n)&&s.ip;
+    const t=el('text',{x,y:r[1]+30,class:'dsub',fill:ok&&VCOL[s.encap]?VCOL[s.encap]:'var(--muted)','font-weight':700},SUBLBL);t.textContent='.'+n.split('.')[1];x+=34;});
+  svg.querySelectorAll('[data-dev]').forEach(g=>g.classList.toggle('sel',g.dataset.dev===cur));
+}
+const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function animate(path,ok){
+  const g=window.PKT;g.innerHTML='';
+  const pts=path.map(p=>POS[p].slice());if(pts[0]&&PCS[path[0]])pts[0][1]-=20;const last=path[path.length-1];if(PCS[last])pts[pts.length-1][1]-=20;
+  const c=el('circle',{r:8,fill:'var(--green)',class:'pkt'},g);
+  const endC=ok?'var(--green)':'var(--bad)';
+  if(reduce||pts.length<2){c.setAttribute('cx',pts[pts.length-1][0]);c.setAttribute('cy',pts[pts.length-1][1]);c.setAttribute('fill',endC);setTimeout(()=>g.innerHTML='',1200);return;}
+  const seg=320;let i=0,t0=null;
+  function step(ts){if(t0===null)t0=ts;let f=(ts-t0)/seg;
+    if(f>=1){i++;t0=ts;f=0;if(i>=pts.length-1){c.setAttribute('cx',pts[pts.length-1][0]);c.setAttribute('cy',pts[pts.length-1][1]);c.setAttribute('fill',endC);c.setAttribute('r',ok?11:12);
+        if(!ok){const p=pts[pts.length-1];el('path',{d:`M${p[0]-7} ${p[1]-7}l14 14m0 -14l-14 14`,stroke:'#fff','stroke-width':3},g);}
+        setTimeout(()=>g.innerHTML='',ok?900:1600);return;}}
+    const a=pts[i],b=pts[i+1];c.setAttribute('cx',a[0]+(b[0]-a[0])*f);c.setAttribute('cy',a[1]+(b[1]-a[1])*f);requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+/* ---------------- Terminal tabs + input ---------------- */
+function renderTabs(){
+  const box=document.getElementById('ttabs');
+  box.innerHTML=DEVS.map(id=>`<button class="ttab" role="tab" aria-selected="${id===cur}" data-t="${id}">${esc(D(id).hostname)} <small style="font-weight:400;opacity:.7">${id!==D(id).hostname?'('+id+')':''}</small><span class="dot ${D(id).saved?'ok':''}" title="${D(id).saved?'Saved':'Unsaved changes'}"></span></button>`).join('');
+  box.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{selectDev(b.dataset.t);tin.focus();});
+}
+function selectDev(id){cur=id;renderTabs();renderTerm();drawState();}
+tin.addEventListener('keydown',e=>{
+  const s=SESS[cur];
+  if(e.key==='Enter'){const v=tin.value;tin.value='';run(cur,v);renderTerm();refresh();}
+  else if(e.key==='ArrowUp'){if(s.hi>0){s.hi--;tin.value=s.hist[s.hi]||'';}e.preventDefault();}
+  else if(e.key==='ArrowDown'){if(s.hi<s.hist.length){s.hi++;tin.value=s.hist[s.hi]||'';}e.preventDefault();}
+  else if(e.key==='z'&&e.ctrlKey){e.preventDefault();if(!['user','priv'].includes(s.mode)){out(cur,prompt(cur)+'^Z','u');s.mode='priv';s.ctx=null;renderTerm();}}
+});
+termEl.addEventListener('click',()=>{if(!window.getSelection().toString())tin.focus();});
+document.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>{const s=SESS[cur];let c=b.dataset.ins;
+  if(s.mode==='user'&&c==='show ip route'){}
+  if(!['user','priv'].includes(s.mode))c='do '+c;tin.value=c;tin.focus();});
+
+/* ---------------- PC panel ---------------- */
+const pcSrc=document.getElementById('pcSrc'),pcDst=document.getElementById('pcDst'),pcout=document.getElementById('pcout');
+pcSrc.innerHTML=Object.keys(PCS).map(k=>`<option value="${k}">${k} (${PCS[k].ip})</option>`).join('');
+function fillDst(){const s=pcSrc.value;const opts=Object.keys(PCS).filter(k=>k!==s).map(k=>`<option value="${PCS[k].ip}">${k} (${PCS[k].ip})</option>`);
+  [10,20,30].forEach(v=>opts.push(`<option value="192.168.${v}.1">R1 gateway VLAN ${v} (192.168.${v}.1)</option>`));const prev=pcDst.value;pcDst.innerHTML=opts.join('');if([...pcDst.options].some(o=>o.value===prev))pcDst.value=prev;}
+pcSrc.onchange=fillDst;fillDst();
+document.getElementById('pingBtn').onclick=()=>{
+  const src=pcSrc.value,dst=pcDst.value,r=pcPing(src,dst);
+  let h=`C:\\&gt; ping ${dst}\n\nPinging ${dst} with 32 bytes of data:\n`;
+  if(r.ok){for(let i=0;i<4;i++)h+=`<span class="g">Reply from ${dst}: bytes=32 time&lt;1ms TTL=${r.ttl}</span>\n`;h+=`\nPing statistics for ${dst}:\n    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),`;
+    const dpc=Object.keys(PCS).find(k=>PCS[k].ip===dst);if(dpc)S.ev.pings[src+'>'+dpc]=true;
+    h+=`\n\n<span class="k">\u25B8 ${r.ttl===127?'TTL 127 means one router hop: the packet went up the trunk to R1 and came back down in another VLAN.':r.ttl===255?'Reply came from the router itself.':'TTL 128 means no router was involved: same VLAN, switched end to end.'}</span>`;}
+  else{for(let i=0;i<4;i++)h+=`<span class="e">Request timed out.</span>\n`;h+=`\nPing statistics for ${dst}:\n    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),\n\n<span class="k">\u25B8 ${esc(r.why)}</span>`;}
+  pcout.innerHTML=h;animate(r.path,r.ok);refresh();
+};
+document.getElementById('ipcBtn').onclick=()=>{const p=PCS[pcSrc.value];pcout.innerHTML=`C:\\&gt; ipconfig\n\nEthernet adapter (${pcSrc.value}):\n   IPv4 Address. . . . . . . . . . . : ${p.ip}\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : ${p.gw}\n\n<span class="k">\u25B8 Plugged into ${p.port} on ${host(p.sw)}. This PC expects to be in VLAN ${p.vlan}.</span>`;};
+
+document.getElementById('resetDev').onclick=()=>{if(!confirm('Reset '+D(cur).hostname+' to factory defaults?'))return;S.D[cur]=cur==='R1'?newRouter():newSwitch();SESS[cur]={mode:'user',ctx:null,hist:[],hi:0,buf:[]};boot(cur);renderTerm();refresh();};
+document.getElementById('resetAll').onclick=()=>{if(!confirm('Erase every device and all progress?'))return;const n=S.name;S=freshState();S.name=n;DEVS.forEach(id=>{SESS[id]={mode:'user',ctx:null,hist:[],hi:0,buf:[]};boot(id);});lastScore=-1;renderTerm();refresh();renderQuiz();};
+function boot(id){
+  if(D(id).type==='router')out(id,'Cisco IOS XE Software, Version 16.09.04\nCisco ISR4321/K9 (1RU) processor with 1795999K/6147K bytes of memory.\n3 Gigabit Ethernet interfaces\n\nPress RETURN to get started!\n','s');
+  else out(id,'Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4\ncisco WS-C2960-24TT-L (PowerPC405) processor\n24 FastEthernet interfaces, 2 Gigabit Ethernet interfaces\n\nPress RETURN to get started!\n','s');
+  if(D(id).hostname!==D(id).type.replace(/^./,c=>c.toUpperCase()))out(id,'(Your saved configuration was restored. You are back at user EXEC.)','s');
+}
+
+/* ---------------- Flip cards ---------------- */
+const TERMS=[['VLAN','Virtual LAN','A logical broadcast domain created on a switch. Devices in different VLANs can\'t exchange frames without a router.'],
+ ['Access port','One VLAN, untagged','A switch port that belongs to a single VLAN and sends frames without tags. Used for PCs, printers and phones.'],
+ ['Trunk port','Many VLANs, tagged','A link that carries traffic for multiple VLANs, adding an 802.1Q tag so the far end knows which VLAN each frame belongs to.'],
+ ['802.1Q','The tagging standard','Inserts a 4-byte tag holding a 12-bit VLAN ID (1 to 4094) into the Ethernet frame on trunk links.'],
+ ['Native VLAN','The untagged one','The single VLAN whose frames cross a trunk without a tag. VLAN 1 by default; both ends must match.'],
+ ['DTP','Dynamic Trunking Protocol','Cisco\'s trunk negotiation. 2960 ports default to dynamic auto, so two default ports never trunk. Static trunk mode avoids surprises.'],
+ ['Router-on-a-stick','One link, many gateways','Inter-VLAN routing over one trunked router interface, divided into a subinterface per VLAN.'],
+ ['Subinterface','A virtual slice','A logical interface such as G0/0/0.10. encapsulation dot1Q 10 links it to VLAN 10, and its IP is that VLAN\'s gateway.'],
+ ['Connected route','The C in the table','Added automatically when an interface with an IP address comes up. The L entry beside it is the router\'s own /32 address.']];
+document.getElementById('flips').innerHTML=TERMS.map(t=>`<button class="flip" type="button" aria-label="${t[0]}: show definition"><div class="flip-in"><div class="flip-f"><b>${t[0]}</b><small>${t[1]}</small></div><div class="flip-b">${t[2]}</div></div></button>`).join('');
+document.querySelectorAll('.flip').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+
+/* ---------------- Quiz ---------------- */
+const QUIZ=[
+ {q:'You run show vlan brief on SW2. Where is FastEthernet0/24?',pre:'VLAN Name          Status    Ports\n1    default       active    Fa0/3, Fa0/4, Fa0/5 ...\n10   SALES         active    Fa0/1\n20   ENGINEERING   active    Fa0/2',o:['It was deleted from the switch','It is a trunk, and trunk ports are not listed in show vlan brief','It belongs to VLAN 1 but the list was truncated','It is shut down'],a:1,e:'show vlan brief lists access ports only. Trunks belong to every allowed VLAN, so they show up in show interfaces trunk instead.'},
+ {q:'Which line created this route on R1?',pre:'C   192.168.20.0/24 is directly connected, GigabitEthernet0/0/0.20',o:['ip route 192.168.20.0 255.255.255.0 g0/0/0.20','router ospf 1','ip address 192.168.20.1 255.255.255.0 on an up subinterface','switchport access vlan 20'],a:2,e:'A connected (C) route appears automatically when an interface with an IP address is up. No static route or routing protocol is involved.'},
+ {q:'On R1 you type ip address 192.168.10.1 255.255.255.0 on G0/0/0.10 and get an error. What did you skip?',o:['no shutdown on the subinterface','encapsulation dot1Q 10','switchport mode trunk','ip routing'],a:1,e:'IOS won\'t accept an IP on a LAN subinterface until it knows which VLAN the subinterface belongs to. Run encapsulation dot1Q first.'},
+ {q:'PC1 can ping PC3 (both VLAN 10) but not PC2 (VLAN 20). Which is the most likely cause?',o:['SW2 F0/1 is in the wrong VLAN','The SW1 to SW2 trunk is down','The router side is incomplete, for example G0/0/0 is still shut down','PC3 has the wrong gateway'],a:2,e:'PC1 to PC3 working proves the access ports and switch trunks are fine for VLAN 10. Inter-VLAN traffic is the only part that depends on R1, so look there first.'},
+ {q:'Both ends of a 2960-to-2960 link are left at default. What does show interfaces trunk show for that link?',o:['Trunking on both switches','Trunking on one switch only','Nothing, because dynamic auto on both ends never forms a trunk','An 802.1Q native VLAN mismatch'],a:2,e:'dynamic auto waits for the other side to ask. When both sides wait, the link stays an access link in VLAN 1.'},
+ {q:'You type switchport access vlan 40 on SW3, but VLAN 40 doesn\'t exist. What happens?',o:['The command is rejected','The switch creates VLAN 40 with the name VLAN0040','The port shuts down','The port joins VLAN 1'],a:1,e:'The 2960 prints "% Access VLAN does not exist. Creating vlan 40" and adds it with a placeholder name. Name it properly afterward.'},
+ {q:'A successful ping from PC2 to PC4 shows TTL=127. What does that tell you?',o:['The packet was switched only','The packet crossed one router hop','The packet was dropped once','PC4 is a Linux host'],a:1,e:'Windows starts at TTL 128. Each router hop subtracts one, so 127 confirms the packet was routed once, through R1.'},
+ {q:'SW1 has no PCs attached. Why must VLANs 10, 20 and 30 still exist on it?',o:['They don\'t; only access switches need VLANs','Without them, SW1 drops frames for those VLANs even though they arrive on trunks','It is required for show vlan brief to work','The router needs them for its routing table'],a:1,e:'A switch only forwards frames for VLANs in its own database. Missing VLANs on a transit switch are a classic cause of "everything looks right but nothing pings."'}
+];
+function renderQuiz(){
+  const box=document.getElementById('quiz');
+  box.innerHTML=QUIZ.map((x,i)=>`<div class="card q" id="q${i}"><h3>${i+1}. ${esc(x.q)}</h3>${x.pre?`<pre>${esc(x.pre)}</pre>`:''}${x.o.map((o,j)=>`<label class="opt" data-j="${j}"><input type="radio" name="q${i}" value="${j}" ${S.quiz[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<div class="fb"></div></div>`).join('');
+  QUIZ.forEach((x,i)=>{const c=document.getElementById('q'+i);c.querySelectorAll('input').forEach(r=>r.onchange=()=>{S.quiz[i]=+r.value;markQ(i);persist();renderReport();});if(S.quiz[i]!==undefined)markQ(i);});
+}
+function markQ(i){const c=document.getElementById('q'+i),x=QUIZ[i],a=S.quiz[i];
+  c.querySelectorAll('.opt').forEach(o=>{o.classList.remove('right','wrong');if(+o.dataset.j===a)o.classList.add(a===x.a?'right':'wrong');});
+  const fb=c.querySelector('.fb');fb.className='fb on '+(a===x.a?'ok':'no');fb.textContent=(a===x.a?'Correct. ':'Not quite. ')+x.e;}
+
+/* ---------------- Report ---------------- */
+function renderReport(){
+  const lab=TASKS.reduce((s,t)=>s+(t.ok()?t.p:0),0),qc=QUIZ.filter((x,i)=>S.quiz[i]===x.a).length;
+  document.getElementById('repWho').textContent=(S.name?S.name+' \u2013 ':'')+'LAN121 VLAN and inter-VLAN routing lab \u2013 '+new Date().toLocaleDateString();
+  document.getElementById('scores').innerHTML=`<div><strong>${lab}</strong><span>lab points of 100</span></div><div><strong>${qc}/${QUIZ.length}</strong><span>output questions correct</span></div><div><strong>${TASKS.filter(t=>t.ok()).length}/${TASKS.length}</strong><span>tasks complete</span></div>`;
+  document.getElementById('repTbl').innerHTML='<thead><tr><th>Task</th><th>Status</th><th>Points</th></tr></thead><tbody>'+TASKS.map(t=>`<tr><td>${t.t}</td><td style="color:${t.ok()?'var(--green)':'var(--muted)'}">${t.ok()?'Complete':'Not complete'}</td><td>${t.ok()?t.p:0} / ${t.p}</td></tr>`).join('')+'</tbody>';
+  document.getElementById('cfgs').innerHTML=DEVS.map(id=>`<details><summary><b>${esc(D(id).hostname)}</b> (${id})${D(id).saved?'':' \u2013 unsaved changes'}</summary><pre>${esc(runConfig(id))}</pre></details>`).join('');
+}
+const nameIn=document.getElementById('stuName');nameIn.value=S.name||'';nameIn.oninput=()=>{S.name=nameIn.value;persist();renderReport();};
+document.getElementById('printBtn').onclick=()=>{document.querySelectorAll('.cfgs details').forEach(d=>d.open=true);window.print();};
+
+/* ---------------- Navigation + theme ---------------- */
+function go(v){document.querySelectorAll('.step').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));window.scrollTo(0,0);if(v==='lab')setTimeout(()=>tin.focus(),50);if(v==='report')renderReport();}
+document.querySelectorAll('.step').forEach(b=>b.onclick=()=>go(b.dataset.v));
+document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>go(b.dataset.goto));
+const tb=document.getElementById('themeBtn');
+function isDark(){const t=document.documentElement.dataset.theme;return t?t==='dark':!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);}
+function setThemeLabel(){tb.textContent=isDark()?'Light mode':'Dark mode';}
+try{const t=localStorage.getItem(KEY+'-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}
+tb.onclick=()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem(KEY+'-theme',t);}catch(e){}setThemeLabel();};
+setThemeLabel();
+
+/* ---------------- Init ---------------- */
+buildTasks();buildTopo();DEVS.forEach(boot);renderQuiz();renderTabs();renderTerm();refresh();
+window.__lab={run,pcPing,S:()=>S,TASKS,showVlan,showTrunk,showRoute,showIpBrief,runConfig,selectDev};
+})();
+</script>
+</body>
+</html>
