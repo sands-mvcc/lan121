@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Firewall Lab: Packet Filtering and Stateful Inspection on a Cisco Router</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F5FA;--surface:#FFFFFF;--surface2:#E8EEF7;--ink:#13203A;--muted:#52627C;--line:#D2DBE8;
+  --navy:#0047AB;--on-navy:#FFFFFF;--green:#00a86b;--green-soft:#DDF5EB;--amber:#A86F00;--amber-soft:#FFF1D1;
+  --red:#C8102E;--red-soft:#FBE3E7;--navy-soft:#E1EBFA;
+  --term:#0B1A2E;--term-ink:#D3E0F2;--term-dim:#7489AA;--term-ok:#43DE9C;--term-warn:#FFC857;--term-err:#FF7A7A;--term-cmd:#A9C9FF;--term-tip:#8FE3FF;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0D1524;--surface:#152038;--surface2:#1B2944;--ink:#E3EAF5;--muted:#98A9C4;--line:#2A3A5A;
+  --navy:#6FA8FF;--on-navy:#0A1324;--green:#2BD08E;--green-soft:#123A2C;--amber:#F2B53A;--amber-soft:#3A2D10;
+  --red:#FF6F82;--red-soft:#3C1820;--navy-soft:#1A2E52;--term:#060E1B;}}
+:root[data-theme="dark"]{
+  --paper:#0D1524;--surface:#152038;--surface2:#1B2944;--ink:#E3EAF5;--muted:#98A9C4;--line:#2A3A5A;
+  --navy:#6FA8FF;--on-navy:#0A1324;--green:#2BD08E;--green-soft:#123A2C;--amber:#F2B53A;--amber-soft:#3A2D10;
+  --red:#FF6F82;--red-soft:#3C1820;--navy-soft:#1A2E52;--term:#060E1B;}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+a{color:var(--navy)}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1260px;margin:0 auto;padding:0 20px}
+header.top{padding:28px 0 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.top .wrap{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.title-block h1{font-size:clamp(1.7rem,3.2vw,2.5rem);line-height:1.1;margin:0 0 8px;letter-spacing:-.015em;font-weight:700}
+.title-block p{margin:0;color:var(--muted);max-width:68ch}
+.top-tools{display:flex;gap:14px;align-items:center}
+.meter{min-width:220px}
+.meter-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.meter-bar{height:10px;border-radius:6px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.meter-fill{height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--green));transition:width .5s ease}
+.btn{font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--navy)}
+.btn.primary{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.btn.go{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.small{padding:4px 10px;font-size:.82rem;font-weight:500}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+.tab{font:inherit;font-weight:600;font-size:.95rem;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:14px 14px 11px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--navy)}
+.tab .tick{display:inline-block;margin-left:6px;color:var(--green);font-weight:700}
+main{padding:28px 0 60px}
+.panel[hidden]{display:none}
+h2{font-size:1.6rem;line-height:1.2;margin:0 0 10px;letter-spacing:-.01em}
+h3{font-size:1.15rem;margin:0 0 8px}
+.lede{color:var(--muted);max-width:75ch;margin:0 0 22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.lab,.grid2{grid-template-columns:minmax(0,1fr)}}
+.stack>*+*{margin-top:18px}
+/* topology */
+.topo{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 10px 4px;position:relative}
+.topo svg{display:block;width:100%;height:auto}
+.topo .lbl{font-family:var(--sans);font-size:12.5px;fill:var(--muted)}
+.topo .lbl-strong{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--ink)}
+.topo .wire{stroke:var(--line);stroke-width:3}
+.topo .node-fill{fill:var(--surface2);stroke:var(--navy);stroke-width:2}
+.topo .node-text{font-family:var(--sans);font-weight:700;font-size:15px;fill:var(--navy);text-anchor:middle;dominant-baseline:central}
+.topo .clickable{cursor:pointer}
+.topo .clickable:hover .node-fill,.topo .clickable:focus .node-fill{fill:var(--navy-soft)}
+.topo .clickable.active .node-fill{fill:var(--navy);}
+.topo .clickable.active .node-text{fill:var(--on-navy)}
+.tun-shell{fill:none;stroke:var(--line);stroke-width:14;stroke-linecap:round;transition:stroke .4s}
+.tun-core{fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:6 8;opacity:.6}
+.up .tun-shell{stroke:color-mix(in srgb,var(--green) 35%,transparent)}
+.up .tun-core{stroke:var(--green);opacity:1;stroke-width:3;animation:flow 1.2s linear infinite}
+.half .tun-shell{stroke:color-mix(in srgb,var(--amber) 30%,transparent)}
+@keyframes flow{to{stroke-dashoffset:-28}}
+.tun-state{font-family:var(--sans);font-weight:600;font-size:13px;text-anchor:middle;fill:var(--muted)}
+.up .tun-state{fill:var(--green)}
+.half .tun-state{fill:var(--amber)}
+.pkt{fill:var(--green);stroke:var(--surface);stroke-width:2;opacity:0}
+/* terminal */
+.term{background:var(--term);border-radius:12px;overflow:hidden;border:1px solid #1E3150;display:flex;flex-direction:column;min-height:460px}
+.term-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.dev-btn{font:500 .85rem var(--mono);color:var(--term-dim);background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 10px;cursor:pointer}
+.dev-btn[aria-pressed="true"]{color:#fff;background:rgba(111,168,255,.18);border-color:rgba(111,168,255,.45)}
+.term-bar .spacer{flex:1}
+.term-bar .tbtn{font:500 .78rem var(--sans);color:var(--term-dim);background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 9px;cursor:pointer}
+.term-bar .tbtn:hover{color:#fff}
+.term-out{flex:1;overflow:auto;padding:12px 14px 4px;font:13.5px/1.5 var(--mono);color:var(--term-ink);height:400px;white-space:pre-wrap;word-break:break-word}
+.ln.cmd{color:var(--term-cmd)}
+.ln.ok{color:var(--term-ok)}
+.ln.err{color:var(--term-err)}
+.ln.dbg{color:var(--term-warn)}
+.ln.tip{color:var(--term-tip);font-family:var(--sans);font-size:13px;border-left:2px solid var(--term-tip);padding-left:8px;margin:4px 0}
+.ln.sys{color:var(--term-dim)}
+.ln.key{color:#fff;cursor:copy;text-decoration:underline dotted rgba(255,255,255,.35);text-underline-offset:4px}
+.ln.key::after{content:"  click to copy";color:var(--term-dim);font-size:11px}
+.ln.key.copied::after{content:"  copied";color:var(--term-ok)}
+.term-in{display:flex;align-items:center;gap:6px;padding:8px 14px 12px;font:13.5px var(--mono);color:var(--term-ok)}
+.term-in input{flex:1;background:transparent;border:0;color:#fff;font:inherit;outline:none;min-width:0;caret-color:var(--term-ok)}
+.term-in:focus-within{background:rgba(255,255,255,.03)}
+/* checklist */
+.checklist{list-style:none;margin:0;padding:0}
+.checklist li{display:grid;grid-template-columns:26px 1fr;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+.checklist li:first-child{border-top:0}
+.cb{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700;color:transparent;transition:all .3s;margin-top:1px}
+.done .cb{background:var(--green);border-color:var(--green);color:#fff}
+.task-t{font-weight:500}
+.done .task-t{color:var(--muted)}
+.hint-btn{font:500 .8rem var(--sans);background:none;border:0;color:var(--navy);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hint{font:12.5px/1.5 var(--mono);background:var(--surface2);border-radius:8px;padding:8px 10px;margin:6px 0 0;white-space:pre-wrap;overflow-x:auto}
+.group-h{font-size:.9rem;font-weight:600;color:var(--navy);margin:16px 0 2px;padding-bottom:4px;border-bottom:2px solid var(--navy-soft)}
+.group-h:first-child{margin-top:0}
+/* spec */
+.spec{width:100%;border-collapse:collapse;font-size:.92rem}
+.spec th,.spec td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.spec th{font-weight:600;color:var(--muted);font-size:.85rem}
+.spec td code,.mono{font-family:var(--mono);font-size:.86rem}
+.tablewrap{overflow-x:auto}
+.st{display:inline-block;font-size:.78rem;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.st.ok{background:var(--green-soft);color:var(--green)}
+.st.bad{background:var(--red-soft);color:var(--red)}
+.st.na{background:var(--surface2);color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.st.weak{background:var(--amber-soft);color:var(--amber);margin-left:6px}
+/* encapsulation */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.seg button{font:600 .88rem var(--sans);border:0;background:var(--surface);color:var(--muted);padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--on-navy)}
+.pkt-row{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 30px}
+.blk{border:2px solid var(--ink);padding:8px 10px;min-width:92px;font-size:.8rem;line-height:1.3;background:var(--surface);margin-left:-2px}
+.blk b{display:block;font-size:.84rem}
+.blk.new{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.blk.orig{background:var(--navy-soft)}
+.blk.esp{background:var(--amber-soft)}
+.blk.icv{background:var(--amber-soft)}
+.blk.data{background:var(--surface2)}
+.enc{display:flex;position:relative;background:repeating-linear-gradient(135deg,transparent 0 8px,color-mix(in srgb,var(--green) 18%,transparent) 8px 10px);outline:2px solid var(--green);outline-offset:-2px}
+.enc .blk{background:transparent}
+.enc::after{content:"Encrypted";position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-size:.75rem;font-weight:600;color:var(--green)}
+.auth{display:flex;position:relative;border-top:4px solid var(--amber);padding-top:0}
+.auth::before{content:"Integrity protected by the ESP ICV";position:absolute;left:0;top:-22px;font-size:.75rem;font-weight:600;color:var(--amber);white-space:nowrap}
+.pkt-wrap{padding-top:22px}
+.pkt-cap{font-size:.85rem;color:var(--muted);margin:2px 0 4px}
+/* accordions */
+details.acc{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+details.acc>summary{cursor:pointer;padding:14px 18px;font-weight:600;font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary::after{content:"+";font-size:1.4rem;color:var(--navy);font-weight:400}
+details.acc[open]>summary::after{content:"\2212"}
+.acc-body{padding:0 18px 16px}
+.acc-body ul{padding-left:20px;margin:6px 0}
+.acc-body li{margin:4px 0}
+.acc-body p{max-width:80ch}
+pre.code{font:12.8px/1.55 var(--mono);background:var(--term);color:var(--term-ink);padding:12px 14px;border-radius:8px;overflow-x:auto;position:relative;margin:8px 0 14px}
+pre.code .c{color:var(--term-dim)}
+.copy-code{position:absolute;top:8px;right:8px;font:500 .75rem var(--sans);background:rgba(255,255,255,.08);color:var(--term-ink);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:2px 8px;cursor:pointer}
+.compare{width:100%;border-collapse:collapse;font-size:.9rem;min-width:640px}
+.compare th,.compare td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.compare thead th{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.compare tbody th{background:var(--surface2);font-weight:600}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0}
+ol.steps li{counter-increment:s;position:relative;padding:8px 0 8px 44px;border-top:1px solid var(--line)}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:8px;width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--on-navy);display:grid;place-items:center;font-weight:700;font-size:.9rem}
+/* glossary */
+.flips{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:10px}
+.flip{perspective:900px;background:none;border:0;padding:0;height:150px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.flipped .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;padding:14px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.face.front{background:var(--surface);font-weight:700;font-size:1.1rem;color:var(--navy);align-items:center;text-align:center}
+.face.front small{font-weight:400;font-size:.78rem;color:var(--muted);margin-top:6px}
+.face.back{background:var(--navy);color:var(--on-navy);transform:rotateY(180deg);font-size:.88rem;line-height:1.4}
+/* banners */
+.banner{border-radius:10px;padding:12px 16px;margin-bottom:14px;border:1px solid}
+.banner.info{background:var(--navy-soft);border-color:var(--navy);color:var(--ink)}
+.banner.good{background:var(--green-soft);border-color:var(--green)}
+.banner.warn{background:var(--amber-soft);border-color:var(--amber)}
+.banner[hidden]{display:none}
+.issues{margin:8px 0 0;padding-left:20px}
+/* key map */
+.keymap{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.keymap{grid-template-columns:1fr}}
+.kcol h4{margin:0 0 6px;font-size:.95rem}
+.krow{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:.84rem;padding:6px 0;border-top:1px dashed var(--line)}
+.krow .mono{color:var(--muted)}
+/* quiz */
+.q{margin-bottom:16px}
+.q fieldset{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:0;background:var(--surface)}
+.q legend{font-weight:600;padding:0 6px;max-width:75ch}
+.q label{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:6px;cursor:pointer}
+.q label:hover{background:var(--surface2)}
+.q input{margin-top:5px;accent-color:var(--navy)}
+.q .fb{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:.92rem}
+.q .fb.right{background:var(--green-soft)}
+.q .fb.wrong{background:var(--red-soft)}
+.q label.correct{outline:2px solid var(--green)}
+/* report */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:600;font-size:.9rem}
+.field input,.field textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.field textarea{min-height:90px;resize:vertical}
+.summary-list{list-style:none;padding:0;margin:0;columns:2;column-gap:28px}
+@media (max-width:700px){.summary-list{columns:1}}
+.summary-list li{break-inside:avoid;padding:4px 0;font-size:.9rem}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(5,12,25,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.modal[hidden]{display:none}
+.modal-box{background:var(--term);color:var(--term-ink);border-radius:12px;width:min(720px,100%);max-height:90vh;display:flex;flex-direction:column;border:1px solid #29406A}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font:600 .9rem var(--mono);border-bottom:1px solid rgba(255,255,255,.08);gap:8px;flex-wrap:wrap}
+.modal-box textarea{flex:1;min-height:340px;background:transparent;color:#fff;border:0;padding:14px;font:14px/1.6 var(--mono);resize:vertical;outline:none}
+.modal-foot{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.modal-foot small{color:var(--term-dim);font-family:var(--sans)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:8px;font-weight:600;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.hero-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0 26px}
+@media (max-width:800px){.hero-strip{grid-template-columns:1fr}}
+.hero-strip .card h3{color:var(--navy)}
+.hero-strip .card p{margin:0;font-size:.93rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  header.top .top-tools,nav.tabs,.panel:not(#report),.no-print{display:none!important}
+  #report{display:block!important}
+  body{background:#fff;color:#000}
+  .card{border-color:#999}
+}
+/* ---------- firewall lab additions ---------- */
+.topo .zone-band{fill:transparent;stroke:var(--line);stroke-width:1.5;stroke-dasharray:6 6;transition:fill .4s,stroke .4s}
+.topo .zone-band.z-in{fill:color-mix(in srgb,var(--green) 9%,transparent);stroke:var(--green);stroke-dasharray:none}
+.topo .zone-band.z-dmz{fill:color-mix(in srgb,var(--amber) 10%,transparent);stroke:var(--amber);stroke-dasharray:none}
+.topo .zone-band.z-out{fill:color-mix(in srgb,var(--red) 8%,transparent);stroke:var(--red);stroke-dasharray:none}
+.topo .zone-lbl{font:600 12.5px var(--sans);fill:var(--muted)}
+.topo .zone-lbl.z-in{fill:var(--green)}.topo .zone-lbl.z-dmz{fill:var(--amber)}.topo .zone-lbl.z-out{fill:var(--red)}
+.topo .if-lbl{font:500 11.5px var(--mono);fill:var(--muted)}
+.topo .sw{fill:var(--surface2);stroke:var(--muted);stroke-width:1.5}
+.fw-state{font:600 13px var(--sans);text-anchor:middle;fill:var(--muted)}
+.fw-state.acl{fill:var(--amber)}.fw-state.zpf{fill:var(--green)}
+.pkt.bad{fill:var(--red)}
+.fw-ring{fill:none;stroke:transparent;stroke-width:4;transition:stroke .4s}
+.fw-ring.acl{stroke:var(--amber)}.fw-ring.zpf{stroke:var(--green)}
+/* packet trace */
+.trace-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.trace-head h3{margin:0}
+.trace-pkt{font:500 .85rem var(--mono);color:var(--muted);margin:0 0 6px}
+.trace{list-style:none;margin:0;padding:0}
+.trace li{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:.9rem}
+.trace .ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;margin-top:2px}
+.trace .ic.ok{background:var(--green)}.trace .ic.bad{background:var(--red)}.trace .ic.info{background:var(--muted)}
+.trace .rule{font-family:var(--mono);font-size:.82rem;color:var(--muted);display:block;margin-top:2px;word-break:break-word}
+.empty-note{color:var(--muted);font-size:.9rem;margin:0}
+/* phase */
+.phase-pill{display:inline-flex;gap:6px;align-items:center;font-size:.85rem;font-weight:600;padding:4px 12px;border-radius:20px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.phase-pill.acl{background:var(--amber-soft);color:var(--amber)}.phase-pill.zpf{background:var(--green-soft);color:var(--green)}
+/* zone-pair matrix */
+.zpm td,.zpm th{text-align:center}
+.zpm td:first-child,.zpm th:first-child{text-align:left}
+/* test plan */
+.tp{width:100%;border-collapse:collapse;font-size:.88rem;min-width:960px}
+.tp th,.tp td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.tp thead th{background:var(--navy);color:var(--on-navy);font-weight:600}
+.tp thead th.cur{box-shadow:inset 0 -4px 0 var(--green)}
+.tp td.cur{background:color-mix(in srgb,var(--navy) 6%,transparent)}
+.tp .tid{font-family:var(--mono);font-weight:600;color:var(--navy)}
+.tp select{font:inherit;font-size:.82rem;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);max-width:120px}
+.tp select:disabled{opacity:.75}
+.cellres{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.st.mis{background:var(--amber-soft);color:var(--amber)}
+.stop{font-size:.76rem;color:var(--muted);line-height:1.35}
+.tp code{font-family:var(--mono);font-size:.8rem}
+.spec td:first-child code{white-space:nowrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:6px 0 12px}
+.rep-tp{font-size:.8rem;min-width:0}
+.rep-tp td,.rep-tp th{padding:5px 6px}
+@media print{.tp{min-width:0}.tp select{display:none}.rep-wide{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="title-block">
+      <h1>Build and test a router-based firewall</h1>
+      <p>Secure a small office with one Cisco router: stateless packet filtering with ACLs first, then a stateful zone-based firewall. Prove every rule with a test plan. Network+, Security+, and CCNA aligned.</p>
+    </div>
+    <div class="top-tools">
+      <div class="meter" aria-live="polite">
+        <div class="meter-label"><span>Lab progress</span><span id="meterTxt">0 of 0 tasks</span></div>
+        <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+      </div>
+      <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark mode</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Lab sections">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" data-tab="brief" aria-selected="true">Briefing</button>
+    <button class="tab" role="tab" data-tab="partA" aria-selected="false">Part A: Packet filtering<span class="tick" id="tickA"></span></button>
+    <button class="tab" role="tab" data-tab="partB" aria-selected="false">Part B: Stateful firewall<span class="tick" id="tickB"></span></button>
+    <button class="tab" role="tab" data-tab="tests" aria-selected="false">Test plan<span class="tick" id="tickT"></span></button>
+    <button class="tab" role="tab" data-tab="quiz" aria-selected="false">Knowledge check<span class="tick" id="tickQ"></span></button>
+    <button class="tab" role="tab" data-tab="report" aria-selected="false">Lab report</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================= BRIEFING ================= -->
+<section class="panel" id="brief" role="tabpanel">
+  <h2>What an IT specialist needs to know about router-based firewalls</h2>
+  <p class="lede">A router-based firewall decides which packets may cross between networks you trust and networks you don't. Your job is to turn a business policy into rules, apply them in the right place, and prove they work. Read this briefing, then complete Parts A and B and the test plan.</p>
+
+  <div class="hero-strip">
+    <div class="card"><h3>Packet filtering</h3><p>Access control lists judge each packet on its own: addresses, protocol, and ports. Fast and simple, but they cannot tell a real reply from a forged one. Part A builds three ACLs.</p></div>
+    <div class="card"><h3>Stateful inspection</h3><p>A zone-based policy firewall remembers every connection started from a trusted zone and admits only its genuine replies. Part B builds three zones and four policies.</p></div>
+    <div class="card"><h3>Testing</h3><p>The same 15 tests run in three phases: no filtering, ACLs only, and full firewall. Predict each result first. The test plan records what actually happens.</p></div>
+  </div>
+
+  <details class="acc" open>
+    <summary>Knowledge an IT specialist needs</summary>
+    <div class="acc-body grid2">
+      <div>
+        <h3>Firewall concepts</h3>
+        <ul>
+          <li><strong>Firewall types:</strong> stateless packet filters, stateful firewalls, and next-generation firewalls (application awareness, IPS, URL filtering).</li>
+          <li><strong>Default deny and least privilege:</strong> permit only what the business needs. Every ACL ends with an invisible <span class="mono">deny any</span>.</li>
+          <li><strong>Session tables:</strong> a stateful firewall tracks source, destination, ports, and TCP state, so replies need no rule of their own.</li>
+          <li><strong>Zones and trust levels:</strong> INSIDE (trusted), DMZ (public servers, semi-trusted), OUTSIDE (untrusted), and the router's own <span class="mono">self</span> zone.</li>
+          <li><strong>Defense in depth:</strong> stateless anti-spoofing filters and stateful inspection work together.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Supporting network knowledge</h3>
+        <ul>
+          <li><strong>TCP/IP behavior:</strong> the three-way handshake, TCP flags (SYN, ACK, RST), and why UDP and ICMP have no connections.</li>
+          <li><strong>Ports:</strong> DNS 53, HTTP 80, HTTPS 443, SSH 22, Telnet 23, SMB 445, NetBIOS 137 to 139, DHCP 67/68.</li>
+          <li><strong>Wildcard masks:</strong> the inverse of a subnet mask. A /24 is <span class="mono">0.0.0.255</span>; one host is <span class="mono">host</span> or <span class="mono">0.0.0.0</span>.</li>
+          <li><strong>NAT and PAT:</strong> inside local vs. inside global addresses, and whether a rule sees the address before or after translation.</li>
+          <li><strong>Address ranges to block:</strong> RFC 1918 private space, loopback, multicast, and your own public addresses arriving from outside (BCP 38).</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Skills an IT specialist must demonstrate</summary>
+    <div class="acc-body grid2">
+      <div>
+        <h3>Plan</h3>
+        <ul>
+          <li>Turn a business requirement into a zone policy table.</li>
+          <li>Choose standard or extended ACLs, and place each one on the correct interface and direction.</li>
+          <li>Decide what the router itself must accept (management, routing, replies).</li>
+        </ul>
+        <h3>Configure</h3>
+        <ul>
+          <li>Restrict device management to one admin host with SSH and an <span class="mono">access-class</span>.</li>
+          <li>Write named extended ACLs for egress and ingress filtering.</li>
+          <li>Build zones, class-maps, policy-maps, and zone-pairs, then assign interfaces to zones.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Test and troubleshoot</h3>
+        <ul>
+          <li>Run a written test plan from inside, DMZ, and outside hosts. Compare predicted and actual results.</li>
+          <li>Read ACL hit counters, firewall session tables, and drop logs to find the rule behind each result.</li>
+          <li>Change one thing at a time, then re-run the failed test.</li>
+        </ul>
+        <h3>Maintain</h3>
+        <ul>
+          <li>Document every rule with its business reason. Use <span class="mono">remark</span> lines.</li>
+          <li>Review logs for repeated drops, and back up configurations before every change.</li>
+          <li>Remove rules nobody can justify.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Stateless vs. stateful filtering</summary>
+    <div class="acc-body tablewrap">
+      <table class="compare">
+        <thead><tr><th>Question</th><th>Packet filter (ACL)</th><th>Stateful firewall (ZPF)</th></tr></thead>
+        <tbody>
+          <tr><th>What is judged</th><td>Each packet alone: addresses, protocol, ports, TCP flags</td><td>Each packet against the session it belongs to</td></tr>
+          <tr><th>Reply traffic</th><td>Needs its own rule, such as <span class="mono">permit tcp any any established</span></td><td>Allowed automatically for sessions started from the trusted side</td></tr>
+          <tr><th>Forged replies</th><td>Pass: <span class="mono">established</span> only checks that ACK or RST is set</td><td>Dropped: no matching session</td></tr>
+          <tr><th>UDP and ICMP replies</th><td>Need source-port or ICMP-type rules that attackers can imitate</td><td>Tracked like TCP sessions with timeouts</td></tr>
+          <tr><th>Default between segments</th><td>Permit, unless an ACL is applied</td><td>Deny, unless a zone-pair allows it</td></tr>
+          <tr><th>Cost</th><td>Very low; good for anti-spoofing at the edge</td><td>Memory per session; needs a security license on the router</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>SOHO vs. enterprise: what changes</summary>
+    <div class="acc-body tablewrap">
+      <table class="compare">
+        <thead><tr><th>Area</th><th>Small office/home office (SOHO)</th><th>Enterprise</th></tr></thead>
+        <tbody>
+          <tr><th>Device</th><td>One router doing routing, NAT, DHCP, and firewalling</td><td>Dedicated next-generation firewalls in high-availability pairs, plus router ACLs</td></tr>
+          <tr><th>Zones</th><td>Inside, one small DMZ or guest network, outside</td><td>Many zones: users, servers, management, partners, cloud, OT</td></tr>
+          <tr><th>Rule base</th><td>Tens of rules, managed at the CLI or a web page</td><td>Thousands of rules, central management, change tickets, rule reviews</td></tr>
+          <tr><th>Inspection depth</th><td>Layer 3 and 4 stateful inspection</td><td>Application ID, TLS inspection, IPS, URL and malware filtering</td></tr>
+          <tr><th>Logging</th><td>Local buffer, occasional review</td><td>Syslog to a SIEM, alerting, retention policies</td></tr>
+          <tr><th>Skill emphasis</th><td>Correct placement, NAT interaction, testing</td><td>Policy design, automation, audit and compliance (PCI DSS, NIST 800-171, CMMC)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Order of operations on R1-SOHO</summary>
+    <div class="acc-body">
+      <p>Knowing what the router checks, and in which order, tells you which address each rule must use.</p>
+      <ol class="steps">
+        <li><strong>Inbound ACL</strong> on the interface where the packet arrives. Outside packets still carry public addresses, such as 203.0.113.3.</li>
+        <li><strong>Destination NAT</strong> for packets from outside. 203.0.113.3 becomes the web server's real address, 192.168.20.10.</li>
+        <li><strong>Routing</strong> picks the exit interface.</li>
+        <li><strong>Zone-based firewall</strong> checks the zone-pair from the arrival zone to the exit zone. It sees real (inside) addresses.</li>
+        <li><strong>Source NAT (PAT)</strong> for packets leaving to the internet, then the <strong>outbound ACL</strong>, if any.</li>
+        <li><strong>Replies</strong> run the same checks in reverse. An inspected session lets the reply past the firewall automatically.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Command reference</summary>
+    <div class="acc-body">
+      <h3>Standard and extended ACLs</h3>
+<pre class="code">ip access-list standard MGMT-ONLY
+ permit host 192.168.10.10
+ deny any log
+line vty 0 4
+ access-class MGMT-ONLY in
+!
+ip access-list extended INSIDE-IN
+ remark Each line: action, protocol, source, [port], destination, [port], [options]
+ deny tcp 192.168.10.0 0.0.0.255 any eq telnet log
+ permit ip 192.168.10.0 0.0.0.255 any
+interface g0/0
+ ip access-group INSIDE-IN in
+!
+ip access-list extended INSIDE-IN
+ 15 deny tcp 192.168.10.0 0.0.0.255 any eq 445   <span class="c">! insert between lines 10 and 20</span>
+ no 15                                         <span class="c">! remove line 15</span></pre>
+      <h3>Zone-based policy firewall</h3>
+<pre class="code">zone security INSIDE
+zone security OUTSIDE
+class-map type inspect match-any CM-INSIDE-TO-OUTSIDE
+ match protocol tcp
+ match protocol udp
+ match protocol icmp
+policy-map type inspect PM-INSIDE-TO-OUTSIDE
+ class type inspect CM-INSIDE-TO-OUTSIDE
+  inspect
+ class class-default
+  drop log
+zone-pair security ZP-IN-OUT source INSIDE destination OUTSIDE
+ service-policy type inspect PM-INSIDE-TO-OUTSIDE
+interface g0/0
+ zone-member security INSIDE</pre>
+      <h3>Verification</h3>
+<pre class="code">show access-lists                    <span class="c">! every ACL with hit counters</span>
+show ip interface g0/2               <span class="c">! which ACL is applied, and which direction</span>
+show zone security                   <span class="c">! zones and their member interfaces</span>
+show zone-pair security              <span class="c">! zone-pairs and their policies</span>
+show policy-map type inspect zone-pair sessions
+show ip nat translations
+show logging                         <span class="c">! ACL log hits and firewall drops</span>
+show running-config | section zone   <span class="c">! filter long output</span>
+clear access-list counters</pre>
+      <h3>Test hosts</h3>
+<pre class="code">ping 198.51.100.10                   <span class="c"># Windows sends 4; Linux: ping -c 4</span>
+nslookup www.netserver.test
+curl http://www.netserver.test
+ssh -l admin 192.168.10.1
+telnet 203.0.113.1
+nmap -Pn -sA -p 22,445,3389 203.0.113.3   <span class="c"># ACK scan, ATTACKER only</span></pre>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Troubleshooting guide</summary>
+    <div class="acc-body tablewrap">
+      <table class="compare">
+        <thead><tr><th>Symptom</th><th>Likely cause</th><th>What to check</th></tr></thead>
+        <tbody>
+          <tr><th>Everything stopped after applying an ACL</th><td>Implicit deny at the end; the permit line is missing or below a broad deny</td><td><span class="mono">show access-lists</span>: which line is counting hits?</td></tr>
+          <tr><th>The ACL has zero hits</th><td>Applied to the wrong interface or direction, or the name is misspelled</td><td><span class="mono">show ip interface g0/x</span></td></tr>
+          <tr><th>Web works but names don't resolve</th><td>DNS replies (UDP from port 53) aren't permitted back in</td><td>The DNS line in OUTSIDE-IN, or the UDP match in the firewall class-map</td></tr>
+          <tr><th>All traffic between zones stops mid-lab</th><td>An interface is in a zone but its partner is not, or no zone-pair exists yet</td><td><span class="mono">show zone security</span>; assign zones last</td></tr>
+          <tr><th>The public web server can't be reached after Part B</th><td>The firewall ACL uses 203.0.113.3, but the firewall sees 192.168.20.10</td><td>ACL-OUTSIDE-TO-DMZ addresses</td></tr>
+          <tr><th>The router still answers pings from the internet</th><td>Traffic to the router itself is in the <span class="mono">self</span> zone, which isn't filtered by default</td><td>Part B challenge task</td></tr>
+          <tr><th>Wildcard rejected or matching too much</th><td>A subnet mask was typed where a wildcard belongs</td><td>Use 0.0.0.255, not 255.255.255.0</td></tr>
+          <tr><th>PC-Staff loses its address</th><td>DHCP requests blocked by INSIDE-IN</td><td>The <span class="mono">bootpc</span>/<span class="mono">bootps</span> line, then <span class="mono">ipconfig /renew</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>How this lab is graded</summary>
+    <div class="acc-body tablewrap">
+      <table class="compare">
+        <thead><tr><th>Component</th><th>Points</th><th>What earns full credit</th></tr></thead>
+        <tbody>
+          <tr><th>Part A: Packet filtering</th><td>25</td><td>Management lockdown, egress filter, and ingress filter all built, applied, and verified</td></tr>
+          <tr><th>Part B: Stateful firewall</th><td>30</td><td>Three zones, four zone-pair policies, interfaces assigned, live sessions shown</td></tr>
+          <tr><th>Test plan</th><td>20</td><td>All 15 tests predicted and run in all three phases, with the blocking rule identified</td></tr>
+          <tr><th>Knowledge check</th><td>10</td><td>One point per correct answer</td></tr>
+          <tr><th>Lab report reflections</th><td>15</td><td>Six answers that cite test IDs and rule names as evidence</td></tr>
+          <tr><th>Challenge (bonus)</th><td>+5</td><td>The router stops answering internet pings but can still ping its ISP</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>Glossary flip cards</summary>
+    <div class="acc-body"><p>Select a card to flip it.</p><div class="flips" id="flips"></div></div>
+  </details>
+
+  <p style="margin-top:22px"><button class="btn primary" type="button" data-goto="partA">Start Part A</button></p>
+</section>
+
+<!-- ================= PART A ================= -->
+<section class="panel" id="partA" role="tabpanel" hidden>
+  <h2>Part A: Packet filtering with access control lists</h2>
+  <p class="lede">Riverside Bookkeeping has four staff, a public web server for clients, and one Cisco router. Interfaces, NAT, DHCP, SSH, and the admin account are already configured, and nothing is filtered yet. Build three stateless filters, then run the test plan. Select a device in the diagram or the console tabs to switch devices.</p>
+  <div class="lab">
+    <div class="stack">
+      <div data-slot="topo"></div>
+      <div data-slot="trace"></div>
+      <div class="card">
+        <h3>Requirements for Part A</h3>
+        <div class="tablewrap"><table class="spec">
+          <tr><th>ACL name</th><th>Type, where applied</th><th>What it must do</th></tr>
+          <tr><td><code>MGMT-ONLY</code></td><td>Standard; <code>line vty 0 4</code>, <code>access-class</code> in</td><td>Only PC-Admin (192.168.10.10) may open an SSH session to the router. Log everything else.</td></tr>
+          <tr><td><code>INSIDE-IN</code></td><td>Extended; G0/0 inbound</td><td>Allow DHCP requests. Block Telnet, NetBIOS (TCP/UDP 137 to 139), and SMB (TCP 445) leaving the LAN. Allow only 192.168.10.0/24 sources out; drop spoofed sources.</td></tr>
+          <tr><td><code>OUTSIDE-IN</code></td><td>Extended; G0/2 inbound</td><td>Drop spoofed sources (RFC 1918, 127/8, 224/3, and 203.0.113.2 and .3). Allow replies statelessly: TCP <code>established</code>, DNS replies from 198.51.100.10, and ICMP echo-reply, unreachable, and time-exceeded. Allow HTTP and HTTPS to the public server at 203.0.113.3. Log and drop the rest.</td></tr>
+        </table></div>
+        <p class="pkt-cap" style="margin-top:10px">Use these exact names; the task checks look for them. Add a <code>remark</code> above each group of lines.</p>
+      </div>
+      <div data-slot="inspect"></div>
+      <div class="card">
+        <h3>Network plan</h3>
+        <div class="tablewrap"><table class="spec">
+          <tr><th>Device</th><th>Address</th><th>Notes</th></tr>
+          <tr><td>R1-SOHO G0/0</td><td class="mono">192.168.10.1/24</td><td>Inside LAN gateway, DHCP server</td></tr>
+          <tr><td>R1-SOHO G0/1</td><td class="mono">192.168.20.1/24</td><td>DMZ gateway</td></tr>
+          <tr><td>R1-SOHO G0/2</td><td class="mono">203.0.113.2/29</td><td>Internet link; PAT for the inside LAN</td></tr>
+          <tr><td>PC-Admin</td><td class="mono">192.168.10.10</td><td>Static; the owner's PC</td></tr>
+          <tr><td>PC-Staff</td><td class="mono">192.168.10.25</td><td>DHCP lease</td></tr>
+          <tr><td>WEB-DMZ</td><td class="mono">192.168.20.10</td><td>Static NAT to 203.0.113.3; serves HTTP and HTTPS</td></tr>
+          <tr><td>NET-SERVER</td><td class="mono">198.51.100.10</td><td>Internet web and DNS server for every host</td></tr>
+          <tr><td>ATTACKER</td><td class="mono">198.51.100.66</td><td>Untrusted internet host (Kali Linux)</td></tr>
+        </table></div>
+        <p class="pkt-cap" style="margin-top:10px">DNS names: <span class="mono">www.netserver.test</span> is 198.51.100.10 and <span class="mono">www.riverside.test</span> is 203.0.113.3.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div data-slot="term"></div>
+      <div class="card">
+        <h3>Tasks</h3>
+        <p class="pkt-cap">Tasks check themselves as you work. Use a hint only after you've tried.</p>
+        <div id="tasksA"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PART B ================= -->
+<section class="panel" id="partB" role="tabpanel" hidden>
+  <h2>Part B: Stateful firewall with zone-based policy</h2>
+  <p class="lede">The ACLs from Part A guess at which packets are replies. Replace that guesswork with a session table. Build the zones and policies first, and assign interfaces to zones last, because traffic between a zoned and an unzoned interface is dropped.</p>
+  <div class="lab">
+    <div class="stack">
+      <div data-slot="topo"></div>
+      <div data-slot="trace"></div>
+      <div class="card">
+        <h3>Firewall policy (the business requirement)</h3>
+        <div class="tablewrap"><table class="spec zpm">
+          <tr><th>From \ To</th><th>INSIDE</th><th>DMZ</th><th>OUTSIDE</th></tr>
+          <tr><th>INSIDE</th><td>Allowed</td><td>HTTP/HTTPS for all; SSH and ping for PC-Admin only</td><td>All TCP, UDP, ICMP, inspected</td></tr>
+          <tr><th>DMZ</th><td>Denied</td><td>Allowed</td><td>DNS, HTTP, HTTPS from WEB-DMZ, inspected</td></tr>
+          <tr><th>OUTSIDE</th><td>Denied</td><td>HTTP/HTTPS to WEB-DMZ only</td><td>Allowed</td></tr>
+        </table></div>
+        <h3 style="margin-top:16px">Names to use</h3>
+        <div class="tablewrap"><table class="spec">
+          <tr><th>Zone-pair</th><th>Source to destination</th><th>Policy-map</th><th>Class-map (ACL)</th></tr>
+          <tr><td><code>ZP-IN-OUT</code></td><td>INSIDE to OUTSIDE</td><td><code>PM-INSIDE-TO-OUTSIDE</code></td><td><code>CM-INSIDE-TO-OUTSIDE</code> (match-any tcp, udp, icmp)</td></tr>
+          <tr><td><code>ZP-IN-DMZ</code></td><td>INSIDE to DMZ</td><td><code>PM-INSIDE-TO-DMZ</code></td><td><code>CM-INSIDE-TO-DMZ</code> (<code>ACL-INSIDE-TO-DMZ</code>)</td></tr>
+          <tr><td><code>ZP-OUT-DMZ</code></td><td>OUTSIDE to DMZ</td><td><code>PM-OUTSIDE-TO-DMZ</code></td><td><code>CM-OUTSIDE-TO-DMZ</code> (<code>ACL-OUTSIDE-TO-DMZ</code>)</td></tr>
+          <tr><td><code>ZP-DMZ-OUT</code></td><td>DMZ to OUTSIDE</td><td><code>PM-DMZ-TO-OUTSIDE</code></td><td><code>CM-DMZ-TO-OUTSIDE</code> (<code>ACL-DMZ-TO-OUTSIDE</code>)</td></tr>
+        </table></div>
+        <p class="pkt-cap" style="margin-top:10px">There is deliberately no zone-pair into INSIDE. With no zone-pair, the firewall denies the traffic; that absence is the rule.</p>
+      </div>
+      <div data-slot="inspect"></div>
+    </div>
+    <div class="stack">
+      <div data-slot="term"></div>
+      <div class="card">
+        <h3>Tasks</h3>
+        <p class="pkt-cap">The policy tasks test your zone-pairs with sample traffic, so any correct design passes.</p>
+        <div id="tasksB"></div>
+      </div>
+      <div class="card">
+        <h3>Challenge (bonus): protect the router itself</h3>
+        <div id="chalBanner" class="banner info" hidden></div>
+        <p class="pkt-cap">After Part B, ATTACKER can still ping 203.0.113.2, because traffic to the router itself is in the <span class="mono">self</span> zone, which no zone-pair covers. Add an OUTSIDE-to-self zone-pair that drops unsolicited traffic to the router but still lets R1-SOHO's own pings to the ISP (203.0.113.1) get their replies. Hint: use the <span class="mono">pass</span> action, and remember that it works in one direction only.</p>
+        <ul class="checklist" id="chalList"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEST PLAN ================= -->
+<section class="panel" id="tests" role="tabpanel" hidden>
+  <h2>Test plan</h2>
+  <p class="lede">Run the same 15 tests in three phases. Before each phase, predict every result; predictions lock once a test runs. Each row's Load button opens the right host and types the command for you; press Enter to run it. Results record automatically in the current phase.</p>
+  <div class="lab">
+    <div class="stack">
+      <div data-slot="topo"></div>
+      <div data-slot="trace"></div>
+    </div>
+    <div class="stack">
+      <div data-slot="term"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <div class="trace-head">
+      <h3>Results</h3>
+      <span><span id="phasePill" class="phase-pill">Phase: Baseline</span> <button class="btn small" type="button" id="tpClear">Clear results</button></span>
+    </div>
+    <div class="legend"><span><strong>Baseline:</strong> no ACLs or zones applied</span><span><strong>After ACLs:</strong> any ACL applied, no zones</span><span><strong>After ZPF:</strong> interfaces assigned to zones</span></div>
+    <div class="tablewrap" id="tpWrap"></div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="panel" id="quiz" role="tabpanel" hidden>
+  <h2>Knowledge check</h2>
+  <p class="lede">Ten questions. Answer all, then check your answers to see explanations. Your score goes into the lab report.</p>
+  <form id="quizForm" onsubmit="return false"></form>
+  <p><button class="btn primary" type="button" id="quizCheck">Check answers</button> <button class="btn" type="button" id="quizReset">Try again</button></p>
+  <div id="quizScore" class="banner good" hidden></div>
+</section>
+
+<!-- ================= REPORT ================= -->
+<section class="panel" id="report" role="tabpanel" hidden>
+  <h2>Lab report</h2>
+  <p class="lede no-print">Fill in your details and reflections, then print or save as PDF to submit. Your typing is saved in this browser.</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="field"><label for="rName">Student name</label><input id="rName" data-save></div>
+      <div class="field"><label for="rCourse">Course and section</label><input id="rCourse" data-save></div>
+      <div class="field"><label for="rDate">Date</label><input id="rDate" data-save></div>
+      <h3 style="margin-top:14px">Completion record</h3>
+      <ul class="summary-list" id="summary"></ul>
+    </div>
+    <div class="card">
+      <div class="field"><label for="r1">1. Compare T13 across all three phases. What does the After-ACLs result reveal about filtering only the internet link?</label><textarea id="r1" data-save></textarea></div>
+      <div class="field"><label for="r2">2. Why did OUTSIDE-IN match the web server as 203.0.113.3, while ACL-OUTSIDE-TO-DMZ matched it as 192.168.20.10?</label><textarea id="r2" data-save></textarea></div>
+      <div class="field"><label for="r3">3. What does the <span class="mono">established</span> keyword actually check? Use T15 to explain how an attacker could exploit it and why the firewall closes that gap.</label><textarea id="r3" data-save></textarea></div>
+    </div>
+  </div>
+  <div class="card rep-wide" style="margin-top:18px">
+    <h3>Test plan results</h3>
+    <p class="pkt-cap">P = prediction. A mismatch between prediction and result is marked with an exclamation point; explain each one in question 4.</p>
+    <div class="tablewrap" id="repTp"></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="field"><label for="r4">4. Explain each mismatch between your predictions and the results, naming the rule responsible. Then explain the T11 result after Part B: what is the self zone?</label><textarea id="r4" data-save></textarea></div>
+    <div class="field"><label for="r5">5. The zone-based firewall now makes every allow decision. Why keep the anti-spoofing lines in OUTSIDE-IN at all?</label><textarea id="r5" data-save></textarea></div>
+    <div class="field"><label for="r6">6. In two sentences to Riverside's owner: what is now protected, and one risk this design does not address?</label><textarea id="r6" data-save></textarea></div>
+  </div>
+  <p class="no-print" style="margin-top:16px"><button class="btn primary" type="button" onclick="window.print()">Print or save as PDF</button></p>
+</section>
+</main>
+
+<!-- ================= SHARED WORKBENCH (moved into each lab tab) ================= -->
+<div id="parking" hidden>
+  <div class="topo" id="wbTopo">
+    <svg viewBox="0 0 760 345" role="img" aria-labelledby="topoTitle">
+      <title id="topoTitle">Inside LAN with PC-Admin and PC-Staff, DMZ with WEB-DMZ, and the internet with the ISP router, NET-SERVER, and ATTACKER, all joined by the firewall router R1-SOHO</title>
+      <rect class="zone-band" id="bandIn" x="10" y="40" width="270" height="178" rx="14"/>
+      <rect class="zone-band" id="bandDmz" x="10" y="230" width="270" height="105" rx="14"/>
+      <rect class="zone-band" id="bandOut" x="482" y="40" width="268" height="295" rx="14"/>
+      <text class="zone-lbl" id="lblIn" x="24" y="60">Inside LAN: no zone</text>
+      <text class="zone-lbl" id="lblDmz" x="24" y="250">DMZ: no zone</text>
+      <text class="zone-lbl" id="lblOut" x="496" y="60">Internet: no zone</text>
+      <text class="fw-state" id="fwState" x="380" y="26">Firewall: no filtering yet</text>
+      <line class="wire" x1="73" y1="86" x2="214" y2="118"/>
+      <line class="wire" x1="73" y1="166" x2="214" y2="122"/>
+      <line class="wire" x1="250" y1="122" x2="352" y2="172"/>
+      <line class="wire" x1="68" y1="282" x2="352" y2="194"/>
+      <line class="wire" x1="410" y1="182" x2="538" y2="182"/>
+      <line class="wire" x1="578" y1="168" x2="672" y2="110"/>
+      <line class="wire" x1="578" y1="196" x2="667" y2="264"/>
+      <text class="if-lbl" x="292" y="134">G0/0</text>
+      <text class="if-lbl" x="300" y="236">G0/1</text>
+      <text class="if-lbl" x="446" y="172" text-anchor="middle">G0/2</text>
+      <g class="clickable" data-dev="pcadmin" tabindex="0" role="button" aria-label="Open PC-Admin command prompt"><rect x="27" y="70" width="46" height="32" rx="4" class="node-fill"/><rect x="43" y="103" width="14" height="6" fill="var(--navy)"/><text class="lbl-strong" x="50" y="128" text-anchor="middle">PC-Admin</text><text class="lbl" x="50" y="143" text-anchor="middle">192.168.10.10</text></g>
+      <g class="clickable" data-dev="pcstaff" tabindex="0" role="button" aria-label="Open PC-Staff command prompt"><rect x="27" y="150" width="46" height="32" rx="4" class="node-fill"/><rect x="43" y="183" width="14" height="6" fill="var(--navy)"/><text class="lbl-strong" x="50" y="207" text-anchor="middle">PC-Staff</text></g>
+      <text class="lbl" x="130" y="207" text-anchor="middle">192.168.10.25</text>
+      <rect x="214" y="110" width="36" height="22" rx="4" class="sw"/><text class="lbl" x="232" y="125" text-anchor="middle">SW</text>
+      <g class="clickable" data-dev="web" tabindex="0" role="button" aria-label="Open WEB-DMZ shell"><rect x="32" y="262" width="36" height="44" rx="4" class="node-fill"/><line x1="38" y1="274" x2="62" y2="274" stroke="var(--navy)" stroke-width="2"/><line x1="38" y1="284" x2="62" y2="284" stroke="var(--navy)" stroke-width="2"/><text class="lbl-strong" x="140" y="296" text-anchor="middle">WEB-DMZ</text><text class="lbl" x="140" y="311" text-anchor="middle">192.168.20.10</text><text class="lbl" x="140" y="326" text-anchor="middle">public: 203.0.113.3</text></g>
+      <g class="clickable" data-dev="r1" tabindex="0" role="button" aria-label="Open R1-SOHO console"><circle class="fw-ring" id="fwRing" cx="380" cy="182" r="36"/><circle cx="380" cy="182" r="29" class="node-fill"/><text class="node-text" x="380" y="182">R1</text></g>
+      <text class="lbl-strong" x="380" y="236" text-anchor="middle">R1-SOHO</text>
+      <text class="lbl" x="380" y="252" text-anchor="middle">firewall router</text>
+      <circle cx="560" cy="182" r="21" class="node-fill" style="stroke:var(--muted)"/><text class="lbl-strong" x="560" y="186" text-anchor="middle">ISP</text>
+      <text class="lbl" x="560" y="222" text-anchor="middle">203.0.113.1</text>
+      <rect x="672" y="78" width="36" height="44" rx="4" class="node-fill" style="stroke:var(--muted)"/><line x1="678" y1="90" x2="702" y2="90" stroke="var(--muted)" stroke-width="2"/><line x1="678" y1="100" x2="702" y2="100" stroke="var(--muted)" stroke-width="2"/>
+      <text class="lbl-strong" x="690" y="140" text-anchor="middle">NET-SERVER</text><text class="lbl" x="690" y="156" text-anchor="middle">198.51.100.10</text><text class="lbl" x="690" y="171" text-anchor="middle">web and DNS</text>
+      <g class="clickable" data-dev="attacker" tabindex="0" role="button" aria-label="Open ATTACKER shell"><rect x="667" y="248" width="46" height="32" rx="4" class="node-fill" style="stroke:var(--red)"/><rect x="683" y="281" width="14" height="6" fill="var(--red)"/><text class="lbl-strong" x="690" y="306" text-anchor="middle">ATTACKER</text><text class="lbl" x="690" y="321" text-anchor="middle">198.51.100.66</text></g>
+      <circle r="8" class="pkt" id="pkt"/>
+    </svg>
+  </div>
+
+  <div class="card" id="wbTrace">
+    <div class="trace-head"><h3>Packet trace</h3><span id="traceRes"></span></div>
+    <p class="trace-pkt" id="tracePkt"></p>
+    <ol class="trace" id="traceList"><li style="border:0;display:block"><p class="empty-note">Run a test from any host (ping, nslookup, curl, ssh, telnet, nmap). Every check R1-SOHO makes on the packet and its reply will appear here.</p></li></ol>
+  </div>
+
+  <div class="card" id="wbInspect">
+    <h3>Firewall at a glance</h3>
+    <p class="pkt-cap">Updates as you configure R1-SOHO.</p>
+    <div id="inspWrap" class="tablewrap"></div>
+  </div>
+
+  <div class="term" id="wbTerm">
+    <div class="term-bar">
+      <button class="dev-btn" data-dev="r1" aria-pressed="true">R1-SOHO</button>
+      <button class="dev-btn" data-dev="pcadmin" aria-pressed="false">PC-Admin</button>
+      <button class="dev-btn" data-dev="pcstaff" aria-pressed="false">PC-Staff</button>
+      <button class="dev-btn" data-dev="web" aria-pressed="false">WEB-DMZ</button>
+      <button class="dev-btn" data-dev="attacker" aria-pressed="false">ATTACKER</button>
+      <span class="spacer"></span>
+      <button class="tbtn" type="button" id="termClear">Clear screen</button>
+      <button class="tbtn" type="button" id="termReset">Reset router</button>
+    </div>
+    <div class="term-out" id="out" aria-live="polite"></div>
+    <div class="term-in"><label for="cli" id="prompt">R1-SOHO&gt;</label><input id="cli" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="R1-SOHO command line"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),1800)}
+
+/* ---------- theme ---------- */
+(function(){const t=store.get('fwlab-theme');if(t)document.documentElement.dataset.theme=t;setThemeLabel()})();
+function curTheme(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function setThemeLabel(){const b=document.getElementById('themeBtn');if(b)b.textContent=curTheme()==='dark'?'Light mode':'Dark mode'}
+$('#themeBtn').onclick=()=>{const n=curTheme()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;store.set('fwlab-theme',n);setThemeLabel()};
+
+/* ---------- tabs + workbench docking ---------- */
+const WB={topo:'#wbTopo',trace:'#wbTrace',inspect:'#wbInspect',term:'#wbTerm'};
+function dock(panel){Object.entries(WB).forEach(([slot,sel])=>{const el=$(sel),dst=panel.querySelector(`[data-slot="${slot}"]`);(dst||$('#parking')).appendChild(el)})}
+let curTab='brief';
+function showTab(id){curTab=id;$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===id)));$$('.panel').forEach(p=>p.hidden=p.id!==id);
+  const p=$('#'+id);if(p.querySelector('[data-slot]')){dock(p);renderTerm()}
+  if(id==='report')renderSummary();if(id==='tests')renderTests();window.scrollTo({top:0})}
+$$('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$$('[data-goto]').forEach(b=>b.onclick=()=>showTab(b.dataset.goto));
+
+/* ---------- copy buttons on code ---------- */
+$$('pre.code').forEach(pre=>{const b=document.createElement('button');b.className='copy-code';b.type='button';b.textContent='Copy';b.onclick=()=>{const txt=pre.innerText.replace(/^Copy\n?/,'').replace(/\s+[!#] .*$/gm,'');copyText(txt.replace(/Copy$/,'').trim());b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)};pre.appendChild(b)});
+function copyText(t){try{navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t))}catch(e){fallbackCopy(t)}}
+function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove()}
+
+/* ---------- glossary ---------- */
+const GLOSS=[
+ ['ACL','Access control list','An ordered list of permit and deny statements. The router uses the first line that matches and ignores the rest.'],
+ ['Implicit deny','The invisible last line','Every ACL ends with deny any. A packet that matches no line is dropped, and the drop is not counted or logged.'],
+ ['Wildcard mask','Inverse mask','Zero bits must match, one bits are ignored. 0.0.0.255 matches a whole /24; 0.0.0.0 matches one host.'],
+ ['Standard ACL','Source only','Matches only the source address. Use it for simple jobs such as limiting who may manage the router.'],
+ ['Extended ACL','Five-tuple match','Matches protocol, source, destination, and ports, plus options like established and ICMP type.'],
+ ['established','TCP flag test','Matches TCP segments with ACK or RST set. A stateless guess that a packet is a reply; attackers can forge it.'],
+ ['Stateful inspection','Session tracking','The firewall records each allowed connection and admits only replies that belong to it.'],
+ ['Security zone','Group of interfaces','Interfaces with the same trust level. Traffic within a zone flows freely; traffic between zones needs a zone-pair.'],
+ ['Zone-pair','One-way policy','A source zone, a destination zone, and the policy applied to traffic going that direction.'],
+ ['self zone','The router itself','System-defined zone for traffic to or from the router. Allowed by default until you create a self zone-pair.'],
+ ['inspect vs. pass','Firewall actions','inspect tracks the session so replies return automatically. pass allows one direction only, with no session.'],
+ ['Anti-spoofing','Ingress filtering (BCP 38)','Dropping packets from outside that claim private, loopback, multicast, or your own source addresses.']];
+$('#flips').innerHTML=GLOSS.map(g=>`<button class="flip" type="button" aria-label="${esc(g[0])}: select to reveal definition"><div class="flip-in"><div class="face front">${esc(g[0])}<small>${esc(g[1])}</small></div><div class="face back">${esc(g[2])}</div></div></button>`).join('');
+$$('.flip').forEach(f=>f.onclick=()=>f.classList.toggle('flipped'));
+
+/* ======================================================================
+   Addresses, ports, ACL entries
+   ====================================================================== */
+const isIP=s=>typeof s==='string'&&/^\d{1,3}(\.\d{1,3}){3}$/.test(s)&&s.split('.').every(o=>+o<=255);
+const ip2n=ip=>ip.split('.').reduce((a,o)=>(a*256+(+o))>>>0,0);
+const n2ip=n=>[24,16,8,0].map(b=>(n>>>b)&255).join('.');
+const ANY={net:'0.0.0.0',wc:'255.255.255.255'};
+const mkSpec=(net,wc)=>{const w=ip2n(wc);return{net:n2ip((ip2n(net)&~w)>>>0),wc}};
+const inSpec=(ip,s)=>{const w=ip2n(s.wc);return((ip2n(ip)&~w)>>>0)===((ip2n(s.net)&~w)>>>0)};
+const looksLikeMask=wc=>{const b=ip2n(wc).toString(2).padStart(32,'0');return/^1+0+$/.test(b)};
+const PNAME={www:80,http:80,https:443,telnet:23,domain:53,bootpc:68,bootps:67,ssh:22,ftp:21,'ftp-data':20,smtp:25,pop3:110,'netbios-ns':137,'netbios-dgm':138,'netbios-ss':139,tftp:69,ntp:123,snmp:161,isakmp:500,syslog:514};
+const PDISP={tcp:{80:'www',23:'telnet',53:'domain',21:'ftp',20:'ftp-data',25:'smtp',110:'pop3'},udp:{53:'domain',67:'bootps',68:'bootpc',69:'tftp',123:'ntp',137:'netbios-ns',138:'netbios-dgm',161:'snmp',500:'isakmp'}};
+const ICMPT={'echo-reply':0,unreachable:3,'source-quench':4,redirect:5,echo:8,'time-exceeded':11,'parameter-problem':12};
+const ICMPN=Object.fromEntries(Object.entries(ICMPT).map(([k,v])=>[v,k]));
+const PROTOS=['ip','tcp','udp','icmp'];
+const INV="% Invalid input detected at '^' marker.";
+const parsePort=t=>{if(t==null)return null;t=String(t).toLowerCase();if(/^\d+$/.test(t)&&+t<=65535)return +t;return t in PNAME?PNAME[t]:null};
+function parseAddr(T,i,std){const t=(T[i]||'').toLowerCase();
+  if(t==='any')return{spec:ANY,i:i+1};
+  if(t==='host'){if(!isIP(T[i+1]))return null;return{spec:{net:T[i+1],wc:'0.0.0.0'},i:i+2}}
+  if(isIP(t)){if(isIP(T[i+1])){return{spec:mkSpec(t,T[i+1]),i:i+2,mask:looksLikeMask(T[i+1])&&T[i+1]!=='255.255.255.255'}}if(std)return{spec:{net:t,wc:'0.0.0.0'},i:i+1};return null}
+  return null}
+function parsePortOp(T,i){const op=(T[i]||'').toLowerCase();
+  if(['eq','neq','gt','lt'].includes(op)){const p=parsePort(T[i+1]);if(p==null)return{bad:true};const ports=[p];let j=i+2;
+    if(op==='eq')while(j<T.length&&!isIP(T[j])&&parsePort(T[j])!=null){ports.push(parsePort(T[j]));j++}
+    return{op:{op,ports},i:j}}
+  if(op==='range'){const a=parsePort(T[i+1]),b=parsePort(T[i+2]);if(a==null||b==null)return{bad:true};return{op:{op:'range',ports:[a,b]},i:i+3}}
+  return{op:null,i}}
+const ACE_TIP_EXT='Syntax: [seq] permit|deny <ip|tcp|udp|icmp> <src> [eq <port>] <dst> [eq <port>] [established] [log]. Addresses are any, host A.B.C.D, or A.B.C.D wildcard.';
+const ACE_TIP_STD='Syntax: [seq] permit|deny {any | host A.B.C.D | A.B.C.D wildcard} [log]';
+function parseAce(T,std){let i=0,seq=null;
+  if(/^\d+$/.test(T[0])){seq=+T[0];i++}
+  const act=(T[i]||'').toLowerCase();if(act!=='permit'&&act!=='deny')return{err:INV,tip:std?ACE_TIP_STD:ACE_TIP_EXT};i++;
+  const a={seq,act,hits:0,log:false};let maskWarn=false;
+  if(std){const s=parseAddr(T,i,true);if(!s)return{err:INV,tip:ACE_TIP_STD};a.std=true;a.src=s.spec;i=s.i;maskWarn=s.mask}
+  else{const pr=(T[i]||'').toLowerCase();if(!PROTOS.includes(pr))return{err:INV,tip:'After permit or deny, name the protocol: ip, tcp, udp, or icmp. '+ACE_TIP_EXT};a.proto=pr;i++;
+    const s=parseAddr(T,i,false);if(!s)return{err:INV,tip:'Source address expected: any, host A.B.C.D, or A.B.C.D followed by a wildcard mask.'};a.src=s.spec;i=s.i;maskWarn=maskWarn||s.mask;
+    if(pr==='tcp'||pr==='udp'){const po=parsePortOp(T,i);if(po.bad)return{err:INV,tip:'Port expected after eq/gt/lt/range: a number or a name such as www, domain, telnet, bootps.'};a.sop=po.op;i=po.i}
+    const d=parseAddr(T,i,false);if(!d)return{err:INV,tip:'Destination address expected: any, host A.B.C.D, or A.B.C.D followed by a wildcard mask.'};a.dst=d.spec;i=d.i;maskWarn=maskWarn||d.mask;
+    if(pr==='tcp'||pr==='udp'){const po=parsePortOp(T,i);if(po.bad)return{err:INV,tip:'Port expected after eq/gt/lt/range: a number or a name such as www, domain, telnet, bootps.'};a.dop=po.op;i=po.i}
+    if(pr==='icmp'&&T[i]){const k=T[i].toLowerCase();if(k in ICMPT){a.icmp=ICMPT[k];i++}else if(/^\d+$/.test(k)&&+k<256){a.icmp=+k;i++}}}
+  while(i<T.length){const k=T[i].toLowerCase();
+    if(k==='established'){if(a.proto!=='tcp')return{err:INV,tip:'established only applies to tcp lines.'};a.est=true}
+    else if(k==='log'||k==='log-input')a.log=true;
+    else return{err:INV,tip:std?ACE_TIP_STD:ACE_TIP_EXT};i++}
+  return{ace:a,maskWarn}}
+function fmtSpec(s,std){if(s.wc==='255.255.255.255')return'any';if(s.wc==='0.0.0.0')return std?s.net:'host '+s.net;return std?s.net+', wildcard bits '+s.wc:s.net+' '+s.wc}
+const fmtSpecCfg=s=>s.wc==='255.255.255.255'?'any':s.wc==='0.0.0.0'?'host '+s.net:s.net+' '+s.wc;
+function fmtPort(o,proto){if(!o)return'';const m=PDISP[proto]||{},n=p=>m[p]||String(p);return' '+o.op+' '+(o.op==='range'?n(o.ports[0])+' '+n(o.ports[1]):o.ports.map(n).join(' '))}
+function aceText(a,cfg){if(a.remark!=null)return'remark '+a.remark;
+  if(a.std)return`${a.act} ${cfg?fmtSpecCfg(a.src).replace(/^host /,''):fmtSpec(a.src,true)}${a.log?' log':''}`;
+  return`${a.act} ${a.proto} ${fmtSpecCfg(a.src)}${fmtPort(a.sop,a.proto)} ${fmtSpecCfg(a.dst)}${fmtPort(a.dop,a.proto)}${a.icmp!=null?' '+(ICMPN[a.icmp]||a.icmp):''}${a.est?' established':''}${a.log?' log':''}`}
+const portOk=(o,p)=>{if(p==null)return false;switch(o.op){case'eq':return o.ports.includes(p);case'neq':return!o.ports.includes(p);case'gt':return p>o.ports[0];case'lt':return p<o.ports[0];case'range':return p>=o.ports[0]&&p<=o.ports[1]}return false};
+function aceMatch(a,p){
+  if(a.remark!=null)return false;
+  if(a.std)return inSpec(p.src,a.src);
+  if(a.proto!=='ip'&&a.proto!==p.proto)return false;
+  if(!inSpec(p.src,a.src)||!inSpec(p.dst,a.dst))return false;
+  if(a.sop&&!portOk(a.sop,p.sport))return false;
+  if(a.dop&&!portOk(a.dop,p.dport))return false;
+  if(a.icmp!=null&&(p.proto!=='icmp'||p.icmp!==a.icmp))return false;
+  if(a.est&&!(p.proto==='tcp'&&(p.ack||p.rst)))return false;
+  return true}
+
+/* ======================================================================
+   Router model
+   ====================================================================== */
+function mkIfs(){return{
+  g0:{name:'GigabitEthernet0/0',sh:'G0/0',ip:'192.168.10.1',mask:'255.255.255.0',desc:'INSIDE LAN',nat:'inside',in:null,out:null,zone:null},
+  g1:{name:'GigabitEthernet0/1',sh:'G0/1',ip:'192.168.20.1',mask:'255.255.255.0',desc:'DMZ',nat:'inside',in:null,out:null,zone:null},
+  g2:{name:'GigabitEthernet0/2',sh:'G0/2',ip:'203.0.113.2',mask:'255.255.255.248',desc:'OUTSIDE to ISP',nat:'outside',in:null,out:null,zone:null}}}
+const R={};
+function freshRouter(){return{mode:'user',ctx:null,ctx2:null,acls:{},ifs:mkIfs(),vty:{acl:null,transport:'ssh'},zones:{},cmaps:{},pmaps:{},zps:{},log:[],sessions:[],nat:[],buf:[],hist:[],hi:0}}
+const CFG_KEYS=['acls','ifs','vty','zones','cmaps','pmaps','zps','log','sessions','nat'];
+function aclSorted(acl){return acl.entries.slice().sort((x,y)=>x.seq-y.seq)}
+function aclEval(name,p,count){const acl=R.acls[name];if(!acl)return{act:'permit',missing:true};
+  for(const a of aclSorted(acl)){if(aceMatch(a,p)){if(count){a.hits++;if(a.log)logAcl(name,a,p)}return{act:a.act,ace:a}}}
+  return{act:'deny',implicit:true}}
+function aclAdd(name,a){const acl=R.acls[name];const es=acl.entries;
+  const maxSeq=es.reduce((m,e)=>Math.max(m,e.seq),0);
+  if(a.remark!=null){a.seq=a.seq||(maxSeq%10===0?maxSeq+5:maxSeq+1)}
+  else if(a.seq==null)a.seq=Math.floor(maxSeq/10)*10+10;
+  else if(es.some(e=>e.seq===a.seq&&e.remark==null))return'% Duplicate sequence number';
+  if(a.remark==null&&es.some(e=>e.remark==null&&aceText(e)===aceText(a)))return{o:'% Duplicate access-list entry',c:'err',tip:'That line already exists in '+name+'.'};
+  es.push(a)}
+const STAMP=()=>{const d=new Date();return'*'+d.toLocaleString('en-US',{month:'short'})+' '+d.getDate()+' '+d.toTimeString().slice(0,8)+'.'+String(d.getMilliseconds()).padStart(3,'0')+': '};
+function syslog(msg){const line=STAMP()+msg;R.log.push(line);if(R.log.length>200)R.log.shift();push(R,line,'dbg')}
+function logAcl(name,a,p){const verb=a.act==='permit'?'permitted':'denied';
+  if(p.proto==='tcp'||p.proto==='udp')syslog(`%SEC-6-IPACCESSLOGP: list ${name} ${verb} ${p.proto} ${p.src}(${p.sport}) -> ${p.dst}(${p.dport}), 1 packet`);
+  else if(p.proto==='icmp')syslog(`%SEC-6-IPACCESSLOGDP: list ${name} ${verb} icmp ${p.src} -> ${p.dst} (${p.icmp}/0), 1 packet`);
+  else syslog(`%SEC-6-IPACCESSLOGS: list ${name} ${verb} ${p.src} 1 packet`)}
+
+/* ======================================================================
+   IOS command line
+   ====================================================================== */
+const SUF={user:'>',priv:'#',config:'(config)#',stdacl:'(config-std-nacl)#',extacl:'(config-ext-nacl)#',iface:'(config-if)#',line:'(config-line)#',zone:'(config-sec-zone)#',cmap:'(config-cmap)#',pmap:'(config-pmap)#',pmapc:'(config-pmap-c)#',zp:'(config-sec-zone-pair)#'};
+const PARENT={stdacl:'config',extacl:'config',iface:'config',line:'config',zone:'config',cmap:'config',pmap:'config',pmapc:'pmap',zp:'config'};
+const SUBMODES=Object.keys(PARENT);
+function rxe(s){return s.replace(/[.*+?^${}()|[\]\\\/-]/g,'\\$&')}
+function ab(w,m){let o='';for(let i=w.length-1;i>=m;i--)o='(?:'+rxe(w[i])+o+')?';return rxe(w.slice(0,m))+o}
+function C(spec){return new RegExp('^'+spec.split(' ').map(t=>t.replace(/([a-z][a-z0-9-]*)\/(\d+)/gi,(m0,w,n)=>ab(w,+n))).join('\\s+')+'$','i')}
+const IFP='(?:'+ab('gigabitethernet',1)+')\\s*0\\/([012])';
+const IFRX=new RegExp('^'+IFP+'$','i');
+const NM='(\\S+)';
+const ZPROTO=['tcp','udp','icmp','http','https','dns','ssh','telnet','ftp','smtp'];
+const PIPE=/^(.*?)\s*\|\s*(include|incl|inc|in|i|exclude|excl|exc|ex|e|begin|beg|b|section|sect|sec|s)\s+(.+)$/i;
+function pipeFilter(out,kind,pat){const lines=String(out).split('\n'),k=kind[0].toLowerCase(),has=l=>l.toLowerCase().includes(pat.toLowerCase());
+  if(k==='i')return lines.filter(has).join('\n');if(k==='e')return lines.filter(l=>!has(l)).join('\n');
+  if(k==='b'){const i=lines.findIndex(has);return i<0?'':lines.slice(i).join('\n')}
+  const o=[];let take=false;lines.forEach(l=>{if(/^\S/.test(l))take=has(l);if(take)o.push(l)});return o.join('\n')}
+const BASELINE_RX=/^(ip\s+nat|ip\s+route|ip\s+dhcp|ip\s+ssh|ip\s+domain|username|enable\s+secret|service\s|crypto\s+key|banner|license|security\s+passwords|logging|no\s+ip\s+domain|ntp)\b/i;
+
+const H={};
+H.ping=[C(`ping/2 (\\S+)(?:\\s+${ab('source',2)}\\s+(\\S+))?`),(r,m)=>routerPing(m[1],m[2])];
+H.user=[[C('enable/2'),r=>{r.mode='priv'}],H.ping,[C('exit'),()=>'Console session stays open in this simulator. Type enable to continue.'],[C('show/2 version/2'),()=>showVersion()]];
+H.priv=[
+ [C('configure/4 terminal/1'),r=>{r.mode='config';return'Enter configuration commands, one per line.  End with CNTL/Z.'}],
+ [C('configure/4'),r=>{r.mode='config';return'Configuring from terminal, memory, or network [terminal]? \nEnter configuration commands, one per line.  End with CNTL/Z.'}],
+ [C('disable/4'),r=>{r.mode='user'}],[C('exit'),r=>{r.mode='user'}],
+ [C('show/2 running-config/3'),()=>runConf()],
+ [C('show/2 startup-config/3'),()=>runConf()],
+ [C('show/2 version/2'),()=>showVersion()],
+ [C(`show/2 (?:ip/2 )?access-lists/6(?:\\s+(\\S+))?`),(r,m)=>showAcl(m[1])],
+ [C('show/2 ip/2 interface/3 brief/2'),()=>ipBrief()],
+ [C(`show/2 ip/2 interface/3(?:\\s+${IFP})?`),(r,m)=>showIpInt(m[1])],
+ [C('show/2 zone/1 security/3'),()=>showZones()],
+ [C('show/2 zone-pair/6 security/3'),()=>showZps()],
+ [C('show/2 class-map/2 type/2 inspect/3'),()=>showCmaps()],
+ [C('show/2 policy-map/2 type/2 inspect/3 zone-pair/6(?:\\s+(\\S+))?(?:\\s+sessions/4)?'),(r,m)=>{const v=showSessions(m[1]&&!/^ses/i.test(m[1])?m[1]:null);if(R.sessions.length)FLAGS.sessions=true;return v}],
+ [C('show/2 policy-map/2 type/2 inspect/3'),()=>showPmaps()],
+ [C('show/2 ip/2 nat/2 translations/3'),()=>showNat()],
+ [C('show/2 logging/3'),()=>showLogging()],
+ H.ping,
+ [C(`clear/3 (?:ip/2 )?access-list/8 counters/3(?:\\s+(\\S+))?`),(r,m)=>{Object.entries(R.acls).forEach(([n,a])=>{if(!m[1]||m[1]===n)a.entries.forEach(e=>e.hits=0)})}],
+ [C('clear/3 logging/3'),()=>{R.log=[];return'Clear logging buffer [confirm]\n[OK]'}],
+ [C('clear/3 zone-pair/6 inspect/3 sessions/4'),()=>{R.sessions=[]}],
+ [C('clear/3 ip/2 nat/2 translation/3 \\*'),()=>{R.nat=[]}],
+ [C('copy/3 running-config/3 startup-config/3'),()=>'Destination filename [startup-config]? \nBuilding configuration...\n[OK]'],
+ [/^wr(?:i(?:t(?:e)?)?)?(?:\s+mem(?:o(?:r(?:y)?)?)?)?$/i,()=>'Building configuration...\n[OK]'],
+ [/^(?:debug|undebug|u|un)\b.*$/i,()=>({tip:'Debugging is not needed in this lab. Use show logging and the packet trace instead.'})],
+ [/^reload$/i,()=>({tip:'Reload is disabled. The security license is already active.'})],
+];
+H.config=[
+ [C(`ip/2 access-list/8 (standard/1|extended/1) ${NM}`),(r,m)=>{const ty=/^s/i.test(m[1])?'standard':'extended',n=m[2];
+   if(R.acls[n]&&R.acls[n].type!==ty)return{o:`% A named ${R.acls[n].type} IP access list with this name already exists`,c:'err'};
+   if(/^\d+$/.test(n))return{o:INV,c:'err',tip:'Use a name such as INSIDE-IN, or the global access-list <number> command for numbered ACLs.'};
+   R.acls[n]=R.acls[n]||{type:ty,entries:[]};r.mode=ty==='standard'?'stdacl':'extacl';r.ctx=n}],
+ [/^access-list\s+(\d+)\s+(.+)$/i,(r,m)=>{const n=+m[1];const std=(n>=1&&n<=99)||(n>=1300&&n<=1999),ext=(n>=100&&n<=199)||(n>=2000&&n<=2699);if(!std&&!ext)return INV;
+   const T=m[2].trim().split(/\s+/);if(/^remark$/i.test(T[0])){R.acls[m[1]]=R.acls[m[1]]||{type:std?'standard':'extended',entries:[]};aclAdd(m[1],{remark:T.slice(1).join(' ')});return''}
+   const p=parseAce(T,std);if(p.err)return{o:p.err,c:'err',tip:p.tip};if(p.ace.seq!=null)return INV;
+   R.acls[m[1]]=R.acls[m[1]]||{type:std?'standard':'extended',entries:[]};const v=aclAdd(m[1],p.ace);if(v)return v;if(p.maskWarn)return{tip:MASKTIP}}],
+ [C(`no ip/2 access-list/8 (standard/1|extended/1) ${NM}`),(r,m)=>{if(!R.acls[m[2]])return'';delete R.acls[m[2]];const u=aclUsedBy(m[2]);if(u)return{tip:`${m[2]} is still applied to ${u}. An applied ACL that doesn't exist permits everything.`}}],
+ [/^no\s+access-list\s+(\d+)$/i,(r,m)=>{delete R.acls[m[1]]}],
+ [C(`interface/3 ${IFP}`),(r,m)=>{r.mode='iface';r.ctx='g'+m[1]}],
+ [C(`interface/3 (\\S+)`),()=>({o:INV,c:'err',tip:'This router has GigabitEthernet0/0, 0/1, and 0/2. Example: interface g0/2'})],
+ [C('line/2 vty/1 0 (?:4|15)'),r=>{r.mode='line';r.ctx='vty'}],
+ [C('line/2 console/3 0'),r=>{r.mode='line';r.ctx='con'}],
+ [C(`zone/1 security/3 ${NM}`),(r,m)=>{if(/^self$/i.test(m[1]))return{o:'% self is a system-defined zone and cannot be configured',c:'err'};R.zones[m[1]]=R.zones[m[1]]||{};r.mode='zone';r.ctx=m[1]}],
+ [C(`no zone/1 security/3 ${NM}`),(r,m)=>{const z=m[1];if(!R.zones[z])return'';const mem=Object.values(R.ifs).filter(i=>i.zone===z);if(mem.length)return{o:`% Zone ${z} has member interfaces (${mem.map(i=>i.sh).join(', ')}). Remove them first.`,c:'err'};
+   if(Object.values(R.zps).some(p=>p.src===z||p.dst===z))return{o:`% Zone ${z} is used by a zone-pair. Remove the zone-pair first.`,c:'err'};delete R.zones[z]}],
+ [C(`class-map/3 type/2 inspect/3(?:\\s+(match-any|match-all))? ${NM}`),(r,m)=>{const n=m[2];R.cmaps[n]=R.cmaps[n]||{type:'all',m:[]};if(m[1])R.cmaps[n].type=/any/i.test(m[1])?'any':'all';r.mode='cmap';r.ctx=n}],
+ [C(`class-map/3(?:\\s+(?:match-any|match-all))? ${NM}`),()=>({o:INV,c:'err',tip:'Firewall class-maps need type inspect: class-map type inspect match-any <NAME>'})],
+ [C(`no class-map/3 type/2 inspect/3 ${NM}`),(r,m)=>{if(Object.values(R.pmaps).some(p=>p.classes.some(c=>c.name===m[1])))return{o:`% Class-map ${m[1]} is being used by a policy-map`,c:'err'};delete R.cmaps[m[1]]}],
+ [C(`policy-map/3 type/2 inspect/3 ${NM}`),(r,m)=>{R.pmaps[m[1]]=R.pmaps[m[1]]||{classes:[]};r.mode='pmap';r.ctx=m[1]}],
+ [C(`policy-map/3 ${NM}`),()=>({o:INV,c:'err',tip:'Firewall policy-maps need type inspect: policy-map type inspect <NAME>'})],
+ [C(`no policy-map/3 type/2 inspect/3 ${NM}`),(r,m)=>{if(Object.values(R.zps).some(z=>z.policy===m[1]))return{o:`% Policy-map ${m[1]} is used by a zone-pair`,c:'err'};delete R.pmaps[m[1]]}],
+ [C(`zone-pair/6 security/3 ${NM} source/3 ${NM} destination/3 ${NM}`),(r,m)=>{const [n,s,d]=[m[1],zname(m[2]),zname(m[3])];
+   for(const z of [s,d])if(z!=='self'&&!R.zones[z])return{o:`% Zone ${z} doesn't exist`,c:'err',tip:'Create it first with zone security '+z};
+   if(s===d)return{o:'% Source and destination zones must be different',c:'err'};
+   const dup=Object.entries(R.zps).find(([k,v])=>k!==n&&v.src===s&&v.dst===d);if(dup)return{o:`% Zone-pair ${dup[0]} already exists for ${s} to ${d}`,c:'err'};
+   R.zps[n]=R.zps[n]||{src:s,dst:d,policy:null};R.zps[n].src=s;R.zps[n].dst=d;r.mode='zp';r.ctx=n}],
+ [C(`no zone-pair/6 security/3 ${NM}(?:\\s+.*)?`),(r,m)=>{delete R.zps[m[1]]}],
+ [C('hostname/4 (\\S+)'),()=>({tip:'Keep the hostname R1-SOHO for this lab.'})],
+ [BASELINE_RX,()=>({tip:'Already configured in the baseline. No change needed for this lab.'})],
+ [C('end'),r=>{r.mode='priv'}],[C('exit'),r=>{r.mode='priv'}],
+];
+const MASKTIP='That looks like a subnet mask. ACLs use wildcard masks: 0.0.0.255 for a /24, 0.0.0.0 (or host) for one address. Remove the line with no <seq> and re-enter it.';
+const zname=z=>/^self$/i.test(z)?'self':z;
+function aclUsedBy(n){const u=[];Object.values(R.ifs).forEach(i=>{if(i.in===n)u.push(i.sh+' in');if(i.out===n)u.push(i.sh+' out')});if(R.vty.acl===n)u.push('line vty');
+  Object.entries(R.cmaps).forEach(([k,c])=>{if(c.m.some(x=>x.k==='acl'&&x.v===n))u.push('class-map '+k)});return u.join(', ')}
+const subExit=[[C('exit'),r=>{r.mode=PARENT[r.mode]||'config';if(r.mode!=='pmap')r.ctx2=null}],[C('end'),r=>{r.mode='priv'}]];
+function aclLineHandler(std){return[
+ [/^remark(?:\s+(.*))?$/i,(r,m)=>{aclAdd(r.ctx,{remark:m[1]||''})}],
+ [/^no\s+(\d+)$/i,(r,m)=>{const a=R.acls[r.ctx];const i=a.entries.findIndex(e=>e.seq===+m[1]&&e.remark==null);if(i<0)return{tip:'No line '+m[1]+' in '+r.ctx+'. Check show access-lists '+r.ctx};a.entries.splice(i,1)}],
+ [/^no\s+remark(?:\s+(.*))?$/i,(r,m)=>{const a=R.acls[r.ctx];const i=a.entries.findIndex(e=>e.remark!=null&&(!m[1]||e.remark===m[1]));if(i>=0)a.entries.splice(i,1)}],
+ [/^no\s+((?:permit|deny)\s+.+)$/i,(r,m)=>{const p=parseAce(m[1].split(/\s+/),std);if(p.err)return{o:p.err,c:'err',tip:p.tip};const a=R.acls[r.ctx];const i=a.entries.findIndex(e=>e.remark==null&&aceText(e)===aceText(p.ace));if(i<0)return{tip:'No matching line. Remove by sequence number instead: no <seq>'};a.entries.splice(i,1)}],
+ [/^(?:\d+\s+)?(?:permit|deny)\b.*$/i,(r,m,t)=>{const p=parseAce(t.split(/\s+/),std);if(p.err)return{o:p.err,c:'err',tip:p.tip};const v=aclAdd(r.ctx,p.ace);if(v)return v;if(p.maskWarn)return{tip:MASKTIP}}],
+ ...subExit]}
+H.stdacl=aclLineHandler(true);H.extacl=aclLineHandler(false);
+H.iface=[
+ [C(`ip/2 access-group/8 ${NM} (in|out)`),(r,m)=>{const f=R.ifs[r.ctx];f[m[2].toLowerCase()]=m[1];if(!R.acls[m[1]])return{tip:`ACL ${m[1]} doesn't exist yet. Until you create it, it permits everything.`};
+   if(R.acls[m[1]].type==='standard'&&r.ctx!=='g0')return{tip:'That is a standard ACL. It matches source addresses only.'}}],
+ [C(`no ip/2 access-group/8(?:\\s+(\\S+))? (in|out)`),(r,m)=>{R.ifs[r.ctx][m[2].toLowerCase()]=null}],
+ [C(`zone-member/6 security/3 ${NM}`),(r,m)=>{if(!R.zones[m[1]])return{o:`% Zone ${m[1]} doesn't exist`,c:'err',tip:'Create the zone first: zone security '+m[1]};R.ifs[r.ctx].zone=m[1];
+   const unz=Object.values(R.ifs).filter(i=>!i.zone);if(unz.length)return{tip:`${unz.map(i=>i.sh).join(' and ')} ${unz.length>1?'are':'is'} not in a zone yet. Traffic between zoned and unzoned interfaces is dropped until every interface has a zone.`}}],
+ [C('no zone-member/6 security/3(?:\\s+\\S+)?'),r=>{R.ifs[r.ctx].zone=null}],
+ [C('ip/2 nat/2 (?:inside|outside)'),()=>''],[C('description/4 .+'),()=>''],[C('no shutdown/4'),()=>''],[C('duplex/2 .+'),()=>''],[C('speed/2 .+'),()=>''],
+ [C('shutdown/4'),()=>({tip:'Interfaces stay up in this lab, so shutdown is disabled.'})],
+ [C(`ip/2 address/3 .+`),()=>({tip:'Addressing is preconfigured. Leave it as is.'})],
+ [C('ip/2 inspect/2 .+'),()=>({tip:'This lab uses the zone-based firewall instead of the older CBAC ip inspect. Use zone-member security.'})],
+ ...subExit];
+H.line=[
+ [C(`access-class/8 ${NM} (in|out)`),(r,m)=>{if(r.ctx!=='vty')return{tip:'Restrict management on the VTY lines: line vty 0 4'};if(/out/i.test(m[2]))return{tip:'Use in to filter who may connect to the router.'};R.vty.acl=m[1];if(!R.acls[m[1]])return{tip:`ACL ${m[1]} doesn't exist yet.`}}],
+ [C('no access-class/8(?:\\s+\\S+)?(?:\\s+in)?'),r=>{if(r.ctx==='vty')R.vty.acl=null}],
+ [C('transport/3 input/1 (ssh|telnet|all|none)(?:\\s+(ssh|telnet))?'),(r,m)=>{if(r.ctx!=='vty')return'';const v=[m[1],m[2]].filter(Boolean).map(x=>x.toLowerCase());R.vty.transport=v.includes('all')?'all':v.join(' ');if(v.includes('telnet')||v.includes('all'))return{tip:'Telnet sends passwords in clear text. Keep transport input ssh.'}}],
+ [C('login/3(?:\\s+local/1)?'),()=>''],[C('exec-timeout/4 .+'),()=>''],[C('password/4 .+'),()=>''],[C('logging/3 synchronous/3'),()=>''],
+ ...subExit];
+H.zone=[[C('description/4 .+'),()=>''],...subExit];
+H.cmap=[
+ [C(`match/3 protocol/3 ${NM}`),(r,m)=>{const p=m[1].toLowerCase();if(!ZPROTO.includes(p))return{o:INV,c:'err',tip:'Protocols available in this lab: '+ZPROTO.join(', ')};const c=R.cmaps[r.ctx];if(!c.m.some(x=>x.k==='protocol'&&x.v===p))c.m.push({k:'protocol',v:p})}],
+ [C(`match/3 access-group/8 (?:name/2 )?${NM}`),(r,m)=>{const c=R.cmaps[r.ctx];if(!c.m.some(x=>x.k==='acl'&&x.v===m[1]))c.m.push({k:'acl',v:m[1]});if(!R.acls[m[1]])return{tip:`ACL ${m[1]} doesn't exist yet. Until it does, this match never succeeds.`}}],
+ [C(`no match/3 protocol/3 ${NM}`),(r,m)=>{const c=R.cmaps[r.ctx];c.m=c.m.filter(x=>!(x.k==='protocol'&&x.v===m[1].toLowerCase()))}],
+ [C(`no match/3 access-group/8 (?:name/2 )?${NM}`),(r,m)=>{const c=R.cmaps[r.ctx];c.m=c.m.filter(x=>!(x.k==='acl'&&x.v===m[1]))}],
+ [C('description/4 .+'),()=>''],...subExit];
+function pmClass(r,name){const p=R.pmaps[r.ctx];let c=p.classes.find(x=>x.name===name);if(!c){c={name,action:null,log:false};if(name==='class-default')p.classes.push(c);else{const i=p.classes.findIndex(x=>x.name==='class-default');i<0?p.classes.push(c):p.classes.splice(i,0,c)}}r.mode='pmapc';r.ctx2=name}
+H.pmap=[
+ [C(`class/2 type/2 inspect/3 ${NM}`),(r,m)=>{if(!R.cmaps[m[1]])return{o:`% Class-map ${m[1]} not configured`,c:'err',tip:'Create it first: class-map type inspect match-any '+m[1]};pmClass(r,m[1])}],
+ [C('class/2 class-default/7'),r=>pmClass(r,'class-default')],
+ [C(`class/2 ${NM}`),()=>({o:INV,c:'err',tip:'Use class type inspect <class-map name>, or class class-default.'})],
+ [C(`no class/2 (?:type/2 inspect/3 )?${NM}`),(r,m)=>{const p=R.pmaps[r.ctx];p.classes=p.classes.filter(x=>x.name!==m[1])}],
+ [C('description/4 .+'),()=>''],...subExit];
+const pmc=r=>R.pmaps[r.ctx].classes.find(x=>x.name===r.ctx2);
+H.pmapc=[
+ [C('inspect/3(?:\\s+\\S+)?'),r=>{const c=pmc(r);c.action='inspect';c.log=false}],
+ [C('pass/2(?:\\s+log/3)?'),(r,m,t)=>{const c=pmc(r);c.action='pass';c.log=/log/i.test(t)}],
+ [C('drop/2(?:\\s+log/3)?'),(r,m,t)=>{const c=pmc(r);c.action='drop';c.log=/log/i.test(t)}],
+ [C('no (?:inspect/3|pass/2|drop/2)(?:\\s+\\S+)?'),r=>{const c=pmc(r);c.action=null;c.log=false}],
+ ...subExit];
+H.zp=[
+ [C(`service-policy/7 type/2 inspect/3 ${NM}`),(r,m)=>{if(!R.pmaps[m[1]])return{o:`% Policy-map ${m[1]} not configured`,c:'err',tip:'Create it first: policy-map type inspect '+m[1]};R.zps[r.ctx].policy=m[1]}],
+ [C(`no service-policy/7(?:\\s+.*)?`),r=>{R.zps[r.ctx].policy=null}],
+ [C('description/4 .+'),()=>''],...subExit];
+
+function tryMode(r,mode,t){for(const [re,fn] of H[mode]){const m=t.match(re);if(m){const v=fn(r,m,t);return v===undefined?'':v}}return undefined}
+const matchesAny=(mode,t)=>H[mode].some(([re])=>re.test(t));
+function execR(line){const r=R;
+  let t=line.trim().replace(/\s+/g,' ');if(!t)return'';
+  if(/\?$/.test(t))return helpR(r);
+  let pm=null;if(['user','priv'].includes(r.mode)||/^do /i.test(t)){const x=t.replace(/^do /i,'').match(PIPE);if(x){pm=x;t=(/^do /i.test(t)?'do ':'')+x[1]}}
+  const filt=v=>pm&&typeof v==='string'?pipeFilter(v,pm[2],pm[3]):v;
+  let m;
+  if(r.mode!=='user'&&r.mode!=='priv'&&(m=t.match(/^do (.+)$/i))){const v=tryMode(r,'priv',m[1]);return v===undefined?INV:filt(v)}
+  let res=tryMode(r,r.mode,t);if(res!==undefined)return filt(res);
+  /* fall back to parent modes, like IOS */
+  let md=r.mode;const save={mode:r.mode,ctx:r.ctx,ctx2:r.ctx2};
+  while(PARENT[md]){md=PARENT[md];const before=r.mode;r.mode=md;if(md!=='pmap')r.ctx2=null;if(md==='config'){r.ctx=null}
+    res=tryMode(r,md,t);if(res!==undefined){if(r.mode===md&&md==='pmap'&&save.mode==='pmapc')r.ctx=save.ctx;return res}
+    r.mode=before}
+  Object.assign(r,save);
+  if(r.mode==='user'&&(matchesAny('priv',t)||matchesAny('config',t)))return{o:INV,c:'err',tip:'You are in user EXEC mode (>). Type enable first.'};
+  if(r.mode==='priv'&&matchesAny('config',t))return{o:INV,c:'err',tip:'That is a configuration command. Type configure terminal first.'};
+  if(r.mode==='priv'&&SUBMODES.some(s=>matchesAny(s,t)))return{o:INV,c:'err',tip:'That command belongs inside a sub-mode. Enter configure terminal, then the parent command (for example ip access-list extended OUTSIDE-IN or interface g0/2).'};
+  if(SUBMODES.includes(r.mode)&&matchesAny('priv',t))return{o:INV,c:'err',tip:'That is an EXEC command. Prefix it with do (for example do show access-lists) or type end first.'};
+  if(r.mode==='config'&&SUBMODES.some(s=>matchesAny(s,t)))return{o:INV,c:'err',tip:'That command belongs inside a sub-mode. Enter the parent command first, for example ip access-list extended INSIDE-IN, interface g0/0, or line vty 0 4.'};
+  if(r.mode==='config'&&/^(permit|deny)\b/i.test(t))return{o:INV,c:'err',tip:'Enter the ACL first: ip access-list extended <NAME>, then type the permit or deny line.'};
+  return{o:/^(ip|show|sh|zone|zone-pair|class-map|policy-map|access-list|interface|int)$/i.test(t)?'% Incomplete command.':INV,c:'err',tip:nearTip(t)}}
+function nearTip(t){const s=t.toLowerCase();
+  if(s.includes('access-list'))return'Syntax: ip access-list extended <NAME> (or standard), then [seq] permit|deny lines.';
+  if(s.includes('access-group'))return'Syntax (inside interface mode): ip access-group <NAME> in|out';
+  if(s.startsWith('zone-pair'))return'Syntax: zone-pair security <NAME> source <ZONE> destination <ZONE>';
+  if(s.startsWith('zone'))return'Syntax: zone security <NAME>, or zone-member security <NAME> inside an interface.';
+  if(s.startsWith('class'))return'Syntax: class-map type inspect match-any <NAME>, then match protocol tcp or match access-group name <ACL>.';
+  if(s.startsWith('policy'))return'Syntax: policy-map type inspect <NAME>, then class type inspect <CLASS>, then inspect, pass, or drop.';
+  if(s.startsWith('ping'))return'Syntax: ping <ip> [source <interface>]';
+  if(s.startsWith('sh'))return'Type show ? to list the show commands in this lab.';
+  return'Type ? to list the commands available in this mode.'}
+function helpR(r){const H2={
+ user:'  enable                 Turn on privileged commands\n  ping <ip>              Send echo messages\n  show version',
+ priv:'  configure terminal     Enter configuration mode\n  show running-config    [| section <word> | include <word>]\n  show access-lists [NAME]\n  show ip interface [brief | g0/x]\n  show zone security\n  show zone-pair security\n  show class-map type inspect\n  show policy-map type inspect\n  show policy-map type inspect zone-pair sessions\n  show ip nat translations\n  show logging\n  clear access-list counters\n  clear logging\n  ping <ip> [source <intf>]\n  copy running-config startup-config',
+ config:'  ip access-list standard|extended <NAME>\n  access-list <number> permit|deny ...\n  interface g0/0 | g0/1 | g0/2\n  line vty 0 4\n  zone security <NAME>\n  class-map type inspect match-any|match-all <NAME>\n  policy-map type inspect <NAME>\n  zone-pair security <NAME> source <Z> destination <Z>\n  no <command>           Remove a setting\n  do <exec command>      For example do show access-lists\n  end',
+ stdacl:'  [seq] permit|deny {any | host A.B.C.D | A.B.C.D wildcard} [log]\n  remark <text>\n  no <seq>               Delete a line\n  exit',
+ extacl:'  [seq] permit|deny <ip|tcp|udp|icmp> <src> [eq|range <port>] <dst> [eq|range <port>]\n        [echo | echo-reply | unreachable | time-exceeded] [established] [log]\n  remark <text>\n  no <seq>               Delete a line\n  exit',
+ iface:'  ip access-group <NAME> in|out\n  no ip access-group <NAME> in|out\n  zone-member security <ZONE>\n  no zone-member security\n  exit',
+ line:'  access-class <NAME> in\n  transport input ssh\n  login local\n  exit',
+ zone:'  description <text>\n  exit',
+ cmap:'  match protocol tcp | udp | icmp | http | https | dns | ssh\n  match access-group name <ACL>\n  no match ...\n  exit',
+ pmap:'  class type inspect <CLASS-MAP>\n  class class-default\n  exit',
+ pmapc:'  inspect                Track sessions; replies allowed automatically\n  pass                   Allow this direction only, no session\n  drop [log]             Discard (and log)\n  exit',
+ zp:'  service-policy type inspect <POLICY-MAP>\n  exit'};return{o:H2[r.mode],c:'sys'}}
+
+/* ======================================================================
+   Network: hosts, services, and the path through R1-SOHO
+   ====================================================================== */
+const HOSTS={
+ pcadmin:{id:'pcadmin',name:'PC-Admin',ip:'192.168.10.10',seg:'in',os:'win'},
+ pcstaff:{id:'pcstaff',name:'PC-Staff',ip:'192.168.10.25',seg:'in',os:'win'},
+ web:{id:'web',name:'WEB-DMZ',ip:'192.168.20.10',seg:'dmz',os:'linux',user:'admin',host:'web-dmz'},
+ attacker:{id:'attacker',name:'ATTACKER',ip:'198.51.100.66',seg:'out',os:'linux',user:'kali',host:'attacker'}};
+const NODES={
+ '192.168.10.10':{name:'PC-Admin',seg:'in',tcp:[],udp:[],anim:'pcadmin'},
+ '192.168.10.25':{name:'PC-Staff',seg:'in',tcp:[],udp:[],anim:'pcstaff'},
+ '192.168.20.10':{name:'WEB-DMZ',seg:'dmz',tcp:[22,80,443],udp:[],anim:'web'},
+ '203.0.113.1':{name:'ISP router',seg:'out',tcp:[23],udp:[],anim:'isp'},
+ '198.51.100.1':{name:'ISP router',seg:'out',tcp:[23],udp:[],anim:'isp'},
+ '198.51.100.10':{name:'NET-SERVER',seg:'out',tcp:[80,443],udp:[53],anim:'net'},
+ '198.51.100.66':{name:'ATTACKER',seg:'out',tcp:[],udp:[],anim:'attacker'}};
+const SELF={'192.168.10.1':'g0','192.168.20.1':'g1','203.0.113.2':'g2'};
+const SEGIF={in:'g0',dmz:'g1',out:'g2'},SEGNAME={in:'inside LAN',dmz:'DMZ',out:'internet'};
+const DNS={'www.netserver.test':'198.51.100.10','netserver.test':'198.51.100.10','ns.netserver.test':'198.51.100.10','www.riverside.test':'203.0.113.3','riverside.test':'203.0.113.3'};
+const DNS_SERVER='198.51.100.10';
+const isPriv=ip=>/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
+const eph=()=>49152+Math.floor(Math.random()*16000);
+const SVCNAME={22:'ssh',23:'telnet',53:'domain',80:'http',443:'https',445:'microsoft-ds',3389:'ms-wbt-server',21:'ftp',25:'smtp',139:'netbios-ssn',135:'msrpc'};
+const zoneOf=f=>R.ifs[f].zone;
+const zpfOn=()=>Object.values(R.ifs).some(i=>i.zone);
+const findZp=(s,d)=>Object.entries(R.zps).find(([n,z])=>z.src===s&&z.dst===d);
+function protoMatch(v,p){const t=p.proto==='tcp',tu=t||p.proto==='udp';switch(v){case'tcp':case'udp':case'icmp':return p.proto===v;case'http':return t&&p.dport===80;case'https':return t&&p.dport===443;case'dns':return tu&&p.dport===53;case'ssh':return t&&p.dport===22;case'telnet':return t&&p.dport===23;case'ftp':return t&&p.dport===21;case'smtp':return t&&p.dport===25}return false}
+function cmapMatch(cm,p){if(!cm||!cm.m.length)return false;const f=x=>x.k==='protocol'?protoMatch(x.v,p):(R.acls[x.v]?aclEval(x.v,p,false).act==='permit':false);return cm.type==='any'?cm.m.some(f):cm.m.every(f)}
+function classify(pmName,p){const pm=R.pmaps[pmName];if(!pm)return{action:'drop',cls:'(missing policy-map)',log:false};
+  for(const c of pm.classes){if(c.name==='class-default')continue;if(cmapMatch(R.cmaps[c.name],p))return{action:c.action||'drop',cls:c.name,log:c.log,noAction:!c.action}}
+  const d=pm.classes.find(c=>c.name==='class-default');return{action:(d&&d.action)||'drop',cls:'class-default',log:d?d.log:false}}
+function zpDecide(zs,zd,p){if(zs===zd)return{ok:true,same:true};const f=findZp(zs,zd);if(!f)return{ok:false,nozp:true};
+  const [name,zp]=f;if(!zp.policy||!R.pmaps[zp.policy])return{ok:false,zp:name,nopolicy:true};
+  const c=classify(zp.policy,p);return{ok:c.action!=='drop',action:c.action,zp:name,cls:c.cls,log:c.log,policy:zp.policy,noAction:c.noAction}}
+function pktDesc(p){return p.proto==='icmp'?`ICMP ${ICMPN[p.icmp]||p.icmp} ${p.src} \u2192 ${p.dst}`:`${p.proto.toUpperCase()} ${p.src}:${p.sport} \u2192 ${p.dst}:${p.dport}${p.proto==='tcp'?(p.syn?' [SYN]':p.rst?' [RST]':' [ACK]'):''}`}
+function ruleTxt(r,name){return r.ace?`${name} line ${r.ace.seq}: ${aceText(r.ace)}`:r.implicit?`${name}: implicit deny (no line matched)`:''}
+function fwDropLog(d,p,f){if(!d.log)return;syslog(`%FW-6-DROP_PKT: Dropping ${p.proto} pkt from ${R.ifs[f].name} ${p.src}:${p.sport||0} => ${p.dst}:${p.dport||0}(target:class)-(${d.zp}:${d.cls}) due to Policy drop:classify result with ip ident 0`)}
+function addSession(d,p,natSrc){R.sessions.unshift({zp:d.zp,cls:d.cls,proto:p.proto,s:p.src,sp:p.sport||0,d:p.dst,dp:p.dport||0,t:Date.now()});R.sessions=R.sessions.slice(0,12);R.drops=R.drops||{}}
+function addNat(p,natSrc,realDst){if(natSrc==='203.0.113.3')return;R.nat.unshift({proto:p.proto,ig:natSrc+':'+(p.sport||1),il:p.src+':'+(p.sport||1),o:realDst+':'+(p.dport||1)});R.nat=R.nat.slice(0,10)}
+function service(node,p){if(p.proto==='icmp')return p.icmp===8?'reply':'none';
+  if(p.proto==='tcp'){if(!p.syn)return'rst';return node.tcp.includes(p.dport)?'open':'closed'}
+  return node.udp.includes(p.dport)?'reply':'none'}
+const SVCTXT={reply:'answers',open:'accepts the connection (port open)',closed:'answers with a TCP reset (port closed)',rst:'answers the stray ACK with a TCP reset'};
+function reply(p,src,dst,svc){return{proto:p.proto,src,dst,sport:p.dport,dport:p.sport,icmp:p.proto==='icmp'?0:undefined,syn:false,ack:p.proto==='tcp'&&svc!=='rst',rst:p.proto==='tcp'&&(svc==='closed'||svc==='rst')}}
+
+/* the main traversal: returns {ok, status, steps, path, block} */
+function traverse(srcId,p){
+  const st=[],S=(k,t,rule)=>st.push({k,t,rule});
+  const h=HOSTS[srcId],srcSeg=h.seg,inIf=SEGIF[srcSeg],IF=R.ifs[inIf];
+  const res={steps:st,ok:false,status:'timeout',path:[srcId],block:null,pkt:pktDesc(p)};
+  const dst=p.dst,selfIf=SELF[dst],pub=dst==='203.0.113.3';
+  /* destinations that never reach the router */
+  if(!selfIf&&!pub){const n=NODES[dst];
+    if(srcSeg==='out'&&isPriv(dst)){S('bad','The ISP does not route private (RFC 1918) addresses across the internet, so the packet is dropped before it reaches R1-SOHO.');res.path=['attacker','isp'];res.block='end';return res}
+    if(!n){S('bad',`No device answers at ${dst} in this lab.`);res.path=chain(srcId).concat(isPriv(dst)?[]:['isp']);res.block='end';return res}
+    if(n.seg===srcSeg){S('info',`${n.name} is on the same network as ${h.name}, so R1-SOHO is not involved.`);const sv=service(n,p);res.path=sameSeg(srcId,n.anim);
+      if(sv==='none'){S('bad',`${n.name} doesn't answer this traffic.`);res.block='end';return res}S('ok',`${n.name} ${SVCTXT[sv]}.`);res.ok=true;res.status=sv;return res}}
+  if(pub&&srcSeg!=='out'){S('bad','R1-SOHO does not loop traffic from inside back to its own public address (no NAT hairpinning). Inside hosts reach the web server at 192.168.20.10.');res.path=chain(srcId);res.block='r1';return res}
+  /* 1. inbound ACL */
+  if(IF.in){const r=aclEval(IF.in,p,true);
+    if(r.missing)S('ok',`${IF.sh} inbound: ACL ${IF.in} is applied but doesn't exist, so everything is permitted.`);
+    else if(r.act==='deny'){S('bad',`${IF.sh} inbound ACL ${IF.in} denied the packet.`,ruleTxt(r,IF.in));res.path=chain(srcId);res.block='r1';res.stop=`${IF.in} (${IF.sh} in)`;return res}
+    else S('ok',`${IF.sh} inbound ACL ${IF.in} permitted the packet.`,ruleTxt(r,IF.in))}
+  else S('info',`${IF.sh} inbound: no ACL applied.`);
+  /* 2a. to the router itself */
+  if(selfIf)return toSelf(srcId,p,res,S,inIf);
+  /* 2b. destination NAT */
+  let realDst=dst;if(pub){realDst='192.168.20.10';S('info','Static NAT: destination 203.0.113.3 becomes 192.168.20.10.')}
+  const node=NODES[realDst],outIf=SEGIF[node.seg],OF=R.ifs[outIf],pr={...p,dst:realDst};
+  /* 3. zone-based firewall */
+  const zi=zoneOf(inIf),zo=zoneOf(outIf);let insp=null;
+  if(zi||zo){
+    if(!zi||!zo){const un=zi?OF:IF,zd=zi?IF:OF;S('bad',`Firewall: ${zd.sh} is in zone ${zd.zone}, but ${un.sh} is in no zone. Traffic between a zoned and an unzoned interface is dropped.`);res.path=chain(srcId);res.block='r1';res.stop=`${un.sh} not in a zone`;return res}
+    if(zi===zo)S('ok',`Firewall: both interfaces are in zone ${zi}; traffic within a zone is allowed.`);
+    else{const d=zpDecide(zi,zo,pr);
+      if(d.nozp){S('bad',`Firewall: no zone-pair from ${zi} to ${zo}, so the traffic is denied by default.`);res.path=chain(srcId);res.block='r1';res.stop=`No ${zi}\u2192${zo} zone-pair`;return res}
+      if(d.nopolicy){S('bad',`Firewall: zone-pair ${d.zp} has no working service-policy, so it drops everything.`);res.path=chain(srcId);res.block='r1';res.stop=`${d.zp}: no policy`;return res}
+      if(d.action==='drop'){S('bad',`Firewall zone-pair ${d.zp} (${zi}\u2192${zo}): matched ${d.cls}, action drop${d.noAction?' (no action was set for this class)':''}.`,`policy-map ${d.policy}, class ${d.cls}`);fwDropLog(d,pr,inIf);R.drops=R.drops||{};R.drops[d.zp]=(R.drops[d.zp]||0)+1;res.path=chain(srcId);res.block='r1';res.stop=`${d.zp} ${d.cls} drop`;return res}
+      if(d.action==='inspect'&&pr.proto==='tcp'&&!pr.syn){S('bad',`Firewall zone-pair ${d.zp}: ${d.cls} says inspect, but this TCP segment is not a SYN and belongs to no session, so it is dropped.`,`policy-map ${d.policy}, class ${d.cls}`);res.path=chain(srcId);res.block='r1';res.stop=`${d.zp}: no session`;return res}
+      if(d.action==='inspect'){insp=d;S('ok',`Firewall zone-pair ${d.zp} (${zi}\u2192${zo}): matched ${d.cls}, action inspect. The session is recorded.`,`policy-map ${d.policy}, class ${d.cls}`)}
+      else S('ok',`Firewall zone-pair ${d.zp} (${zi}\u2192${zo}): matched ${d.cls}, action pass. One direction only; no session is recorded.`,`policy-map ${d.policy}, class ${d.cls}`)}}
+  else S('info','Firewall: no interfaces are in zones, so the zone-based firewall is not active.');
+  /* 4. source NAT + outbound ACL */
+  let natSrc=p.src;if(outIf==='g2'){natSrc=p.src==='192.168.20.10'?'203.0.113.3':'203.0.113.2';S('info',`${natSrc==='203.0.113.3'?'Static NAT':'PAT'}: source ${p.src} becomes ${natSrc}.`);addNat(p,natSrc,realDst)}
+  if(insp)addSession(insp,pr);
+  const po={...pr,src:natSrc};
+  if(OF.out){const r=aclEval(OF.out,po,true);if(r.act==='deny'&&!r.missing){S('bad',`${OF.sh} outbound ACL ${OF.out} denied the packet.`,ruleTxt(r,OF.out));res.path=chain(srcId);res.block='r1';res.stop=`${OF.out} (${OF.sh} out)`;return res}S('ok',`${OF.sh} outbound ACL ${OF.out} permitted the packet.`,ruleTxt(r,OF.out))}
+  /* 5. destination answers */
+  const fwd=chain(srcId).concat(chain(node.anim).reverse().slice(1));res.path=fwd;
+  const sv=service(node,pr);
+  if(sv==='none'){S('bad',`${node.name} doesn't answer this traffic.`);res.block='end';return res}
+  S('ok',`${node.name} ${SVCTXT[sv]}.`);
+  /* 6. the reply */
+  const rt=reply(pr,realDst,natSrc,sv);
+  if(OF.in){const r=aclEval(OF.in,rt,true);
+    if(r.act==='deny'&&!r.missing){S('bad',`Reply: ${OF.sh} inbound ACL ${OF.in} denied the reply (${pktDesc(rt)}).`,ruleTxt(r,OF.in));res.block='ret';res.stop=`${OF.in} (${OF.sh} in, reply)`;return res}
+    S('ok',`Reply: ${OF.sh} inbound ACL ${OF.in} permitted the reply.`,ruleTxt(r,OF.in))}
+  if(zi&&zo&&zi!==zo){
+    if(insp)S('ok',`Reply: matches the session in ${insp.zp}, so the firewall lets it back without a rule.`);
+    else{const rr={...rt,dst:p.src};const d=zpDecide(zo,zi,rr);
+      if(d.ok&&d.action==='pass')S('ok',`Reply: zone-pair ${d.zp} (${zo}\u2192${zi}) passes it.`);
+      else{S('bad',`Reply: the forward packet was passed, not inspected, so no session exists. ${d.nozp?`No ${zo}\u2192${zi} zone-pair allows the reply.`:`Zone-pair ${d.zp} does not pass it.`}`);res.block='ret';res.stop=`Reply: no session (pass)`;return res}}}
+  if(outIf==='g2')S('info',`NAT: reply to ${natSrc} is translated back to ${p.src}.`);
+  if(IF.out){const r=aclEval(IF.out,{...rt,dst:p.src},true);if(r.act==='deny'&&!r.missing){S('bad',`Reply: ${IF.sh} outbound ACL ${IF.out} denied the reply.`,ruleTxt(r,IF.out));res.block='ret';res.stop=`${IF.out} (${IF.sh} out, reply)`;return res}}
+  S('ok',`The reply reaches ${h.name}.`);res.ok=true;res.status=sv;return res}
+function toSelf(srcId,p,res,S,inIf){const IF=R.ifs[inIf],h=HOSTS[srcId];res.path=chain(srcId);
+  const zi=zoneOf(inIf);
+  if(zi){const f=findZp(zi,'self');
+    if(f){const d=zpDecide(zi,'self',p);if(!d.ok){S('bad',`Firewall zone-pair ${d.zp} (${zi}\u2192self): ${d.nopolicy?'no working service-policy':`matched ${d.cls}, action drop`}.`,d.policy?`policy-map ${d.policy}, class ${d.cls}`:'');fwDropLog(d,p,inIf);res.block='r1';res.stop=`${d.zp} ${d.cls||''} drop`;return res}
+      S('ok',`Firewall zone-pair ${d.zp} (${zi}\u2192self): matched ${d.cls}, action ${d.action}.`)}
+    else S('info',`To the router itself (self zone). No ${zi}\u2192self zone-pair exists, so the firewall allows it.`)}
+  else S('info','Addressed to the router itself.');
+  let sv='closed';
+  if(p.proto==='icmp')sv=p.icmp===8?'reply':'none';
+  else if(p.proto==='udp')sv=p.dport===67?'reply':'none';
+  else if(p.proto==='tcp'&&!p.syn)sv='rst';
+  else if(p.dport===22||p.dport===23){const proto=p.dport===22?'ssh':'telnet';
+    const ok=R.vty.transport==='all'||R.vty.transport.split(' ').includes(proto);
+    if(!ok){S('bad',`The VTY lines accept ${R.vty.transport==='none'?'no remote logins':'SSH only'} (transport input ${R.vty.transport}), so the ${proto} connection is refused.`);res.block='r1';res.status='refused';res.stop='transport input ssh';return res}
+    if(R.vty.acl){const r=aclEval(R.vty.acl,p,true);if(r.act==='deny'&&!r.missing){S('bad',`VTY access-class ${R.vty.acl} denied ${p.src}, so the connection is refused.`,ruleTxt(r,R.vty.acl));res.block='r1';res.status='refused';res.stop=`${R.vty.acl} (vty access-class)`;return res}
+      S('ok',`VTY access-class ${R.vty.acl} permitted ${p.src}.`,ruleTxt(r,R.vty.acl))}
+    else S('info','No access-class on the VTY lines, so any host that reaches the router may try to log in.');sv='open'}
+  if(sv==='none'){S('bad','The router has no service for this traffic.');res.block='r1';return res}
+  S('ok',`R1-SOHO ${sv==='reply'?'answers':SVCTXT[sv]}.`);
+  if(zi){const f=findZp('self',zi);if(f){const d=zpDecide('self',zi,reply(p,p.dst,p.src,sv));if(!d.ok){S('bad',`Reply: zone-pair ${d.zp} (self\u2192${zi}) drops it.`);res.block='ret';res.stop=`${d.zp} drop`;return res}}}
+  S('ok',`The reply reaches ${h.name}.`);res.ok=true;res.status=sv;return res}
+/* pings sourced by the router itself */
+function routerFlow(dst){const st=[],S=(k,t,rule)=>st.push({k,t,rule});
+  const res={steps:st,ok:false,path:['r1'],block:null};
+  if(SELF[dst]){S('ok','That is one of R1-SOHO\u2019s own addresses.');res.ok=true;return res}
+  if(dst==='203.0.113.3')dst='192.168.20.10';
+  const n=NODES[dst];if(!n){S('bad',`No device answers at ${dst} in this lab.`);res.block='r1';return res}
+  const outIf=SEGIF[n.seg],OF=R.ifs[outIf],src=OF.ip,p={proto:'icmp',icmp:8,src,dst};res.pkt=pktDesc(p);
+  S('info',`R1-SOHO sends the ping out ${OF.sh} from ${src}. Outbound ACLs don't filter traffic the router creates itself.`);
+  const zo=zoneOf(outIf);let insp=false;
+  if(zo){const f=findZp('self',zo);if(f){const d=zpDecide('self',zo,p);if(!d.ok){S('bad',`Firewall zone-pair ${d.zp} (self\u2192${zo}) drops it.`);res.block='r1';return res}insp=d.action==='inspect';S('ok',`Firewall zone-pair ${d.zp} (self\u2192${zo}): ${d.action}.`)}
+    else S('info',`From the self zone. No self\u2192${zo} zone-pair exists, so it is allowed.`)}
+  res.path=chain(n.anim).reverse();
+  S('ok',`${n.name} answers.`);
+  const rt={proto:'icmp',icmp:0,src:dst,dst:src};
+  if(OF.in){const r=aclEval(OF.in,rt,true);if(r.act==='deny'&&!r.missing){S('bad',`Reply: ${OF.sh} inbound ACL ${OF.in} denied the echo-reply.`,ruleTxt(r,OF.in));res.block='ret';return res}S('ok',`Reply: ${OF.sh} inbound ACL ${OF.in} permitted it.`,ruleTxt(r,OF.in))}
+  if(zo&&!insp){const f=findZp(zo,'self');if(f){const d=zpDecide(zo,'self',rt);if(!d.ok){S('bad',`Reply: zone-pair ${d.zp} (${zo}\u2192self) matched ${d.cls}, action drop.`,`policy-map ${d.policy}, class ${d.cls}`);fwDropLog(d,rt,outIf);res.block='ret';return res}S('ok',`Reply: zone-pair ${d.zp} (${zo}\u2192self) matched ${d.cls}, action ${d.action}.`)}}
+  S('ok','The echo-reply reaches R1-SOHO.');res.ok=true;return res}
+function routerPing(target,src){let dst=target;if(!isIP(dst)){const d=DNS[dst.toLowerCase()];if(!d)return{o:'% Unrecognized host or address, or protocol not running.',c:'err'};dst=d}
+  const f=routerFlow(dst);setTrace([{title:'Ping from R1-SOHO',pkt:f.pkt||'',steps:f.steps}],f.ok);animate(f.path,f.ok?null:f.block);
+  if(f.ok&&dst==='203.0.113.1'&&findZp('OUTSIDE','self')&&R.ifs.g2.zone==='OUTSIDE')FLAGS.chalRouter=true;
+  const pat=f.ok?'!!!!!':'.....',ok=f.ok?5:0;
+  const o=`Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to ${dst}, timeout is 2 seconds:\n${pat}\nSuccess rate is ${ok*20} percent (${ok}/5)${ok?', round-trip min/avg/max = 1/2/4 ms':''}`;
+  return f.ok?{ok:o}:{o,tip:'See the packet trace for the rule that stopped it.'}}
+
+/* ---------- show commands ---------- */
+function showVersion(){return'Cisco IOS Software, C2900 Software (C2900-UNIVERSALK9-M), Version 15.7(3)M8\nROM: System Bootstrap, Version 15.0(1r)M16\nR1-SOHO uptime is 2 hours, 14 minutes\ncisco CISCO2911/K9 (revision 1.0) with 491520K/32768K bytes of memory.\n3 Gigabit Ethernet interfaces\n\nTechnology Package License Information for Module:\'c2900\'\n-----------------------------------------------------------------\nTechnology    Technology-package           Technology-package\n              Current       Type           Next reboot\n------------------------------------------------------------------\nipbase        ipbasek9      Permanent      ipbasek9\nsecurity      securityk9    Permanent      securityk9\nuc            None          None           None\ndata          None          None           None'}
+function aclCfgLines(n,a){const L=[];if(/^\d+$/.test(n)){aclSorted(a).forEach(e=>L.push(`access-list ${n} ${aceText(e,true)}`))}else{L.push(`ip access-list ${a.type} ${n}`);aclSorted(a).forEach(e=>L.push(' '+aceText(e,true)))}return L}
+function runConf(){const L=['Building configuration...','','Current configuration : '+(3200+JSON.stringify(R.acls).length)+' bytes','!','version 15.7','service timestamps log datetime msec','service password-encryption','!','hostname R1-SOHO','!','security passwords min-length 10','enable secret 9 $9$Wl3bK8vGqH1x0e$Qm2c1u0aZfPp7yR4sLkT5nVwXcB9dE6gH3jK2lM1nO0','!',
+  'ip dhcp excluded-address 192.168.10.1 192.168.10.20','ip dhcp excluded-address 192.168.10.51 192.168.10.254','!','ip dhcp pool INSIDE-LAN',' network 192.168.10.0 255.255.255.0',' default-router 192.168.10.1',' dns-server 198.51.100.10','!','no ip domain lookup','ip domain name riverside.test','!',
+  'license udi pid CISCO2911/K9 sn FTX1840AL2D','license boot module c2900 technology-package securityk9','!','username admin privilege 15 secret 9 $9$aD2bC4eF6gH8iJ0k$Zx8Yw7Vu6Ts5Rq4Po3Nm2Lk1Ji0Hg9Fe8Dc7Ba6','!','ip ssh version 2','!'];
+  Object.entries(R.cmaps).forEach(([n,c])=>{L.push(`class-map type inspect match-${c.type} ${n}`);c.m.forEach(x=>L.push(x.k==='protocol'?` match protocol ${x.v}`:` match access-group name ${x.v}`))});if(Object.keys(R.cmaps).length)L.push('!');
+  Object.entries(R.pmaps).forEach(([n,p])=>{L.push(`policy-map type inspect ${n}`);p.classes.forEach(c=>{L.push(c.name==='class-default'?' class class-default':` class type inspect ${c.name}`);if(c.action)L.push(`  ${c.action}${c.log?' log':''}`)})});if(Object.keys(R.pmaps).length)L.push('!');
+  Object.keys(R.zones).forEach(z=>L.push('zone security '+z));if(Object.keys(R.zones).length)L.push('!');
+  Object.entries(R.zps).forEach(([n,z])=>{L.push(`zone-pair security ${n} source ${z.src} destination ${z.dst}`);if(z.policy)L.push(` service-policy type inspect ${z.policy}`)});if(Object.keys(R.zps).length)L.push('!');
+  Object.values(R.ifs).forEach(f=>{L.push('interface '+f.name,' description '+f.desc,` ip address ${f.ip} ${f.mask}`);if(f.in)L.push(` ip access-group ${f.in} in`);if(f.out)L.push(` ip access-group ${f.out} out`);L.push(' ip nat '+f.nat);if(f.zone)L.push(' zone-member security '+f.zone);L.push(' duplex auto',' speed auto','!')});
+  L.push('ip nat inside source list NAT-INSIDE interface GigabitEthernet0/2 overload','ip nat inside source static 192.168.20.10 203.0.113.3','ip route 0.0.0.0 0.0.0.0 203.0.113.1','!','ip access-list standard NAT-INSIDE',' permit 192.168.10.0 0.0.0.255');
+  Object.entries(R.acls).filter(([n])=>!/^\d+$/.test(n)).forEach(([n,a])=>L.push(...aclCfgLines(n,a)));L.push('!');
+  Object.entries(R.acls).filter(([n])=>/^\d+$/.test(n)).forEach(([n,a])=>L.push(...aclCfgLines(n,a)));
+  L.push('logging buffered 16384','!','banner motd ^C Authorized access only. Activity is logged. ^C','!','line con 0',' exec-timeout 10 0',' login local','line vty 0 4');
+  if(R.vty.acl)L.push(` access-class ${R.vty.acl} in`);L.push(' exec-timeout 10 0',' login local',' transport input '+R.vty.transport,'!','end');return L.join('\n')}
+function showAcl(name){const out=[];if(!name||name==='NAT-INSIDE')out.push('Standard IP access list NAT-INSIDE','    10 permit 192.168.10.0, wildcard bits 0.0.0.255');
+  Object.entries(R.acls).forEach(([n,a])=>{if(name&&name!==n)return;out.push(`${a.type==='standard'?'Standard':'Extended'} IP access list ${n}`);
+    aclSorted(a).filter(e=>e.remark==null).forEach(e=>out.push(`    ${e.seq} ${aceText(e)}${e.hits?` (${e.hits} match${e.hits>1?'es':''})`:''}`))});
+  if(Object.values(R.acls).some(a=>a.entries.some(e=>e.hits)))FLAGS.counters=true;return out.join('\n')}
+function ipBrief(){return'Interface              IP-Address      OK? Method Status                Protocol\n'+Object.values(R.ifs).map(f=>`${f.name.padEnd(23)}${f.ip.padEnd(16)}YES manual up                    up`).join('\n')}
+function showIpInt(n){return Object.entries(R.ifs).filter(([k])=>!n||k==='g'+n).map(([k,f])=>`${f.name} is up, line protocol is up\n  Internet address is ${f.ip}/${f.mask==='255.255.255.0'?24:29}\n  Broadcast address is 255.255.255.255\n  MTU is 1500 bytes\n  Outgoing Common access list is not set\n  Outgoing access list is ${f.out||'not set'}\n  Inbound Common access list is not set\n  Inbound  access list is ${f.in||'not set'}\n  Proxy ARP is enabled\n  Security level is default\n  Network address translation is enabled, interface in domain ${f.nat}`).join('\n')}
+function showZones(){const L=['zone self','  Description: System defined zone',''];Object.keys(R.zones).forEach(z=>{L.push('zone '+z);const m=Object.values(R.ifs).filter(f=>f.zone===z);if(m.length){L.push('  Member Interfaces:');m.forEach(f=>L.push('    '+f.name))}L.push('')});return L.join('\n')}
+function showZps(){const e=Object.entries(R.zps);if(!e.length)return'';return e.map(([n,z])=>`Zone-pair name ${n}\n    Source-Zone ${z.src}  Destination-Zone ${z.dst}\n    service-policy ${z.policy||'not configured'}`).join('\n')}
+function showCmaps(){return Object.entries(R.cmaps).map(([n,c],i)=>` Class Map type inspect match-${c.type} ${n} (id ${i+1})\n`+c.m.map(x=>x.k==='protocol'?`   Match protocol ${x.v}`:`   Match access-group name ${x.v}`).join('\n')).join('\n\n')}
+function showPmaps(){return Object.entries(R.pmaps).map(([n,p])=>`  Policy Map type inspect ${n}\n`+p.classes.map(c=>`    Class ${c.name}\n      ${c.action?c.action[0].toUpperCase()+c.action.slice(1)+(c.log?' log':''):'(no action: drop)'}`).join('\n')).join('\n\n')}
+function ago(t){const s=Math.max(0,Math.round((Date.now()-t)/1000));return[Math.floor(s/3600),Math.floor(s/60)%60,s%60].map(x=>String(x).padStart(2,'0')).join(':')}
+function showSessions(only){const e=Object.entries(R.zps).filter(([n])=>!only||n===only);if(!e.length)return'';
+  return e.map(([n,z])=>{const pm=R.pmaps[z.policy];let o=`policy exists on zp ${n}\n  Zone-pair: ${n}\n\n  Service-policy inspect : ${z.policy||'(none)'}\n`;if(!pm)return o;
+    pm.classes.forEach(c=>{const cm=R.cmaps[c.name];o+=`\n    Class-map: ${c.name} (${c.name==='class-default'?'match-any':'match-'+(cm?cm.type:'all')})\n`+(c.name==='class-default'?'      Match: any\n':(cm?cm.m.map(x=>`      Match: ${x.k==='protocol'?'protocol '+x.v:'access-group name '+x.v}`).join('\n')+'\n':''));
+      const act=c.action||'drop';o+=`      ${act[0].toUpperCase()+act.slice(1)}\n`;
+      if(act==='inspect'){const ss=R.sessions.filter(s=>s.zp===n&&s.cls===c.name);o+=ss.length?'        Established Sessions\n'+ss.map((s,i)=>`         Session 0x${(0x6A1C2B40+i*0x88).toString(16).toUpperCase()} (${s.s}:${s.sp})=>(${s.d}:${s.dp}) ${s.proto} SIS_OPEN\n          Created ${ago(s.t)}, Last heard ${ago(s.t)}\n          Bytes sent (initiator:responder) [${s.proto==='tcp'?'412:2048':'64:64'}]`).join('\n')+'\n':'        Session creations since subsystem startup or last reset 0\n'}
+      if(act==='drop'&&c.name==='class-default'){const d=(R.drops||{})[n]||0;o+=`        ${d} packets, ${d*64} bytes\n`}});return o}).join('\n')}
+function showNat(){const L=['Pro Inside global         Inside local          Outside local         Outside global','--- 203.0.113.3           192.168.20.10         ---                   ---'];R.nat.forEach(x=>L.push(`${x.proto.padEnd(4)}${x.ig.padEnd(22)}${x.il.padEnd(22)}${x.o.padEnd(22)}${x.o}`));return L.join('\n')}
+function showLogging(){return`Syslog logging: enabled (0 messages dropped, 0 messages rate-limited, 0 flushes, 0 overruns)\n    Console logging: level debugging, ${R.log.length} messages logged\n    Buffer logging:  level debugging, ${R.log.length} messages logged\n\nLog Buffer (16384 bytes):\n`+(R.log.length?R.log.join('\n'):'(empty: add the log keyword to ACL lines, or drop log in a policy-map)')}
+
+/* ---------- animation ---------- */
+const PT={pcadmin:[50,86],pcstaff:[50,166],sw:[232,121],r1:[380,182],web:[50,284],isp:[560,182],net:[690,100],attacker:[690,264]};
+const CHAIN={pcadmin:['pcadmin','sw','r1'],pcstaff:['pcstaff','sw','r1'],web:['web','r1'],attacker:['attacker','isp','r1'],net:['net','isp','r1'],isp:['isp','r1'],r1:['r1']};
+const chain=k=>(CHAIN[k]||[k]).slice();
+function sameSeg(a,b){if(a===b)return[a];const A=chain(a),B=chain(b);const i=A.findIndex(x=>B.includes(x));return A.slice(0,i+1).concat(B.slice(0,B.indexOf(A[i])).reverse())}
+function animate(path,block){const pk=$('#pkt');if(!pk||!path||!path.length)return;pk.classList.remove('bad');
+  let pts=path.map(k=>PT[k]).filter(Boolean);
+  if(block==='r1'){const i=path.indexOf('r1');pts=path.slice(0,i+1).map(k=>PT[k])}
+  else if(block==='ret'){const i=path.indexOf('r1');pts=pts.concat(path.slice(i,-1).reverse().map(k=>PT[k]))}
+  else if(block!=='end'&&block!=='isp')pts=pts.concat(pts.slice(0,-1).reverse());
+  if(reduceMotion||pts.length<2){if(block){pk.classList.add('bad');const e=pts[pts.length-1];pk.setAttribute('cx',e[0]);pk.setAttribute('cy',e[1]);pk.style.opacity=1;setTimeout(()=>pk.style.opacity=0,1200)}return}
+  const seg=[];let L=0;for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);L+=d}
+  const dur=Math.min(2600,400+L*2.2);let start=null;cancelAnimationFrame(animate._r);
+  function step(ts){if(!start)start=ts;let t=Math.min(1,(ts-start)/dur),d=t*L,i=0;while(i<seg.length-1&&d>seg[i]){d-=seg[i];i++}
+    const f=seg[i]?Math.min(1,d/seg[i]):1,x=pts[i][0]+(pts[i+1][0]-pts[i][0])*f,y=pts[i][1]+(pts[i+1][1]-pts[i][1])*f;
+    pk.setAttribute('cx',x);pk.setAttribute('cy',y);pk.style.opacity=1;
+    if(t<1)animate._r=requestAnimationFrame(step);else{if(block)pk.classList.add('bad');setTimeout(()=>{pk.style.opacity=0},block?1100:300)}}
+  animate._r=requestAnimationFrame(step)}
+
+/* ======================================================================
+   Host shells: Windows (PCs) and Linux (WEB-DMZ, ATTACKER)
+   ====================================================================== */
+function resolveName(h,name,secs){if(isIP(name))return{ip:name};
+  const n=name.toLowerCase();const q={proto:'udp',src:h.ip,dst:DNS_SERVER,sport:eph(),dport:53};
+  const f=traverse(h.id,q);secs.push({title:`DNS query for ${n}`,pkt:f.pkt,steps:f.steps,f});
+  if(!f.ok)return{fail:true,f,ip:DNS[n]};const ip=DNS[n];if(!ip)return{nx:true,f};return{ip,f}}
+function finish(secs,ok,last){setTrace(secs.map(s=>({title:s.title,pkt:s.pkt,steps:s.steps})),ok);const f=last||secs[secs.length-1].f;animate(f.path,f.ok?null:(f.block||'end'))}
+const stopOf=secs=>{const f=secs.find(s=>!s.f.ok);return f?(f.f.stop||(f.title.startsWith('DNS')?'DNS reply blocked':'No answer')):''};
+function hPing(h,target){const secs=[],r=resolveName(h,target,secs),win=h.os==='win';
+  if(r.fail||r.nx){finish(secs,false);return win?{o:`Ping request could not find host ${target}. Please check the name and try again.`,c:'err'}:{o:`ping: ${target}: ${r.nx?'Name or service not known':'Temporary failure in name resolution'}`,c:'err'}}
+  const p={proto:'icmp',icmp:8,src:h.ip,dst:r.ip};const f=traverse(h.id,p);secs.push({title:`Ping ${r.ip}`,pkt:f.pkt,steps:f.steps,f});finish(secs,f.ok,f);
+  recordTest(h.id,'ping',r.ip,f.ok?'Allow':'Block',f.stop||(f.ok?'':'No reply'));
+  if(h.id==='attacker'&&r.ip==='203.0.113.2'&&!f.ok&&findZp('OUTSIDE','self'))FLAGS.chalBlock=true;
+  if(win){const L=[`Pinging ${r.ip} with 32 bytes of data:`];for(let i=0;i<4;i++)L.push(f.ok?`Reply from ${r.ip}: bytes=32 time=${1+i%3}ms TTL=${r.ip.startsWith('192.168')?127:254}`:'Request timed out.');
+    L.push('',`Ping statistics for ${r.ip}:`,`    Packets: Sent = 4, Received = ${f.ok?4:0}, Lost = ${f.ok?0:4} (${f.ok?0:100}% loss),`);if(f.ok)L.push('Approximate round trip times in milli-seconds:','    Minimum = 1ms, Maximum = 3ms, Average = 2ms');return f.ok?{ok:L.join('\n')}:{o:L.join('\n')}}
+  const L=[`PING ${target} (${r.ip}) 56(84) bytes of data.`];if(f.ok)for(let i=1;i<=4;i++)L.push(`64 bytes from ${r.ip}: icmp_seq=${i} ttl=${r.ip.startsWith('192.168')?63:254} time=${(1.2+i*0.3).toFixed(1)} ms`);
+  L.push('',`--- ${target} ping statistics ---`,`4 packets transmitted, ${f.ok?4:0} received, ${f.ok?0:100}% packet loss, time 3004ms`);return f.ok?{ok:L.join('\n')}:{o:L.join('\n')}}
+function hLookup(h,name){const secs=[];const n=name.toLowerCase();const q={proto:'udp',src:h.ip,dst:DNS_SERVER,sport:eph(),dport:53};const f=traverse(h.id,q);secs.push({title:`DNS query for ${n}`,pkt:f.pkt,steps:f.steps,f});finish(secs,f.ok,f);
+  recordTest(h.id,'dns',DNS[n]||n,f.ok?'Allow':'Block',f.stop||'');
+  if(!f.ok)return h.os==='win'?{o:`DNS request timed out.\n    timeout was 2 seconds.\nServer:  UnKnown\nAddress:  ${DNS_SERVER}\n\n*** Request to UnKnown timed-out`}:{o:`;; communications error to ${DNS_SERVER}#53: timed out\n;; no servers could be reached`};
+  const ip=DNS[n];if(!ip)return{o:`Server:  ns.netserver.test\nAddress:  ${DNS_SERVER}\n\n*** ns.netserver.test can't find ${n}: Non-existent domain`};
+  return{ok:h.os==='win'?`Server:  ns.netserver.test\nAddress:  ${DNS_SERVER}\n\nNon-authoritative answer:\nName:    ${n}\nAddress:  ${ip}`:`Server:\t\t${DNS_SERVER}\nAddress:\t${DNS_SERVER}#53\n\nNon-authoritative answer:\nName:\t${n}\nAddress: ${ip}`}}
+const PAGES={'198.51.100.10':'<html><head><title>NetServer test page</title></head><body><h1>It works: NetServer</h1></body></html>','192.168.20.10':'<html><head><title>Riverside Bookkeeping</title></head><body><h1>Client document drop-off</h1></body></html>'};
+function hCurl(h,args){const head=/(^|\s)-I(\s|$)/.test(args);const url=(args.split(/\s+/).filter(a=>!a.startsWith('-')).pop()||'');
+  const m=url.match(/^(?:(https?):\/\/)?([^\/:\s]+)(?::(\d+))?/i);if(!m)return{o:'curl: (3) URL using bad/illegal format or missing URL',c:'err'};
+  const port=m[3]?+m[3]:/^https$/i.test(m[1]||'')?443:80,host=m[2],secs=[];
+  const r=resolveName(h,host,secs);
+  if(r.fail||r.nx){finish(secs,false);recordTest(h.id,'web',r.ip||host,'Block',r.nx?'Name not found':stopOf(secs));return{o:`curl: (6) Could not resolve host: ${host}`,c:'err'}}
+  const p={proto:'tcp',src:h.ip,dst:r.ip,sport:eph(),dport:port,syn:true,ack:false};const f=traverse(h.id,p);secs.push({title:`${port===443?'HTTPS':'HTTP'} to ${r.ip}:${port}`,pkt:f.pkt,steps:f.steps,f});
+  const good=f.ok&&f.status==='open';finish(secs,good,f);
+  recordTest(h.id,'web',r.ip,good?'Allow':'Block',good?'':(f.stop||(f.ok?'Port closed':'No reply')));
+  if(f.ok&&f.status==='closed')return{o:`curl: (7) Failed to connect to ${host} port ${port} after 3 ms: Connection refused`,c:'err'};
+  if(!good)return{o:`curl: (28) Failed to connect to ${host} port ${port} after 21003 ms: Timed out`,c:'err'};
+  const real=r.ip==='203.0.113.3'?'192.168.20.10':r.ip;
+  return{ok:head?`HTTP/1.1 200 OK\nServer: nginx\nContent-Type: text/html\nContent-Length: ${(PAGES[real]||'').length}`:(PAGES[real]||'<html><body>OK</body></html>')}}
+function hSsh(h,user,target){const secs=[];const r=resolveName(h,target,secs);if(r.fail||r.nx){finish(secs,false);return{o:`ssh: Could not resolve hostname ${target}: Name or service not known`,c:'err'}}
+  const p={proto:'tcp',src:h.ip,dst:r.ip,sport:eph(),dport:22,syn:true};const f=traverse(h.id,p);secs.push({title:`SSH to ${r.ip}`,pkt:f.pkt,steps:f.steps,f});
+  const good=f.ok&&f.status==='open';finish(secs,good,f);recordTest(h.id,'ssh',r.ip,good?'Allow':'Block',good?'':(f.stop||'No reply'));
+  if(good){const isR=!!SELF[r.ip];return{ok:isR?`${user}@${r.ip}'s password: ********\n\nAuthorized access only. Activity is logged.\n\nR1-SOHO#\n(Login works. The simulator closes the session here; configure R1-SOHO from its console tab.)\nConnection to ${r.ip} closed.`:`${user}@${r.ip}'s password: ********\nWelcome to Ubuntu 24.04 LTS\n${user}@web-dmz:~$ exit\nConnection to ${r.ip} closed.`}}
+  if(f.status==='refused'||(f.ok&&f.status==='closed'))return{o:`ssh: connect to host ${r.ip} port 22: Connection refused`,c:'err'};
+  return{o:`ssh: connect to host ${r.ip} port 22: Connection timed out`,c:'err'}}
+function hTelnet(h,target,port){port=port?+port:23;const secs=[];const r=resolveName(h,target,secs);if(r.fail||r.nx){finish(secs,false);return{o:`telnet: could not resolve ${target}`,c:'err'}}
+  const p={proto:'tcp',src:h.ip,dst:r.ip,sport:eph(),dport:port,syn:true};const f=traverse(h.id,p);secs.push({title:`Telnet to ${r.ip}:${port}`,pkt:f.pkt,steps:f.steps,f});
+  const good=f.ok&&f.status==='open';finish(secs,good,f);if(port===23)recordTest(h.id,'telnet',r.ip,good?'Allow':'Block',good?'':(f.stop||'No reply'));
+  const win=h.os==='win';
+  if(good)return{ok:`Trying ${r.ip} ...Open\n\nUser Access Verification\n\nPassword:\n(Connected. Telnet would send this password in clear text.)\nConnection closed by foreign host.`};
+  if(f.status==='refused'||(f.ok&&f.status==='closed'))return{o:win?`Connecting To ${r.ip}...Could not open connection to the host, on port ${port}: Connect failed`:`telnet: Unable to connect to remote host: Connection refused`,c:'err'};
+  return{o:win?`Connecting To ${r.ip}...Could not open connection to the host, on port ${port}: Connect failed`:`telnet: Unable to connect to remote host: Connection timed out`,c:'err'}}
+function hNmap(h,args){if(h.id!=='attacker')return{o:'nmap: command not found',c:'err'};
+  const T=args.trim().split(/\s+/);let ack=false,pn=false,ports=[22,80,443],target=null;
+  for(let i=0;i<T.length;i++){const t=T[i];if(t==='-sA')ack=true;else if(t==='-sS'||t==='-sT')ack=false;else if(t==='-Pn')pn=true;else if(t==='-p'){ports=(T[++i]||'').split(',').map(Number).filter(n=>n>0&&n<65536)}else if(/^-p[\d,]+$/.test(t))ports=t.slice(2).split(',').map(Number);else if(!t.startsWith('-'))target=t}
+  if(!target||!ports.length)return{o:'Usage: nmap [-sA|-sS] [-Pn] -p <ports> <target>',c:'err'};
+  const secs=[];const r=resolveName(h,target,secs);if(r.fail||r.nx){finish(secs,false);return{o:`Failed to resolve "${target}".`,c:'err'}}
+  let up=pn;if(!pn){const pf=traverse(h.id,{proto:'icmp',icmp:8,src:h.ip,dst:r.ip});up=pf.ok}
+  if(!up)return{o:`Starting Nmap 7.94 ( https://nmap.org )\nNote: Host seems down. If it is really up, but blocking our ping probes, try -Pn\nNmap done: 1 IP address (0 hosts up) scanned in 3.05 seconds`,tip:'The host didn\u2019t answer a ping, so nmap gave up. Add -Pn to scan anyway.'};
+  const rows=[];let lastF=null;
+  ports.forEach(pt=>{const p={proto:'tcp',src:h.ip,dst:r.ip,sport:eph(),dport:pt,syn:!ack,ack};const f=traverse(h.id,p);lastF=f;if(pt===ports[ports.length-1])secs.push({title:`${ack?'ACK':'SYN'} probe to port ${pt}`,pkt:f.pkt,steps:f.steps,f});
+    const state=ack?(f.ok?'unfiltered':'filtered'):(f.ok?(f.status==='open'?'open':'closed'):'filtered');rows.push([pt,state])});
+  finish(secs,lastF.ok,lastF);
+  if(ack&&r.ip==='203.0.113.3'){const all=rows.every(x=>x[1]==='filtered');recordTest(h.id,'ackscan',r.ip,all?'Filtered':'Unfiltered',all?(lastF.stop||''):'ACK probes reach the server')}
+  const w=Math.max(...rows.map(x=>(x[0]+'/tcp').length))+1;
+  return{o:`Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for ${target}${target!==r.ip?' ('+r.ip+')':''}\nHost is up (0.0021s latency).\n\n${'PORT'.padEnd(w)}STATE      SERVICE\n`+rows.map(([p,s])=>`${(p+'/tcp').padEnd(w)}${s.padEnd(11)}${SVCNAME[p]||'unknown'}`).join('\n')+`\n\nNmap done: 1 IP address (1 host up) scanned in 1.${ports.length}2 seconds`}}
+function hDhcp(h){const p={proto:'udp',src:'0.0.0.0',dst:'255.255.255.255',sport:68,dport:67};const IF=R.ifs.g0,st=[];let ok=true,rule='';
+  if(IF.in){const r=aclEval(IF.in,p,true);if(r.act==='deny'&&!r.missing){ok=false;rule=ruleTxt(r,IF.in)}st.push({k:ok?'ok':'bad',t:`G0/0 inbound ACL ${IF.in} ${ok?'permitted':'denied'} the DHCP request.`,rule:ok?ruleTxt(r,IF.in):rule})}else st.push({k:'info',t:'G0/0 inbound: no ACL applied.'});
+  if(ok)st.push({k:'ok',t:'R1-SOHO\u2019s DHCP server renews the lease.'});setTrace([{title:'DHCP renewal',pkt:'UDP 0.0.0.0:68 \u2192 255.255.255.255:67',steps:st}],ok);animate(chain(h.id),ok?null:'r1');
+  return ok?{ok:`Windows IP Configuration\n\nEthernet adapter Ethernet0:\n\n   IPv4 Address. . . . . . . . . . . : ${h.ip}\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.10.1`}:{o:'An error occurred while renewing interface Ethernet0 : unable to contact your DHCP server. Request has timed out.',c:'err',tip:'Something on G0/0 is blocking DHCP. Check the first line of INSIDE-IN.'}}
+function ipcfg(h){const gw=h.seg==='in'?'192.168.10.1':h.seg==='dmz'?'192.168.20.1':'198.51.100.1';
+  return h.os==='win'?`Windows IP Configuration\n\nEthernet adapter Ethernet0:\n\n   Connection-specific DNS Suffix  . : riverside.test\n   IPv4 Address. . . . . . . . . . . : ${h.ip}\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : ${gw}\n   DNS Servers . . . . . . . . . . . : ${DNS_SERVER}`
+  :`2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 state UP\n    inet ${h.ip}/24 brd ${h.ip.replace(/\d+$/,'255')} scope global eth0\ndefault via ${gw} dev eth0`}
+function execHost(h,line){const t=line.trim().replace(/\s+/g,' ');if(!t)return'';const win=h.os==='win';let m;
+  if(/^(help|\?)$/i.test(t))return{o:(win?'  ping <ip|name>\n  nslookup <name>\n  curl [-I] http://<ip|name>\n  ssh -l admin <ip>\n  telnet <ip> [port]\n  ipconfig [/renew]\n  cls':'  ping -c 4 <ip|name>\n  nslookup <name>\n  curl [-I] http://<ip|name>\n  ssh admin@<ip>\n  telnet <ip> [port]\n'+(h.id==='attacker'?'  nmap [-sA|-sS] [-Pn] -p <ports> <ip>\n':'')+'  ip a\n  clear'),c:'sys'};
+  if(/^(cls|clear)$/i.test(t)){DEV[h.id].buf=[];return''}
+  if((m=t.match(/^ping(?:\s+-[nc]\s*\d+)?\s+(\S+)(?:\s+-[nc]\s*\d+)?$/i)))return hPing(h,m[1]);
+  if((m=t.match(/^(?:nslookup|dig|host)\s+(\S+)$/i)))return hLookup(h,m[1]);
+  if((m=t.match(/^(?:curl|wget|browse)\s+(.+)$/i)))return hCurl(h,m[1]);
+  if((m=t.match(/^ssh\s+(?:-l\s+(\S+)\s+(\S+)|(\S+)@(\S+)|(\S+))$/i)))return hSsh(h,m[1]||m[3]||(win?'staff':h.user),m[2]||m[4]||m[5]);
+  if((m=t.match(/^telnet\s+(\S+)(?:\s+(\d+))?$/i)))return hTelnet(h,m[1],m[2]);
+  if((m=t.match(/^(?:sudo\s+)?nmap\s+(.+)$/i)))return hNmap(h,m[1]);
+  if(win&&/^ipconfig\s+\/renew$/i.test(t))return h.id==='pcstaff'?hDhcp(h):{o:'Windows IP Configuration\n\nThis adapter has a static address, so there is nothing to renew.'};
+  if(win&&/^ipconfig(\s+\/all)?$/i.test(t))return ipcfg(h);
+  if(!win&&/^(ip\s+a(ddr)?|ifconfig|ip\s+addr\s+show)$/i.test(t))return ipcfg(h);
+  if(/^(hostname)$/i.test(t))return h.name;
+  if(/^(whoami)$/i.test(t))return win?'riverside\\'+(h.id==='pcadmin'?'admin':'staff'):h.user;
+  if(/^tracert|^traceroute/i.test(t))return{tip:'Traceroute is not part of this lab. Use ping and the packet trace.'};
+  if(win)return{o:`'${t.split(' ')[0]}' is not recognized as an internal or external command,\noperable program or batch file.`,c:'err',tip:'Type help to list the commands on this host.'};
+  return{o:`${t.split(' ')[0]}: command not found`,c:'err',tip:'Type help to list the commands on this host.'}}
+
+/* ======================================================================
+   Terminal plumbing (one console, five devices)
+   ====================================================================== */
+const DEV={};let cur='r1';
+function push(d,text,cls){String(text).split('\n').forEach(t=>d.buf.push({t,c:cls||''}));if(d.buf.length>700)d.buf.splice(0,d.buf.length-700)}
+function emit(d,r){if(r==null||r==='')return;if(typeof r==='string'){push(d,r);return}
+  if(r.o)push(d,r.o,r.c||'');if(r.ok)push(d,r.ok,'ok');if(r.tip)push(d,'Tip: '+r.tip,'tip')}
+function promptOf(k){if(k==='r1')return'R1-SOHO'+SUF[R.mode];const h=HOSTS[k];return h.os==='win'?`C:\\Users\\${k==='pcadmin'?'admin':'staff'}>`:`${h.user}@${h.host}:~$ `}
+function renderTerm(){const d=DEV[cur],out=$('#out');
+  out.innerHTML=d.buf.map(l=>`<div class="ln ${l.c}">${esc(l.t)||'&nbsp;'}</div>`).join('');out.scrollTop=out.scrollHeight;
+  $('#prompt').textContent=promptOf(cur);$('#cli').setAttribute('aria-label',(cur==='r1'?'R1-SOHO':HOSTS[cur].name)+' command line');
+  $$('#wbTerm .dev-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dev===cur)));
+  $$('#wbTopo .clickable').forEach(n=>n.classList.toggle('active',n.dataset.dev===cur))}
+function selectDev(k){cur=k;renderTerm()}
+function runLine(v){const d=DEV[cur];push(d,promptOf(cur)+v,'cmd');if(v.trim())d.hist.push(v);d.hi=d.hist.length;
+  const res=cur==='r1'?execR(v):execHost(HOSTS[cur],v);emit(d,res)}
+(function wire(){const inp=$('#cli');
+  inp.addEventListener('keydown',e=>{const d=DEV[cur];
+    if(e.key==='Enter'){const v=inp.value;inp.value='';runLine(v);renderTerm();updateAll()}
+    else if(e.key==='ArrowUp'){if(d.hi>0){d.hi--;inp.value=d.hist[d.hi]}e.preventDefault()}
+    else if(e.key==='ArrowDown'){if(d.hi<d.hist.length-1){d.hi++;inp.value=d.hist[d.hi]}else{d.hi=d.hist.length;inp.value=''}e.preventDefault()}
+    else if(e.key==='l'&&e.ctrlKey){d.buf=[];renderTerm();e.preventDefault()}});
+  inp.addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData).getData('text');if(t&&/\n/.test(t.trim())){e.preventDefault();t.replace(/\r/g,'').split('\n').forEach(l=>{if(l.trim()!=='')runLine(l)});renderTerm();updateAll()}});
+  $('#out').addEventListener('click',()=>{if(!getSelection().toString())inp.focus()});
+  $$('#wbTerm .dev-btn').forEach(b=>b.onclick=()=>{selectDev(b.dataset.dev);inp.focus()});
+  $$('#wbTopo .clickable').forEach(n=>{const go=()=>{selectDev(n.dataset.dev);inp.focus()};n.addEventListener('click',go);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
+  $('#termClear').onclick=()=>{DEV[cur].buf=[];renderTerm();inp.focus()};
+  $('#termReset').onclick=()=>{if(confirm('Erase every ACL, zone, and policy on R1-SOHO and return to the baseline? Test results and completed tasks are kept.')){resetRouter();push(R,'Configuration erased. R1-SOHO is back to the baseline.','sys');selectDev('r1');updateAll()}}})();
+
+/* ======================================================================
+   Packet trace + inspector + topology state
+   ====================================================================== */
+function setTrace(secs,ok){$('#traceRes').innerHTML=ok?'<span class="st ok">Allowed</span>':'<span class="st bad">Blocked</span>';
+  $('#tracePkt').textContent=secs.length===1?secs[0].pkt:'';
+  $('#traceList').innerHTML=secs.map(s=>(secs.length>1?`<li style="display:block;border-top:2px solid var(--navy-soft)"><strong>${esc(s.title)}</strong><span class="rule">${esc(s.pkt||'')}</span></li>`:'')+
+    s.steps.map(x=>`<li><span class="ic ${x.k}" aria-hidden="true">${x.k==='ok'?'\u2713':x.k==='bad'?'\u2715':'i'}</span><div>${esc(x.t)}${x.rule?`<span class="rule">${esc(x.rule)}</span>`:''}</div></li>`).join('')).join('')}
+function phase(){if(zpfOn())return'zpf';return Object.values(R.ifs).some(f=>f.in||f.out)||R.vty.acl?'acl':'base'}
+const PHASES={base:'Baseline',acl:'After ACLs',zpf:'After ZPF'};
+function aclCell(n){if(!n)return'<span class="st na">none</span>';return`<span class="mono">${esc(n)}</span>${R.acls[n]?'':' <span class="st bad">not defined</span>'}`}
+function renderInspect(){const rows=[['G0/0','inside LAN','g0'],['G0/1','DMZ','g1'],['G0/2','internet','g2']];
+  let h='<table class="spec"><tr><th>Interface</th><th>Inbound ACL</th><th>Outbound ACL</th><th>Zone</th></tr>'+rows.map(([s,d,k])=>{const f=R.ifs[k];return`<tr><td>${s} <span class="pkt-cap">${d}</span></td><td>${aclCell(f.in)}</td><td>${aclCell(f.out)}</td><td>${f.zone?`<span class="mono">${esc(f.zone)}</span>`:'<span class="st na">none</span>'}</td></tr>`}).join('');
+  h+=`<tr><td>VTY lines</td><td colspan="2">access-class ${aclCell(R.vty.acl)}</td><td><span class="mono">ssh${R.vty.transport==='ssh'?' only':': '+esc(R.vty.transport)}</span></td></tr></table>`;
+  const Z=Object.keys(R.zones);
+  if(!Z.length)h+='<p class="pkt-cap" style="margin-top:10px">No security zones yet. You will create them in Part B.</p>';
+  else{const cols=Z.concat('self');h+='<h3 style="margin-top:16px;font-size:1rem">Zone-pairs (from row to column)</h3><table class="spec zpm"><tr><th>From \\ To</th>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>'+
+    Z.map(s=>'<tr><th>'+esc(s)+'</th>'+cols.map(d=>{if(s===d)return'<td><span class="st na">same zone</span></td>';const f=findZp(s,d);
+      if(!f)return d==='self'?'<td><span class="st na">allowed</span></td>':'<td><span class="st bad">denied</span></td>';const z=f[1];return`<td><span class="mono">${esc(f[0])}</span><br>${z.policy&&R.pmaps[z.policy]?'<span class="st ok">policy set</span>':'<span class="st bad">no policy</span>'}</td>`}).join('')+'</tr>').join('')+'</table>'}
+  $('#inspWrap').innerHTML=h}
+const ZCLS={g0:'z-in',g1:'z-dmz',g2:'z-out'},ZDEF={g0:'Inside LAN',g1:'DMZ',g2:'Internet'},ZBAND={g0:['#bandIn','#lblIn'],g1:['#bandDmz','#lblDmz'],g2:['#bandOut','#lblOut']};
+function renderTopo(){Object.entries(ZBAND).forEach(([k,[b,l]])=>{const z=R.ifs[k].zone;$(b).setAttribute('class','zone-band'+(z?' '+ZCLS[k]:''));$(l).setAttribute('class','zone-lbl'+(z?' '+ZCLS[k]:''));$(l).textContent=z?`Zone ${z}`:`${ZDEF[k]}: no zone`});
+  const ph=phase();$('#fwState').setAttribute('class','fw-state '+ph);$('#fwState').textContent=ph==='zpf'?'Firewall: zone-based policy active':ph==='acl'?'Firewall: stateless ACLs active':'Firewall: no filtering yet';$('#fwRing').setAttribute('class','fw-ring '+ph)}
+
+/* ======================================================================
+   Test plan
+   ====================================================================== */
+const TESTS=[
+ {id:'T01',h:'pcstaff',k:'web',ip:'198.51.100.10',t:'PC-Staff browses an internet site',cmd:'curl http://www.netserver.test'},
+ {id:'T02',h:'pcstaff',k:'dns',ip:'198.51.100.10',t:'PC-Staff resolves a name',cmd:'nslookup www.netserver.test'},
+ {id:'T03',h:'pcstaff',k:'ping',ip:'198.51.100.10',t:'PC-Staff pings the internet',cmd:'ping 198.51.100.10'},
+ {id:'T04',h:'pcstaff',k:'telnet',ip:'203.0.113.1',t:'PC-Staff uses Telnet outbound',cmd:'telnet 203.0.113.1'},
+ {id:'T05',h:'pcstaff',k:'web',ip:'192.168.20.10',t:'PC-Staff browses the DMZ server',cmd:'curl http://192.168.20.10'},
+ {id:'T06',h:'pcstaff',k:'ping',ip:'192.168.20.10',t:'PC-Staff pings the DMZ server',cmd:'ping 192.168.20.10'},
+ {id:'T07',h:'pcadmin',k:'ssh',ip:'192.168.10.1',t:'PC-Admin manages the router',cmd:'ssh -l admin 192.168.10.1'},
+ {id:'T08',h:'pcstaff',k:'ssh',ip:'192.168.10.1',t:'PC-Staff tries to manage the router',cmd:'ssh -l admin 192.168.10.1'},
+ {id:'T09',h:'attacker',k:'web',ip:'203.0.113.3',t:'Internet user reaches the public site',cmd:'curl http://www.riverside.test'},
+ {id:'T10',h:'attacker',k:'ping',ip:'203.0.113.3',t:'Internet host pings the public server',cmd:'ping -c 4 203.0.113.3'},
+ {id:'T11',h:'attacker',k:'ping',ip:'203.0.113.2',t:'Internet host pings the router',cmd:'ping -c 4 203.0.113.2'},
+ {id:'T12',h:'attacker',k:'ssh',ip:'203.0.113.2',t:'Internet host tries to manage the router',cmd:'ssh admin@203.0.113.2'},
+ {id:'T13',h:'web',k:'ping',ip:'192.168.10.10',t:'A compromised DMZ server pivots inside',cmd:'ping -c 4 192.168.10.10'},
+ {id:'T14',h:'web',k:'web',ip:'198.51.100.10',t:'DMZ server fetches updates',cmd:'curl http://www.netserver.test'},
+ {id:'T15',h:'attacker',k:'ackscan',ip:'203.0.113.3',t:'TCP ACK scan of the public server',cmd:'nmap -Pn -sA -p 22,445,3389 203.0.113.3',opts:['Unfiltered','Filtered']}];
+let TP={};
+function tpCell(id,ph){TP[id]=TP[id]||{};TP[id][ph]=TP[id][ph]||{};return TP[id][ph]}
+function recordTest(hid,kind,ip,result,stop){const ph=phase();TESTS.filter(t=>t.h===hid&&t.k===kind&&t.ip===ip).forEach(t=>{const c=tpCell(t.id,ph);c.r=result;c.s=stop||'';c.at=Date.now()});
+  if(TESTS.some(t=>t.h===hid&&t.k===kind&&t.ip===ip))toast(`Recorded in ${PHASES[ph]}`)}
+const tpCount=ph=>TESTS.filter(t=>TP[t.id]&&TP[t.id][ph]&&TP[t.id][ph].r).length;
+function renderTests(){const ph=phase();$('#phasePill').className='phase-pill '+ph;$('#phasePill').textContent='Current phase: '+PHASES[ph];
+  const cell=(t,p)=>{const c=(TP[t.id]||{})[p]||{},opts=t.opts||['Allow','Block'];
+    const sel=`<select data-pred="${t.id}|${p}" aria-label="${t.id} prediction, ${PHASES[p]}" ${c.r?'disabled':''}><option value="">Predict\u2026</option>${opts.map(o=>`<option ${c.p===o?'selected':''}>${o}</option>`).join('')}</select>`;
+    const res=c.r?`<span class="st ${/Allow|Unfiltered/.test(c.r)?'ok':'bad'}">${c.r}</span>${c.p?(c.p===c.r?' <span class="st ok" title="Matches your prediction">P \u2713</span>':' <span class="st mis" title="Differs from your prediction">P: '+esc(c.p)+' !</span>'):' <span class="st na">no prediction</span>'}${c.s?`<span class="stop">${esc(c.s)}</span>`:''}`:'';
+    return`<td class="${p===ph?'cur':''}"><div class="cellres">${sel}${res}</div></td>`};
+  $('#tpWrap').innerHTML=`<table class="tp"><thead><tr><th>ID</th><th>Test</th><th>Host and command</th>${['base','acl','zpf'].map(p=>`<th class="${p===ph?'cur':''}">${PHASES[p]} (${tpCount(p)}/15)</th>`).join('')}</tr></thead><tbody>`+
+    TESTS.map(t=>`<tr><td class="tid">${t.id}</td><td>${esc(t.t)}</td><td><div style="display:flex;gap:10px;align-items:center;justify-content:space-between"><strong>${HOSTS[t.h].name}</strong><button class="btn small" type="button" data-load="${t.id}" aria-label="Load ${t.id} on ${HOSTS[t.h].name}">Load</button></div><code>${esc(t.cmd)}</code></td>${['base','acl','zpf'].map(p=>cell(t,p)).join('')}</tr>`).join('')+'</tbody></table>';
+  $$('#tpWrap [data-pred]').forEach(s=>s.onchange=()=>{const [id,p]=s.dataset.pred.split('|');tpCell(id,p).p=s.value||undefined;save()});
+  $$('#tpWrap [data-load]').forEach(b=>b.onclick=()=>{const t=TESTS.find(x=>x.id===b.dataset.load);selectDev(t.h);$('#cli').value=t.cmd;$('#cli').focus();const wt=$('#wbTerm');if(wt.scrollIntoView)wt.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'})})}
+$('#tpClear').onclick=()=>{if(confirm('Clear every prediction and result in all three phases?')){TP={};save();renderTests();updateProgress()}};
+
+/* ======================================================================
+   Tasks (self-checking with sample packets)
+   ====================================================================== */
+const PK=(proto,src,dst,o={})=>({proto,src,dst,sport:o.sp!=null?o.sp:50001,dport:o.dp,icmp:o.icmp,syn:proto==='tcp'&&!o.ack,ack:!!o.ack,rst:false});
+const has=n=>!!R.acls[n];
+const permits=(n,p)=>has(n)&&aclEval(n,p,false).act==='permit',denies=(n,p)=>has(n)&&aclEval(n,p,false).act==='deny';
+const A1='198.51.100.66',NS='198.51.100.10',ST='192.168.10.25',AD='192.168.10.10',WS='192.168.20.10';
+const SPOOF=['10.1.2.3','172.20.1.1','192.168.10.25','127.0.0.1','224.0.0.9','203.0.113.2','203.0.113.3'];
+const legitIn=()=>permits('OUTSIDE-IN',PK('tcp',A1,'203.0.113.3',{dp:80}))||permits('OUTSIDE-IN',PK('tcp',NS,'203.0.113.2',{sp:80,dp:50000,ack:true}));
+const spoofOk=()=>legitIn()&&SPOOF.every(s=>denies('OUTSIDE-IN',PK('tcp',s,'203.0.113.2',{sp:80,dp:50000,ack:true}))&&denies('OUTSIDE-IN',PK('tcp',s,'203.0.113.3',{dp:80})));
+const insp=(a,b,p)=>{const d=zpDecide(a,b,p);return d.ok&&d.action==='inspect'},blocked=(a,b,p)=>!zpDecide(a,b,p).ok;
+let DONE={},FLAGS={};
+const TASKS_A=[
+ {g:'Before you start',items:[{id:'base',t:'Run all 15 tests in the Baseline phase (Test plan tab)',chk:()=>tpCount('base')===15,h:'Open the Test plan tab. Pick a prediction for each test, then use Load and press Enter.'}]},
+ {g:'Task 1: Restrict router management',items:[
+  {id:'mgmt',t:'Create standard ACL MGMT-ONLY that permits only PC-Admin',chk:()=>R.acls['MGMT-ONLY']&&R.acls['MGMT-ONLY'].type==='standard'&&permits('MGMT-ONLY',PK('tcp',AD,'192.168.10.1',{dp:22}))&&denies('MGMT-ONLY',PK('tcp',ST,'192.168.10.1',{dp:22}))&&denies('MGMT-ONLY',PK('tcp',A1,'203.0.113.2',{dp:22})),h:'enable\nconfigure terminal\nip access-list standard MGMT-ONLY\n remark Only the owner\'s PC may manage R1-SOHO\n permit host 192.168.10.10\n deny any log\n exit'},
+  {id:'vty',t:'Apply MGMT-ONLY to the VTY lines',chk:()=>R.vty.acl==='MGMT-ONLY'&&has('MGMT-ONLY'),h:'line vty 0 4\n access-class MGMT-ONLY in\n exit'}]},
+ {g:'Task 2: Egress filter on the inside LAN',items:[
+  {id:'inside',t:'Build INSIDE-IN: allow DHCP; block Telnet, NetBIOS, and SMB; allow only LAN sources',chk:()=>permits('INSIDE-IN',{proto:'udp',src:'0.0.0.0',dst:'255.255.255.255',sport:68,dport:67})&&denies('INSIDE-IN',PK('tcp',ST,'203.0.113.1',{dp:23}))&&denies('INSIDE-IN',PK('tcp',ST,NS,{dp:445}))&&denies('INSIDE-IN',PK('tcp',ST,NS,{dp:139}))&&denies('INSIDE-IN',PK('tcp',ST,NS,{dp:137}))&&denies('INSIDE-IN',PK('udp',ST,NS,{dp:137}))&&denies('INSIDE-IN',PK('udp',ST,NS,{dp:138}))&&permits('INSIDE-IN',PK('tcp',ST,NS,{dp:80}))&&permits('INSIDE-IN',PK('udp',ST,NS,{dp:53}))&&permits('INSIDE-IN',PK('icmp',ST,NS,{icmp:8}))&&denies('INSIDE-IN',PK('tcp','10.9.9.9',NS,{dp:80})),
+   h:'ip access-list extended INSIDE-IN\n remark Allow DHCP discovery from hosts with no address yet\n permit udp any eq bootpc any eq bootps\n remark Block Telnet, NetBIOS, and SMB leaving the LAN\n deny tcp 192.168.10.0 0.0.0.255 any eq telnet log\n deny tcp 192.168.10.0 0.0.0.255 any range 137 139 log\n deny tcp 192.168.10.0 0.0.0.255 any eq 445 log\n deny udp 192.168.10.0 0.0.0.255 any range 137 138 log\n remark Egress anti-spoofing: only LAN sources may leave\n permit ip 192.168.10.0 0.0.0.255 any\n deny ip any any log\n exit'},
+  {id:'insideApp',t:'Apply INSIDE-IN inbound on G0/0',chk:()=>R.ifs.g0.in==='INSIDE-IN'&&has('INSIDE-IN'),h:'interface g0/0\n ip access-group INSIDE-IN in\n exit\n\nThen test DHCP from PC-Staff: ipconfig /renew'}]},
+ {g:'Task 3: Stateless ingress filter on the internet link',items:[
+  {id:'spoof',t:'OUTSIDE-IN: drop spoofed sources first',chk:spoofOk,h:'ip access-list extended OUTSIDE-IN\n remark Ingress anti-spoofing (BCP 38, RFC 1918, loopback, multicast, own addresses)\n deny ip 10.0.0.0 0.255.255.255 any log\n deny ip 172.16.0.0 0.15.255.255 any log\n deny ip 192.168.0.0 0.0.255.255 any log\n deny ip 127.0.0.0 0.255.255.255 any log\n deny ip 224.0.0.0 31.255.255.255 any log\n deny ip host 203.0.113.2 any log\n deny ip host 203.0.113.3 any log'},
+  {id:'stateless',t:'OUTSIDE-IN: allow replies statelessly (TCP established, DNS from NET-SERVER only, ICMP replies)',chk:()=>permits('OUTSIDE-IN',PK('tcp',NS,'203.0.113.2',{sp:80,dp:50000,ack:true}))&&permits('OUTSIDE-IN',PK('udp',NS,'203.0.113.2',{sp:53,dp:50000}))&&denies('OUTSIDE-IN',PK('udp',A1,'203.0.113.2',{sp:53,dp:50000}))&&[0,3,11].every(i=>permits('OUTSIDE-IN',PK('icmp',NS,'203.0.113.2',{icmp:i}))),
+   h:' remark STATELESS return traffic - replaced in Part B\n permit tcp any any established\n permit udp host 198.51.100.10 eq domain any\n permit icmp any any echo-reply\n permit icmp any any unreachable\n permit icmp any any time-exceeded'},
+  {id:'publish',t:'OUTSIDE-IN: allow HTTP and HTTPS to 203.0.113.3; log and drop everything else',chk:()=>permits('OUTSIDE-IN',PK('tcp',A1,'203.0.113.3',{dp:80}))&&permits('OUTSIDE-IN',PK('tcp',A1,'203.0.113.3',{dp:443}))&&denies('OUTSIDE-IN',PK('tcp',A1,'203.0.113.3',{dp:22}))&&denies('OUTSIDE-IN',PK('icmp',A1,'203.0.113.3',{icmp:8}))&&denies('OUTSIDE-IN',PK('tcp',A1,'203.0.113.2',{dp:22}))&&denies('OUTSIDE-IN',PK('icmp',A1,'203.0.113.2',{icmp:8})),
+   h:' remark Published web server (global address, before NAT)\n permit tcp any host 203.0.113.3 eq www\n permit tcp any host 203.0.113.3 eq 443\n deny ip any any log\n exit'},
+  {id:'outsideApp',t:'Apply OUTSIDE-IN inbound on G0/2',chk:()=>R.ifs.g2.in==='OUTSIDE-IN'&&has('OUTSIDE-IN'),h:'interface g0/2\n ip access-group OUTSIDE-IN in\n end'}]},
+ {g:'Verify',items:[
+  {id:'aclTests',t:'Run all 15 tests in the After ACLs phase',chk:()=>tpCount('acl')===15,h:'Test plan tab. Predict first, then Load and run each test.'},
+  {id:'counters',t:'Show the ACL hit counters after testing',chk:()=>!!FLAGS.counters,h:'R1-SOHO# show access-lists\nWhich lines counted the blocked tests?'}]}];
+const TASKS_B=[
+ {g:'Prepare',items:[
+  {id:'reduce',t:'Reduce OUTSIDE-IN to anti-spoofing plus permit ip any any',chk:()=>R.ifs.g2.in==='OUTSIDE-IN'&&spoofOk()&&permits('OUTSIDE-IN',PK('tcp',A1,'203.0.113.2',{dp:22}))&&permits('OUTSIDE-IN',PK('icmp',A1,'203.0.113.3',{icmp:8}))&&permits('OUTSIDE-IN',PK('udp',A1,'203.0.113.2',{dp:161})),
+   h:'R1-SOHO# show access-lists OUTSIDE-IN\nconfigure terminal\nip access-list extended OUTSIDE-IN\n no 80\n no 90  ... (remove every line after the anti-spoofing denies)\n permit ip any any\n end\n\nOr remove the ACL from G0/2, delete it, rebuild it, and re-apply it.'},
+  {id:'zones',t:'Create zones INSIDE, DMZ, and OUTSIDE',chk:()=>['INSIDE','DMZ','OUTSIDE'].every(z=>R.zones[z]),h:'zone security INSIDE\nzone security DMZ\nzone security OUTSIDE'}]},
+ {g:'Policies (tested with sample traffic)',items:[
+  {id:'inout',t:'INSIDE to OUTSIDE: inspect all TCP, UDP, and ICMP',chk:()=>insp('INSIDE','OUTSIDE',PK('tcp',ST,NS,{dp:80}))&&insp('INSIDE','OUTSIDE',PK('udp',ST,NS,{dp:53}))&&insp('INSIDE','OUTSIDE',PK('icmp',ST,NS,{icmp:8})),
+   h:'class-map type inspect match-any CM-INSIDE-TO-OUTSIDE\n match protocol tcp\n match protocol udp\n match protocol icmp\npolicy-map type inspect PM-INSIDE-TO-OUTSIDE\n class type inspect CM-INSIDE-TO-OUTSIDE\n  inspect\n class class-default\n  drop log\nzone-pair security ZP-IN-OUT source INSIDE destination OUTSIDE\n service-policy type inspect PM-INSIDE-TO-OUTSIDE'},
+  {id:'indmz',t:'INSIDE to DMZ: web for everyone; SSH and ping for PC-Admin only',chk:()=>insp('INSIDE','DMZ',PK('tcp',ST,WS,{dp:80}))&&insp('INSIDE','DMZ',PK('tcp',ST,WS,{dp:443}))&&insp('INSIDE','DMZ',PK('tcp',AD,WS,{dp:22}))&&insp('INSIDE','DMZ',PK('icmp',AD,WS,{icmp:8}))&&blocked('INSIDE','DMZ',PK('tcp',ST,WS,{dp:22}))&&blocked('INSIDE','DMZ',PK('icmp',ST,WS,{icmp:8})),
+   h:'ip access-list extended ACL-INSIDE-TO-DMZ\n permit tcp 192.168.10.0 0.0.0.255 host 192.168.20.10 eq www\n permit tcp 192.168.10.0 0.0.0.255 host 192.168.20.10 eq 443\n permit tcp host 192.168.10.10 host 192.168.20.10 eq 22\n permit icmp host 192.168.10.10 host 192.168.20.10 echo\nclass-map type inspect match-all CM-INSIDE-TO-DMZ\n match access-group name ACL-INSIDE-TO-DMZ\npolicy-map type inspect PM-INSIDE-TO-DMZ\n class type inspect CM-INSIDE-TO-DMZ\n  inspect\n class class-default\n  drop log\nzone-pair security ZP-IN-DMZ source INSIDE destination DMZ\n service-policy type inspect PM-INSIDE-TO-DMZ'},
+  {id:'outdmz',t:'OUTSIDE to DMZ: HTTP and HTTPS to WEB-DMZ only',chk:()=>insp('OUTSIDE','DMZ',PK('tcp',A1,WS,{dp:80}))&&insp('OUTSIDE','DMZ',PK('tcp',A1,WS,{dp:443}))&&blocked('OUTSIDE','DMZ',PK('tcp',A1,WS,{dp:22}))&&blocked('OUTSIDE','DMZ',PK('icmp',A1,WS,{icmp:8})),
+   h:'The firewall checks this traffic after NAT, so use the real address.\n\nip access-list extended ACL-OUTSIDE-TO-DMZ\n permit tcp any host 192.168.20.10 eq www\n permit tcp any host 192.168.20.10 eq 443\nclass-map type inspect match-all CM-OUTSIDE-TO-DMZ\n match access-group name ACL-OUTSIDE-TO-DMZ\npolicy-map type inspect PM-OUTSIDE-TO-DMZ\n class type inspect CM-OUTSIDE-TO-DMZ\n  inspect\n class class-default\n  drop log\nzone-pair security ZP-OUT-DMZ source OUTSIDE destination DMZ\n service-policy type inspect PM-OUTSIDE-TO-DMZ'},
+  {id:'dmzout',t:'DMZ to OUTSIDE: DNS, HTTP, and HTTPS from WEB-DMZ only',chk:()=>insp('DMZ','OUTSIDE',PK('udp',WS,NS,{dp:53}))&&insp('DMZ','OUTSIDE',PK('tcp',WS,NS,{dp:80}))&&insp('DMZ','OUTSIDE',PK('tcp',WS,NS,{dp:443}))&&blocked('DMZ','OUTSIDE',PK('tcp',WS,NS,{dp:25})),
+   h:'ip access-list extended ACL-DMZ-TO-OUTSIDE\n permit udp host 192.168.20.10 any eq domain\n permit tcp host 192.168.20.10 any eq www\n permit tcp host 192.168.20.10 any eq 443\nclass-map type inspect match-all CM-DMZ-TO-OUTSIDE\n match access-group name ACL-DMZ-TO-OUTSIDE\npolicy-map type inspect PM-DMZ-TO-OUTSIDE\n class type inspect CM-DMZ-TO-OUTSIDE\n  inspect\n class class-default\n  drop log\nzone-pair security ZP-DMZ-OUT source DMZ destination OUTSIDE\n service-policy type inspect PM-DMZ-TO-OUTSIDE'}]},
+ {g:'Activate and verify',items:[
+  {id:'assign',t:'Assign G0/0, G0/1, and G0/2 to their zones, with no zone-pair into INSIDE',chk:()=>R.ifs.g0.zone==='INSIDE'&&R.ifs.g1.zone==='DMZ'&&R.ifs.g2.zone==='OUTSIDE'&&!findZp('DMZ','INSIDE')&&!findZp('OUTSIDE','INSIDE'),h:'interface g0/0\n zone-member security INSIDE\ninterface g0/1\n zone-member security DMZ\ninterface g0/2\n zone-member security OUTSIDE\n end'},
+  {id:'sessions',t:'Show a live firewall session',chk:()=>!!FLAGS.sessions,h:'From PC-Staff: curl http://www.netserver.test\nThen on R1-SOHO: show policy-map type inspect zone-pair sessions'},
+  {id:'zpfTests',t:'Run all 15 tests in the After ZPF phase',chk:()=>tpCount('zpf')===15,h:'Test plan tab. Predict first; several results change from the After ACLs phase.'}]}];
+const CHAL=[{id:'chalBlock',t:'ATTACKER\u2019s ping to 203.0.113.2 is dropped by an OUTSIDE-to-self zone-pair',chk:()=>!!FLAGS.chalBlock},
+ {id:'chalRouter',t:'R1-SOHO can still ping the ISP (203.0.113.1) with that zone-pair in place',chk:()=>!!FLAGS.chalRouter}];
+const isDone=it=>DONE[it.id]||(it.chk()&&(DONE[it.id]=true));
+function taskHTML(groups,prefix){return groups.map(g=>`<div class="group-h">${esc(g.g)}</div><ul class="checklist">`+g.items.map(it=>{const done=isDone(it);
+  return`<li class="${done?'done':''}"><span class="cb" aria-hidden="true">\u2713</span><div><div class="task-t">${esc(it.t)}<span class="sr-only">${done?' (complete)':''}</span></div>${it.h?`<button class="hint-btn" type="button" data-hint="${prefix}${it.id}">Show hint</button><pre class="hint" id="hint-${prefix}${it.id}" hidden>${esc(it.h)}</pre>`:''}</div></li>`}).join('')+'</ul>').join('')}
+const openHints=new Set();
+function bindHints(c){c.querySelectorAll('[data-hint]').forEach(b=>{const id=b.dataset.hint,pre=$('#hint-'+id);if(openHints.has(id)){pre.hidden=false;b.textContent='Hide hint'}
+  b.onclick=()=>{pre.hidden=!pre.hidden;b.textContent=pre.hidden?'Show hint':'Hide hint';pre.hidden?openHints.delete(id):openHints.add(id)}})}
+function renderTasks(){$('#tasksA').innerHTML=taskHTML(TASKS_A,'a');bindHints($('#tasksA'));$('#tasksB').innerHTML=taskHTML(TASKS_B,'b');bindHints($('#tasksB'));
+  const cd=CHAL.map(isDone);$('#chalList').innerHTML=CHAL.map((c,i)=>`<li class="${cd[i]?'done':''}"><span class="cb" aria-hidden="true">\u2713</span><div class="task-t">${esc(c.t)}</div></li>`).join('');
+  if(cd.every(Boolean)){$('#chalBanner').className='banner good';$('#chalBanner').innerHTML='<strong>Challenge complete.</strong> The router ignores internet pings but still reaches its ISP. Re-run T11 to record it, and explain the self zone in your report.';$('#chalBanner').hidden=false}}
+const allA=()=>TASKS_A.flatMap(g=>g.items),allB=()=>TASKS_B.flatMap(g=>g.items);
+function updateProgress(){const a=allA(),b=allB(),da=a.filter(isDone).length,db=b.filter(isDone).length,q=quizScore!==null?1:0,tot=a.length+b.length+1;
+  $('#meterTxt').textContent=`${da+db+q} of ${tot} tasks`;$('#meterFill').style.width=((da+db+q)/tot*100)+'%';
+  $('#tickA').textContent=da===a.length?'\u2713':'';$('#tickB').textContent=db===b.length?'\u2713':'';$('#tickT').textContent=['base','acl','zpf'].every(p=>tpCount(p)===15)?'\u2713':'';$('#tickQ').textContent=quizScore!==null?'\u2713':''}
+function updateAll(){renderTopo();renderInspect();renderTasks();if(curTab==='tests')renderTests();updateProgress();save()}
+
+/* ======================================================================
+   Persistence
+   ====================================================================== */
+const SKEY='fwlab-state';
+function save(){try{const cfg={};CFG_KEYS.forEach(k=>cfg[k]=R[k]);cfg.drops=R.drops||{};store.set(SKEY,JSON.stringify({cfg,TP,DONE,FLAGS}))}catch(e){}}
+function resetRouter(){const keep={buf:R.buf,hist:R.hist,hi:R.hi};Object.assign(R,freshRouter(),keep);R.drops={};delete FLAGS.chalBlock;delete FLAGS.chalRouter}
+function load(){Object.assign(R,freshRouter());R.drops={};const raw=store.get(SKEY);if(!raw)return false;
+  try{const s=JSON.parse(raw);CFG_KEYS.forEach(k=>{if(s.cfg&&s.cfg[k]!==undefined)R[k]=s.cfg[k]});R.drops=(s.cfg&&s.cfg.drops)||{};R.mode='user';TP=s.TP||{};DONE=s.DONE||{};FLAGS=s.FLAGS||{};return true}catch(e){return false}}
+
+/* ======================================================================
+   QUIZ
+   ====================================================================== */
+const QUIZ=[
+ {q:'A packet matches none of the lines in an applied ACL. What happens to it?',o:['It is permitted, because nothing denied it','It is dropped by the implicit deny at the end of every ACL','It is sent to the next ACL on the interface','It is logged and then permitted'],a:1,e:'Every ACL ends with an invisible deny any. That is why each ACL in this lab ends with an explicit deny ip any any log: the drops become visible.'},
+ {q:'Which wildcard mask matches every address in 192.168.10.0/24?',o:['255.255.255.0','0.0.0.255','0.0.0.0','255.255.255.255'],a:1,e:'Wildcard bits set to 0 must match and bits set to 1 are ignored, so a /24 is 0.0.0.255. Typing 255.255.255.0 is a common and dangerous mistake.'},
+ {q:'Where should an extended ACL usually be placed?',o:['As close to the destination as possible','As close to the source as possible','Only on outbound interfaces','Only on the VTY lines'],a:1,e:'Extended ACLs can identify traffic precisely, so placing them near the source drops unwanted packets before they use bandwidth. INSIDE-IN on G0/0 inbound follows this rule.'},
+ {q:'What does the established keyword in an ACL actually test?',o:['That a TCP three-way handshake completed','That the TCP segment has the ACK or RST flag set','That the router has a session table entry','That the packet came from a trusted zone'],a:1,e:'established only looks at flags in one packet. An attacker can set the ACK flag on a forged packet, which is why T15 shows ports as unfiltered after Part A.'},
+ {q:'Why does ACL-OUTSIDE-TO-DMZ match the web server as 192.168.20.10 instead of 203.0.113.3?',o:['Because the public address is only used for DNS','Because the zone-based firewall evaluates traffic after destination NAT','Because class-maps cannot use public addresses','Because 203.0.113.3 is blocked by anti-spoofing'],a:1,e:'The interface ACL runs before NAT and sees 203.0.113.3. The firewall runs after NAT and sees the real address, 192.168.20.10.'},
+ {q:'With the Part B configuration, WEB-DMZ tries to ping PC-Admin. What happens?',o:['It succeeds, because the DMZ is semi-trusted','It is dropped, because no DMZ-to-INSIDE zone-pair exists','It succeeds only if PC-Admin pings first','It is dropped by INSIDE-IN'],a:1,e:'Between different zones, traffic is denied unless a zone-pair allows it. Leaving out the DMZ-to-INSIDE zone-pair is how this design protects staff PCs from a compromised server.'},
+ {q:'What is the difference between the inspect and pass actions?',o:['inspect logs; pass does not','inspect records a session so replies return automatically; pass allows one direction only','pass is stateful; inspect is stateless','There is no difference'],a:1,e:'pass works like a one-way stateless permit. Replies need their own policy in the opposite zone-pair, which is exactly what the challenge task uses for echo-replies to the router.'},
+ {q:'G0/0 is assigned to zone INSIDE, but G0/1 has not been assigned to any zone yet. What happens to traffic between them?',o:['It is permitted until both are zoned','It is dropped','It is inspected using the default policy','It bypasses the firewall'],a:1,e:'Traffic between a zoned and an unzoned interface is dropped. That is why you build policies first and assign interfaces to zones last.'},
+ {q:'After Part B, ATTACKER can still ping 203.0.113.2. Why?',o:['OUTSIDE-IN permits it','Traffic to the router itself is in the self zone, which is allowed until a self zone-pair is configured','ICMP cannot be filtered by a zone-based firewall','The ISP answers on the router\u2019s behalf'],a:1,e:'The self zone covers traffic to and from the router. With no OUTSIDE-to-self zone-pair, it is allowed by default.'},
+ {q:'Why does OUTSIDE-IN deny packets arriving from the internet with a source in 192.168.0.0/16?',o:['They are always malware','RFC 1918 addresses can\u2019t legitimately arrive from the internet, so they must be spoofed','They would overload the NAT table','Cisco routers require it'],a:1,e:'Private addresses are not routed on the internet. A packet from outside claiming one is forged, often to impersonate an inside host. Dropping them is ingress filtering (BCP 38).'}];
+function renderQuiz(){$('#quizForm').innerHTML=QUIZ.map((q,i)=>`<div class="q"><fieldset><legend>${i+1}. ${esc(q.q)}</legend>${q.o.map((o,j)=>`<label id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}"> <span>${esc(o)}</span></label>`).join('')}<div class="fb" id="fb${i}" hidden></div></fieldset></div>`).join('');$('#quizScore').hidden=true}
+let quizScore=null;
+$('#quizCheck').onclick=()=>{let s=0,un=0;QUIZ.forEach((q,i)=>{const sel=document.querySelector(`input[name="q${i}"]:checked`),fb=$('#fb'+i);
+  $$(`[id^="q${i}o"]`).forEach(l=>l.classList.remove('correct'));
+  if(!sel){un++;fb.hidden=true;return}const right=+sel.value===q.a;if(right)s++;
+  fb.className='fb '+(right?'right':'wrong');fb.innerHTML=(right?'<strong>Correct.</strong> ':'<strong>Not quite.</strong> ')+esc(q.e);fb.hidden=false;$(`#q${i}o${q.a}`).classList.add('correct')});
+  if(un){$('#quizScore').className='banner warn';$('#quizScore').textContent=`Answer all questions first. ${un} left.`;$('#quizScore').hidden=false;return}
+  quizScore=s;store.set('fwlab-quiz',String(s));$('#quizScore').className='banner '+(s>=8?'good':'warn');$('#quizScore').innerHTML=`<strong>Score: ${s} of ${QUIZ.length}.</strong> ${s>=8?'Well done.':'Review the briefing and explanations, then try again.'}`;$('#quizScore').hidden=false;updateProgress()};
+$('#quizReset').onclick=()=>{renderQuiz();window.scrollTo({top:0})};
+renderQuiz();{const q=store.get('fwlab-quiz');if(q!==null)quizScore=+q}
+
+/* ======================================================================
+   REPORT
+   ====================================================================== */
+function renderSummary(){const li=(t,d)=>`<li>${d?'\u2705':'\u25CB'} ${esc(t)}</li>`;
+  $('#summary').innerHTML='<li><strong>Part A: Packet filtering</strong></li>'+allA().map(t=>li(t.t,isDone(t))).join('')+
+   '<li style="margin-top:8px"><strong>Part B: Stateful firewall</strong></li>'+allB().map(t=>li(t.t,isDone(t))).join('')+li('Challenge: router protected (bonus)',CHAL.every(isDone))+
+   `<li style="margin-top:8px"><strong>Test plan:</strong> ${['base','acl','zpf'].map(p=>`${PHASES[p]} ${tpCount(p)}/15`).join(', ')}</li>`+
+   `<li><strong>Knowledge check:</strong> ${quizScore===null?'not completed':quizScore+' of '+QUIZ.length}</li>`;
+  const c=(t,p)=>{const x=(TP[t.id]||{})[p]||{};if(!x.r)return`<td>${x.p?'P: '+esc(x.p):'\u2014'}</td>`;return`<td><strong>${esc(x.r)}</strong>${x.p?` (P: ${esc(x.p)}${x.p!==x.r?' !':''})`:' (no P)'}${x.s?`<br><span class="stop">${esc(x.s)}</span>`:''}</td>`};
+  $('#repTp').innerHTML='<table class="spec rep-tp"><tr><th>ID</th><th>Test</th><th>Baseline</th><th>After ACLs</th><th>After ZPF</th></tr>'+TESTS.map(t=>`<tr><td class="mono">${t.id}</td><td>${esc(t.t)}</td>${['base','acl','zpf'].map(p=>c(t,p)).join('')}</tr>`).join('')+'</table>'}
+$$('[data-save]').forEach(el=>{const k='fwlab-'+el.id,v=store.get(k);if(v!==null)el.value=v;el.addEventListener('input',()=>store.set(k,el.value))});
+if(!$('#rDate').value)$('#rDate').value=new Date().toLocaleDateString();
+
+/* ======================================================================
+   INIT
+   ====================================================================== */
+const restored=load();
+DEV.r1=R;Object.keys(HOSTS).forEach(k=>DEV[k]={buf:[],hist:[],hi:0});
+push(R,`R1-SOHO console connected. Interfaces, NAT, DHCP, SSH, and the admin account are preconfigured.\n${restored?'Your configuration from an earlier session was restored from this browser.\n':''}Type enable to begin, ? for help. Multi-line pastes run line by line.\n`,'sys');
+Object.entries(HOSTS).forEach(([k,h])=>push(DEV[k],h.os==='win'?`Microsoft Windows [Version 10.0.22631]\n${h.name} (${h.ip}). Type help to list the commands on this host.\n`:`${h.name} (${h.ip}) Linux shell. Type help to list the commands on this host.\n`,'sys'));
+dock($('#partA'));renderTerm();updateAll();
+</script>
+</body>
+</html>
