@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Threat Hunt | LAN121 Activity 04</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EEF5; --paper:#F7FAFD; --surface:#FFFFFF; --ink:#0E2340; --ink-2:#4A5D78; --line:#C7D4E5;
+  --navy:#0047AB; --on-navy:#FFFFFF; --navy-soft:#DCE7F7;
+  --green:#00A86B; --green-ink:#007A4E; --green-soft:#D5F2E5;
+  --amber:#B86E00; --amber-soft:#FBEACB; --red:#C2303A; --red-soft:#F8DCDE;
+  --console:#0E2340; --console-ink:#CFE0F5; --console-dim:#7F97B8; --console-hi:#FFD27A;
+  --shadow:0 1px 2px rgba(14,35,64,.08),0 6px 18px rgba(14,35,64,.06);
+  --sans:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,"Courier New",monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#071326; --paper:#0B1C36; --surface:#102644; --ink:#E4ECF7; --ink-2:#9DB0CB; --line:#264268;
+    --navy:#6AA2FF; --on-navy:#061428; --navy-soft:#16325E;
+    --green:#2FD08F; --green-ink:#5BE0A8; --green-soft:#0E3A2B;
+    --amber:#F2B24C; --amber-soft:#3A2C12; --red:#FF6B74; --red-soft:#3D1A21;
+    --console:#030B18; --console-ink:#CFE0F5; --console-dim:#6F87A8; --console-hi:#FFD27A;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071326; --paper:#0B1C36; --surface:#102644; --ink:#E4ECF7; --ink-2:#9DB0CB; --line:#264268;
+  --navy:#6AA2FF; --on-navy:#061428; --navy-soft:#16325E;
+  --green:#2FD08F; --green-ink:#5BE0A8; --green-soft:#0E3A2B;
+  --amber:#F2B24C; --amber-soft:#3A2C12; --red:#FF6B74; --red-soft:#3D1A21;
+  --console:#030B18; --console-ink:#CFE0F5; --console-dim:#6F87A8; --console-hi:#FFD27A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.app{max-width:1320px;margin:0 auto;padding:20px 20px 48px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:18px}
+.course{font-family:var(--cond);font-weight:600;font-size:1rem;color:var(--navy);margin:0 0 2px}
+h1{font-family:var(--cond);font-weight:700;font-size:clamp(2rem,4.2vw,3rem);line-height:1;margin:0;letter-spacing:-.01em}
+.lede{margin:8px 0 0;color:var(--ink-2);max-width:66ch}
+.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;font-weight:500}
+.theme-btn svg{width:18px;height:18px}
+
+/* Phase stepper */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.step{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center}
+.step .n{font-family:var(--cond);font-weight:700;font-size:1.6rem;color:var(--ink-2);width:1.1em}
+.step strong{display:block;font-weight:600;line-height:1.2}
+.step small{color:var(--ink-2);font-size:.82rem}
+.step[aria-pressed="true"]{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--navy-soft)}
+.step[aria-pressed="true"] .n{color:var(--navy)}
+.step:disabled{cursor:not-allowed;opacity:.6}
+.step .done{color:var(--green-ink);font-weight:600}
+
+/* Field guide */
+details.guide{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+details.guide summary{cursor:pointer;padding:12px 18px;font-family:var(--cond);font-weight:600;font-size:1.15rem;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.guide summary::-webkit-details-marker{display:none}
+details.guide summary::after{content:"+";font-size:1.4rem;color:var(--navy)}
+details.guide[open] summary::after{content:"\2212"}
+.guide-body{padding:0 18px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 24px;font-size:.92rem}
+.guide-body h3{font-family:var(--cond);font-weight:600;font-size:1.05rem;margin:0 0 4px;color:var(--navy)}
+.guide-body ul{margin:0;padding-left:18px}
+.guide-body li{margin-bottom:3px}
+
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;align-items:flex-start}
+.brief p{margin:0;max-width:74ch}
+.howto{font-size:.88rem;color:var(--ink-2);max-width:36ch}
+
+/* Workspace */
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.side{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));max-height:calc(100vh - 24px);overflow:auto}
+.side h2,.results h2{font-family:var(--cond);font-weight:600;font-size:1.25rem;margin:0 0 8px}
+
+/* Case files */
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.case{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px 14px 20px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.case::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--sev)}
+.case[data-sev="critical"]{--sev:var(--red)}
+.case[data-sev="high"]{--sev:var(--amber)}
+.case[data-sev="medium"]{--sev:var(--navy)}
+.case.focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-soft),var(--shadow)}
+.case-head{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline}
+.case-no{font-family:var(--cond);font-weight:700;font-size:2.1rem;line-height:.9;color:var(--sev);grid-row:span 2}
+.case-head h3{margin:0;font-family:var(--cond);font-weight:600;font-size:1.22rem;line-height:1.15}
+.meta{font-size:.8rem;color:var(--ink-2)}
+.sev{display:inline-block;font-weight:600;color:var(--sev)}
+.story{margin:0;font-size:.92rem}
+.log{margin:0;background:var(--console);color:var(--console-ink);font-family:var(--mono);font-size:.74rem;line-height:1.55;border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre}
+.log .p{color:var(--console-dim)}
+.assign{margin-top:auto;display:flex;align-items:center;gap:10px;width:100%;border:2px dashed var(--navy);border-radius:10px;background:var(--paper);padding:8px 10px;cursor:pointer;text-align:left;min-height:48px;transition:transform .12s,box-shadow .12s}
+.assign svg{width:26px;height:26px;color:var(--navy);flex:none}
+.assign .lbl{font-weight:600}
+.assign .ph{color:var(--ink-2);font-weight:500}
+.assign.filled{border-style:solid;background:var(--navy-soft)}
+.assign:hover,.case.focus .assign{box-shadow:0 0 0 4px var(--navy-soft)}
+.armed .assign{animation:pulse 1.4s ease-in-out infinite}
+.assign.drop{transform:scale(1.02);box-shadow:0 0 0 4px var(--green)}
+@keyframes pulse{50%{box-shadow:0 0 0 5px var(--navy-soft)}}
+.case-tools{display:flex;gap:8px;align-items:center}
+.linkbtn{background:none;border:0;padding:2px 0;color:var(--navy);font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hint{font-size:.88rem;border-left:3px solid var(--navy);padding:4px 10px;background:var(--navy-soft);border-radius:0 6px 6px 0;margin:0}
+.fb{border-radius:8px;padding:8px 12px;font-size:.88rem;margin:0}
+.fb strong{display:block;font-family:var(--cond);font-size:1.05rem}
+.fb.ok{background:var(--green-soft)} .fb.ok strong{color:var(--green-ink)}
+.fb.bad{background:var(--red-soft)} .fb.bad strong{color:var(--red)}
+.case.r-ok .assign{border-color:var(--green);background:var(--green-soft)}
+.case.r-bad .assign{border-color:var(--red);background:var(--red-soft)}
+
+/* Stamp: the one orchestrated moment */
+.case.r-ok .case-head,.case.r-bad .case-head{padding-right:104px}
+.stamp{position:absolute;top:12px;right:12px;font-family:var(--cond);font-weight:700;font-size:1.05rem;letter-spacing:.02em;padding:2px 10px;border:3px solid currentColor;border-radius:6px;transform:rotate(-8deg);opacity:.9;pointer-events:none;background:var(--surface)}
+.stamp.ok{color:var(--green-ink)} .stamp.bad{color:var(--red)}
+.stamp.anim{animation:stamp .35s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes stamp{from{transform:rotate(-8deg) scale(2.2);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:.9}}
+
+/* Trays */
+.tray{padding:14px}
+.tray .sub{font-size:.85rem;color:var(--ink-2);margin:-4px 0 10px}
+.about{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px;font-size:.84rem;height:118px;overflow:auto}
+.about b{display:block;font-size:.95rem}
+.about p{margin:3px 0 0;line-height:1.38}
+.about .cat{font-size:.76rem;font-weight:600;color:var(--ink-2)}
+.about.idle{color:var(--ink-2)}
+.placing-wrap{height:40px;margin-bottom:10px}
+.placing{display:flex;align-items:center;gap:10px;background:var(--navy);color:var(--on-navy);border-radius:8px;padding:0 10px;height:40px;font-size:.88rem}
+.placing.idle{background:transparent;color:var(--ink-2);border:1px dashed var(--line)}
+.placing button{margin-left:auto;background:transparent;border:1px solid currentColor;border-radius:6px;padding:2px 8px;cursor:pointer;color:inherit;font-size:.8rem}
+.group{margin-bottom:10px}
+.group h3{font-family:var(--cond);font-weight:600;font-size:.95rem;color:var(--ink-2);margin:0 0 6px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{display:flex;align-items:center;gap:8px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:grab;font-size:.85rem;font-weight:500;line-height:1.15;min-height:44px;position:relative}
+.chip svg{width:22px;height:22px;flex:none;color:var(--navy)}
+.chip:hover{border-color:var(--navy)}
+.chip[aria-pressed="true"]{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.chip[aria-pressed="true"] svg{color:var(--on-navy)}
+.chip.used{opacity:.55}
+.chip .uc{position:absolute;top:-7px;right:-6px;font-family:var(--cond);font-weight:700;font-size:.75rem;background:var(--navy);color:var(--on-navy);border-radius:999px;padding:0 6px}
+.cm-list{display:grid;gap:5px}
+.cm{display:flex;align-items:center;gap:8px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:grab;font-size:.84rem;font-weight:500;line-height:1.2;min-height:40px}
+.cm .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c)}
+.cm:hover{border-color:var(--navy)}
+.cm[aria-pressed="true"]{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+
+/* Defense board */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.tcard-head{display:flex;gap:10px;align-items:center}
+.tcard-head .ic{width:40px;height:40px;border-radius:10px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;flex:none}
+.tcard-head .ic svg{width:26px;height:26px}
+.tcard-head h3{margin:0;font-family:var(--cond);font-weight:600;font-size:1.2rem;line-height:1.1}
+.tcard-head small{color:var(--ink-2);font-size:.8rem}
+.slot{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:2px dashed var(--navy);border-radius:9px;background:var(--paper);padding:7px 10px;cursor:pointer;min-height:44px;font-size:.88rem;position:relative;transition:transform .12s,box-shadow .12s}
+.slot .ph{color:var(--ink-2)}
+.slot.filled{border-style:solid;background:var(--navy-soft);font-weight:500}
+.slot.focus{box-shadow:0 0 0 3px var(--navy)}
+.slot.drop{transform:scale(1.02);box-shadow:0 0 0 4px var(--green)}
+.armed .slot{animation:pulse 1.4s ease-in-out infinite}
+.slot.r-ok{border-color:var(--green);background:var(--green-soft)}
+.slot.r-bad{border-color:var(--red);background:var(--red-soft)}
+.slot .mark{margin-left:auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.8rem;font-weight:700;flex:none}
+.slot.r-ok .mark{background:var(--green)} .slot.r-bad .mark{background:var(--red)}
+.tcard .why{font-size:.84rem;color:var(--ink-2);margin:0}
+.tcard .why b{color:var(--ink)}
+.locked{padding:28px;text-align:center;color:var(--ink-2)}
+.locked strong{display:block;font-family:var(--cond);font-size:1.4rem;color:var(--ink)}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
+.btn.go{background:var(--green);border-color:var(--green);color:#03261A}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:5px 11px;font-size:.88rem}
+.verdict{flex:1 1 260px;font-size:.92rem;padding:8px 12px;border-radius:8px;background:var(--navy-soft)}
+.verdict:empty{display:none}
+.verdict b{font-family:var(--cond);font-size:1.15rem}
+.progress{font-size:.88rem;color:var(--ink-2)}
+
+/* Results */
+.results{margin-top:20px;padding:18px}
+.tbl{overflow-x:auto}
+.results table{width:100%;border-collapse:collapse;font-size:.9rem}
+.results th,.results td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.results th{font-family:var(--cond);font-weight:600;font-size:1rem;color:var(--ink-2)}
+.results .total td{font-weight:700;border-bottom:0}
+.y{color:var(--green-ink);font-weight:700} .x{color:var(--red);font-weight:700}
+.name-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 14px}
+.name-row input{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);flex:1 1 200px;max-width:320px}
+.score-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.score{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.score .big{font-family:var(--cond);font-weight:700;font-size:2rem;line-height:1}
+.score small{display:block;color:var(--ink-2);font-size:.82rem}
+.bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar span{display:block;height:100%;background:var(--green)}
+.print-only{display:none}
+
+@media (max-width:980px){
+  .workspace{grid-template-columns:1fr}
+  .side{position:static;max-height:none}
+}
+@media (max-width:640px){
+  .steps{grid-template-columns:1fr}
+  .chips{grid-template-columns:1fr 1fr}
+  .app{padding:14px 12px 40px}
+}
+@media (prefers-reduced-motion:reduce){
+  .armed .assign,.armed .slot{animation:none;box-shadow:0 0 0 4px var(--navy-soft)}
+  .stamp.anim{animation:none}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .no-print{display:none!important}
+  .print-only{display:block}
+  .results{box-shadow:none;border:0;margin:0;padding:0}
+  .score{border-color:#999}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-ddos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="8" width="7" height="9" rx="1"/><path d="M17.5 11h2M17.5 14h2"/><path d="M2 5l10 6M2 12h10M2 19l10-6M5 3l7 8M5 21l7-8"/></symbol>
+    <symbol id="i-vlanhop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="15" width="18" height="5" rx="1"/><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M8 15c0-3 2-4 4-4s4-1 4-2"/><path d="M14 9h2v2"/></symbol>
+    <symbol id="i-macflood" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="15" rx="1.5"/><path d="M4 7h16M4 11h16M4 15h16M9 3v15"/><path d="M6 21c1.5-1 3-1 4.5 0s3 1 4.5 0 3-1 4.5 0"/></symbol>
+    <symbol id="i-arp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/><path d="M6.7 12h3M14.3 12h3"/><path d="M9.5 9.5c1-1 4-1 5 0v3.5c0 1.7-1.2 3-2.5 3s-2.5-1.3-2.5-3z"/><path d="M10.6 11.6h.01M13.4 11.6h.01"/></symbol>
+    <symbol id="i-dns" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 5h10l2 2-2 2H5z"/><path d="M19 11H9l-2 2 2 2h10z"/><path d="M15 19l4-3"/></symbol>
+    <symbol id="i-roguedhcp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="8" rx="1.5"/><path d="M7 15h.01M10 15h.01"/><path d="M9.5 5.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4"/><path d="M12 9.3v.2"/></symbol>
+    <symbol id="i-eviltwin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5a7 7 0 0 1 8.5 0M4.3 12a4 4 0 0 1 4.9 0"/><circle cx="6.7" cy="15" r="1"/><path d="M13 9.5a7 7 0 0 1 8.5 0M14.8 12a4 4 0 0 1 4.9 0"/><circle cx="17.2" cy="15" r="1"/><path d="M15.5 18.5l1.7 1.5 1.7-1.5"/></symbol>
+    <symbol id="i-phishing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10a4 4 0 1 1-8 0v-1"/><path d="M4 11l2 2"/><rect x="13" y="13" width="9" height="7" rx="1"/><path d="M13 14l4.5 3 4.5-3"/></symbol>
+    <symbol id="i-tailgating" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h7v18"/><path d="M8 12h.01"/><circle cx="15" cy="6.5" r="1.7"/><path d="M15 8.5v5l-2 6M15 13.5l2 6"/><circle cx="20" cy="8" r="1.4"/><path d="M20 9.8v4l1.5 5.2"/></symbol>
+    <symbol id="i-ransomware" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v6"/><path d="M14 2v4h4"/><path d="M6 2v19h6"/><rect x="13" y="15" width="8" height="6" rx="1"/><path d="M15 15v-2a2 2 0 0 1 4 0v2"/></symbol>
+    <symbol id="i-shoulder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="i-dumpster" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-1.5 13h-13z"/><path d="M3 7l3-3h12l3 3"/><path d="M9 11h6M9 14.5h4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="top no-print">
+    <div>
+      <p class="course">LAN121 Network Essentials, Activity 04</p>
+      <h1>Threat hunt</h1>
+      <p class="lede">You are the on-call analyst for Ridgeline Credit Union. Ten incident tickets are waiting. Read the evidence, name the attack behind each one, then build the defenses that would have stopped it.</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch color theme"></button>
+  </header>
+
+  <nav class="steps no-print" id="steps" aria-label="Activity phases"></nav>
+
+  <details class="guide no-print">
+    <summary>Field guide: what you need to know (Network+ N10-009, 4.2 and 4.3)</summary>
+    <div class="guide-body">
+      <div>
+        <h3>Know the attack</h3>
+        <ul>
+          <li>Which layer or system it abuses: switch tables, VLAN tags, ARP, DNS, DHCP, Wi-Fi, people, or endpoints.</li>
+          <li>What it threatens: confidentiality (eavesdropping), integrity (redirection), or availability (outage).</li>
+          <li>The evidence it leaves: log messages, address mismatches, traffic patterns.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Read the evidence</h3>
+        <ul>
+          <li>Interpret <code>arp -a</code>, <code>ipconfig /all</code>, <code>nslookup</code>, and switch output.</li>
+          <li>Compare what you see with what you expect: the right server, gateway, MAC, or SSID.</li>
+          <li>Count things: sources, MAC addresses, badges, people.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Pick the defense</h3>
+        <ul>
+          <li>Switch hardening: port security, DHCP snooping, DAI, disabling DTP, native VLAN changes.</li>
+          <li>NAC and identity: 802.1X, MFA, WPA3-Enterprise.</li>
+          <li>Layered controls: filtering, IPS, segmentation, backups, training, and physical security.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <section class="brief no-print" id="brief"></section>
+
+  <!-- Phase 1 -->
+  <div class="workspace no-print" id="p1">
+    <div>
+      <div class="cases" id="cases"></div>
+      <div class="actions">
+        <button class="btn primary" id="check1" type="button">Submit my identifications</button>
+        <button class="btn go" id="to2" type="button" hidden>Go to phase 2: Defend</button>
+        <span class="progress" id="prog1"></span>
+        <div class="verdict" id="verdict1" aria-live="polite"></div>
+      </div>
+    </div>
+    <aside class="side panel tray" aria-label="Threat tray">
+      <h2>Threat tray</h2>
+      <p class="sub">Drag a threat onto a ticket, or tap a threat and then tap a ticket. Each threat fits one ticket. Two threats don’t fit any.</p>
+      <div class="placing-wrap" id="placing1"></div>
+      <div class="about idle" id="about1" aria-live="polite"></div>
+      <div id="threatTray"></div>
+    </aside>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="workspace no-print" id="p2" hidden>
+    <div>
+      <div class="board" id="board"></div>
+      <div class="actions" id="actions2">
+        <button class="btn primary" id="check2" type="button">Submit my defenses</button>
+        <button class="btn go" id="to3" type="button" hidden>See my results</button>
+        <span class="progress" id="prog2"></span>
+        <div class="verdict" id="verdict2" aria-live="polite"></div>
+      </div>
+    </div>
+    <aside class="side panel tray" aria-label="Countermeasure tray">
+      <h2>Countermeasure tray</h2>
+      <p class="sub">Give each threat two different countermeasures that directly stop or limit it. Countermeasures can be reused across threats. A few are weak controls.</p>
+      <div class="placing-wrap" id="placing2"></div>
+      <div class="about idle" id="about2" aria-live="polite"></div>
+      <div id="cmTray"></div>
+    </aside>
+  </div>
+
+  <section class="panel results" id="results">
+    <h2>Activity summary</h2>
+    <div class="name-row no-print">
+      <label for="stuName">Student name</label>
+      <input id="stuName" type="text" autocomplete="name" placeholder="First and last name">
+      <button class="btn small" id="printBtn" type="button">Print summary</button>
+      <button class="btn small" id="resetAll" type="button">Start over</button>
+    </div>
+    <p class="print-only" id="printName"></p>
+    <div id="resultsBody"></div>
+  </section>
+  <p class="sr" id="live" aria-live="assertive"></p>
+</div>
+
+<script>
+const THREATS={
+  ddos:{name:"DDoS attack",cat:"Availability",def:"Many compromised systems (a botnet) flood a target with traffic or requests until it can’t serve legitimate users."},
+  vlanhop:{name:"VLAN hopping",cat:"Layer 2",def:"Reaching a VLAN you aren’t assigned to, by tricking a port into trunking (switch spoofing with DTP) or by sending double-tagged 802.1Q frames that ride the native VLAN."},
+  macflood:{name:"MAC flooding",cat:"Layer 2",def:"Floods a switch with frames from thousands of fake source MACs until its MAC (CAM) table fills. The switch then floods frames out every port, so the attacker can capture them."},
+  arp:{name:"ARP poisoning",cat:"Layer 2",def:"Forged ARP replies map the attacker’s MAC to another host’s IP, usually the default gateway, placing the attacker on-path between victims."},
+  dns:{name:"DNS poisoning",cat:"Network services",def:"False records planted in a DNS server’s cache send users who type a correct name to an attacker-controlled IP address."},
+  roguedhcp:{name:"Rogue DHCP server",cat:"Network services",def:"An unauthorized DHCP server hands out wrong addresses, gateways, and DNS servers, whether by accident (a home router) or to redirect traffic."},
+  eviltwin:{name:"Evil twin",cat:"Wireless",def:"A rogue access point copies a legitimate SSID, often with a stronger signal, to lure users and capture credentials and traffic."},
+  phishing:{name:"Phishing",cat:"Social engineering",def:"Fraudulent messages impersonate a trusted source to trick people into clicking a link, opening an attachment, or entering credentials."},
+  tailgating:{name:"Tailgating",cat:"Physical",def:"An unauthorized person follows an authorized person through a secured door without badging in."},
+  ransomware:{name:"Ransomware",cat:"Malware",def:"Malware that encrypts files and demands payment for the key, often spreading from one infected host across shares and the network."},
+  shoulder:{name:"Shoulder surfing",cat:"Social engineering",def:"Watching someone’s screen or keypad to steal passwords, PINs, or sensitive information."},
+  dumpster:{name:"Dumpster diving",cat:"Social engineering",def:"Searching trash and recycling for documents, notes, or old hardware that reveal sensitive information."}
+};
+const TRAY_GROUPS=[["Switching and Layer 2",["macflood","vlanhop","arp"]],["Network services",["ddos","dns","roguedhcp"]],["Wireless and malware",["eviltwin","ransomware"]],["People and physical",["phishing","tailgating","shoulder","dumpster"]]];
+
+const CASES=[
+ {id:"c1",ans:"arp",sev:"high",title:"Certificate warnings on the teller floor",who:"Teller supervisor",where:"Branch 2, VLAN 20",
+  story:"Tellers keep getting browser certificate warnings in the core banking app. A help desk tech ran arp -a on a teller PC and noticed something odd about the default gateway.",
+  log:["$ arp -a   (TELLER-07)","  10.20.30.1    3c-22-fb-91-4e-07   dynamic","  10.20.30.57   3c-22-fb-91-4e-07   dynamic","# Wireshark: 10.20.30.1 is at 3c:22:fb:91:4e:07","#   unsolicited reply, repeats every 2 s"],
+  hint:"Two different IP addresses map to the same MAC address, and the replies arrive without anyone asking.",
+  why:"The gateway IP and host .57 share one MAC, and unsolicited ARP replies keep arriving. Host .57 is poisoning ARP caches to sit on-path, which is why the TLS certificates no longer match."},
+ {id:"c2",ans:"ddos",sev:"critical",title:"Online banking is down",who:"Network operations center",where:"Internet edge",
+  story:"Members can’t reach online banking or the VPN portal. The ISP link is saturated and the edge router CPU sits at 98 percent.",
+  log:["edge-rtr1 Gi0/0/0 input rate 9.41 Gbps (link 10 Gbps)","top talkers: 41,286 unique source IPs, 63 countries","TCP SYN -> 203.0.113.10:443   1.8 M packets/s","completed handshakes: 0.3%"],
+  hint:"Look at how many sources there are, and whether the connections ever complete.",
+  why:"Tens of thousands of sources sending half-open SYN floods at one service is a distributed denial-of-service attack. It exhausts bandwidth and connection state to take away availability."},
+ {id:"c3",ans:"phishing",sev:"high",title:"Mailbox deactivation notice",who:"Help desk",where:"Email",
+  story:"Three employees reported an urgent email. Two clicked the link and signed in before noticing anything was off. Hours later the sign-in log showed this.",
+  log:["From: IT Help Desk <helpdesk@ridge1ine-cu-support.com>","Subject: ACTION REQUIRED: mailbox closes in 24 hours","Link: hxxp://ridgeline-verify[.]top/login","signin: j.ortiz  SUCCESS  185.220.101.4  (RO)  02:13"],
+  hint:"Read the sender’s domain letter by letter.",
+  why:"A look-alike domain (ridge1ine, with the digit 1), false urgency, and a credential-harvesting link are classic phishing. The overseas sign-in shows the stolen password was used."},
+ {id:"c4",ans:"macflood",sev:"high",title:"Third-floor switch acting like a hub",who:"Desktop support",where:"Floor 3 access switch",
+  story:"Accounting reports a slow network. An intern running Wireshark on his own PC can see other people’s unicast traffic, including file transfers between two other desks.",
+  log:["sw-3f# show mac address-table count","  Dynamic entries: 8192   Space available: 0","  Gi0/14: 7,941 addresses learned in 60 s","  sample: 2a:91:0c:..  7e:04:b3:..  d6:5f:11:.."],
+  hint:"What does a switch do with frames when it has no room left to learn addresses?",
+  why:"One port learned almost 8,000 random MACs in a minute and the table is full. With no free entries, the switch floods unicast frames out every port, so any host can capture them."},
+ {id:"c5",ans:"eviltwin",sev:"medium",title:"Two guest networks in the lobby",who:"Branch manager",where:"Main branch lobby",
+  story:"Members in the lobby see two networks with the same name. Several who joined the stronger one got a sign-in page asking for their online banking password.",
+  log:["SSID             BSSID              Signal   Security","Ridgeline-Guest  f0:9f:c2:10:aa:31  -67 dBm  WPA3","Ridgeline-Guest  02:1a:11:fe:00:9c  -41 dBm  Open","# AP inventory lookup 02:1a:11:fe:00:9c: not found"],
+  hint:"Same name, different security, and one BSSID that IT doesn’t own.",
+  why:"An access point the credit union doesn’t own broadcasts the real SSID with a stronger signal and no encryption, then harvests passwords through a fake portal. That is an evil twin."},
+ {id:"c6",ans:"roguedhcp",sev:"medium",title:"Conference room laptops can’t reach anything",who:"Facilities",where:"Conference room B",
+  story:"After a vendor meeting, laptops in Conference Room B can’t reach file shares or the intranet. A small unlabeled box is plugged into a wall jack under the table.",
+  log:["C:\\> ipconfig /all","   IPv4 Address . . . : 192.168.0.104","   Default Gateway  . : 192.168.0.1","   DHCP Server  . . . : 192.168.0.1","# expected DHCP server: 10.20.0.5"],
+  hint:"Who handed out this address? Compare it with the expected server.",
+  why:"The laptops got their lease from 192.168.0.1 instead of the authorized server, so their subnet, gateway, and DNS are wrong. The unlabeled box is a rogue DHCP server, probably a home router a vendor plugged in."},
+ {id:"c7",ans:"ransomware",sev:"critical",title:"Files renamed on the shared drive",who:"Loan department",where:"File server FS02",
+  story:"Loan officers can’t open spreadsheets on the S: drive. Every file has a new extension and each folder has a new text file in it.",
+  log:["S:\\Loans\\2026\\Q3_pipeline.xlsx.lockd","S:\\Loans\\README_RESTORE_FILES.txt","  \"Your files are encrypted. Pay within 72 hours.\"","fw: LOAN-PC11 -> 214 internal hosts  TCP 445 in 10 min"],
+  hint:"Encrypted files plus a payment demand.",
+  why:"Encrypted files with a new extension, a ransom note, and one PC reaching hundreds of hosts over SMB (TCP 445) is ransomware spreading laterally."},
+ {id:"c8",ans:"vlanhop",sev:"high",title:"Lobby kiosk port became a trunk",who:"Network team",where:"Main branch access switch",
+  story:"The lobby kiosk is a public device. The switch logged a change on its port, and minutes later the IDS flagged unusual frames from that port.",
+  log:["%DTP-5-TRUNKPORTON: Port Gi0/22 has become dot1q trunk","IDS: Gi0/22 frame with 2 x 802.1Q tags","     outer VLAN 1, inner VLAN 50","# VLAN 50 = FINANCE   native VLAN on uplinks = 1"],
+  hint:"A user port should never negotiate a trunk, and frames shouldn’t carry two VLAN tags.",
+  why:"The kiosk port negotiated a trunk through DTP (switch spoofing), and double-tagged frames use native VLAN 1 to reach VLAN 50. Both are VLAN hopping techniques."},
+ {id:"c9",ans:"tailgating",sev:"medium",title:"One badge, two people",who:"Security officer",where:"Server room door",
+  story:"The security officer compared the server room badge log with the door camera. Later, an unknown laptop was found plugged in behind a rack.",
+  log:["14:14:07  SRV-DOOR  badge 4471 (K. Nguyen)  granted","14:14:07  SRV-DOOR  door held open 9 s","14:14:09  CAM-12    2 persons enter (1 carrying boxes)","14:14 - 14:31  no further badge events"],
+  hint:"Count the badges, then count the people.",
+  why:"One badge swipe let two people in. The second person followed an authorized employee through the door without authenticating. Carrying boxes is a common way to get someone to hold the door."},
+ {id:"c10",ans:"dns",sev:"high",title:"The bank portal looks slightly wrong",who:"Member services",where:"Internal DNS",
+  story:"Employees who type the correct portal address land on a page that looks right but asks them to re-enter their password. The same name works from home.",
+  log:["internal> nslookup portal.ridgelinecu.com 10.20.0.53","  Address: 185.193.88.21    TTL 604800","public>   nslookup portal.ridgelinecu.com 1.1.1.1","  Address: 52.14.200.7      TTL 300"],
+  hint:"The same name resolves differently depending on which server you ask.",
+  why:"The internal resolver returns a wrong address with an unusually long TTL, while public DNS returns the real one. The internal server’s cache has been poisoned."}
+];
+
+const CM={
+  dtp:{name:"Disable DTP and set user ports to access mode",g:"sw",valid:["vlanhop"],what:"Hard-codes user ports with switchport mode access and nonegotiate so they can never become trunks."},
+  native:{name:"Change the native VLAN to an unused VLAN ID",g:"sw",valid:["vlanhop"],what:"Moves untagged trunk traffic off VLAN 1 so double-tagged frames have nowhere useful to land."},
+  portsec:{name:"Port security with a MAC address limit",g:"sw",valid:["macflood"],what:"Caps how many MAC addresses a port can learn and shuts or restricts the port when the limit is exceeded."},
+  dot1x:{name:"802.1X port-based network access control",g:"sw",valid:["macflood","roguedhcp"],what:"Requires a device to authenticate through a RADIUS server before its switch port forwards traffic."},
+  snoop:{name:"DHCP snooping with trusted uplink ports",g:"sw",valid:["roguedhcp","arp"],what:"Drops DHCP offers that arrive on untrusted ports and builds a table of valid IP-to-MAC leases."},
+  dai:{name:"Dynamic ARP Inspection (DAI)",g:"sw",valid:["arp"],what:"Checks ARP packets against the DHCP snooping table and drops replies with forged IP-to-MAC mappings."},
+  hub:{name:"Replace switches with hubs",g:"sw",valid:[],what:"Swaps intelligent switches for Layer 1 repeaters.",weak:"Hubs send every frame out every port. That makes eavesdropping easier, not harder."},
+  rate:{name:"Rate limiting and ACL filtering at the edge",g:"edge",valid:["ddos"],what:"Caps traffic rates and drops packets from unwanted sources or ports at the router or firewall."},
+  scrub:{name:"DDoS scrubbing service from the ISP or cloud provider",g:"edge",valid:["ddos"],what:"Diverts attack traffic to a provider with enough capacity to filter it before it reaches your link."},
+  ips:{name:"Inline IPS with signature and anomaly detection",g:"edge",valid:["ddos","ransomware"],what:"Inspects traffic in line and blocks known attack patterns and abnormal floods or scanning."},
+  tls:{name:"Encrypted protocols end to end (TLS, VPN)",g:"edge",valid:["arp","eviltwin"],what:"Protects data in transit so an on-path attacker can’t read or silently alter it."},
+  dnssec:{name:"DNSSEC validation on resolvers",g:"edge",valid:["dns"],what:"Uses digital signatures to verify DNS answers came from the authoritative zone and weren’t altered."},
+  dnshard:{name:"Harden and patch DNS servers, then flush the cache",g:"edge",valid:["dns"],what:"Restricts recursion, randomizes source ports, applies patches, and clears poisoned entries."},
+  wips:{name:"Wireless IPS (WIPS) rogue AP detection",g:"wifi",valid:["eviltwin"],what:"Monitors the air for access points that aren’t in inventory, including ones spoofing your SSID."},
+  wpa3e:{name:"WPA3-Enterprise with server certificate validation",g:"wifi",valid:["eviltwin"],what:"Clients authenticate with 802.1X and verify the network’s certificate, so a fake AP can’t prove it’s legitimate."},
+  hidessid:{name:"Hide the SSID",g:"wifi",valid:[],what:"Stops the access point from advertising its network name in beacons.",weak:"The SSID still appears in client probe traffic, and hiding it does nothing to stop an attacker from broadcasting the same name."},
+  email:{name:"Email filtering with SPF, DKIM, and DMARC",g:"id",valid:["phishing"],what:"Checks sender authenticity and quarantines spoofed or malicious messages before they reach inboxes."},
+  mfa:{name:"Multifactor authentication (MFA)",g:"id",valid:["phishing","eviltwin"],what:"Requires a second factor, so a stolen password alone isn’t enough to sign in."},
+  edr:{name:"Endpoint detection and response (EDR) and timely patching",g:"id",valid:["ransomware"],what:"Detects and isolates malicious behavior on hosts and closes the vulnerabilities malware exploits."},
+  backup:{name:"Offline, immutable backups (3-2-1 rule)",g:"id",valid:["ransomware"],what:"Keeps copies attackers can’t encrypt or delete, so data can be restored without paying."},
+  segment:{name:"Network segmentation and least-privilege shares",g:"id",valid:["ransomware"],what:"Limits which systems and shares one compromised host can reach, slowing lateral spread."},
+  aware:{name:"Security awareness training",g:"ppl",valid:["phishing","tailgating"],what:"Teaches staff to spot suspicious messages and to challenge people who follow them through doors."},
+  vest:{name:"Access control vestibule (mantrap)",g:"ppl",valid:["tailgating"],what:"Two interlocking doors that let only one authenticated person through at a time."},
+  guard:{name:"Security guard and video surveillance at entrances",g:"ppl",valid:["tailgating"],what:"Deters and detects people entering without badging in."}
+};
+const CM_GROUPS=[["sw","Switch and Layer 2","#0047AB"],["edge","Edge and network services","#7A4FD0"],["wifi","Wireless","#0089A8"],["id","Identity, endpoint, and data","#00A86B"],["ppl","People and physical","#B86E00"]];
+const GCOLOR=Object.fromEntries(CM_GROUPS.map(g=>[g[0],g[2]]));
+
+const KEY="lan121-activity04-threathunt-v1";
+const blank=()=>({phase:1,p1:{},p2:{},r1:null,r2:null,hints:[],name:"",theme:null});
+let store=blank();
+try{const raw=localStorage.getItem(KEY); if(raw) store=Object.assign(blank(),JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+const state={sel:null,focus:null,preview:null,shown1:false,shown2:false,hintOpen:{},stampAnim:false};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const icon=(id)=>`<svg aria-hidden="true"><use href="#i-${id}"/></svg>`;
+function say(t){const l=$("#live"); l.textContent=""; setTimeout(()=>l.textContent=t,30);}
+const caseNo=id=>CASES.findIndex(c=>c.id===id)+1;
+const caseOf=t=>CASES.find(c=>c.ans===t);
+
+/* Theme */
+function applyTheme(){
+  const root=document.documentElement;
+  if(store.theme) root.setAttribute("data-theme",store.theme); else root.removeAttribute("data-theme");
+  const dark=store.theme?store.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  $("#themeBtn").innerHTML=dark?`${icon("sun")}Light mode`:`${icon("moon")}Dark mode`;
+}
+$("#themeBtn").onclick=()=>{
+  const dark=store.theme?store.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  store.theme=dark?"light":"dark"; save(); applyTheme();
+};
+
+/* Grading */
+function grade1(){const r={};CASES.forEach(c=>r[c.id]=store.p1[c.id]===c.ans);return r;}
+function score1(){return Object.values(grade1()).filter(Boolean).length;}
+function slotOk(t,i){const v=(store.p2[t]||[])[i]; if(!v) return false; if(i===1&&(store.p2[t]||[])[0]===v) return false; return CM[v].valid.includes(t);}
+function score2(){let s=0;CASES.forEach(c=>{s+=slotOk(c.ans,0)?1:0;s+=slotOk(c.ans,1)?1:0;});return s;}
+const filled1=()=>CASES.filter(c=>store.p1[c.id]).length;
+const filled2=()=>CASES.reduce((n,c)=>n+(store.p2[c.ans]||[]).filter(Boolean).length,0);
+
+/* Render: steps and brief */
+function renderSteps(){
+  const st=[
+    [1,"Identify","Name the attack behind 10 tickets",store.r1?`<span class="done">Submitted, ${store.r1.first}/10</span>`:`${filled1()}/10 assigned`],
+    [2,"Defend","Match two countermeasures to each threat",store.r2?`<span class="done">Submitted, ${store.r2.first}/20</span>`:(store.r1?`${filled2()}/20 placed`:"Unlocks after phase 1")],
+    [3,"Summary","Review and print for grading",store.r1&&store.r2?`<span class="done">Ready to print</span>`:"Complete both phases"]
+  ];
+  $("#steps").innerHTML=st.map(([n,t,d,s])=>`<button class="step" type="button" data-step="${n}" aria-pressed="${store.phase===n}" ${n===2&&!store.r1?"disabled":""}><span class="n">${n}</span><span><strong>${t}</strong><small>${d}<br>${s}</small></span></button>`).join("");
+}
+function renderBrief(){
+  const b=$("#brief");
+  if(store.phase===1) b.innerHTML=`<p><strong>Phase 1: Identify.</strong> Each ticket describes symptoms and includes evidence from logs or commands. Decide which attack explains the evidence and assign it to the ticket. The color bar shows severity: red is critical, amber is high, blue is medium.</p><p class="howto">Your first submission is the graded score. You can resubmit afterward to practice, and each hint you open is noted on the summary.</p>`;
+  else if(store.phase===2) b.innerHTML=`<p><strong>Phase 2: Defend.</strong> The board shows the correct threat for every ticket. For each one, choose two different countermeasures that directly prevent or limit that attack. Some controls protect against more than one threat.</p><p class="howto">Hover or focus a countermeasure to read what it does. Your first submission is the graded score.</p>`;
+  else b.innerHTML=`<p><strong>Summary.</strong> Enter your name, review your results below, and print or save as PDF to submit.</p>`;
+}
+
+/* Phase 1 */
+function renderCases(){
+  const res=state.shown1?grade1():null;
+  $("#p1").classList.toggle("armed",!!state.sel&&store.phase===1);
+  $("#cases").innerHTML=CASES.map((c,i)=>{
+    const a=store.p1[c.id], cls=res?(res[c.id]?"r-ok":"r-bad"):"";
+    const logHtml=c.log.map(l=>l.startsWith("#")?`<span class="p">${esc(l)}</span>`:esc(l)).join("\n");
+    let fb="";
+    if(res){
+      fb=res[c.id]?`<p class="fb ok"><strong>Confirmed</strong>${esc(c.why)}</p>`
+        :`<p class="fb bad"><strong>${a?"Doesn’t fit the evidence":"No threat assigned"}</strong>${a?esc(THREATS[a].name)+" doesn’t explain this evidence. ":""}Look again: ${esc(c.hint)}</p>`;
+    }
+    const stamp=res?`<span class="stamp ${res[c.id]?"ok":"bad"} ${state.stampAnim?"anim":""}" style="animation-delay:${i*60}ms">${res[c.id]?"Confirmed":"Recheck"}</span>`:"";
+    const hintBtn=!res?`<div class="case-tools"><button class="linkbtn" type="button" data-hint="${c.id}">${state.hintOpen[c.id]?"Hide hint":"Show hint"}</button></div>`:"";
+    const hint=!res&&state.hintOpen[c.id]?`<p class="hint">${esc(c.hint)}</p>`:"";
+    return `<article class="case ${cls} ${state.focus===c.id?"focus":""}" data-sev="${c.sev}" aria-label="Ticket ${i+1}">
+      ${stamp}
+      <div class="case-head"><span class="case-no">${i+1}</span><h3>${esc(c.title)}</h3>
+        <span class="meta"><span class="sev">${c.sev[0].toUpperCase()+c.sev.slice(1)}</span>, reported by ${esc(c.who)}, ${esc(c.where)}</span></div>
+      <p class="story">${esc(c.story)}</p>
+      <pre class="log" tabindex="0" aria-label="Evidence">${logHtml}</pre>
+      ${hintBtn}${hint}${fb}
+      <button class="assign ${a?"filled":""}" type="button" data-case="${c.id}" aria-label="Ticket ${i+1} threat: ${a?THREATS[a].name:"not assigned"}">
+        ${icon(a||"target")}<span>${a?`<span class="lbl">${esc(THREATS[a].name)}</span>`:`<span class="ph">Assign a threat</span>`}</span>
+      </button>
+    </article>`;
+  }).join("");
+  $("#prog1").textContent=`${filled1()} of 10 tickets assigned`;
+  $("#to2").hidden=!store.r1;
+}
+function renderThreatTray(){
+  const used={}; Object.values(store.p1).forEach(t=>used[t]=1);
+  $("#threatTray").innerHTML=TRAY_GROUPS.map(([g,ids])=>`<div class="group"><h3>${g}</h3><div class="chips">${ids.map(id=>
+    `<button class="chip ${used[id]?"used":""}" type="button" draggable="true" data-threat="${id}" aria-pressed="${state.sel===id}">${icon(id)}<span>${esc(THREATS[id].name)}</span>${used[id]?`<span class="uc">#${caseNo(Object.keys(store.p1).find(k=>store.p1[k]===id))}</span>`:""}</button>`).join("")}</div></div>`).join("");
+  const pv=state.preview||state.sel;
+  const ab=$("#about1");
+  if(pv&&THREATS[pv]){ab.classList.remove("idle"); ab.innerHTML=`<b>${esc(THREATS[pv].name)}</b><span class="cat">${THREATS[pv].cat}</span><p>${esc(THREATS[pv].def)}</p>`;}
+  else {ab.classList.add("idle"); ab.textContent="Hover or focus a threat to see its definition.";}
+  $("#placing1").innerHTML=state.focus&&store.phase===1&&CASES.some(c=>c.id===state.focus)?`<div class="placing">Choosing a threat for ticket ${caseNo(state.focus)}<button type="button" data-cancel>Cancel</button></div>`
+    :state.sel&&THREATS[state.sel]&&store.phase===1?`<div class="placing">Tap a ticket to assign ${esc(THREATS[state.sel].name)}<button type="button" data-cancel>Cancel</button></div>`:`<div class="placing idle">Nothing selected yet</div>`;
+}
+function assign(caseId,t){
+  let moved="";
+  Object.keys(store.p1).forEach(k=>{if(k!==caseId&&store.p1[k]===t){delete store.p1[k]; moved=` Moved from ticket ${caseNo(k)}.`;}});
+  store.p1[caseId]=t; state.shown1=false; save();
+  say(`${THREATS[t].name} assigned to ticket ${caseNo(caseId)}.${moved}`);
+}
+
+/* Phase 2 */
+function renderBoard(){
+  $("#p2").classList.toggle("armed",!!state.sel&&store.phase===2);
+  if(!store.r1){$("#board").innerHTML=`<div class="locked panel"><strong>Phase 2 is locked</strong>Submit your phase 1 identifications first.</div>`; $("#actions2").hidden=true; return;}
+  $("#actions2").hidden=false;
+  $("#board").innerHTML=CASES.map((c,i)=>{
+    const t=c.ans, sl=store.p2[t]||[];
+    const slots=[0,1].map(k=>{
+      const v=sl[k], key=`${t}:${k}`;
+      let cls=v?"filled":""; let mark="";
+      if(state.shown2&&v){const ok=slotOk(t,k); cls+=ok?" r-ok":" r-bad"; mark=`<span class="mark" aria-hidden="true">${ok?"✓":"✕"}</span>`;}
+      return `<button class="slot ${cls} ${state.focus===key?"focus":""}" type="button" data-slot="${key}" aria-label="${THREATS[t].name} countermeasure ${k+1}: ${v?CM[v].name:"empty"}">${v?esc(CM[v].name):`<span class="ph">Add countermeasure ${k+1}</span>`}${mark}</button>`;
+    }).join("");
+    let why="";
+    if(state.shown2){
+      const notes=[0,1].map(k=>{const v=sl[k]; if(!v||slotOk(t,k)) return ""; 
+        if(k===1&&sl[0]===v) return `<b>Duplicate.</b> Pick a second, different control.`;
+        if(CM[v].weak) return `<b>${esc(CM[v].name)}:</b> ${esc(CM[v].weak)}`;
+        return `<b>${esc(CM[v].name)}</b> defends against ${CM[v].valid.map(x=>THREATS[x].name).join(" and ")}, not ${THREATS[t].name.toLowerCase()}.`;}).filter(Boolean);
+      if(notes.length) why=`<p class="why">${notes.join("<br>")}</p>`;
+    }
+    return `<article class="tcard"><div class="tcard-head"><span class="ic">${icon(t)}</span><div><h3>${esc(THREATS[t].name)}</h3><small>Ticket ${i+1}: ${esc(c.title)}</small></div></div>${slots}${why}</article>`;
+  }).join("");
+  $("#prog2").textContent=`${filled2()} of 20 slots filled`;
+  $("#to3").hidden=!store.r2;
+}
+function renderCmTray(){
+  $("#cmTray").innerHTML=CM_GROUPS.map(([g,label,col])=>`<div class="group"><h3>${label}</h3><div class="cm-list">${Object.entries(CM).filter(([,v])=>v.g===g).map(([id,v])=>
+    `<button class="cm" type="button" draggable="true" data-cm="${id}" style="--c:${col}" aria-pressed="${state.sel===id}"><span class="dot" aria-hidden="true"></span>${esc(v.name)}</button>`).join("")}</div></div>`).join("");
+  const pv=state.preview||state.sel, ab=$("#about2");
+  if(pv&&CM[pv]){ab.classList.remove("idle"); ab.innerHTML=`<b>${esc(CM[pv].name)}</b><p>${esc(CM[pv].what)}</p>`;}
+  else {ab.classList.add("idle"); ab.textContent="Hover or focus a countermeasure to see what it does.";}
+  $("#placing2").innerHTML=state.focus&&store.phase===2&&state.focus.includes(":")?`<div class="placing">Choosing for ${esc(THREATS[state.focus.split(":")[0]].name)}<button type="button" data-cancel>Cancel</button></div>`
+    :state.sel&&CM[state.sel]&&store.phase===2?`<div class="placing">Tap a slot to add this control<button type="button" data-cancel>Cancel</button></div>`:`<div class="placing idle">Nothing selected yet</div>`;
+}
+function placeCm(key,id){
+  const [t,k]=key.split(":"); const arr=(store.p2[t]||[null,null]).slice();
+  const other=arr[1-k];
+  if(other===id){say("That countermeasure is already on this threat. Choose a different one."); return false;}
+  arr[k]=id; store.p2[t]=arr; state.shown2=false; save();
+  say(`${CM[id].name} added to ${THREATS[t].name}.`); return true;
+}
+
+/* Results */
+function renderResults(){
+  const r1=store.r1, r2=store.r2;
+  const g1=grade1();
+  const s1=r1?r1.first:0, s2=r2?r2.first:0, tot=s1+s2, pct=Math.round(tot/30*100);
+  const sc=(lbl,val,max,sub)=>`<div class="score"><small>${lbl}</small><span class="big">${val}<span style="font-size:1.1rem;color:var(--ink-2)">/${max}</span></span><div class="bar"><span style="width:${max?Math.round(val/max*100):0}%"></span></div><small>${sub}</small></div>`;
+  let h=`<div class="score-row">
+    ${sc("Phase 1: Identification",s1,10,r1?`First submission. Latest ${r1.latest}/10, ${r1.attempts} submission${r1.attempts>1?"s":""}.`:"Not submitted yet.")}
+    ${sc("Phase 2: Countermeasures",s2,20,r2?`First submission. Latest ${r2.latest}/20, ${r2.attempts} submission${r2.attempts>1?"s":""}.`:"Not submitted yet.")}
+    ${sc("Graded total",tot,30,`${pct}%. Hints opened: ${store.hints.length}${store.hints.length?" (tickets "+store.hints.map(caseNo).sort((a,b)=>a-b).join(", ")+")":""}.`)}
+  </div>`;
+  h+=`<div class="tbl"><table><thead><tr><th>Ticket</th><th>Your identification</th><th>Correct threat</th><th>ID</th><th>Your countermeasures</th><th>Defense</th></tr></thead><tbody>`;
+  CASES.forEach((c,i)=>{
+    const a=store.p1[c.id];
+    const sl=store.p2[c.ans]||[];
+    const cms=r1?[0,1].map(k=>sl[k]?`${slotOk(c.ans,k)?'<span class="y">✓</span>':'<span class="x">✕</span>'} ${esc(CM[sl[k]].name)}`:"<span class=\"x\">✕</span> (empty)").join("<br>"):"Locked";
+    const dp=(slotOk(c.ans,0)?1:0)+(slotOk(c.ans,1)?1:0);
+    h+=`<tr><td>${i+1}. ${esc(c.title)}</td><td>${a?esc(THREATS[a].name):"(none)"}</td><td>${r1?esc(THREATS[c.ans].name):"Hidden until submitted"}</td><td>${r1?(g1[c.id]?'<span class="y">✓</span>':'<span class="x">✕</span>'):""}</td><td>${cms}</td><td>${r2?dp+"/2":""}</td></tr>`;
+  });
+  h+=`<tr class="total"><td colspan="3">Current answers (latest)</td><td>${score1()}/10</td><td></td><td>${r1?score2()+"/20":""}</td></tr></tbody></table></div>
+  <p class="meta">The table shows the student’s current answers. The graded total uses each phase’s first submission.</p>`;
+  $("#resultsBody").innerHTML=h;
+  $("#printName").textContent=`Student: ${store.name||"________________"}   |   LAN121 Activity 04: Threat hunt   |   ${new Date().toLocaleDateString()}`;
+}
+
+function renderAll(){
+  $("#p1").hidden=store.phase!==1; $("#p2").hidden=store.phase!==2;
+  renderSteps(); renderBrief(); renderCases(); renderThreatTray(); renderBoard(); renderCmTray(); renderResults();
+  $("#stuName").value=store.name;
+  state.stampAnim=false;
+}
+
+/* Events */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-step],[data-case],[data-threat],[data-slot],[data-cm],[data-hint],[data-cancel]");
+  if(!t) return;
+  if(t.dataset.step){const n=+t.dataset.step; if(n===2&&!store.r1) return; store.phase=n; state.sel=null; state.focus=null; save(); renderAll(); if(n===3) $("#results").scrollIntoView({behavior:"smooth"}); return;}
+  if(t.dataset.case){
+    if(state.sel&&THREATS[state.sel]){assign(t.dataset.case,state.sel); state.sel=null; state.focus=null;}
+    else state.focus=state.focus===t.dataset.case?null:t.dataset.case;
+    renderAll(); return;
+  }
+  if(t.dataset.threat){
+    if(state.focus&&CASES.some(c=>c.id===state.focus)){assign(state.focus,t.dataset.threat); state.focus=null; state.sel=null;}
+    else state.sel=state.sel===t.dataset.threat?null:t.dataset.threat;
+    renderAll(); return;
+  }
+  if(t.dataset.slot){
+    if(state.sel&&CM[state.sel]){if(placeCm(t.dataset.slot,state.sel)){state.sel=null; state.focus=null;}}
+    else state.focus=state.focus===t.dataset.slot?null:t.dataset.slot;
+    renderAll(); return;
+  }
+  if(t.dataset.cm){
+    if(state.focus&&state.focus.includes(":")){if(placeCm(state.focus,t.dataset.cm)){state.focus=null; state.sel=null;}}
+    else state.sel=state.sel===t.dataset.cm?null:t.dataset.cm;
+    renderAll(); return;
+  }
+  if(t.dataset.hint){const id=t.dataset.hint; state.hintOpen[id]=!state.hintOpen[id]; if(state.hintOpen[id]&&!store.hints.includes(id)){store.hints.push(id); save();} renderAll(); return;}
+  if(t.hasAttribute("data-cancel")){state.sel=null; state.focus=null; renderAll();}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(state.sel||state.focus)){state.sel=null;state.focus=null;renderAll();}});
+
+/* Hover previews */
+[["#threatTray","data-threat",renderThreatTray],["#cmTray","data-cm",renderCmTray]].forEach(([sel,attr,fn])=>{
+  const el=$(sel);
+  ["mouseover","focusin"].forEach(ev=>el.addEventListener(ev,e=>{const b=e.target.closest(`[${attr}]`); if(b&&state.preview!==b.getAttribute(attr)){state.preview=b.getAttribute(attr); updateAbout(fn===renderThreatTray);}}));
+  ["mouseleave","focusout"].forEach(ev=>el.addEventListener(ev,e=>{if(ev==="focusout"&&el.contains(e.relatedTarget))return; if(state.preview){state.preview=null; updateAbout(fn===renderThreatTray);}}));
+});
+function updateAbout(isThreat){
+  const pv=state.preview||state.sel;
+  if(isThreat){const ab=$("#about1"); if(pv&&THREATS[pv]){ab.classList.remove("idle"); ab.innerHTML=`<b>${esc(THREATS[pv].name)}</b><span class="cat">${THREATS[pv].cat}</span><p>${esc(THREATS[pv].def)}</p>`;} else {ab.classList.add("idle"); ab.textContent="Hover or focus a threat to see its definition.";}}
+  else {const ab=$("#about2"); if(pv&&CM[pv]){ab.classList.remove("idle"); ab.innerHTML=`<b>${esc(CM[pv].name)}</b><p>${esc(CM[pv].what)}</p>`;} else {ab.classList.add("idle"); ab.textContent="Hover or focus a countermeasure to see what it does.";}}
+}
+
+/* Drag and drop */
+document.addEventListener("dragstart",e=>{const b=e.target.closest("[data-threat],[data-cm]"); if(b){e.dataTransfer.setData("text/plain",b.dataset.threat?"t:"+b.dataset.threat:"c:"+b.dataset.cm); e.dataTransfer.effectAllowed="copy";}});
+document.addEventListener("dragover",e=>{const z=e.target.closest("[data-case],[data-slot]"); if(z){e.preventDefault(); document.querySelectorAll(".drop").forEach(x=>x!==z&&x.classList.remove("drop")); z.classList.add("drop");}});
+document.addEventListener("dragleave",e=>{const z=e.target.closest("[data-case],[data-slot]"); if(z&&!z.contains(e.relatedTarget)) z.classList.remove("drop");});
+document.addEventListener("drop",e=>{
+  const z=e.target.closest("[data-case],[data-slot]"); if(!z) return; e.preventDefault();
+  const d=e.dataTransfer.getData("text/plain"); const [kind,id]=d.split(":");
+  if(kind==="t"&&z.dataset.case&&THREATS[id]) assign(z.dataset.case,id);
+  if(kind==="c"&&z.dataset.slot&&CM[id]) placeCm(z.dataset.slot,id);
+  state.sel=null; state.focus=null; renderAll();
+});
+document.addEventListener("dragend",()=>document.querySelectorAll(".drop").forEach(x=>x.classList.remove("drop")));
+
+/* Submit */
+$("#check1").onclick=()=>{
+  const n=filled1();
+  if(n<10){$("#verdict1").innerHTML=`Assign a threat to all 10 tickets before submitting. ${10-n} still need one.`; say(`${10-n} tickets still need a threat.`); return;}
+  const s=score1();
+  store.r1=store.r1?{...store.r1,latest:s,attempts:store.r1.attempts+1}:{first:s,latest:s,attempts:1};
+  state.shown1=true; state.stampAnim=true; save();
+  $("#verdict1").innerHTML=`<b>${s} of 10 correct.</b> ${store.r1.attempts===1?"This first submission is your graded score.":"Practice resubmission; your graded score stays "+store.r1.first+"/10."} Phase 2 is unlocked.`;
+  renderAll(); say(`Identifications submitted. ${s} of 10 correct.`);
+};
+$("#to2").onclick=()=>{store.phase=2; state.sel=null; state.focus=null; save(); renderAll(); window.scrollTo({top:0,behavior:"smooth"});};
+$("#check2").onclick=()=>{
+  const n=filled2();
+  if(n<20){$("#verdict2").innerHTML=`Fill all 20 slots before submitting. ${20-n} still empty.`; say(`${20-n} slots still empty.`); return;}
+  const s=score2();
+  store.r2=store.r2?{...store.r2,latest:s,attempts:store.r2.attempts+1}:{first:s,latest:s,attempts:1};
+  state.shown2=true; save();
+  $("#verdict2").innerHTML=`<b>${s} of 20 points.</b> ${store.r2.attempts===1?"This first submission is your graded score.":"Practice resubmission; your graded score stays "+store.r2.first+"/20."}`;
+  renderAll(); say(`Defenses submitted. ${s} of 20 points.`);
+};
+$("#to3").onclick=()=>{store.phase=3; save(); renderAll(); $("#results").scrollIntoView({behavior:"smooth"});};
+$("#stuName").addEventListener("input",e=>{store.name=e.target.value; save(); $("#printName").textContent=`Student: ${store.name}   |   LAN121 Activity 04: Threat hunt   |   ${new Date().toLocaleDateString()}`;});
+$("#printBtn").onclick=()=>{renderResults(); window.print();};
+let resetArm=false;
+$("#resetAll").onclick=e=>{
+  if(!resetArm){resetArm=true; e.target.textContent="Click again to erase all work"; setTimeout(()=>{resetArm=false; e.target.textContent="Start over";},4000); return;}
+  const th=store.theme; store=blank(); store.theme=th; Object.assign(state,{sel:null,focus:null,preview:null,shown1:false,shown2:false,hintOpen:{}});
+  resetArm=false; e.target.textContent="Start over"; $("#verdict1").innerHTML=""; $("#verdict2").innerHTML=""; save(); renderAll();
+};
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(!store.theme)applyTheme();});
+
+if(store.phase===3&&!store.r1) store.phase=1;
+applyTheme(); renderAll();
+</script>
+</body>
+</html>
