@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LAN121 Command-Line Troubleshooting Lab</title>
+<script>try{var _s=JSON.parse(localStorage.getItem('lan121-cmd-lab-v1')||'{}');if(_s.theme)document.documentElement.setAttribute('data-theme',_s.theme);}catch(e){}</script>
+<style>
+:root{
+  --bg:#eaf0f7;--surface:#fff;--surface2:#f3f6fb;--ink:#13213b;--muted:#53637d;--line:#cbd6e5;
+  --navy:#0047AB;--navy-soft:#e1eafa;--green:#00a86b;--green-soft:#dcf4ea;--red:#c42f2f;--red-soft:#fbe4e4;
+  --amber:#9a6200;--amber-soft:#fbefd6;--on-accent:#fff;
+  --term:#0d1726;--term-bar:#1a2638;--term-ink:#d3dff2;--term-dim:#7d90b0;--term-cmd:#ffffff;--term-ok:#4fe0a6;--term-err:#ff8a8a;--term-note:#ffd479;
+  --f-head:Bahnschrift,"DIN Alternate","Barlow","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --f-body:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,"Liberation Mono",monospace;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a1321;--surface:#122035;--surface2:#172a44;--ink:#e3ebf6;--muted:#9badc8;--line:#2a3e60;
+  --navy:#6b9dff;--navy-soft:#1a2d50;--green:#33d19a;--green-soft:#103a2f;--red:#ff7070;--red-soft:#3e1b22;
+  --amber:#f2b64e;--amber-soft:#3a2d12;--on-accent:#06122a;--term:#060d18;--term-bar:#111d2e}}
+:root[data-theme="dark"]{
+  --bg:#0a1321;--surface:#122035;--surface2:#172a44;--ink:#e3ebf6;--muted:#9badc8;--line:#2a3e60;
+  --navy:#6b9dff;--navy-soft:#1a2d50;--green:#33d19a;--green-soft:#103a2f;--red:#ff7070;--red-soft:#3e1b22;
+  --amber:#f2b64e;--amber-soft:#3a2d12;--on-accent:#06122a;--term:#060d18;--term-bar:#111d2e}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.15;margin:0 0 .5em;font-weight:600}
+h1{font-size:clamp(1.9rem,4vw,2.8rem);font-weight:700}
+h2{font-size:1.6rem}h3{font-size:1.2rem}h4{font-size:1rem}
+p{margin:0 0 .9em;max-width:72ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px;border-radius:4px}
+code,.mono{font-family:var(--f-mono)}
+code{font-size:.86em;background:var(--surface2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:16px;min-height:58px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-head);font-weight:700;font-size:1.05rem}
+.brand .mark{width:30px;height:30px;border-radius:7px;background:var(--navy);display:grid;place-items:center;color:#fff;font:700 .95rem var(--f-mono)}
+.brand small{display:block;font-family:var(--f-body);font-weight:400;font-size:.78rem;color:var(--muted)}
+.spacer{flex:1}
+.ring{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.ring svg{width:36px;height:36px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;border-radius:7px;padding:9px 16px;font-weight:600;cursor:pointer;background:var(--navy);color:var(--on-accent);font-size:.95rem}
+.btn:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface2)}
+.btn.go{background:var(--green)}
+.btn.sm{padding:6px 11px;font-size:.85rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* hero with keycaps */
+.hero{padding:30px 0 22px}
+.hero p{color:var(--muted);font-size:1.05rem}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:20px}
+.key{position:relative;text-align:left;border:1px solid var(--line);border-bottom-width:5px;border-radius:10px;background:var(--surface);padding:12px 14px 10px;cursor:pointer;transition:transform .08s,border-color .2s}
+.key:active{transform:translateY(2px);border-bottom-width:3px}
+.key b{display:block;font:600 1rem var(--f-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.key small{color:var(--muted);font-size:.78rem}
+.key .num{position:absolute;top:9px;right:11px;font:700 .75rem var(--f-head);color:var(--muted)}
+.key.prog{border-bottom-color:var(--amber)}
+.key.done{border-color:var(--green);border-bottom-color:var(--green);background:var(--green-soft)}
+.key.done .num{color:var(--green)}
+
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:15;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px}
+.tab{white-space:nowrap;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;cursor:pointer;font-size:.92rem;color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--navy);color:var(--on-accent);border-color:var(--navy)}
+main{padding:24px 0 70px}
+.section{display:none}.section.active{display:block}
+.sec-head{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.sec-head p{margin:0;color:var(--muted)}
+.eyebrow{font-size:.88rem;color:var(--navy);font-weight:600;margin-bottom:4px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px}
+
+/* study */
+.ladder{display:grid;gap:6px}
+.rung{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;background:var(--surface2);border-radius:8px;padding:9px 12px;border-left:4px solid var(--navy)}
+.rung b{font-family:var(--f-head);font-size:.95rem}
+.rung b small{display:block;font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.78rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 .82rem var(--f-mono);padding:4px 10px;border-radius:999px;background:var(--navy-soft);color:var(--navy);border:0;cursor:pointer}
+.chip.any{background:var(--amber-soft);color:var(--amber)}
+details.cmdcard{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--surface)}
+details.cmdcard summary{cursor:pointer;list-style:none;padding:14px 18px;display:grid;grid-template-columns:200px 1fr auto;gap:14px;align-items:center}
+details.cmdcard summary::-webkit-details-marker{display:none}
+details.cmdcard summary .nm{font:700 1.02rem var(--f-mono);color:var(--navy)}
+details.cmdcard summary .pp{color:var(--muted);font-size:.92rem}
+details.cmdcard summary .seen{font-size:.78rem;font-weight:600;color:var(--muted);white-space:nowrap}
+details.cmdcard.viewed summary .seen{color:var(--green)}
+details.cmdcard[open] summary{border-bottom:1px dashed var(--line)}
+.cc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;padding:16px 18px}
+.cc h4{font-size:.9rem;color:var(--navy);margin-bottom:6px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-head);font-weight:600;background:var(--surface2)}
+td.c{font-family:var(--f-mono);font-size:.84rem;white-space:nowrap}
+.tscroll{overflow-x:auto}
+.tip{background:var(--navy-soft);border-radius:8px;padding:10px 12px;font-size:.9rem;margin-top:10px}
+.cc p{font-size:.92rem}
+
+/* lab */
+.lab{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start;min-width:0}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 125px);display:flex;flex-direction:column;gap:6px}
+.rail button{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 10px;cursor:pointer}
+.rail button .n{font:700 .8rem var(--f-head);color:var(--muted)}
+.rail button .c{font:600 .85rem var(--f-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail button .s{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.rail button[aria-current="true"]{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy-soft)}
+.rail button.done{background:var(--green-soft);border-color:var(--green)}
+.rail button.done .s{color:var(--green);font-weight:600}
+.mission{min-width:0}.mission h2{margin-bottom:6px}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.steps span{font-size:.82rem;font-weight:600;padding:4px 11px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.steps span.cur{background:var(--navy);color:var(--on-accent);border-color:var(--navy)}
+.steps span.ok{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.task{border-left:5px solid var(--navy);background:var(--navy-soft);border-radius:4px 10px 10px 4px;padding:12px 16px;font-size:1.02rem;margin-bottom:12px}
+.task b{font-family:var(--f-head)}
+.ethics{border-left:5px solid var(--amber);background:var(--amber-soft);border-radius:4px 10px 10px 4px;padding:10px 14px;font-size:.9rem;margin-bottom:12px}
+
+.term{border-radius:12px;overflow:hidden;min-width:0;background:var(--term);box-shadow:0 10px 30px rgba(10,20,40,.18)}
+.tbar{display:flex;align-items:center;gap:8px;background:var(--term-bar);padding:8px 12px;flex-wrap:wrap}
+.tbar .dots{display:flex;gap:6px;margin-right:6px}
+.tbar .dots i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.tbar .dots i:nth-child(2){background:#febc2e}.tbar .dots i:nth-child(3){background:#28c840}
+.htab{border:1px solid #2c3c56;background:transparent;color:#9fb2d2;border-radius:6px;padding:4px 10px;font:600 .8rem var(--f-mono);cursor:pointer}
+.htab[aria-pressed="true"]{background:#24344f;color:#fff;border-color:#4a6390}
+.tbar .os{margin-left:auto;color:#7d90b0;font-size:.78rem}
+.screen{height:420px;overflow-y:auto;padding:12px 14px 4px;font:13.5px/1.5 var(--f-mono);color:var(--term-ink);cursor:text}
+.screen .l{white-space:pre-wrap;word-break:break-word}
+.screen .cmdl{color:var(--term-cmd)}
+.screen .cmdl .p{color:var(--term-ok)}
+.screen .note{color:var(--term-note)}
+.screen .err{color:var(--term-err)}
+.screen .sys{color:var(--term-dim)}
+.inrow{display:flex;align-items:baseline;gap:6px;padding:4px 14px 12px;font:13.5px/1.5 var(--f-mono)}
+.inrow .p{color:var(--term-ok);white-space:nowrap}
+.inrow input{flex:1;background:transparent;border:0;outline:0;color:var(--term-cmd);font:16px/1.5 var(--f-mono);caret-color:var(--term-ok);min-width:0;padding:0}
+.coach{min-height:46px;margin:12px 0;padding:11px 14px;border-radius:9px;font-size:.94rem;background:var(--surface);border:1px solid var(--line)}
+.coach.ok{background:var(--green-soft);border-color:var(--green)}
+.coach.warn{background:var(--amber-soft);border-color:var(--amber)}
+.coach.bad{background:var(--red-soft);border-color:var(--red)}
+.qgrid{display:grid;gap:10px}
+.qrow{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:0}
+.qrow.ok{background:var(--green-soft);border-color:var(--green)}
+.qrow label{display:block;font-size:.95rem;font-weight:600;margin-bottom:8px}
+.qrow .ir{display:flex;gap:10px;align-items:center}
+.qrow input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:8px 11px;font:15px var(--f-mono)}
+.qrow .fb{font-size:.88rem;margin-top:7px}
+.qrow .fb.bad{color:var(--red)}.qrow .fb.good{color:var(--green)}
+.locked{color:var(--muted);font-size:.92rem;padding:10px 0}
+.hints{display:flex;flex-direction:column;gap:8px}
+.hint{background:var(--navy-soft);border-radius:8px;padding:9px 13px;font-size:.92rem}
+.hint b{font-family:var(--f-head)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.next{display:none;margin-top:12px}
+.next.show{display:flex}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+
+/* summary */
+.sumhead{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.big{font:700 3rem var(--f-head);color:var(--navy);line-height:1}
+.bar{height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--green);width:0;transition:width .6s}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.pill.d{background:var(--green-soft);color:var(--green)}.pill.p{background:var(--amber-soft);color:var(--amber)}.pill.n{background:var(--surface2);color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.86rem;font-weight:600;color:var(--muted)}
+.field input{border:1px solid var(--line);background:var(--surface2);border-radius:7px;padding:8px 10px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateX(-50%) translateY(140px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:10px;font-weight:600;z-index:50;transition:transform .35s;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--line);padding:18px 0;color:var(--muted);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:980px){
+  .keys{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .lab{grid-template-columns:1fr}
+  .rail{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .rail button{flex:none;min-width:148px}
+  .cc{grid-template-columns:1fr}
+  details.cmdcard summary{grid-template-columns:1fr auto}
+  details.cmdcard summary .pp{grid-column:1/-1;grid-row:2}
+}
+@media (max-width:720px){
+  .keys{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid2{grid-template-columns:1fr}
+  .qrow{grid-template-columns:1fr}
+  .rung{grid-template-columns:1fr}
+  .screen{height:340px;font-size:12.5px}
+  .ring span,.brand small{display:none}
+}
+@media print{
+  .topbar,.hero,.tabs,footer,.toast,.section:not(#summary),.noprint{display:none!important}
+  #summary{display:block!important}
+  body{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <div class="brand"><span class="mark">&gt;_</span><div>Command-Line Troubleshooting Lab<small>LAN121 Network Essentials, Moraine Valley Community College</small></div></div>
+  <div class="spacer"></div>
+  <div class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="ringArc" cx="18" cy="18" r="15" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 94.25" transform="rotate(-90 18 18)"/></svg><span id="ringTxt">0 of 10 commands</span></div>
+  <button class="btn ghost sm" id="themeBtn" type="button">Dark mode</button>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <h1>Ten commands every network admin types first</h1>
+  <p>Learn what each command tells you, then use it on a simulated Windows PC, Linux host, and Cisco switch to answer real troubleshooting questions. Each key lights up green when you've mastered that command.</p>
+  <div class="keys" id="keys"></div>
+</div></section>
+
+<nav class="tabs" aria-label="Lab sections"><div class="wrap" role="tablist">
+  <button class="tab" role="tab" data-tab="study">Study: command overviews</button>
+  <button class="tab" role="tab" data-tab="lab">Hands-on terminal lab</button>
+  <button class="tab" role="tab" data-tab="summary">Progress summary</button>
+</div></nav>
+
+<main><div class="wrap">
+
+<section class="section" id="study" role="tabpanel">
+  <div class="sec-head"><div><div class="eyebrow">Study</div><h2>Which command, at which layer?</h2></div><p>About 15 minutes. Open each overview before the lab.</p></div>
+  <div class="panel">
+    <p>Good troubleshooters pick the command that answers the question at the layer they suspect. Select any command to jump to its overview.</p>
+    <div class="ladder" id="ladder"></div>
+  </div>
+  <div class="panel" style="padding-bottom:12px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px"><h3 style="margin:0">Command overviews</h3><span class="muted" id="viewedTxt">0 of 10 opened</span></div>
+    <div id="cards"></div>
+  </div>
+  <div class="panel">
+    <h3>The lab environment</h3>
+    <div class="tscroll"><table>
+      <tr><th>Host</th><th>System</th><th>Address</th><th>Role</th></tr>
+      <tr><td>PC-A</td><td>Windows 11</td><td class="c">192.168.10.25/24</td><td>Your workstation in VLAN 10</td></tr>
+      <tr><td>lin-01</td><td>Ubuntu 24.04</td><td class="c">192.168.10.40/24</td><td>Linux admin box with tcpdump and nmap</td></tr>
+      <tr><td>SW1</td><td>Cisco IOS</td><td class="c">192.168.10.2</td><td>Access switch for the floor</td></tr>
+      <tr><td>Gateway</td><td>Core switch SVI</td><td class="c">192.168.10.1</td><td>Default gateway for VLAN 10</td></tr>
+      <tr><td>dns1</td><td>DNS server</td><td class="c">192.168.10.53</td><td>Internal DNS for lab.example</td></tr>
+      <tr><td>www</td><td>Web server</td><td class="c">192.168.20.80</td><td>Internal web and FTP server</td></tr>
+    </table></div>
+    <div class="row" style="margin-top:14px"><button class="btn" type="button" data-goto="lab">Open the terminal lab</button></div>
+  </div>
+</section>
+
+<section class="section" id="lab" role="tabpanel">
+  <div class="lab">
+    <nav class="rail" id="rail" aria-label="Missions"></nav>
+    <div class="mission" id="mission">
+      <div class="eyebrow" id="mEyebrow"></div>
+      <h2 id="mTitle"></h2>
+      <div class="steps" id="mSteps"></div>
+      <div class="task" id="mTask"></div>
+      <div class="ethics" id="mEthics" hidden></div>
+      <div class="term">
+        <div class="tbar"><span class="dots"><i></i><i></i><i></i></span>
+          <button class="htab" type="button" data-host="win" aria-pressed="false">PC-A</button>
+          <button class="htab" type="button" data-host="lin" aria-pressed="false">lin-01</button>
+          <button class="htab" type="button" data-host="sw" aria-pressed="false">SW1</button>
+          <span class="os" id="osTxt"></span></div>
+        <div class="screen" id="screen" aria-live="polite"></div>
+        <div class="inrow"><span class="p" id="prompt"></span><input id="cli" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Command input"></div>
+      </div>
+      <div class="coach" id="coach" role="status">Type a command and press Enter. Type <code>help</code> to list commands on this host, <code>hint</code> for a hint, or <code>clear</code> to clear the screen. Use the up and down arrows for history.</div>
+      <div class="grid2">
+        <div class="panel"><h4>Read the output</h4><div id="qs"></div></div>
+        <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h4 style="margin:0">Hints</h4><button class="btn ghost sm" type="button" id="hintBtn">Show hint</button></div><div class="hints" id="hints"><p class="muted" style="margin:0;font-size:.9rem">Each step has three hints, from a nudge to the full command. Each hint costs 10 points.</p></div></div>
+      </div>
+      <div class="next row" id="nextRow"><button class="btn go" type="button" id="nextBtn">Next mission</button><span class="muted" id="nextTxt"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="summary" role="tabpanel">
+  <div class="sec-head"><div><div class="eyebrow">Progress summary</div><h2>Your command record</h2></div><div class="row noprint"><button class="btn" type="button" id="printBtn">Print or save as PDF</button><button class="btn ghost" type="button" id="resetBtn">Reset all progress</button></div></div>
+  <div class="panel"><div class="sumhead">
+    <div><div class="big" id="sumScore">0%</div><div class="muted">Average score of completed commands</div></div>
+    <div style="flex:1;min-width:220px"><div class="row" style="justify-content:space-between;font-size:.9rem;margin-bottom:6px"><span id="sumCount"></span><span class="muted" id="sumStudy"></span></div><div class="bar"><i id="sumBar"></i></div></div>
+    <div class="field" style="min-width:220px"><label for="stuName">Student name</label><input id="stuName" autocomplete="name" placeholder="Type your name"></div>
+  </div></div>
+  <div class="panel tscroll"><table id="sumTbl"></table></div>
+  <p class="muted" style="font-size:.85rem">Scoring: each command starts at 100. Each hint costs 10 points and each wrong answer costs 5, with a floor of 50. Progress is saved in this browser only.</p>
+</section>
+
+</div></main>
+<footer><div class="wrap">All hosts, addresses, and outputs are simulated training data. Run nmap and tcpdump only on networks you own or are authorized to test.</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ===== COMMAND OVERVIEWS (study) ===== */
+const CMDS=[
+ {id:'ping',nm:'ping',layer:'L3',pp:'Is the host reachable, and how fast?',
+  what:'Sends ICMP echo requests and times the replies. The fastest way to confirm Layer 3 reachability and get a rough round-trip time and loss figure.',
+  read:'Look at replies vs. timeouts (loss), the time= value (latency), and TTL (how many routers it crossed).',
+  syntax:[['ping 192.168.10.1','Windows: 4 pings by default'],['ping -c 4 192.168.10.1','Linux/macOS: -c sets the count'],['ping -t host','Windows: ping until Ctrl+C'],['ping -n 10 host','Windows: send 10 echo requests']],
+  tip:'"Request timed out" vs. "Destination host unreachable" matters: the first means no reply came back; the second means your own host had no route to even try.'},
+ {id:'trace',nm:'traceroute / tracert',layer:'L3',pp:'Where along the path does it break?',
+  what:'Maps the routers (hops) between you and a destination by sending packets with increasing TTL and recording who replies. Pinpoints where latency or a failure appears.',
+  read:'Each line is one hop. Rising, steady times are normal; a jump then timeouts marks where the trouble starts. Asterisks mean no reply from that hop.',
+  syntax:[['tracert www.example.com','Windows'],['traceroute host','Linux/macOS'],['tracert -d host','Windows: skip DNS lookups, faster'],['traceroute -n host','Linux: numeric, no DNS']],
+  tip:'A single hop of asterisks is often just a router that de-prioritizes ICMP. Trouble is real when every hop after a point times out.'},
+ {id:'ipconfig',nm:'ipconfig / ifconfig / ip',layer:'L3',pp:'What are my own settings?',
+  what:'Shows your interface addresses, mask, gateway, DNS servers, and MAC. Always start here: half of "no internet" calls are a missing gateway or a 169.254 APIPA address.',
+  read:'Check IPv4 address, subnet mask, and default gateway. A 169.254.x.x address means DHCP failed. An empty gateway means nothing leaves the subnet.',
+  syntax:[['ipconfig','Windows: brief'],['ipconfig /all','Windows: full, incl. DNS and MAC'],['ifconfig','Linux/macOS: classic (net-tools)'],['ip addr','Linux: modern, shows all addresses'],['ip route','Linux: show the routing table']],
+  tip:'On modern Linux, ip has replaced ifconfig. "ip a" is the everyday shorthand for ip addr.'},
+ {id:'arp',nm:'arp -a',layer:'L2/L3',pp:'Which MAC owns that IP on my LAN?',
+  what:'Shows the ARP cache: the IP-to-MAC mappings your host has learned on the local segment. Essential for spotting duplicate IPs and ARP spoofing.',
+  read:'Each entry maps an IPv4 address to a MAC. Two IPs sharing one MAC, or your gateway\'s IP showing an unexpected MAC, can signal spoofing or a misconfiguration.',
+  syntax:[['arp -a','Windows and macOS: show the cache'],['arp -n','Linux: numeric'],['ip neigh','Linux: modern equivalent'],['arp -d *','Windows: clear the cache (admin)']],
+  tip:'ARP only works inside your own broadcast domain. You will never see the MAC of a host on another subnet, only your gateway\'s.'},
+ {id:'dns',nm:'nslookup / dig',layer:'L7',pp:'Does the name resolve, and to what?',
+  what:'Queries DNS directly so you can separate name resolution from connectivity. If ping by IP works but by name fails, DNS is the suspect.',
+  read:'Check the answer section for the A/AAAA record, and which server answered. NXDOMAIN means the name does not exist; SERVFAIL means the server failed to resolve it.',
+  syntax:[['nslookup www.lab.example','Windows/Linux: simple lookup'],['nslookup www.lab.example 192.168.10.53','Query a specific server'],['dig www.lab.example','Linux/macOS: detailed'],['dig +short www.lab.example','Just the answer'],['dig -x 192.168.10.80','Reverse lookup (PTR)']],
+  tip:'Always note which server answered. Querying a specific resolver tells you whether the problem is your client\'s configured DNS or the server itself.'},
+ {id:'netstat',nm:'netstat',layer:'L4',pp:'What connections and ports are open?',
+  what:'Lists active connections and listening ports, with the state of each TCP session. Confirms whether a service is actually listening and whether a session reached ESTABLISHED.',
+  read:'LISTENING means a service is waiting on that port. ESTABLISHED is an active session. Many SYN_SENT lines mean your side is trying but getting no answer.',
+  syntax:[['netstat -an','All connections, numeric'],['netstat -ano','Windows: add owning PID'],['netstat -tulpn','Linux: TCP/UDP listening + program'],['netstat -r','Show the routing table']],
+  tip:'ss -tulpn is the faster modern Linux replacement for netstat, but netstat still works everywhere and is worth knowing.'},
+ {id:'route',nm:'route',layer:'L3',pp:'Where does my traffic go next?',
+  what:'Shows the host routing table: which gateway each destination uses. Explains why traffic for one subnet works and another is black-holed.',
+  read:'The 0.0.0.0 (or default) route points at your gateway. Look for a wrong gateway, a missing default route, or a stray static route sending a subnet the wrong way.',
+  syntax:[['route print','Windows'],['netstat -r','Any OS: routing table'],['ip route','Linux: modern'],['route add 10.0.0.0 mask 255.0.0.0 192.168.10.1','Add a static route (admin)']],
+  tip:'The default route is the catch-all for anything with no more specific match. No default route means you can reach your own subnet and nothing else.'},
+ {id:'tcpdump',nm:'tcpdump',layer:'L2-7',pp:'What is actually on the wire?',
+  what:'Captures and decodes live packets on an interface. The ground truth when higher-level tools disagree: you see exactly what was sent and received.',
+  read:'Each line is a packet: time, source > destination, protocol, flags. Watch for repeated SYNs with no SYN-ACK (nothing listening or a firewall drop) or ICMP unreachable replies.',
+  syntax:[['tcpdump -i eth0','Capture on an interface'],['tcpdump -i eth0 host 192.168.20.80','Filter by host'],['tcpdump -i eth0 port 80','Filter by port'],['tcpdump -i eth0 -n icmp','ICMP only, no DNS']],
+  tip:'Filter tightly from the start (host and port). An unfiltered capture on a busy link scrolls faster than you can read and buries the packet you need.'},
+ {id:'nmap',nm:'nmap',layer:'L3/L4',pp:'What is alive and what ports are open?',
+  what:'Scans hosts to discover which are up and which TCP/UDP ports are open. Used to inventory a subnet or confirm a service is reachable from the network, not just locally.',
+  read:'Read the host state (up/down) and the port list: open, closed, or filtered. "filtered" usually means a firewall is dropping the probe silently.',
+  syntax:[['nmap -sn 192.168.10.0/24','Ping sweep: who is up'],['nmap 192.168.20.80','Default scan of top ports'],['nmap -p 80,443 host','Scan specific ports'],['nmap -sV host','Probe service versions']],
+  tip:'Scan only networks you own or are authorized to test. Unapproved scanning can violate policy or law and will trip intrusion detection.'},
+ {id:'lldp',nm:'LLDP / CDP',layer:'L2',pp:'What am I physically plugged into?',
+  what:'Neighbor-discovery protocols that let a switch report its directly connected neighbors: device name, the far-end port, and often the VLAN. The fastest way to map physical topology without chasing cables.',
+  read:'Each neighbor entry names the remote device, the local port it is on, and the remote port. Use it to confirm which switch port a device lands on.',
+  syntax:[['show cdp neighbors','Cisco: summary of neighbors'],['show cdp neighbors detail','Cisco: add IP and version'],['show lldp neighbors','Vendor-neutral (802.1AB)'],['show lldp neighbors detail','Full neighbor detail']],
+  tip:'CDP is Cisco-only; LLDP is the open standard every vendor supports. In a mixed shop, LLDP is what crosses between brands.'}
+];
+
+/* ===== quick helpers for building outputs ===== */
+function pad(s,n){s=String(s);return s.length>=n?s:s+' '.repeat(n-s.length)}
+</script>
+<script>
+/* ===================== TERMINAL SIMULATOR ===================== */
+/* Each host has a set of regex-matched commands returning styled output lines.
+   Lines: ['class','text'] where class in '', 'note','err','sys'. */
+const RT=/\s+/;
+function argify(s){return s.trim().split(RT)}
+
+/* shared tables */
+const WIN_IPCONFIG_ALL=[
+ ['sys','Windows IP Configuration'],['',''],
+ ['','Ethernet adapter Ethernet0:'],
+ ['','   Connection-specific DNS Suffix  . : lab.example'],
+ ['','   Description . . . . . . . . . . . : Intel I219-V'],
+ ['','   Physical Address. . . . . . . . . : 00-1A-2B-3C-4D-5E'],
+ ['','   DHCP Enabled. . . . . . . . . . . : Yes'],
+ ['','   IPv4 Address. . . . . . . . . . . : 192.168.10.25(Preferred)'],
+ ['','   Subnet Mask . . . . . . . . . . . : 255.255.255.0'],
+ ['','   Default Gateway . . . . . . . . . : 192.168.10.1'],
+ ['','   DHCP Server . . . . . . . . . . . : 192.168.10.1'],
+ ['','   DNS Servers . . . . . . . . . . . : 192.168.10.53'],
+ ['','                                       192.168.10.54']];
+const WIN_IPCONFIG=[['sys','Windows IP Configuration'],['',''],['','Ethernet adapter Ethernet0:'],['',''],
+ ['','   Connection-specific DNS Suffix  . : lab.example'],
+ ['','   IPv4 Address. . . . . . . . . . . : 192.168.10.25'],
+ ['','   Subnet Mask . . . . . . . . . . . : 255.255.255.0'],
+ ['','   Default Gateway . . . . . . . . . : 192.168.10.1']];
+const ARP_WIN=[['sys','Interface: 192.168.10.25 --- 0x6'],
+ ['','  Internet Address      Physical Address      Type'],
+ ['','  192.168.10.1          00-11-22-aa-bb-cc     dynamic'],
+ ['','  192.168.10.40         00-1a-2b-9f-8e-7d     dynamic'],
+ ['','  192.168.10.53         00-50-56-23-11-02     dynamic'],
+ ['','  192.168.10.99         00-11-22-aa-bb-cc     dynamic'],
+ ['','  192.168.10.255        ff-ff-ff-ff-ff-ff     static'],
+ ['','  224.0.0.22            01-00-5e-00-00-16     static']];
+
+function pingOut(os,target,opts){
+  const map={
+    '192.168.10.1':{ok:true,t:1,ttl:255},'192.168.10.40':{ok:true,t:1,ttl:64},
+    '192.168.10.53':{ok:true,t:1,ttl:64},'192.168.10.2':{ok:true,t:1,ttl:255},
+    '192.168.20.80':{ok:true,t:3,ttl:63},'www.lab.example':{ok:true,t:3,ttl:63,res:'192.168.20.80'},
+    'ftp.lab.example':{ok:true,t:3,ttl:63,res:'192.168.20.80'},
+    '8.8.8.8':{ok:true,t:14,ttl:115},'192.168.99.10':{ok:false,unreach:true},
+    'intranet.lab.example':{dns:false}
+  };
+  const m=map[target];const n=opts.n||(os==='win'?4:4);
+  if(!m){ // unknown name
+    if(/[a-z]/i.test(target)&&!/^\d/.test(target))return [['err',(os==='win'?'Ping request could not find host '+target+'. Please check the name and try again.':'ping: '+target+': Name or service not known')]];
+    return seqTimeout(os,target,n);
+  }
+  if(m.dns===false)return [['err',(os==='win'?'Ping request could not find host '+target+'. Please check the name and try again.':'ping: '+target+': Temporary failure in name resolution')]];
+  const ip=m.res||target;const out=[];
+  if(os==='win'){out.push(['','Pinging '+target+(m.res?' ['+ip+']':'')+' with 32 bytes of data:']);
+    if(m.unreach){for(let i=0;i<n;i++)out.push(['err','Reply from 192.168.10.25: Destination host unreachable.']);out.push(['',''],['','Ping statistics for '+ip+':'],['','    Packets: Sent = '+n+', Received = '+n+', Lost = 0 (0% loss),']);return out;}
+    for(let i=0;i<n;i++)out.push(['','Reply from '+ip+': bytes=32 time'+(m.t<1?'<1ms':'='+m.t+'ms')+' TTL='+m.ttl]);
+    out.push(['',''],['','Ping statistics for '+ip+':'],['','    Packets: Sent = '+n+', Received = '+n+', Lost = 0 (0% loss),'],['','Approximate round trip times in milli-seconds:'],['','    Minimum = '+m.t+'ms, Maximum = '+(m.t+1)+'ms, Average = '+m.t+'ms']);
+  }else{out.push(['','PING '+target+' ('+ip+') 56(84) bytes of data.']);
+    if(m.unreach){out.push(['err','From 192.168.10.25 icmp_seq=1 Destination Host Unreachable']);out.push(['',''],['','--- '+target+' ping statistics ---'],['',n+' packets transmitted, 0 received, 100% packet loss']);return out;}
+    for(let i=0;i<n;i++)out.push(['','64 bytes from '+ip+': icmp_seq='+(i+1)+' ttl='+m.ttl+' time='+(m.t+(i%2?0.1:0)).toFixed(1)+' ms']);
+    out.push(['',''],['','--- '+target+' ping statistics ---'],['',n+' packets transmitted, '+n+' received, 0% packet loss']);
+  }
+  return out;
+}
+function seqTimeout(os,t,n){const o=[['',os==='win'?'Pinging '+t+' with 32 bytes of data:':'PING '+t]];for(let i=0;i<n;i++)o.push(['err',os==='win'?'Request timed out.':'Request timeout for icmp_seq '+(i+1)]);o.push(['',''],['',(os==='win'?'    Packets: Sent = '+n+', Received = 0, Lost = '+n+' (100% loss),':n+' packets transmitted, 0 received, 100% packet loss')]);return o;}
+
+function traceOut(os,target){
+  const paths={
+   'www.lab.example':['192.168.20.80',[['192.168.10.1','1'],['192.168.20.1','1'],['192.168.20.80','3']]],
+   '192.168.20.80':['192.168.20.80',[['192.168.10.1','1'],['192.168.20.1','1'],['192.168.20.80','3']]],
+   '8.8.8.8':['8.8.8.8',[['192.168.10.1','1'],['203.0.113.1','4'],['198.51.100.6','12'],['8.8.8.8','14']]],
+   '192.168.99.10':['192.168.99.10',[['192.168.10.1','1'],['*','*'],['*','*'],['*','*']]]
+  };
+  const p=paths[target];if(!p){if(/[a-z]/i.test(target)&&!/^\d/.test(target))return[['err',os==='win'?'Unable to resolve target system name '+target+'.':target+': Name or service not known']];return[['err','Over maximum hops reached.']];}
+  const [ip,hops]=p;const o=[];
+  if(os==='win'){o.push(['','Tracing route to '+target+' ['+ip+']'],['','over a maximum of 30 hops:'],['','']);
+    hops.forEach((h,i)=>{if(h[0]==='*')o.push(['','  '+pad(i+1,3)+'    *        *        *     Request timed out.']);else o.push(['','  '+pad(i+1,3)+'   '+pad('<'+(+h[1]+1)+' ms',7)+' '+pad((+h[1])+' ms',7)+' '+pad((+h[1]+1)+' ms',7)+'  '+h[0]]);});
+    o.push(['',''],['','Trace complete.']);
+  }else{o.push(['','traceroute to '+target+' ('+ip+'), 30 hops max, 60 byte packets']);
+    hops.forEach((h,i)=>{if(h[0]==='*')o.push(['',' '+pad(i+1,2)+'  * * *']);else o.push(['',' '+pad(i+1,2)+'  '+h[0]+'  '+h[1]+'.'+(i)+' ms  '+h[1]+'.'+(i+2)+' ms  '+(+h[1]+1)+'.0 ms']);});
+  }
+  return o;
+}
+
+function nslookup(os,args){
+  // args: name [server]
+  const name=args[0];const server=args[1]||'192.168.10.53';
+  const rec={'www.lab.example':'192.168.20.80','ftp.lab.example':'192.168.20.80','dns1.lab.example':'192.168.10.53','intranet.lab.example':null,'8.8.8.8':'dns.google'};
+  const srvName=server==='192.168.10.53'?'dns1.lab.example':server;
+  const o=[['','Server:  '+srvName],['','Address:  '+server+'#53'],['','']];
+  if(!(name in rec)){o.push(['err','** server can\'t find '+name+': NXDOMAIN']);return o;}
+  if(rec[name]===null){o.push(['err','** server can\'t find '+name+': NXDOMAIN'],['sys','(no A record exists for this name)']);return o;}
+  if(/^\d+\.\d+\.\d+\.\d+$/.test(name)){o.push(['','Name:    '+rec[name]],['','Address:  '+name]);return o;}
+  o.push(['','Non-authoritative answer:'],['','Name:    '+name],['','Address:  '+rec[name]]);
+  return o;
+}
+function dig(os,args){
+  let short=args.includes('+short');let rev=args.includes('-x');
+  const target=args.find(a=>a!=='-x'&&a[0]!=='+'&&a[0]!=='@');
+  const rec={'www.lab.example':'192.168.20.80','ftp.lab.example':'192.168.20.80','intranet.lab.example':null};
+  if(short){if(rev)return[['','ftp.lab.example.']];const v=rec[target];return v?[['',v]]:[['sys',';; NXDOMAIN']];}
+  if(rev){return[['sys','; <<>> DiG 9.18 <<>> -x '+target],['','80.20.168.192.in-addr.arpa. 3600 IN  PTR  www.lab.example.']];}
+  const v=rec[target];
+  const o=[['sys','; <<>> DiG 9.18 <<>> '+target],['sys',';; global options: +cmd']];
+  if(v===undefined||v===null){o.push(['sys',';; Got answer:'],['err',';; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 42'],['sys',';; QUESTION SECTION:'],['',';'+target+'.      IN  A']);return o;}
+  o.push(['sys',';; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 42'],['sys',';; ANSWER SECTION:'],['',target+'.   3600  IN  A   '+v],['sys',';; Query time: 2 msec'],['sys',';; SERVER: 192.168.10.53#53']);
+  return o;
+}
+
+function netstat(os,args){
+  const a=args.join(' ');
+  if(/-r/.test(a))return routeOut(os,[]);
+  const rows=[
+   ['TCP','192.168.10.25:52140','192.168.20.80:80','ESTABLISHED'],
+   ['TCP','192.168.10.25:52155','192.168.20.80:443','ESTABLISHED'],
+   ['TCP','192.168.10.25:52160','192.168.20.80:21','SYN_SENT'],
+   ['TCP','0.0.0.0:135','0.0.0.0:0','LISTENING'],
+   ['TCP','0.0.0.0:445','0.0.0.0:0','LISTENING'],
+   ['TCP','192.168.10.25:3389','0.0.0.0:0','LISTENING']];
+  if(os==='lin'&&/-tulpn|-tlnp|-tuln/.test(a)){
+    return [['','Active Internet connections (only servers)'],['','Proto Recv-Q Send-Q Local Address      Foreign Address  State    PID/Program'],
+     ['','tcp        0      0 0.0.0.0:22         0.0.0.0:*        LISTEN   712/sshd'],
+     ['','tcp        0      0 0.0.0.0:80         0.0.0.0:*        LISTEN   990/nginx'],
+     ['','udp        0      0 0.0.0.0:68         0.0.0.0:*                805/dhclient']];
+  }
+  const o=[['','Active Connections'],['',''],['','  Proto  Local Address          Foreign Address        State']];
+  rows.forEach(r=>o.push([r[3]==='SYN_SENT'?'note':'','  '+pad(r[0],6)+' '+pad(r[1],22)+' '+pad(r[2],22)+' '+r[3]]));
+  return o;
+}
+function routeOut(os,args){
+  if(os==='lin'||/ip route/.test(args.join(' '))){
+    return [['','default via 192.168.10.1 dev eth0 proto dhcp metric 100'],['','192.168.10.0/24 dev eth0 proto kernel scope link src 192.168.10.40']];
+  }
+  return [['sys','==========================================================================='],
+   ['sys','Interface List'],['sys','  6...00 1a 2b 3c 4d 5e ......Intel I219-V'],
+   ['sys','==========================================================================='],
+   ['','IPv4 Route Table'],['sys','==========================================================================='],
+   ['','Active Routes:'],
+   ['','Network Destination        Netmask          Gateway       Interface  Metric'],
+   ['','          0.0.0.0          0.0.0.0     192.168.10.1  192.168.10.25     25'],
+   ['','     192.168.10.0    255.255.255.0         On-link   192.168.10.25    281'],
+   ['','   192.168.10.25  255.255.255.255         On-link   192.168.10.25    281'],
+   ['sys','===========================================================================']];
+}
+
+function tcpdump(os,args){
+  const a=args.join(' ');
+  if(!/-i/.test(a))return[['err','tcpdump: you must specify an interface with -i (try: tcpdump -i eth0 ...)']];
+  const hostF=(a.match(/host\s+([\d.]+)/)||[])[1];
+  const portF=(a.match(/port\s+(\d+)/)||[])[1];
+  const icmp=/\bicmp\b/.test(a);
+  const base=[
+   {t:'10:02:01.114',s:'192.168.10.25.52160',d:'192.168.20.80.21',p:'tcp',f:'Flags [S], seq 10',host:'192.168.20.80',port:'21'},
+   {t:'10:02:02.117',s:'192.168.10.25.52160',d:'192.168.20.80.21',p:'tcp',f:'Flags [S], seq 10',host:'192.168.20.80',port:'21'},
+   {t:'10:02:04.121',s:'192.168.10.25.52160',d:'192.168.20.80.21',p:'tcp',f:'Flags [S], seq 10 (retransmit)',host:'192.168.20.80',port:'21',note:true},
+   {t:'10:02:05.090',s:'192.168.10.25.52155',d:'192.168.20.80.443',p:'tcp',f:'Flags [S], seq 77',host:'192.168.20.80',port:'443'},
+   {t:'10:02:05.092',s:'192.168.20.80.443',d:'192.168.10.25.52155',p:'tcp',f:'Flags [S.], seq 90, ack 78',host:'192.168.20.80',port:'443'},
+   {t:'10:02:05.092',s:'192.168.10.25.52155',d:'192.168.20.80.443',p:'tcp',f:'Flags [.], ack 91',host:'192.168.20.80',port:'443'},
+   {t:'10:02:06.330',s:'192.168.10.25',d:'192.168.20.80',p:'icmp',f:'echo request',host:'192.168.20.80',icmp:true},
+   {t:'10:02:06.333',s:'192.168.20.80',d:'192.168.10.25',p:'icmp',f:'echo reply',host:'192.168.20.80',icmp:true}
+  ];
+  let pk=base.filter(p=>(!hostF||p.host===hostF)&&(!portF||p.port===portF)&&(!icmp||p.icmp));
+  if(!pk.length)return[['sys','tcpdump: listening on eth0, link-type EN10MB (Ethernet)'],['sys','(0 packets captured matching the filter)']];
+  const o=[['sys','tcpdump: verbose output suppressed, use -v[v]... for full protocol decode'],['sys','listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes']];
+  pk.forEach(p=>o.push([p.note?'note':'',p.t+' IP '+p.s+' > '+p.d+': '+p.p.toUpperCase()+' '+p.f]));
+  o.push(['sys','^C'],['sys',pk.length+' packets captured']);
+  return o;
+}
+
+function nmap(os,args){
+  const a=args.join(' ');
+  if(/-sn/.test(a)){
+    const net=(a.match(/([\d.]+\/\d+)/)||[])[1]||'192.168.10.0/24';
+    return [['sys','Starting Nmap 7.94 ( https://nmap.org )'],
+     ['','Nmap scan report for gw.lab.example (192.168.10.1)'],['','Host is up (0.0010s latency).'],
+     ['','Nmap scan report for PC-A (192.168.10.25)'],['','Host is up.'],
+     ['','Nmap scan report for lin-01 (192.168.10.40)'],['','Host is up (0.0008s latency).'],
+     ['','Nmap scan report for dns1 (192.168.10.53)'],['','Host is up (0.0012s latency).'],
+     ['sys','Nmap done: 256 IP addresses (4 hosts up) scanned in 2.14 seconds']];
+  }
+  const tgt=args.find(x=>/^[\d.]+$/.test(x)||/lab\.example/.test(x))||'192.168.20.80';
+  const svc=/-sV/.test(a);
+  const pf=(a.match(/-p\s*([\d,]+)/)||[])[1];
+  let ports=[['22','open','ssh',svc?'OpenSSH 9.6':''],['80','open','http',svc?'nginx 1.24.0':''],['443','open','https',svc?'nginx 1.24.0':''],['21','filtered','ftp','']];
+  if(pf){const set=pf.split(',');ports=ports.filter(p=>set.includes(p[0]));}
+  const o=[['sys','Starting Nmap 7.94 ( https://nmap.org )'],['','Nmap scan report for '+(tgt==='192.168.20.80'?'www.lab.example ':'')+'('+tgt+')'],['','Host is up (0.0032s latency).'],['',''],['','PORT     STATE     SERVICE'+(svc?'   VERSION':'')]];
+  ports.forEach(p=>o.push([p[1]==='filtered'?'note':'',pad(p[0]+'/tcp',9)+pad(p[1],10)+pad(p[2],8)+(svc?'  '+p[3]:'')]));
+  o.push(['',''],['sys','Nmap done: 1 IP address (1 host up) scanned in 1.80 seconds']);
+  return o;
+}
+
+function cdp(detail){
+  const o=[['','Capability Codes: R - Router, T - Trans Bridge, S - Switch, H - Host, I - IGMP'],['',''],
+   ['','Device ID        Local Intrfce     Holdtme    Capability  Platform   Port ID'],
+   ['','CORE-SW          Gig 0/1           174          R S I     C9300      Gig 1/0/1'],
+   ['','AP-Floor1-A      Gig 0/12          156            H       AIR-AP     Gig 0'],
+   ['','IPPhone-204      Gig 0/7           143          H P       IP Phone   Port 1']];
+  if(detail)o.push(['',''],['sys','-------------------------'],['','Device ID: CORE-SW'],['','  IP address: 192.168.10.1'],['','Interface: GigabitEthernet0/1,  Port ID (outgoing port): GigabitEthernet1/0/1'],['','Native VLAN: 1'],['','Version : Cisco IOS XE 17.9']);
+  return o;
+}
+function lldp(detail){
+  const o=[['','Capability codes: (R) Router, (B) Bridge, (W) WLAN AP, (S) Station'],['',''],
+   ['','Device ID         Local Intf   Hold-time  Capability  Port ID'],
+   ['','CORE-SW           Gi0/1        120        B,R         Gi1/0/1'],
+   ['','AP-Floor1-A       Gi0/12       120        W           gigabitethernet0'],
+   ['','lin-01            Gi0/9        120        S           eth0']];
+  if(detail)o.push(['',''],['','Local Intf: Gi0/1'],['','Chassis id: 00:11:22:aa:bb:cc'],['','Port id: Gi1/0/1'],['','System Name: CORE-SW'],['','Management Addresses:  IP: 192.168.10.1']);
+  o.push(['',''],['','Total entries displayed: '+(detail?1:3)]);return o;
+}
+
+/* ===== master resolver: returns {out:[lines], cmd:'id'|null, err:bool} ===== */
+function run(host,raw){
+  const line=raw.trim();if(!line)return{out:[]};
+  const a=argify(line);const c=a[0].toLowerCase();const os=host;
+  const rest=a.slice(1);
+  const notOnHost=(ids)=>({out:[['err',a[0]+': command not found on this host. Type help to see what '+hostName(host)+' supports.']],err:true});
+  // Windows PC-A
+  if(host==='win'){
+    if(c==='ping'){const n=(line.match(/-n\s+(\d+)/)||[])[1];const t=rest.filter(x=>x[0]!=='-'&&!/^\d+$/.test(x)||/^\d+\.\d/.test(x)).pop()||rest[rest.length-1];if(!t||t[0]==='-')return{out:[['err','Usage: ping [-n count] target']],err:true};return{out:pingOut('win',t,{n:n?+n:4}),cmd:'ping'};}
+    if(c==='tracert'){const t=rest.filter(x=>x!=='-d').pop();if(!t)return{out:[['err','Usage: tracert target_name']],err:true};return{out:traceOut('win',t),cmd:'trace'};}
+    if(c==='traceroute')return{out:[['err','\'traceroute\' is not recognized. On Windows the command is tracert.']],err:true,cmd:null};
+    if(c==='ipconfig'){return{out:/\/all/.test(line)?WIN_IPCONFIG_ALL:WIN_IPCONFIG,cmd:'ipconfig'};}
+    if(c==='ifconfig'||c==='ip')return{out:[['err',a[0]+' is a Linux command. On Windows use ipconfig. (Try lin-01 for '+a[0]+'.)']],err:true};
+    if(c==='arp'){if(rest[0]==='-a'||rest[0]==='-g')return{out:ARP_WIN,cmd:'arp'};return{out:[['err','Usage: arp -a']],err:true};}
+    if(c==='nslookup'){if(!rest.length)return{out:[['err','Usage: nslookup name [server]']],err:true};return{out:nslookup('win',rest),cmd:'dns'};}
+    if(c==='dig')return{out:[['err','\'dig\' is not installed on Windows. Use nslookup here, or try dig on lin-01.']],err:true};
+    if(c==='netstat'){return{out:netstat('win',rest),cmd:'netstat'};}
+    if(c==='route'){if(rest[0]==='print'||!rest.length)return{out:routeOut('win',rest),cmd:'route'};if(rest[0]==='add')return{out:[['sys',' OK!']],cmd:'route'};return{out:routeOut('win',rest),cmd:'route'};}
+    if(c==='tcpdump'||c==='nmap')return{out:[['err',a[0]+' is not installed on PC-A. Switch to lin-01 (the Linux admin box) to use it.']],err:true};
+    if(c==='show')return{out:[['err','This is a Windows PC, not a switch. Switch to SW1 for show commands.']],err:true};
+  }
+  // Linux lin-01
+  if(host==='lin'){
+    if(c==='ping'){const n=(line.match(/-c\s+(\d+)/)||[])[1];const t=rest.filter(x=>x[0]!=='-'&&!/^\d+$/.test(x)||/^\d+\.\d/.test(x)).pop();if(!t)return{out:[['err','Usage: ping [-c count] destination']],err:true};return{out:pingOut('lin',t,{n:n?+n:4}),cmd:'ping'};}
+    if(c==='traceroute'){const t=rest.filter(x=>x!=='-n').pop();if(!t)return{out:[['err','Usage: traceroute host']],err:true};return{out:traceOut('lin',t),cmd:'trace'};}
+    if(c==='tracert')return{out:[['err','\'tracert\' is the Windows name. On Linux use traceroute.']],err:true};
+    if(c==='ifconfig')return{out:[['','eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500'],['','        inet 192.168.10.40  netmask 255.255.255.0  broadcast 192.168.10.255'],['','        ether 00:1a:2b:9f:8e:7d  txqueuelen 1000  (Ethernet)']],cmd:'ipconfig'};
+    if(c==='ip'){const s=rest.join(' ');if(/^a(ddr)?/.test(s))return{out:[['','1: lo: <LOOPBACK,UP> mtu 65536'],['','    inet 127.0.0.1/8 scope host lo'],['','2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500'],['','    inet 192.168.10.40/24 brd 192.168.10.255 scope global eth0'],['','    link/ether 00:1a:2b:9f:8e:7d brd ff:ff:ff:ff:ff:ff']],cmd:'ipconfig'};if(/^r(oute)?/.test(s))return{out:routeOut('lin',['ip route']),cmd:'route'};if(/^neigh/.test(s))return{out:[['','192.168.10.1 dev eth0 lladdr 00:11:22:aa:bb:cc REACHABLE'],['','192.168.10.25 dev eth0 lladdr 00:1a:2b:3c:4d:5e REACHABLE'],['','192.168.10.99 dev eth0 lladdr 00:11:22:aa:bb:cc STALE']],cmd:'arp'};return{out:[['err','Usage: ip addr | ip route | ip neigh']],err:true};}
+    if(c==='ipconfig')return{out:[['err','\'ipconfig\' is the Windows command. On Linux use ip addr or ifconfig.']],err:true};
+    if(c==='arp'){if(rest[0]==='-a'||rest[0]==='-n')return{out:[['','Address           HWtype  HWaddress           Flags  Iface'],['','192.168.10.1      ether   00:11:22:aa:bb:cc   C      eth0'],['','192.168.10.25     ether   00:1a:2b:3c:4d:5e   C      eth0'],['','192.168.10.99     ether   00:11:22:aa:bb:cc   C      eth0']],cmd:'arp'};return{out:[['err','Usage: arp -n  (or: ip neigh)']],err:true};}
+    if(c==='nslookup'){if(!rest.length)return{out:[['err','Usage: nslookup name [server]']],err:true};return{out:nslookup('lin',rest),cmd:'dns'};}
+    if(c==='dig'){if(!rest.length)return{out:[['err','Usage: dig [+short] [-x] name']],err:true};return{out:dig('lin',rest),cmd:'dns'};}
+    if(c==='netstat')return{out:netstat('lin',rest),cmd:'netstat'};
+    if(c==='ss')return{out:netstat('lin',['-tulpn']),cmd:'netstat'};
+    if(c==='route')return{out:routeOut('lin',rest),cmd:'route'};
+    if(c==='tcpdump')return{out:tcpdump('lin',rest),cmd:'tcpdump'};
+    if(c==='nmap'){if(!rest.length)return{out:[['err','Usage: nmap [-sn|-sV] [-p ports] target']],err:true};return{out:nmap('lin',rest),cmd:'nmap'};}
+    if(c==='show')return{out:[['err','This is a Linux host. Switch to SW1 for show commands.']],err:true};
+  }
+  // Cisco SW1
+  if(host==='sw'){
+    if(c==='show'||c==='sh'){const s=rest.join(' ').toLowerCase();
+      if(/^cdp\s+nei/.test(s))return{out:cdp(/detail/.test(s)),cmd:'lldp'};
+      if(/^lldp\s+nei/.test(s))return{out:lldp(/detail/.test(s)),cmd:'lldp'};
+      if(/^ip\s+int/.test(s))return{out:[['','Interface              IP-Address      OK? Method Status   Protocol'],['','Vlan10                 192.168.10.2    YES NVRAM  up       up'],['','GigabitEthernet0/1     unassigned      YES unset  up       up']],cmd:'ipconfig'};
+      if(/^mac/.test(s))return{out:[['','          Mac Address Table'],['','Vlan    Mac Address       Type      Ports'],['','  10    001a.2b3c.4d5e    DYNAMIC   Gi0/7'],['','  10    001a.2b9f.8e7d    DYNAMIC   Gi0/9']],cmd:'arp'};
+      if(/^version/.test(s))return{out:[['','Cisco IOS XE Software, Version 17.9.3'],['','SW1 uptime is 24 weeks, 3 days']]};
+      return{out:[['err','% Try: show cdp neighbors [detail], show lldp neighbors [detail], show ip interface brief']],err:true};}
+    if(['ping','traceroute','tracert','ipconfig','ifconfig','arp','nslookup','dig','netstat','route','tcpdump','nmap'].includes(c))
+      return{out:[['err','% On a Cisco switch, neighbor discovery uses: show cdp neighbors  or  show lldp neighbors. Host tools like '+c+' run on PC-A or lin-01.']],err:true};
+  }
+  return {out:[['err',(host==='sw'?'% Unknown command: ':'command not found: ')+a[0]+'   (type help)']],err:true};
+}
+function hostName(h){return h==='win'?'PC-A (Windows)':h==='lin'?'lin-01 (Linux)':'SW1 (Cisco)'}
+function hostHelp(h){
+  if(h==='win')return 'ping, tracert, ipconfig [/all], arp -a, nslookup, netstat [-an|-r], route print';
+  if(h==='lin')return 'ping [-c], traceroute, ip addr / ifconfig, ip route, arp -n / ip neigh, nslookup, dig [+short|-x], netstat / ss, tcpdump -i eth0 ..., nmap ...';
+  return 'show cdp neighbors [detail], show lldp neighbors [detail], show ip interface brief, show mac address-table';
+}
+</script>
+<script>
+(function(){
+"use strict";
+const KEY='lan121-cmd-lab-v1';
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+const blank=()=>({theme:null,viewed:{},done:{},scores:{},hints:{},wrong:{},start:{},end:{},answered:{},name:'',curMission:0});
+let S=Object.assign(blank(),load()||{});['viewed','done','scores','hints','wrong','start','end','answered'].forEach(k=>{if(!S[k])S[k]={}});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- MISSIONS ----------
+ Each mission trains one command id. defaultHost is pre-selected.
+ questions: {q, placeholder, check(normalizedAnswer)->bool, good, bad, pre?}
+ solved when all questions correct. */
+const M=[
+ {id:'ipconfig',host:'win',title:'Start with your own settings',eyebrow:'Command 1 of 10 · ipconfig / ifconfig / ip',
+  task:'A user on PC-A says "the internet is down." Before blaming the network, read PC-A\'s own IP configuration.',
+  need:'Run ipconfig on PC-A (try the full form to see DNS too).',
+  hints:['Half of outage calls are a local setting. The Windows command starts with "ip".','Add a switch to see DNS servers and the MAC address.','Type: ipconfig /all'],
+  qs:[
+   {q:'What is PC-A\'s default gateway?',ph:'x.x.x.x',check:v=>v==='192.168.10.1',good:'Right. All off-subnet traffic leaves through 192.168.10.1.',bad:'Look at the Default Gateway line.'},
+   {q:'Which DNS server is listed first?',ph:'x.x.x.x',check:v=>v==='192.168.10.53',good:'Correct. Name lookups go to 192.168.10.53 first.',bad:'Run ipconfig /all to see the DNS Servers line.'}
+  ]},
+ {id:'ping',host:'win',title:'Prove reachability, layer by layer',eyebrow:'Command 2 of 10 · ping',
+  task:'The settings look fine. Test connectivity outward: first the gateway, then the internal web server at 192.168.20.80.',
+  need:'Ping the gateway and ping 192.168.20.80.',
+  hints:['Ping tests Layer 3 reachability with ICMP. Start with the nearest hop, your gateway.','Then ping the server on the other subnet, 192.168.20.80.','Type: ping 192.168.10.1  then  ping 192.168.20.80'],
+  qs:[
+   {q:'TTL on the reply from the web server (192.168.20.80)?',ph:'number',check:v=>v==='63',good:'Right. TTL 63 (started at 64, one router decremented it) confirms the reply crossed one hop.',bad:'Ping 192.168.20.80 and read the TTL= value.'},
+   {q:'Packet loss pinging the gateway, in percent?',ph:'number',check:v=>v==='0',good:'Clean: 0% loss to the gateway.',bad:'Read the loss figure from the ping statistics.'}
+  ]},
+ {id:'arp',host:'win',title:'Catch the duplicate on the LAN',eyebrow:'Command 3 of 10 · arp -a',
+  task:'Two hosts report intermittent drops. Inspect PC-A\'s ARP cache for an IP-to-MAC clash on the local segment.',
+  need:'Show the ARP table on PC-A.',
+  hints:['ARP maps IPv4 addresses to MACs inside your broadcast domain.','On Windows the switch is -a.','Type: arp -a — then look for one MAC appearing on two IPs.'],
+  qs:[
+   {q:'Which second IP shares the gateway\'s MAC (00-11-22-aa-bb-cc)?',ph:'x.x.x.x',check:v=>v==='192.168.10.99',good:'Found it. 192.168.10.99 answers with the gateway\'s MAC, a classic sign of ARP spoofing or a duplicate.',bad:'Scan the Physical Address column for 00-11-22-aa-bb-cc on two rows.'}
+  ]},
+ {id:'dns',host:'win',title:'Is it the name or the network?',eyebrow:'Command 4 of 10 · nslookup / dig',
+  task:'A user can reach 192.168.20.80 by IP but www.lab.example "doesn\'t work." Separate DNS from connectivity, and check a second name that users say is broken.',
+  need:'Resolve www.lab.example, then intranet.lab.example.',
+  hints:['If ping by IP works but by name fails, suspect DNS.','nslookup <name> queries your configured server.','Type: nslookup www.lab.example  then  nslookup intranet.lab.example'],
+  qs:[
+   {q:'What address does www.lab.example resolve to?',ph:'x.x.x.x',check:v=>v==='192.168.20.80',good:'Correct. The name maps to the server you already reached by IP.',bad:'Read the Address line of the answer.'},
+   {q:'What status does intranet.lab.example return? (one word)',ph:'e.g. NXDOMAIN',check:v=>/nxdomain/i.test(v),good:'Right. NXDOMAIN means that name has no record. The fix is a DNS record, not the network.',bad:'Look at the error nslookup returns for that name.'}
+  ]},
+ {id:'route',host:'win',title:'Follow the routing table',eyebrow:'Command 5 of 10 · route',
+  task:'Traffic to one subnet works and another is black-holed. Read PC-A\'s routing table to see where packets are sent.',
+  need:'Print the routing table on PC-A.',
+  hints:['The host routing table decides the next hop for every destination.','On Windows: route print (or netstat -r on any OS).','Type: route print — then find the catch-all 0.0.0.0 route.'],
+  qs:[
+   {q:'What gateway does the default route (0.0.0.0) use?',ph:'x.x.x.x',check:v=>v==='192.168.10.1',good:'Right. Anything without a more specific route goes to 192.168.10.1.',bad:'Find the row where Network Destination is 0.0.0.0.'}
+  ]},
+ {id:'trace',host:'win',title:'Find where the path breaks',eyebrow:'Command 6 of 10 · traceroute / tracert',
+  task:'A remote subnet (192.168.99.10) is unreachable. Trace the path to see which hop it dies at, and compare with a good path to the web server.',
+  need:'Trace to 192.168.99.10.',
+  hints:['Traceroute reveals each router hop by raising the TTL.','On Windows the command is tracert.','Type: tracert 192.168.99.10 — watch which hop stops replying.'],
+  qs:[
+   {q:'At which hop number do the timeouts begin?',ph:'number',check:v=>v==='2',good:'Correct. Hop 1 (the gateway) answers, then hop 2 onward times out: the break is just past your gateway.',bad:'The first hop replies; count to the first row of asterisks.'}
+  ]},
+ {id:'netstat',host:'win',title:'Is the service even listening?',eyebrow:'Command 7 of 10 · netstat',
+  task:'An FTP client to 192.168.20.80 hangs. Check PC-A\'s active connections to see whether the session ever established.',
+  need:'List active connections on PC-A.',
+  hints:['netstat shows connection state: LISTENING, ESTABLISHED, SYN_SENT.','Use numeric output: netstat -an.','Type: netstat -an — find the line to port 21 and read its state.'],
+  qs:[
+   {q:'What state is the connection to 192.168.20.80 port 21 stuck in?',ph:'one word',check:v=>/syn.?sent/i.test(v),good:'Right. SYN_SENT means PC-A sent SYN and got no SYN-ACK: port 21 is blocked or not listening.',bad:'Find the :80 and :443 lines (ESTABLISHED) vs. the :21 line.'}
+  ]},
+ {id:'nmap',host:'lin',title:'Scan the server\'s ports',eyebrow:'Command 8 of 10 · nmap',
+  task:'Confirm from the network which ports the web server offers, and why FTP failed. Use the Linux admin box, lin-01.',
+  need:'Scan 192.168.20.80.',ethics:'Only scan hosts you own or are authorized to test. This lab network is yours.',
+  hints:['nmap reports each port as open, closed, or filtered.','A default scan of the host checks its common ports.','Type: nmap 192.168.20.80 — then read the STATE column for port 21.'],
+  qs:[
+   {q:'What state is port 21 (ftp) in?',ph:'one word',check:v=>/filtered/i.test(v),good:'Correct. "filtered" means a firewall is silently dropping FTP, which matches the SYN_SENT you saw earlier.',bad:'Read the STATE column next to 21/tcp.'},
+   {q:'Name one port that is open on the server.',ph:'number',check:v=>['22','80','443'].includes(v),good:'Right. 22, 80, and 443 are open; FTP is the one being filtered.',bad:'Any port shown as "open" counts (22, 80, or 443).'}
+  ]},
+ {id:'tcpdump',host:'lin',title:'See it on the wire',eyebrow:'Command 9 of 10 · tcpdump',
+  task:'Get ground truth. Capture packets to the web server on lin-01 and confirm the FTP SYNs get no answer while HTTPS completes its handshake.',
+  need:'Capture traffic to host 192.168.20.80.',ethics:'Capture only on networks you are authorized to monitor.',
+  hints:['tcpdump needs an interface: -i eth0. Filter tightly so you can read it.','Filter by host: tcpdump -i eth0 host 192.168.20.80','Type: tcpdump -i eth0 host 192.168.20.80 — compare the port 21 SYNs with the port 443 exchange.'],
+  qs:[
+   {q:'The 443 handshake shows [S], then [S.], then what flag completes it?',ph:'e.g. [X]',check:v=>/^\[?\.?\]?$/.test(v)&&/\./.test(v),good:'Right. [.] is the final ACK. SYN, SYN-ACK, ACK: the three-way handshake succeeded on 443.',bad:'Look at the third packet of the 443 exchange: [S], [S.], then [.].'},
+   {q:'How many times does the SYN to port 21 appear (including the retransmit)?',ph:'number',check:v=>v==='3',good:'Correct. Three unanswered SYNs to port 21, no SYN-ACK: the firewall is dropping FTP.',bad:'Count the Flags [S] lines headed to 192.168.20.80.21.'}
+  ]},
+ {id:'lldp',host:'sw',title:'Map what you\'re plugged into',eyebrow:'Command 10 of 10 · LLDP / CDP',
+  task:'Finish on SW1. Without chasing cables, discover the switch\'s directly connected neighbors and which port the access point lands on.',
+  need:'Show the switch\'s CDP or LLDP neighbors.',
+  hints:['Neighbor discovery names the device, the local port, and the remote port.','On Cisco: show cdp neighbors (or the open standard, show lldp neighbors).','Type: show cdp neighbors — then find AP-Floor1-A.'],
+  qs:[
+   {q:'On which local interface is AP-Floor1-A connected?',ph:'e.g. Gig 0/x',check:v=>/g(ig)?\s*0\/12/i.test(v.replace(/\s+/g,' ')),good:'Correct. The access point is on Gig 0/12.',bad:'Find the AP-Floor1-A row and read its Local Intrfce.'},
+   {q:'Which neighbor is the router/core switch (capability R)?',ph:'device name',check:v=>/core.?sw/i.test(v),good:'Right. CORE-SW carries the R (router) capability and uplinks on Gig 0/1.',bad:'Look for R in the Capability column.'}
+  ]}
+];
+const SCORE_FLOOR=50;
+const CMAP={};CMDS.forEach(c=>CMAP[c.id]=c);
+function cmdFor(i){return CMAP[M[i].id]}
+
+/* ---------- theme ---------- */
+function curTheme(){const t=document.documentElement.getAttribute('data-theme');return t||((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light')}
+function paintTheme(){$('#themeBtn').textContent=curTheme()==='dark'?'Light mode':'Dark mode'}
+$('#themeBtn').onclick=()=>{const n=curTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);S.theme=n;save();paintTheme()};paintTheme();
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000)}
+
+/* ---------- tabs ---------- */
+function openTab(id){$$('.section').forEach(s=>s.classList.toggle('active',s.id===id));$$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id?'true':'false'));if(id==='summary')renderSummary();if(id==='lab')loadMission(S.curMission||0)}
+$$('.tab').forEach(b=>b.onclick=()=>{openTab(b.dataset.tab);window.scrollTo({top:Math.max(0,$('main').offsetTop-120),behavior:RM?'auto':'smooth'})});
+$$('[data-goto]').forEach(b=>b.onclick=()=>{openTab(b.dataset.goto);$('.tabs').scrollIntoView({behavior:RM?'auto':'smooth'})});
+
+/* ---------- hero keys ---------- */
+function renderKeys(){
+  $('#keys').innerHTML=CMDS.map((c,i)=>{const st=S.done[c.id]?'done':S.start[c.id]?'prog':'';return '<button class="key '+st+'" data-k="'+c.id+'" type="button"><span class="num">'+(i+1)+'</span><b>'+c.nm.split(' ')[0]+'</b><small>'+c.pp+'</small></button>'}).join('');
+  $$('.key').forEach(k=>k.onclick=()=>{const mi=M.findIndex(m=>m.id===k.dataset.k);S.curMission=mi<0?0:mi;save();openTab('lab');$('.tabs').scrollIntoView({behavior:RM?'auto':'smooth'})});
+}
+
+/* ---------- STUDY ---------- */
+$('#ladder').innerHTML=CMDS.map(c=>'<div class="rung"><b>'+c.nm+'<small>'+c.layer+'</small></b><div class="chips"><button class="chip" data-j="'+c.id+'">'+c.pp+'</button></div></div>').join('');
+function layerName(l){return l}
+$('#cards').innerHTML=CMDS.map((c,i)=>
+ '<details class="cmdcard'+(S.viewed[c.id]?' viewed':'')+'" data-id="'+c.id+'"><summary><span class="nm">'+c.nm+'</span><span class="pp">'+c.pp+' · '+c.layer+'</span><span class="seen">'+(S.viewed[c.id]?'✓ opened':'not opened')+'</span></summary>'+
+ '<div class="cc"><div><h4>What it does</h4><p>'+c.what+'</p><h4>How to read it</h4><p>'+c.read+'</p><div class="tip"><b>Pro tip.</b> '+c.tip+'</div></div>'+
+ '<div><h4>Common syntax</h4><div class="tscroll"><table><tr><th>Command</th><th>What it does</th></tr>'+c.syntax.map(s=>'<tr><td class="c">'+s[0]+'</td><td>'+s[1]+'</td></tr>').join('')+'</table></div></div></div></details>').join('');
+$$('.cmdcard').forEach(d=>d.addEventListener('toggle',()=>{if(d.open&&!S.viewed[d.dataset.id]){S.viewed[d.dataset.id]=true;save();d.classList.add('viewed');d.querySelector('.seen').textContent='✓ opened';updateViewed();renderKeys()}}));
+$$('[data-j]').forEach(b=>b.onclick=()=>{const d=$('.cmdcard[data-id="'+b.dataset.j+'"]');d.open=true;d.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'})});
+function updateViewed(){const n=CMDS.filter(c=>S.viewed[c.id]).length;$('#viewedTxt').textContent=n+' of 10 opened'}
+updateViewed();
+
+/* ---------- LAB ENGINE ---------- */
+let curHost='win',histIdx=-1,hist=[];
+function renderRail(){
+  $('#rail').innerHTML=M.map((m,i)=>'<button type="button" data-m="'+i+'" class="'+(S.done[m.id]?'done':'')+'" aria-current="'+(i===(S.curMission||0))+'"><span class="n">'+(i+1)+'</span><span class="c">'+CMDS[i].nm.split(' ')[0]+'</span><span class="s">'+(S.done[m.id]?'done':S.scores[m.id]!=null?'':'')+'</span></button>').join('');
+  $$('#rail button').forEach(b=>b.onclick=()=>loadMission(+b.dataset.m));
+}
+function setHost(h){
+  curHost=h;$$('.htab').forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.host===h)));
+  $('#prompt').textContent=h==='win'?'C:\\Users\\student>':h==='lin'?'student@lin-01:~$':'SW1#';
+  $('#osTxt').textContent=hostName(h);
+  $('#cli').focus();
+}
+$$('.htab').forEach(t=>t.onclick=()=>setHost(t.dataset.host));
+
+function printLines(lines,cmdEcho){
+  const sc=$('#screen');
+  if(cmdEcho!==undefined){const d=document.createElement('div');d.className='l cmdl';d.innerHTML='<span class="p">'+promptFor(curHost)+'</span> '+esc(cmdEcho);sc.appendChild(d)}
+  lines.forEach(l=>{const d=document.createElement('div');d.className='l '+(l[0]||'');d.textContent=l[1];sc.appendChild(d)});
+  const sp=document.createElement('div');sp.className='l';sp.textContent='';sc.appendChild(sp);
+  sc.scrollTop=sc.scrollHeight;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function promptFor(h){return h==='win'?'C:\\Users\\student>':h==='lin'?'student@lin-01:~$':'SW1#'}
+
+let cur=0;
+function loadMission(i){
+  cur=i;S.curMission=i;if(!S.start[M[i].id]){S.start[M[i].id]=Date.now()}save();
+  const m=M[i];
+  $('#mEyebrow').textContent=m.eyebrow;$('#mTitle').textContent=m.title;
+  $('#mSteps').innerHTML=['Run the command','Read the output','Answer to confirm'].map((s,k)=>'<span>'+(k+1)+'. '+s+'</span>').join('');
+  $('#mTask').innerHTML='<b>Task.</b> '+m.task+'<br><span class="muted" style="font-size:.9rem">'+m.need+'</span>';
+  const eth=$('#mEthics');if(m.ethics){eth.hidden=false;eth.innerHTML='<b>Authorized use.</b> '+m.ethics}else eth.hidden=true;
+  $('#screen').innerHTML='';
+  printLines([['sys','Simulated host. Type a command, or type help / hint / clear. Arrow keys recall history.']]);
+  setHost(m.host);
+  renderQuestions();renderHints(true);renderRail();
+  $('#coach').className='coach';$('#coach').innerHTML='Target command for this mission: <code>'+cmdFor(i).nm+'</code>. Run it on the highlighted host, then answer below.';
+  $('#nextRow').classList.toggle('show',!!S.done[m.id]);
+  updateNextTxt();
+  window.scrollTo({top:Math.max(0,$('main').offsetTop-120),behavior:RM?'auto':'smooth'});
+}
+function updateNextTxt(){const i=cur;const nd=M.findIndex((m,k)=>k>i&&!S.done[m.id]);$('#nextTxt').textContent=S.done[M[i].id]?(allDone()?'All ten commands mastered.':'Command mastered. Keep going.'):''}
+function allDone(){return M.every(m=>S.done[m.id])}
+
+function renderQuestions(){
+  const m=M[cur];const ans=S.answered[m.id]||{};
+  if(!S.ran||!S.ran[m.id]){/*noop*/}
+  $('#qs').innerHTML=m.qs.map((q,qi)=>{
+    const ok=ans[qi]===true;
+    return '<div class="qrow'+(ok?' ok':'')+'" data-q="'+qi+'" style="margin-bottom:10px"><label>'+(m.qs.length>1?(qi+1)+'. ':'')+q.q+'</label><div class="ir"><input '+(ok?'disabled value="✓ correct"':'placeholder="'+q.ph+'"')+' data-qi="'+qi+'"><button class="btn sm '+(ok?'ghost':'go')+'" type="button" data-check="'+qi+'"'+(ok?' disabled':'')+'>'+(ok?'Done':'Check')+'</button></div><div class="fb"></div></div>'}).join('');
+  if(!ranMission(m.id)){$('#qs').insertAdjacentHTML('afterbegin','<p class="locked">Run <code>'+cmdFor(cur).nm.split(' ')[0]+'</code> first — the output above holds the answers.</p>')}
+  $$('#qs [data-check]').forEach(b=>b.onclick=()=>checkAnswer(+b.dataset.check));
+  $$('#qs input:not([disabled])').forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer(+inp.dataset.qi)}));
+}
+function ranMission(id){return S.ranCmd&&S.ranCmd[id]}
+function markRan(id){if(!S.ranCmd)S.ranCmd={};S.ranCmd[id]=true;save()}
+
+function norm(v){return (v||'').trim().toLowerCase().replace(/\s+/g,' ')}
+function checkAnswer(qi){
+  const m=M[cur];const inp=$('#qs input[data-qi="'+qi+'"]');if(!inp||inp.disabled)return;
+  const row=$('#qs .qrow[data-q="'+qi+'"]');const fb=row.querySelector('.fb');
+  const val=norm(inp.value);if(!val){fb.className='fb bad';fb.textContent='Type an answer first.';return}
+  const q=m.qs[qi];
+  if(q.check(val)){
+    if(!S.answered[m.id])S.answered[m.id]={};S.answered[m.id][qi]=true;save();
+    fb.className='fb good';fb.textContent=q.good;renderQuestions();checkSolved();
+  }else{
+    S.wrong[m.id]=(S.wrong[m.id]||0)+1;save();
+    fb.className='fb bad';fb.textContent=q.bad+' (−5)';
+  }
+}
+function checkSolved(){
+  const m=M[cur];const ans=S.answered[m.id]||{};
+  const all=m.qs.every((q,i)=>ans[i]===true);
+  if(all&&!S.done[m.id]){
+    S.done[m.id]=true;S.end[m.id]=Date.now();
+    S.scores[m.id]=Math.max(SCORE_FLOOR,100-10*(S.hints[m.id]||0)-5*(S.wrong[m.id]||0));
+    save();renderKeys();renderRail();updateProgressRing();
+    $('#nextRow').classList.add('show');updateNextTxt();
+    $('#coach').className='coach ok';$('#coach').innerHTML='<b>Mastered:</b> '+cmdFor(cur).nm+'. '+(allDone()?'That\'s all ten. Open the progress summary.':'Press Next mission to continue.');
+    toast(allDone()?'All 10 commands mastered':'Command mastered: '+cmdFor(cur).nm.split(' ')[0]);
+  }
+}
+$('#nextBtn').onclick=()=>{const nx=M.findIndex((m,k)=>k>cur&&!S.done[m.id]);if(nx>=0)loadMission(nx);else if(cur<M.length-1)loadMission(cur+1);else openTab('summary')};
+
+/* hints */
+function renderHints(resetView){
+  const m=M[cur];const used=S.hints[m.id]||0;
+  const h=$('#hints');
+  if(used===0){h.innerHTML='<p class="muted" style="margin:0;font-size:.9rem">Three hints available, from a nudge to the exact command. Each costs 10 points. You can also type <code>hint</code> in the terminal.</p>';}
+  else{h.innerHTML='';for(let k=0;k<used;k++){const d=document.createElement('div');d.className='hint';d.innerHTML='<b>Hint '+(k+1)+'.</b> '+m.hints[k];h.appendChild(d)}}
+  $('#hintBtn').disabled=used>=3||!!S.done[m.id];
+  $('#hintBtn').textContent=used>=3?'No more hints':'Show hint ('+(used+1)+' of 3)';
+}
+function giveHint(){
+  const m=M[cur];if(S.done[m.id])return;const used=S.hints[m.id]||0;if(used>=3){toast('All three hints shown');return}
+  S.hints[m.id]=used+1;save();renderHints();renderKeys();
+  $('#coach').className='coach warn';$('#coach').innerHTML='Hint '+(used+1)+' shown (−10 points): '+m.hints[used];
+}
+$('#hintBtn').onclick=giveHint;
+
+/* CLI */
+const cli=$('#cli');
+cli.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const raw=cli.value;if(raw.trim()){hist.push(raw);histIdx=hist.length}cli.value='';handle(raw);}
+  else if(e.key==='ArrowUp'){if(hist.length){histIdx=Math.max(0,histIdx-1);cli.value=hist[histIdx]||'';setTimeout(()=>cli.setSelectionRange(cli.value.length,cli.value.length),0)}e.preventDefault()}
+  else if(e.key==='ArrowDown'){if(hist.length){histIdx=Math.min(hist.length,histIdx+1);cli.value=hist[histIdx]||''}e.preventDefault()}
+});
+$('#screen').addEventListener('click',()=>cli.focus());
+function handle(raw){
+  const line=raw.trim();const lc=line.toLowerCase();
+  if(!line){printLines([],'');return}
+  if(lc==='clear'||lc==='cls'){$('#screen').innerHTML='';return}
+  if(lc==='help'||lc==='?'){printLines([['sys','Commands available on '+hostName(curHost)+':'],['',hostHelp(curHost)],['sys','Lab helpers: help, hint, clear. Switch hosts with the tabs above the screen.']],raw);return}
+  if(lc==='hint'){printLines([['note','Hint shown in the Hints panel (−10 points).']],raw);giveHint();return}
+  const r=run(curHost,line);
+  printLines(r.out,raw);
+  if(r.cmd){
+    const m=M[cur];
+    if(r.cmd===m.id){markRan(m.id);renderQuestions();
+      if(!S.done[m.id]){$('#coach').className='coach ok';$('#coach').innerHTML='Good — that\'s the right command. Now read the output and answer the questions below.'}
+    } else if(!r.err){
+      $('#coach').className='coach';$('#coach').innerHTML='That\'s a valid command, but this mission trains <code>'+cmdFor(cur).nm+'</code>. Try that one.';
+    }
+  } else if(r.err){
+    // keep coach as is
+  }
+}
+
+/* progress ring */
+function updateProgressRing(){const n=M.filter(m=>S.done[m.id]).length;$('#ringArc').setAttribute('stroke-dasharray',(94.25*n/10).toFixed(2)+' 94.25');$('#ringTxt').textContent=n+' of 10 commands'}
+
+/* ---------- SUMMARY ---------- */
+function fmtDur(ms){if(!ms||ms<0)return '';const m=Math.round(ms/60000);return m<1?'<1 min':m+' min'}
+function renderSummary(){
+  let n=0,sum=0;
+  const rows=CMDS.map((c,i)=>{const id=c.id;const d=!!S.done[id],st=!!S.start[id];if(d){n++;sum+=S.scores[id]}
+   return '<tr><td>'+(i+1)+'. <span class="mono">'+c.nm+'</span></td><td><span class="pill '+(d?'d">Mastered':st?'p">Started':'n">Not started')+'</span></td><td class="mono">'+(d?S.scores[id]+'%':'—')+'</td><td class="mono">'+(S.hints[id]||0)+'</td><td class="mono">'+(S.wrong[id]||0)+'</td><td>'+(d&&S.start[id]?fmtDur(S.end[id]-S.start[id]):'')+'</td></tr>'});
+  $('#sumTbl').innerHTML='<tr><th>Command</th><th>Status</th><th>Score</th><th>Hints</th><th>Wrong tries</th><th>Time</th></tr>'+rows.join('');
+  $('#sumScore').textContent=(n?Math.round(sum/n):0)+'%';
+  $('#sumCount').textContent=n+' of 10 mastered';
+  $('#sumBar').style.width=(100*n/10)+'%';
+  const vn=CMDS.filter(c=>S.viewed[c.id]).length;$('#sumStudy').textContent=vn+' of 10 overviews opened';
+}
+$('#stuName').value=S.name||'';$('#stuName').oninput=e=>{S.name=e.target.value;save()};
+$('#printBtn').onclick=()=>{renderSummary();window.print()};
+$('#resetBtn').onclick=()=>{if(!confirm('Reset all progress, scores, and answers?'))return;const th=S.theme;S=blank();S.theme=th;save();location.reload()};
+
+/* init */
+renderKeys();renderRail();updateProgressRing();openTab('study');
+})();
+</script>
+</body>
+</html>
