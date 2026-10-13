@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Threat Hunt | LAN121 Activity 04</title>
+<title>Threat Hunt | LAN121 Activity 7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -283,7 +283,7 @@ details.guide[open] summary::after{content:"\2212"}
 <div class="app">
   <header class="top no-print">
     <div>
-      <p class="course">LAN121 Network Essentials, Activity 04</p>
+      <p class="course">LAN121 Network Essentials, Activity 7</p>
       <h1>Threat hunt</h1>
       <p class="lede">You are the on-call analyst for Ridgeline Credit Union. Ten incident tickets are waiting. Read the evidence, name the attack behind each one, then build the defenses that would have stopped it.</p>
     </div>
@@ -494,7 +494,7 @@ const CM={
 const CM_GROUPS=[["sw","Switch and Layer 2","#0047AB"],["edge","Edge and network services","#7A4FD0"],["wifi","Wireless","#0089A8"],["id","Identity, endpoint, and data","#00A86B"],["ppl","People and physical","#B86E00"]];
 const GCOLOR=Object.fromEntries(CM_GROUPS.map(g=>[g[0],g[2]]));
 
-const KEY="lan121-activity04-threathunt-v1";
+const KEY="lan121-activity-7-threathunt-v1";
 const blank=()=>({phase:0,studied:false,p1:{},p2:{},r1:null,r2:null,hints:[],name:"",theme:null});
 let store=blank();
 try{const raw=localStorage.getItem(KEY); if(raw) store=Object.assign(blank(),JSON.parse(raw));}catch(e){}
@@ -657,7 +657,7 @@ function renderResults(){
   h+=`<tr class="total"><td colspan="3">Current answers (latest)</td><td>${score1()}/10</td><td></td><td>${r1?score2()+"/20":""}</td></tr></tbody></table></div>
   <p class="meta">The table shows the student’s current answers. The graded total uses each phase’s first submission.</p>`;
   $("#resultsBody").innerHTML=h;
-  $("#printName").textContent=`Student: ${store.name||"________________"}   |   LAN121 Activity 04: Threat hunt   |   ${new Date().toLocaleDateString()}`;
+  $("#printName").textContent=`Student: ${store.name||"________________"}   |   LAN121 Activity 7: Threat hunt   |   ${new Date().toLocaleDateString()}`;
 }
 
 function renderAll(){
@@ -743,7 +743,7 @@ $("#check2").onclick=()=>{
   renderAll(); say(`Defenses submitted. ${s} of 20 points.`);
 };
 $("#to3").onclick=()=>{store.phase=3; save(); renderAll(); $("#results").scrollIntoView({behavior:"smooth"});};
-$("#stuName").addEventListener("input",e=>{store.name=e.target.value; save(); $("#printName").textContent=`Student: ${store.name}   |   LAN121 Activity 04: Threat hunt   |   ${new Date().toLocaleDateString()}`;});
+$("#stuName").addEventListener("input",e=>{store.name=e.target.value; save(); $("#printName").textContent=`Student: ${store.name}   |   LAN121 Activity 7: Threat hunt   |   ${new Date().toLocaleDateString()}`;});
 $("#printBtn").onclick=()=>{renderResults(); window.print();};
 let resetArm=false;
 $("#resetAll").onclick=e=>{
