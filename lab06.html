@@ -267,7 +267,7 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
 
   <h3 style="margin-top:22px">Where each skill is practiced</h3>
   <div class="tablewrap"><table class="map">
-    <thead><tr><th>Competency</th><th>Lab 6</th><th>Lab 2</th><th>Check</th></tr></thead>
+    <thead><tr><th>Competency</th><th>Lab 6</th><th>Part 2</th><th>Check</th></tr></thead>
     <tbody>
       <tr><td>Channel selection from a survey</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
       <tr><td>Device hardening (admin, WPS)</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
@@ -314,11 +314,11 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
   </div>
 </section>
 
-<!-- ============ LAB 2 ============ -->
+<!-- ============ Part 2 ============ -->
 <section class="tab" id="tab-lab2" role="tabpanel">
   <div class="labhead">
     <div>
-      <h2>Lab 2: Enterprise WLAN with WPA2-Enterprise and RADIUS</h2>
+      <h2>Part 2: Enterprise WLAN with WPA2-Enterprise and RADIUS</h2>
       <p class="lede" style="margin:0">One shared passphrase no longer works for this client. Every user will sign in with their own account, authorized by a RADIUS server.</p>
     </div>
     <div class="meter"><small id="m2t"></small><div class="bar"><i id="m2"></i></div></div>
@@ -369,7 +369,7 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
     <div class="card">
       <h3>Reflection</h3>
       <label class="fld" style="margin-bottom:12px"><span>1. When would you recommend WPA2-Personal over WPA2-Enterprise to a client? Why?</span><textarea id="ra"></textarea></label>
-      <label class="fld"><span>2. Which failure in Lab 2 would be hardest to diagnose without the EAP/RADIUS log, and why?</span><textarea id="rb"></textarea></label>
+      <label class="fld"><span>2. Which failure in Part 2 would be hardest to diagnose without the EAP/RADIUS log, and why?</span><textarea id="rb"></textarea></label>
       <div class="row noprint">
         <button class="btn" type="button" id="printBtn">Print or save as PDF</button>
         <button class="btn ghost" type="button" id="resetBtn">Reset all labs</button>
@@ -389,10 +389,10 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
     </ul>
   </div></details>
   <details class="acc"><summary>Logistics</summary><div class="body"><ul>
-    <li>Time: Lab 6 about 40 minutes, Lab 2 about 60 minutes, knowledge check 15 minutes.</li>
+    <li>Time: Lab 6 about 40 minutes, Part 2 about 60 minutes, knowledge check 15 minutes.</li>
     <li>Prerequisites: IPv4 addressing and DHCP; the CIA triad; basic symmetric encryption.</li>
-    <li>Delivery: individual or pairs (one plays the client, one the technician, swapping for Lab 2). Works in class or asynchronously; progress is saved in the browser.</li>
-    <li>Suggested sequence: brief on PSK versus 802.1X, Lab 6, debrief on why PSK fails at scale, Lab 2, knowledge check, reflection.</li>
+    <li>Delivery: individual or pairs (one plays the client, one the technician, swapping for Part 2). Works in class or asynchronously; progress is saved in the browser.</li>
+    <li>Suggested sequence: brief on PSK versus 802.1X, Lab 6, debrief on why PSK fails at scale, Part 2, knowledge check, reflection.</li>
   </ul></div></details>
   <details class="acc"><summary>Scoring rubric (20 points)</summary><div class="body">
     <div class="tablewrap"><table class="map">
@@ -410,7 +410,7 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
     <li>Have students uncheck certificate validation and discuss how an evil-twin AP could harvest MSCHAPv2 credentials.</li>
     <li>Extension: repeat Lab 6 with WPA3-Personal (SAE) and compare its resistance to offline dictionary attacks.</li>
     <li>Extension: replace PEAP with EAP-TLS and discuss the client-certificate deployment burden.</li>
-    <li>Hands-on transfer: rebuild Lab 2 in Packet Tracer, or with a physical AP plus Windows NPS or FreeRADIUS.</li>
+    <li>Hands-on transfer: rebuild Part 2 in Packet Tracer, or with a physical AP plus Windows NPS or FreeRADIUS.</li>
   </ul></div></details>
 </section>
 </main>
@@ -484,7 +484,7 @@ function connect1(id){var f=S.f,p=id+"_",e=[];
   if(f[p+"ip"]!=="dhcp")e.push("Set IP assignment to Automatic (DHCP). The work order doesn't reserve static addresses for laptops.");
   return e;}
 
-/* ---------- validators: Lab 2 ---------- */
+/* ---------- validators: Part 2 ---------- */
 function vRad(){var f=S.f,e=[];
   if(!f.rc_name)e.push("RADIUS client: give the entry a friendly name such as AP-01.");
   if(f.rc_ip!=="10.10.20.5")e.push("RADIUS client: the address must be AP-01's management IP, 10.10.20.5. RAD-01 silently drops requests from devices it doesn't know.");
@@ -565,7 +565,7 @@ function topo1(){var d=S.done,ip=S.ip;
   node(1,"lt2",410,175,"LT-02",d.lt2?ip.lt2:"no address",d.lt2,true)+
   '<text class="lbl" x="358" y="125">'+(d.wifi?esc(S.f.w_ssid)+" ch "+esc(S.f.w_ch):"Wi-Fi not set")+"</text></svg>";}
 function topo2(){var d=S.done;
-  return '<svg viewBox="0 0 600 250" role="img" aria-label="Lab 2 topology: RAD-01 and AP-01 on switch SW-01; LT-03 and LT-04 join AP-01 over Wi-Fi">'+
+  return '<svg viewBox="0 0 600 250" role="img" aria-label="Part 2 topology: RAD-01 and AP-01 on switch SW-01; LT-03 and LT-04 join AP-01 over Wi-Fi">'+
   link(130,125,200,125,d.rad&&d.ap,false)+link(300,125,350,125,d.rad&&d.ap,false)+link(460,115,480,50,d.lt3,true)+link(460,135,480,200,d.lt4,true)+
   node(2,"rad",20,100,"RAD-01","10.10.20.10",d.rad,true)+
   '<g class="node" transform="translate(200,105)"><rect width="100" height="40" rx="6"/><text x="50" y="25" class="n1">SW-01</text></g>'+
@@ -614,7 +614,7 @@ function pLap1(id){var host=id==="lt1"?"LT-01":"LT-02";var p=id+"_";
   sel(p+"ip","IP assignment",[["dhcp","Automatic (DHCP)"],["manual","Manual"]],"manual")+
   '</div><button class="btn" type="button" data-act="conn1" data-dev="'+id+'">Connect</button><div class="fb" id="fb-'+id+'"></div></div></div>';}
 
-/* ---------- Lab 2 panels ---------- */
+/* ---------- Part 2 panels ---------- */
 function pRad(){
   if(S.done.lt3&&S.done.lt4&&!S.done.acct){S.done.acct=true;save();setTimeout(refresh2,0);}
   var acct="";
@@ -738,7 +738,7 @@ function renderQuiz(){var right=0,answered=0;
 document.addEventListener("change",function(e){var t=e.target;if(t.matches&&t.matches("input[data-q]")){S.quiz[+t.getAttribute("data-q")]=+t.value;save();var y=window.scrollY;renderQuiz();window.scrollTo(0,y);var el=document.querySelector('input[name="q'+t.getAttribute("data-q")+'"]:checked');if(el)el.focus({preventScroll:true});}});
 
 /* ---------- results ---------- */
-function renderResults(){var items=STEPS1.map(function(s){return ["Lab 6: "+s[2],S.done[s[0]]];}).concat(STEPS2.map(function(s){return ["Lab 2: "+s[2],S.done[s[0]]];}));
+function renderResults(){var items=STEPS1.map(function(s){return ["Lab 6: "+s[2],S.done[s[0]]];}).concat(STEPS2.map(function(s){return ["Part 2: "+s[2],S.done[s[0]]];}));
   $("#prog").innerHTML=items.map(function(i){return "<li><span>"+esc(i[0])+'</span><span class="'+(i[1]?"ok":"no")+'">'+(i[1]?"Complete":"Not yet")+"</span></li>";}).join("");
   var right=QUIZ.filter(function(q,i){return S.quiz[i]===q[2];}).length;
   var labPts=count(STEPS1)/5*6+count(STEPS2)/5*8,qPts=right/QUIZ.length*4;
