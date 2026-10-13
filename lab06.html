@@ -267,7 +267,7 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
 
   <h3 style="margin-top:22px">Where each skill is practiced</h3>
   <div class="tablewrap"><table class="map">
-    <thead><tr><th>Competency</th><th>Lab 1</th><th>Lab 2</th><th>Check</th></tr></thead>
+    <thead><tr><th>Competency</th><th>Lab 6</th><th>Lab 2</th><th>Check</th></tr></thead>
     <tbody>
       <tr><td>Channel selection from a survey</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
       <tr><td>Device hardening (admin, WPS)</td><td class="yes">Yes</td><td></td><td class="yes">Yes</td></tr>
@@ -283,11 +283,11 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
   </div>
 </section>
 
-<!-- ============ LAB 1 ============ -->
+<!-- ============ LAB 6 ============ -->
 <section class="tab" id="tab-lab1" role="tabpanel">
   <div class="labhead">
     <div>
-      <h2>Lab 1: Small office WLAN with WPA2-Personal</h2>
+      <h2>Lab 6: Small office WLAN with WPA2-Personal</h2>
       <p class="lede" style="margin:0">Click a device in the diagram, or a step, to open its configuration screen. Each screen checks your settings when you save.</p>
     </div>
     <div class="meter"><small id="m1t"></small><div class="bar"><i id="m1"></i></div></div>
@@ -389,17 +389,17 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
     </ul>
   </div></details>
   <details class="acc"><summary>Logistics</summary><div class="body"><ul>
-    <li>Time: Lab 1 about 40 minutes, Lab 2 about 60 minutes, knowledge check 15 minutes.</li>
+    <li>Time: Lab 6 about 40 minutes, Lab 2 about 60 minutes, knowledge check 15 minutes.</li>
     <li>Prerequisites: IPv4 addressing and DHCP; the CIA triad; basic symmetric encryption.</li>
     <li>Delivery: individual or pairs (one plays the client, one the technician, swapping for Lab 2). Works in class or asynchronously; progress is saved in the browser.</li>
-    <li>Suggested sequence: brief on PSK versus 802.1X, Lab 1, debrief on why PSK fails at scale, Lab 2, knowledge check, reflection.</li>
+    <li>Suggested sequence: brief on PSK versus 802.1X, Lab 6, debrief on why PSK fails at scale, Lab 2, knowledge check, reflection.</li>
   </ul></div></details>
   <details class="acc"><summary>Scoring rubric (20 points)</summary><div class="body">
     <div class="tablewrap"><table class="map">
       <thead><tr><th>Criterion</th><th>Points</th><th>Evidence</th></tr></thead>
       <tbody>
-        <tr><td>Lab 1 configuration and verification</td><td>6</td><td>All five Lab 1 steps complete, including the ping test</td></tr>
-        <tr><td>Lab 2 configuration and verification</td><td>8</td><td>All five Lab 2 steps complete, including the accounting log review</td></tr>
+        <tr><td>Lab 6 configuration and verification</td><td>6</td><td>All five Parts of lab 6 steps complete, including the ping test</td></tr>
+        <tr><td>Lab 6 configuration and verification</td><td>8</td><td>All five parts of lab 6 part 2 steps complete, including the accounting log review</td></tr>
         <tr><td>Knowledge check</td><td>4</td><td>Proportional to score (10 questions)</td></tr>
         <tr><td>Reflection</td><td>2</td><td>Answers justify choices with specific technical reasons</td></tr>
       </tbody>
@@ -408,7 +408,7 @@ footer{color:var(--muted);font-size:.85rem;padding:20px 0 40px;border-top:1px so
   <details class="acc"><summary>Debrief prompts and extensions</summary><div class="body"><ul>
     <li>Ask students to deliberately try kwilson on LT-04 and explain which component rejected the attempt and why that's the right place for the decision.</li>
     <li>Have students uncheck certificate validation and discuss how an evil-twin AP could harvest MSCHAPv2 credentials.</li>
-    <li>Extension: repeat Lab 1 with WPA3-Personal (SAE) and compare its resistance to offline dictionary attacks.</li>
+    <li>Extension: repeat Lab 6 with WPA3-Personal (SAE) and compare its resistance to offline dictionary attacks.</li>
     <li>Extension: replace PEAP with EAP-TLS and discuss the client-certificate deployment burden.</li>
     <li>Hands-on transfer: rebuild Lab 2 in Packet Tracer, or with a physical AP plus Windows NPS or FreeRADIUS.</li>
   </ul></div></details>
@@ -442,7 +442,7 @@ function ip4(s){var p=String(s||"").split(".");if(p.length!==4)return null;var n
 function strong(p){return p.length>=12&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/\d/.test(p)&&/[^A-Za-z0-9]/.test(p);}
 function classes(p){return [/[A-Z]/,/[a-z]/,/\d/,/[^A-Za-z0-9]/].filter(function(r){return r.test(p);}).length;}
 
-/* ---------- validators: Lab 1 ---------- */
+/* ---------- validators: Lab 6 ---------- */
 function vRouter(){var f=S.f,e=[];
   var pw=f.r_admin||"";
   if(!strong(pw))e.push("Admin password: use at least 12 characters with uppercase, lowercase, a number and a symbol. Default router passwords are published online.");
@@ -557,7 +557,7 @@ function node(lab,id,x,y,name,sub,done,click){var cur=lab===1?S.sel1:S.sel2;var 
   return '<g class="'+c+'"'+a+' transform="translate('+x+","+y+')"><rect width="110" height="50" rx="8"/><text x="55" y="22" class="n1">'+name+'</text><text x="55" y="39" class="n2">'+sub+"</text>"+(click?'<circle cx="101" cy="9" r="4" class="dot"/>':"")+"</g>";}
 function link(x1,y1,x2,y2,on,wl){return '<line class="lk'+(on?" on":"")+(wl?" wl":"")+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';}
 function topo1(){var d=S.done,ip=S.ip;
-  return '<svg viewBox="0 0 560 250" role="img" aria-label="Lab 1 topology: ISP modem to SOHO-RTR, which serves LT-01 and LT-02 over Wi-Fi">'+
+  return '<svg viewBox="0 0 560 250" role="img" aria-label="Lab 6 topology: ISP modem to SOHO-RTR, which serves LT-01 and LT-02 over Wi-Fi">'+
   link(120,125,200,125,true,false)+link(310,115,410,50,d.lt1,true)+link(310,135,410,200,d.lt2,true)+
   '<ellipse class="cloud" cx="60" cy="125" rx="55" ry="30"/><text class="lbl" x="60" y="122">ISP modem</text><text class="lbl" x="60" y="138">Internet</text>'+
   node(1,"router",200,100,"SOHO-RTR",d.router?esc(S.f.r_lanip):"192.168.1.1",d.router&&d.wifi,true)+
@@ -580,7 +580,7 @@ var STEPS2=[["rad","rad","Register AP-01 and build the policy on RAD-01"],["ap",
 function steps(list,lab){return list.map(function(s){return '<li class="'+(S.done[s[0]]?"done":"")+'"><button type="button" data-act="pick" data-lab="'+lab+'" data-dev="'+s[1]+'">'+s[2]+"</button></li>";}).join("");}
 function count(list){return list.filter(function(s){return S.done[s[0]];}).length;}
 
-/* ---------- Lab 1 panels ---------- */
+/* ---------- Lab 6 panels ---------- */
 function pRouter(){
   return '<div class="dev router"><div class="devbar"><span>SOHO-RTR admin console</span><small>http://'+esc(S.done.router?S.f.r_lanip:"192.168.1.1")+'</small></div>'+
   '<div class="devsec" id="sec-router"><h4>Administration and LAN</h4><p class="note">You are logged in with the factory default admin/admin. Replace it, lock down management, then set the LAN and DHCP to match the work order.</p><div class="grid2">'+
@@ -738,7 +738,7 @@ function renderQuiz(){var right=0,answered=0;
 document.addEventListener("change",function(e){var t=e.target;if(t.matches&&t.matches("input[data-q]")){S.quiz[+t.getAttribute("data-q")]=+t.value;save();var y=window.scrollY;renderQuiz();window.scrollTo(0,y);var el=document.querySelector('input[name="q'+t.getAttribute("data-q")+'"]:checked');if(el)el.focus({preventScroll:true});}});
 
 /* ---------- results ---------- */
-function renderResults(){var items=STEPS1.map(function(s){return ["Lab 1: "+s[2],S.done[s[0]]];}).concat(STEPS2.map(function(s){return ["Lab 2: "+s[2],S.done[s[0]]];}));
+function renderResults(){var items=STEPS1.map(function(s){return ["Lab 6: "+s[2],S.done[s[0]]];}).concat(STEPS2.map(function(s){return ["Lab 2: "+s[2],S.done[s[0]]];}));
   $("#prog").innerHTML=items.map(function(i){return "<li><span>"+esc(i[0])+'</span><span class="'+(i[1]?"ok":"no")+'">'+(i[1]?"Complete":"Not yet")+"</span></li>";}).join("");
   var right=QUIZ.filter(function(q,i){return S.quiz[i]===q[2];}).length;
   var labPts=count(STEPS1)/5*6+count(STEPS2)/5*8,qPts=right/QUIZ.length*4;
